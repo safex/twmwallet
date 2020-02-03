@@ -1,0 +1,135 @@
+{
+  "name": "twmwallet",
+  "description": "graphical user interface to the world marketplace application on the safex blockchain",
+  "version": "v0.0.1",
+  "homepage": ".",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/safex/twmwallet.git"
+  },
+  "author": {
+    "name": "Daniel Dabek",
+    "url": "https://safex.io",
+    "email": "daniel@safex.io"
+  },
+  "maintainers": [
+    {
+      "name": "Daniel Dabek",
+      "url": "https://github.com/ddabek",
+      "email": "daniel@safex.io"
+    }
+  ],
+  "license": "MIT",
+  "bugs": "https://github.com/safex/twmwallet",
+  "keywords": [
+    "safex token",
+    "safex cash",
+    "ecommerce",
+    "crypto",
+    "cryptocurrency",
+    "wallet",
+    "bitcoin",
+    "blockchain",
+    "electron",
+    "twm",
+    "the world marketplace"
+  ],
+  "devDependencies": {
+    "electron": "^7.1.11",
+    "electron-builder": "^22.1.0",
+    "electron-installer-dmg": "^3.0.0",
+    "electron-packager": "^14.1.0",
+    "electron-react-devtools": "^0.5.3",
+    "electron-winstaller": "^4.0.0",
+    "foreman": "^3.0.1",
+    "react-scripts": "^3.2.0"
+  },
+  "dependencies": {
+    "react-bootstrap": "^1.0.0-beta.14",
+    "electron-context-menu": "^0.16.0",
+    "axios": "^0.19.0",
+    "binstring": "^0.2.1",
+    "bitcoinjs-lib": "^5.1.6",
+    "bitcore-lib": "^8.11.0",
+    "bootstrap": "^4.3.1",
+    "bs58": "^4.0.1",
+    "child_process": "^1.0.2",
+    "qrcode.react": "^1.0.0",
+    "react": "^16.12.0",
+    "react-copy-to-clipboard": "^5.0.2",
+    "react-dom": "^16.12.0",
+    "react-file-input": "^0.2.5",
+    "react-number-format": "^4.3.1",
+    "react-router-dom": "^5.1.2",
+    "react-tooltip": "^3.11.3",
+    "safe-buffer": "^5.2.0",
+    "safex-addressjs": "git+https://github.com/safex/safex_addressjs.git",
+    "safex-nodejs-libwallet": "git+https://github.com/safex/safex-nodejs-libwallet.git"
+  },
+  "main": "src/electron.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "electron": "electron .",
+    "dev": "nf start -p 8000",
+    "dist": "build",
+    "make-mac-installer": "npm run build && electron-builder build -m",
+    "make-win-installer": "npm run build && electron-builder build -w --x64 --ia32",
+    "make-linux-installer": "npm run build && electron-builder build -l",
+    "make-all-installers": "npm run build && electron-builder build -ml && electron-builder build -w --x64 --ia32"
+  },
+  "build": {
+    "extraResources": [
+      {
+        "from": "./extraResources/xmrig-osx",
+        "to": "xmrig-osx"
+      }
+    ],
+    "appId": "com.electron.safex_miner",
+    "extends": null,
+    "files": [
+      "**/*",
+      "build/*.*",
+      "build/css/*.*",
+      "build/fonts/*.*",
+      "build/images/*.*",
+      "build/images/migration/*.*",
+      "build/static/css/*.*",
+      "build/static/js/*.*"
+    ],
+    "mac": {
+      "category": "public.app-category.business",
+      "icon": "public/images/icons/wallet-icon2.icns",
+      "type": "distribution",
+      "target": [
+        "dmg"
+      ]
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "public/images/icons/wallet-icon2.ico"
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "rpm"
+      ],
+      "category": "Utility",
+      "icon": "public/images/icons/"
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

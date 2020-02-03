@@ -1,2 +1,2 @@
 # twmwallet
-wallet for interacting with safex cash and token with an interface to the world marketplace
+wallet for interacting with safex cash and token and an interface to the world marketplace
