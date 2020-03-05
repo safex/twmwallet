@@ -10,7 +10,9 @@ export default class WalletHome extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            wallet: "",
+            public_address: '',
+            wallet: '',
+            wallet_path: '',
             safex_key: null,
             instructionsModal: false,
             loading: true,
@@ -31,8 +33,8 @@ export default class WalletHome extends React.Component {
         try {
 
             let h_obj = {};
-            h_obj.daemon_host = this.props.location.state.daemon_host;
-            h_obj.daemon_port = this.props.location.state.daemon_port;
+            h_obj.daemon_host = `rpc.safex.io`;
+            h_obj.daemon_port = 17402;
             console.log(h_obj);
             let chain_info = await get_chain_info(h_obj);
 
@@ -41,22 +43,14 @@ export default class WalletHome extends React.Component {
 
             this.setState({
                 height: chain_info.height,
-                daemon_host: this.props.location.state.daemon_host,
-                daemon_port: this.props.location.state.daemon_port
+                daemon_host: h_obj.daemon_host,
+                daemon_port: h_obj.daemon_port
             });
         } catch (e) {
             console.error(e);
             console.error("error getting height ");
         }
         this.setState({loading: false});
-
-
-        let interval = setInterval(this.update_check, 30000);
-        this.setState({refresh_interval: interval})
-    };
-
-
-    view_keys = async () => {
 
     };
 
@@ -69,7 +63,15 @@ export default class WalletHome extends React.Component {
                     </Row>
 
                     <Row>
-                        <Col>
+                        <Col sm={8}>
+                            <ul>
+                                <li>
+                                    Public Address
+                                </li>
+                                <li>
+                                    SFXtzSLGbGw4A6YYFGPJpo5xKLF7BuFC5jRkpUxGwqZ5RQn4NFdySMDaq4PArmTd8w38xMCwMJuuFiashQAbzJev1KtvQxAwTNk
+                                </li>
+                            </ul>
                         </Col>
                         <Col>
                             <ul>
@@ -83,20 +85,10 @@ export default class WalletHome extends React.Component {
 
 
                     <Row>
-                        <Table>
-                            <thead>
-                            <tr>
-                                <th>index</th>
-                                <th>safex address</th>
-                                <th>Cash</th>
-                                <th>Tokens</th>
-                                <th>actions</th>
-                            </tr>
-                            </thead>
+                        <Col>
 
-                            <tbody>
-                            </tbody>
-                        </Table>
+                        </Col>
+
                     </Row>
                 </Container>
 

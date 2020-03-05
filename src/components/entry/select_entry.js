@@ -59,7 +59,7 @@ export default class SelectEntry extends React.Component {
 
     create_new = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/new_wallet'});
+        this.props.history.push({pathname: '/create_wallet'});
     };
 
     restore_keys = (e) => {
@@ -76,7 +76,10 @@ export default class SelectEntry extends React.Component {
         e.preventDefault();
         this.props.history.push({pathname: '/legacy_password', state: {wallet: this.state.wallet}});
     };
-
+    bypass = (e) => {
+        e.preventDefault();
+        this.props.history.push({pathname: '/wallet_home', state: {wallet: this.state.wallet}});
+    };
     render() {
         return (<div>
             <Container>
@@ -108,6 +111,13 @@ export default class SelectEntry extends React.Component {
                     <Col>
                         <Button onClick={this.seed_phrase} variant="primary" size="lg" block>
                             Recover From Seed Phrase
+                        </Button>
+                    </Col>
+                </Row>
+                <Row className="justify-content-md-center">
+                    <Col>
+                        <Button onClick={this.bypass} variant="warning" size="lg" block>
+                            Bypass
                         </Button>
                     </Col>
                 </Row>
