@@ -1,14 +1,8 @@
-/*
-safex.createWallet({
-    'path': path.join(__dirname, 'test-wallet'),
-    'password': '123',
-    'network': 'mainnet',
-    'daemonAddress': 'localhost:17402',
-}).then((wallet) => console.log('New wallet succesfully created: ' + wallet.address()))
-    .catch((e) => console.log('Failed to create new wallet: ' + e));*/
 import React from 'react';
 import {Row, Col, Container, Button, Form} from 'react-bootstrap';
 import path from 'path';
+import {create_wallet} from '../../utils/wallet_creation';
+
 
 const safex = window.require("safex-nodejs-libwallet");
 
@@ -19,32 +13,19 @@ export default class CreateWallet extends React.Component {
         super(props);
 
         this.state = {
-            daemon_host: 'rpc.safex.io',
-            daemon_port: 17402,
-            new_path: 'test-wallet',
-            password: '123',
+            daemon_host: '',
+            daemon_port: 0,
+            new_path: '',
+            password: '',
             safex_key: null,
             wallet: {},
-            success: false
+            success: false,
+            network: 'mainnet'
         };
     }
 
     async componentDidMount() {
-        try {
 
-            console.log(`set the state of the safex_key`);
-            safex.createWallet({
-                'path': path.join(__dirname, 'test-wallet'),
-                'password': '123',
-                'network': 'mainnet',
-                'daemonAddress': 'rpc.safex.io:17402',
-            }).then((wallet) => console.log('New wallet succesfully created: ' + wallet.address()))
-                .catch((e) => console.log('Failed to create new wallet: ' + e));
-
-        } catch (e) {
-            console.log("no attribute of wallet found");
-            this.props.history.push({pathname: '/'})
-        }
     }
 
     set_path = (e) => {
@@ -64,50 +45,41 @@ export default class CreateWallet extends React.Component {
         e.preventDefault();
         this.setState({new_path: ''})
     };
-    set_daemon_state = async (e) => {
+    set_daemon_state = (e) => {
         e.preventDefault();
         this.setState({daemon_host: e.target.daemon_host.value, daemon_port: parseInt(e.target.daemon_port.value)})
+    };
+
+    change_daemon = (e) => {
+        e.preventDefault();
+        this.setState({daemon_host: '', daemon_port: 0});
     };
 
     set_password = (e) => {
         e.preventDefault();
         if (e.target.password.value === e.target.repeat_password.value) {
-            this.setState({password: e.target.password.value, repeat_password: e.target.repeat_password.value});
+            this.setState({password: e.target.password.value});
         } else {
             alert("passwords dont match");
         }
     };
 
-    make_wallet = (e) => {
+    change_password = (e) => {
+        e.preventDefault();
+        this.setState({password: ''});
+    };
+
+    make_wallet = async(e) => {
         e.preventDefault();
         try {
-            safex.createWallet({
-                'path': path.join(__dirname, 'test-wallet'),
-                'password': '123',
-                'network': 'mainnet',
-                'daemonAddress': 'rpc.safex.io:17402',
-            }).then((wallet) => console.log('New wallet succesfully created: ' + wallet.address()))
-                .catch((e) => console.log('Failed to create new wallet: ' + e));
-
-            // console.log(wallet);
-            /*
-                        try {
-                            this.props.history.push({
-                                pathname: '/wallet_home',
-                                state: {
-                                    wallet: wallet,
-                                    safex_key: this.state.safex_key
-                                }
-                            });
-                        } catch (e) {
-                            console.error(e);
-                            console.error("error on the packing the btc keys");
-                        }
-            */
-            console.log("reached the end");
-
-        } catch (e) {
-            console.error(e);
+            let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
+            let wallet = await create_wallet(this.state.new_path, this.state.password, this.state.network, daemon_string);
+            console.log(wallet);
+            this.props.history.push({
+                pathname: '/wallet_home'
+            })
+        } catch (err) {
+            console.error(err);
             console.error("error on initial recovery");
         }
     };
