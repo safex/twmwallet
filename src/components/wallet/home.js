@@ -11,7 +11,6 @@ export default class WalletHome extends React.Component {
         super(props);
         this.state = {
             public_address: '',
-            wallet: '',
             wallet_path: '',
             safex_key: null,
             instructionsModal: false,
@@ -24,12 +23,13 @@ export default class WalletHome extends React.Component {
             refresh_interval: '',
             syncing: false
         };
-
+        this.wallet_meta = null;
 
 
     }
 
     async componentDidMount() {
+        console.log(this.props.wallet);
         try {
 
             let h_obj = {};
@@ -45,6 +45,7 @@ export default class WalletHome extends React.Component {
                 height: chain_info.height,
                 daemon_host: h_obj.daemon_host,
                 daemon_port: h_obj.daemon_port
+
             });
         } catch (e) {
             console.error(e);
@@ -69,7 +70,7 @@ export default class WalletHome extends React.Component {
                                     Public Address
                                 </li>
                                 <li>
-                                    SFXtzSLGbGw4A6YYFGPJpo5xKLF7BuFC5jRkpUxGwqZ5RQn4NFdySMDaq4PArmTd8w38xMCwMJuuFiashQAbzJev1KtvQxAwTNk
+                                    {this.props.wallet.address()}
                                 </li>
                             </ul>
                         </Col>
