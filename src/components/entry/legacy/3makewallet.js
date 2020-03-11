@@ -2,6 +2,8 @@ import React from 'react';
 import {Row, Col, Container, Button} from 'react-bootstrap';
 import Form from "react-bootstrap/esm/Form";
 
+import {recover_from_keys} from "../../../utils/wallet_creation";
+
 const safex = window.require("safex-nodejs-libwallet");
 
 let {dialog} = window.require("electron").remote;
@@ -17,7 +19,8 @@ export default class ConvertLegacy extends React.Component {
             password: '',
             safex_key: null,
             wallet: {},
-            success: false
+            success: false,
+            network: 'mainnet'
         };
     }
 
@@ -77,21 +80,23 @@ export default class ConvertLegacy extends React.Component {
             r_obj.password = this.state.password;
             r_obj.daemon_host = this.state.daemon_host;
             r_obj.daemon_port = this.state.daemon_port;
+            r_obj.network = this.state.network;
             console.log(r_obj);
-            let wallet = safex.createWalletFromKeys({
-                path: r_obj.path,
-                password: r_obj.password,
-                network: r_obj.daemon_host,
-                daemonAddress: r_obj.daemon_port,
-                restoreHeight: 0,
-                addressString: r_obj.address,
-                viewKeyString: r_obj.viewkey,
-                spendKeyString: r_obj.spendkey
-            });
 
-            console.log(wallet);
+
 
             try {
+                let wallet = await recover_from_keys(
+                    r_obj.path,
+                    r_obj.password,
+                    r_obj.network,
+                    r_obj.daemon_port,
+                    0,
+                    r_obj.address,
+                    r_obj.viewkey,
+                    r_obj.spendkey);
+
+                console.log(wallet);
                 this.props.history.push({
                     pathname: '/wallet_home',
                     state: {
