@@ -20,7 +20,8 @@ export default class CreateWallet extends React.Component {
             safex_key: null,
             wallet: {},
             success: false,
-            network: 'mainnet'
+            network: 'mainnet',
+            testnet: false
         };
     }
 
@@ -84,6 +85,22 @@ export default class CreateWallet extends React.Component {
         }
     };
 
+    set_to_testnet = (e) => {
+        e.preventDefault();
+        const target = e.target;
+        if (target.checked === true) {
+            this.setState({
+                testnet: true,
+                network: 'testnet'
+            });
+        } else {
+            this.setState({
+                testnet: false,
+                network: 'mainnet'
+            });
+        }
+    };
+
     render() {
         return (
             <div>
@@ -95,6 +112,13 @@ export default class CreateWallet extends React.Component {
                                 When this procedure is finished you will still have the safexwallet.dat
                                 in your home directory, as well as a marker that the safexwallet.dat was merged
                                 into the new wallet file.
+                            </p>
+                            <p>
+                                <input
+                                    name="isTestnet"
+                                    type="checkbox"
+                                    checked={this.state.testnet}
+                                    onChange={this.set_to_testnet} />
                             </p>
                         </Col>
                     </Row>
