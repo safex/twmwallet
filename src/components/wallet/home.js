@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Navigation from '../partials/Navigation';
+import Navigation from './Navigation';
 
 import {Row, Col, Container, Button, Table} from 'react-bootstrap';
 
