@@ -1,0 +1,12 @@
+.wallet {
+    padding: 10px;
+    background-color: #d2d16f;
+    border: 6px solid #fff;
+    color: #fff;
+    width: 100%;
+}
+
+.wallet ul {
+    list-style-type: none;
+    padding: 0;
+}
