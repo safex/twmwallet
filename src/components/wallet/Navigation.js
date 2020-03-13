@@ -18,7 +18,7 @@ export default class Navigation extends React.Component {
 
                     <div className="menu__right">
                         <ul className="menu__list">
-                            <li className="menu__list-item"><a className="menu__link" href="#">Home</a></li>
+                            <li className="menu__list-item"><a className="menu__link" href="/wallet_home">Home</a></li>
                             <li className="menu__list-item"><a className="menu__link" href="#">Market</a></li>
                             <li className="menu__list-item"><a className="menu__link" href="#">Cash</a></li>
                             <li className="menu__list-item"><a className="menu__link" href="#">Tokens</a></li>
