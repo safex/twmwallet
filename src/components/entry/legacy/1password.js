@@ -11,8 +11,8 @@ export default class LegacyPassword extends React.Component {
 
     async componentDidMount() {
         try {
-            localStorage.setItem('encrypted_wallet', this.props.location.state.wallet.toString());
-            this.setState({wallet: this.props.location.state.wallet});
+            localStorage.setItem('encrypted_wallet', this.props.location.state.legacy_wallet.toString());
+            this.setState({legacy_wallet: this.props.location.state.legacy_wallet});
             console.log(`setting encrypted_wallet localStorage path with the encrypted wallet also setting state`);
 
         } catch (e) {

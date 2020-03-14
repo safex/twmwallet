@@ -25,7 +25,7 @@ export default class SelectEntry extends React.Component {
         super(props);
 
         this.state = {
-            wallet: '',
+            legacy_wallet: '',
             legacy_detected: false
         };
 
@@ -42,7 +42,7 @@ export default class SelectEntry extends React.Component {
             if (wallet.e) {
                 alert("error on loading the wallet")
             } else {
-                this.setState({wallet: wallet, legacy_detected: true});
+                this.setState({legacy_wallet: wallet, legacy_detected: true});
             }
 
         } catch (err) {
@@ -74,12 +74,13 @@ export default class SelectEntry extends React.Component {
 
     restore_legacy = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/legacy_password', state: {wallet: this.state.wallet}});
+        this.props.history.push({pathname: '/legacy_password', state: {legacy_wallet: this.state.wallet}});
     };
     bypass = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/wallet_home', state: {wallet: this.state.wallet}});
+        this.props.history.push({pathname: '/wallet_home', state: {legacy_wallet: this.state.wallet}});
     };
+
     render() {
         return (<div>
             <Container>
@@ -114,6 +115,7 @@ export default class SelectEntry extends React.Component {
                         </Button>
                     </Col>
                 </Row>
+
                 <Row className="justify-content-md-center">
                     <Col>
                         <Button onClick={this.bypass} variant="warning" size="lg" block>
@@ -121,17 +123,16 @@ export default class SelectEntry extends React.Component {
                         </Button>
                     </Col>
                 </Row>
-                {
-                    this.state.legacy_detected ? (
-                        <Row className="justify-content-md-center">
-                            <Col>
-                                <Button onClick={this.restore_legacy} variant="primary" size="lg" block>
-                                    Load from a Legacy Wallet
-                                </Button>
-                            </Col>
-                        </Row>) : (<div></div>)
-                }
 
+                {this.state.legacy_detected ? (
+                    <Row className="justify-content-md-center">
+                        <Col>
+                            <Button onClick={this.restore_legacy} variant="primary" size="lg" block>
+                                Load from a Legacy Wallet
+                            </Button>
+                        </Col>
+                    </Row>) : (<div></div>)
+                }
             </Container>
         </div>);
     }
