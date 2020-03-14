@@ -49,7 +49,11 @@ export default class ConvertLegacy extends React.Component {
 
         //alert if not permitted
 
-        this.setState({new_path: new_path})
+        if (new_path.length > 0) {
+            this.setState({new_path: new_path})
+        } else {
+            console.log("cancelled, no path set");
+        }
     };
 
     change_path = (e) => {
