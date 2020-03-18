@@ -11,7 +11,7 @@ export async function create_wallet(path, password, restore_height, network, dae
         console.log(`created the wallet for address ${wallet.address()}`);
         return wallet;
     });
-}
+};
 
 export async function open_wallet(path, password, restore_height, network, daemon) {
     return safex.openWallet({
@@ -24,7 +24,8 @@ export async function open_wallet(path, password, restore_height, network, daemo
         console.log(`opened the wallet for address ${wallet.address()}`);
         return wallet;
     });
-}
+};
+
 export async function recover_from_keys(path, password, restore_height, network, daemon, address, viewkey, spendkey) {
     return safex.createWalletFromKeys({
         path: path,
@@ -36,11 +37,24 @@ export async function recover_from_keys(path, password, restore_height, network,
         viewKeyString: viewkey,
         spendKeyString: spendkey
     }).then((wallet) => {
-        console.log(`recovered the wallet for address ${wallet.address()}`);
+        console.log(`recovered the wallet through keys for address ${wallet.address()}`);
         return wallet;
     })
-}
+};
 
+export async function recover_from_seed(path, password, restore_height, network, daemon, menmonic_string) {
+    return safex.createWalletFromKeys({
+        path: path,
+        password: password,
+        network: network,
+        daemonAddress: daemon,
+        restoreHeight: restore_height,
+        mnemonic: menmonic_string
+    }).then((wallet) => {
+        console.log(`recovered the wallet through seed for address ${wallet.address()}`);
+        return wallet;
+    })
+};
 
 export function normalize_8decimals(balance) {
     return Math.floor(parseFloat(balance) / 100000000) / 100;
