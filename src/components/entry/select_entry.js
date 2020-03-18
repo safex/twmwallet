@@ -40,7 +40,7 @@ export default class SelectEntry extends React.Component {
 
             //if there is an error loading the file, perhaps it doesn't exist
             if (wallet.e) {
-                alert("error on loading the wallet")
+                console.log("legacy wallet was not found");
             } else {
                 this.setState({legacy_wallet: wallet, legacy_detected: true});
             }
@@ -64,12 +64,12 @@ export default class SelectEntry extends React.Component {
 
     restore_keys = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/restore_wallet'});
+        this.props.history.push({pathname: '/recover_keys'});
     };
 
     seed_phrase = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/seed_phrase'});
+        this.props.history.push({pathname: '/recover_seed'});
     };
 
     restore_legacy = (e) => {
@@ -112,14 +112,6 @@ export default class SelectEntry extends React.Component {
                     <Col>
                         <Button onClick={this.seed_phrase} variant="primary" size="lg" block>
                             Recover From Seed Phrase
-                        </Button>
-                    </Col>
-                </Row>
-
-                <Row className="justify-content-md-center">
-                    <Col>
-                        <Button onClick={this.bypass} variant="warning" size="lg" block>
-                            Bypass
                         </Button>
                     </Col>
                 </Row>
