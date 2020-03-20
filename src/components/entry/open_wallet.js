@@ -35,7 +35,13 @@ export default class OpenWallet extends React.Component {
         let sails_path = dialog.showOpenDialogSync();
         let new_path = sails_path;
 
-        this.setState({new_path: new_path})
+        try {
+            if (new_path.length > 0) {
+                this.setState({new_path: new_path});
+            }
+        } catch (err) {
+            console.log("cancelled, no path set");
+        }
     };
 
     change_path = (e) => {
@@ -59,9 +65,10 @@ export default class OpenWallet extends React.Component {
         try {
             let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
             let wallet = await open_wallet(this.state.new_path,
-                                            e.target.password.value,
-                                            this.state.network,
-                                            daemon_string);
+                e.target.password.value,
+                0,
+                this.state.network,
+                daemon_string);
             console.log(wallet);
             localStorage.setItem('wallet', JSON.stringify(wallet));
             this.setState({wallet_made: true, wallet: wallet, password: "entered"});
@@ -87,6 +94,11 @@ export default class OpenWallet extends React.Component {
         }
     };
 
+    exit_home = (e) => {
+        e.preventDefault();
+        this.props.history.push({pathname: '/'});
+    };
+
     render() {
         return (
             <div>
@@ -96,6 +108,7 @@ export default class OpenWallet extends React.Component {
                             wallet={this.state.wallet}/>
                     </div>) :
                     (<Container>
+                        <button onClick={this.exit_home}>exit home</button>
                         <Row className="justify-content-md-center">
                             <Col sm={6}>
                                 <p>
@@ -151,9 +164,10 @@ export default class OpenWallet extends React.Component {
                                             A usual self hosted wallet set up would be
                                             host: 127.0.0.1
                                             port: 17402
+                                            The default is rpc.safex.org provided by the Safex Foundation
                                         </p>
                                         <Form id="set_daemon" onSubmit={this.set_daemon_state}>
-                                            Safexd Host <Form.Control name="daemon_host" defaultValue="rpc.safex.io"
+                                            Safexd Host <Form.Control name="daemon_host" defaultValue="rpc.safex.org"
                                                                       placedholder="set the ip address of the safex blockchain"/>
                                             Safexd Port <Form.Control name="daemon_port" defaultValue="17402"
                                                                       placedholder="set the port of the safex blockchain"/>
