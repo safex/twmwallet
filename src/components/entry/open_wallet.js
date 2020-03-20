@@ -157,15 +157,16 @@ export default class OpenWallet extends React.Component {
                                     <div>
                                         <p>
                                             This is the connection url to the safex blockchain network.
-                                            You can use the default provided by the safex development team
-                                            or replace the default values with your own.
+                                            You can use the default provided by the Safex Foundation
+                                            or replace the default values with your own full node.
                                         </p>
-                                        <p>
-                                            A usual self hosted wallet set up would be
-                                            host: 127.0.0.1
-                                            port: 17402
-                                            The default is rpc.safex.org provided by the Safex Foundation
-                                        </p>
+                                        <ul>
+                                            <li>A usual self hosted wallet set up would be</li>
+                                            <li>host: 127.0.0.1</li>
+                                            <li>port: 17402</li>
+                                            <li>The default is rpc.safex.org/li>
+
+                                        </ul>
                                         <Form id="set_daemon" onSubmit={this.set_daemon_state}>
                                             Safexd Host <Form.Control name="daemon_host" defaultValue="rpc.safex.org"
                                                                       placedholder="set the ip address of the safex blockchain"/>
@@ -190,7 +191,7 @@ export default class OpenWallet extends React.Component {
                                     <Col sm={6}>
                                         <div>
                                             <Form id="set_password" onSubmit={this.open_wallet}>
-                                                <Form.Control name="password" type="password"
+                                                enter your password <Form.Control name="password" type="password"
                                                               placedholder="enter your password and open your wallet"/>
                                                 <Button type="submit" variant="primary" size="lg" block>open your
                                                     wallet</Button>
