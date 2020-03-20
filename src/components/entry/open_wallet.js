@@ -164,7 +164,7 @@ export default class OpenWallet extends React.Component {
                                             <li>A usual self hosted wallet set up would be</li>
                                             <li>host: 127.0.0.1</li>
                                             <li>port: 17402</li>
-                                            <li>The default is rpc.safex.org/li>
+                                            <li>The default is rpc.safex.org</li>
 
                                         </ul>
                                         <Form id="set_daemon" onSubmit={this.set_daemon_state}>
