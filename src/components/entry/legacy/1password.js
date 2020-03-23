@@ -53,12 +53,18 @@ export default class LegacyPassword extends React.Component {
         }
     };
 
+    exit_home = (e) => {
+        e.preventDefault();
+        this.props.history.push({pathname: '/'});
+    };
+
     render() {
         return (
             <div>
                 <Container>
+                    <button onClick={this.exit_home}>exit home</button>
                     <Row className="justify-content-md-center">
-                        <Col>
+                        <Col sm={6}>
                             <p>
                                 It appears that you have a wallet from the legacy wallets from where you migrated from
                                 Safe Exchange Coin and Bitcoin to the Safex Token and the Safex Blockchain.
@@ -82,7 +88,7 @@ export default class LegacyPassword extends React.Component {
                         </Col>
                     </Row>
                     <Row className="justify-content-md-center">
-                        <Col>
+                        <Col sm={6}>
                             <form onSubmit={this.submitLogin}>
                                 <Form.Control name="password" type="password" placedholder="Password"/>
                                 <Button type="submit" variant="primary" size="lg" block>Login</Button>

@@ -3,6 +3,7 @@ import {Row, Col, Container, Button} from 'react-bootstrap';
 import Form from "react-bootstrap/esm/Form";
 
 import {recover_from_keys} from "../../../utils/wallet_creation";
+import WalletHome from "../../wallet/home";
 
 const safex = window.require("safex-nodejs-libwallet");
 
@@ -45,13 +46,11 @@ export default class ConvertLegacy extends React.Component {
         let sails_path = dialog.showSaveDialogSync();
         let new_path = sails_path;
 
-        //check write permissions here,
-
-        //alert if not permitted
-
-        if (new_path.length > 0) {
-            this.setState({new_path: new_path})
-        } else {
+        try {
+            if (new_path.length > 0) {
+                this.setState({new_path: new_path});
+            }
+        } catch (err) {
             console.log("cancelled, no path set");
         }
     };
@@ -76,38 +75,20 @@ export default class ConvertLegacy extends React.Component {
     make_wallet = async (e) => {
         e.preventDefault();
         try {
-            let r_obj = {};
-            r_obj.address = this.state.safex_key.public_addr;
-            r_obj.spendkey = this.state.safex_key.spend.sec;
-            r_obj.viewkey = this.state.safex_key.view.sec;
-            r_obj.path = this.state.new_path;
-            r_obj.password = this.state.password;
-            r_obj.daemon_host = this.state.daemon_host;
-            r_obj.daemon_port = this.state.daemon_port;
-            r_obj.network = this.state.network;
-            console.log(r_obj);
-
-
-
+            let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
             try {
                 let wallet = await recover_from_keys(
-                    r_obj.path,
-                    r_obj.password,
-                    r_obj.network,
-                    r_obj.daemon_port,
+                    this.state.new_path,
+                    this.state.password,
                     0,
-                    r_obj.address,
-                    r_obj.viewkey,
-                    r_obj.spendkey);
+                    this.state.network,
+                    daemon_string,
+                    this.state.safex_key.public_addr,
+                    this.state.safex_key.view.sec,
+                    this.state.safex_key.spend.sec);
 
                 console.log(wallet);
-                this.props.history.push({
-                    pathname: '/wallet_home',
-                    state: {
-                        wallet: wallet,
-                        safex_key: this.state.safex_key
-                    }
-                });
+                this.setState({wallet_made: true, wallet: wallet});
             } catch (e) {
                 console.error(e);
                 console.error("error on the packing the btc keys");
@@ -120,34 +101,43 @@ export default class ConvertLegacy extends React.Component {
         }
     };
 
+    exit_home = (e) => {
+        e.preventDefault();
+        this.props.history.push({pathname: '/'});
+    };
+
     render() {
         return (
             <div>
-                <Container>
-                    <Row className="justify-content-md-center">
-                        <Col>
-                            <p>
-                                Here you will establish your new wallet file.
-                                When this procedure is finished you will still have the safexwallet.dat
-                                in your home directory, as well as a marker that the safexwallet.dat was merged
-                                into the new wallet file.
-                            </p>
-                        </Col>
-                    </Row>
-                    <Row className="justify-content-md-center">
-                        <Col>
+                {this.state.wallet_made ?
+                    (<div>
+                        <WalletHome
+                            wallet={this.state.wallet}/>
+                    </div>) :
+                    (<Container>
+                        <button onClick={this.exit_home}>exit home</button>
+                        <Row className="justify-content-md-center">
+                            <Col sm={6}>
+                                <p>
+                                    Here you will establish your new wallet file.
+                                    When this procedure is finished you will still have the safexwallet.dat
+                                    in your home directory, as well as a marker that the safexwallet.dat was merged
+                                    into the new wallet file.
+                                </p>
+                            </Col>
+                        </Row>
+                        <Row className="justify-content-md-center">
+                            <Col sm={6}>
+                                {this.state.new_path.length > 0 ? (
 
-                            {this.state.new_path.length > 0 ? (
-
-                                    <div>
-                                        <p>
-                                            this file will be saved to {this.state.new_path} <Button
-                                            onClick={this.change_path}>change path?</Button>
-                                        </p>
-                                    </div>
-                                ) :
-                                (
-                                    <div>
+                                        <div>
+                                            <p>
+                                                this file will be saved to {this.state.new_path} <Button
+                                                onClick={this.change_path}>change path?</Button>
+                                            </p>
+                                        </div>
+                                    ) :
+                                    (<div>
                                         <p>
                                             Set the path where to save your new wallet file
                                         </p>
@@ -155,85 +145,76 @@ export default class ConvertLegacy extends React.Component {
                                             <Button type="submit" variant="primary" size="lg" block>Select File
                                                 Path</Button>
                                         </form>
-                                    </div>
-                                )
-                            }
-
-                        </Col>
-                    </Row>
-
-
-                    {this.state.new_path.length > 0 && this.state.daemon_host.length < 1 ? (
-                        <Row>
-                            <Col>
-                                <div>
-                                    <form id="set_daemon" onSubmit={this.set_daemon_state}>
-                                        <Form.Control name="daemon_host" defaultValue="127.0.0.1"
-                                                      placedholder="set the ip address of the safex blockchain"/>
-                                        <Form.Control name="daemon_port" defaultValue="17402"
-                                                      placedholder="set the port of the safex blockchain"/>
-                                        <Button type="submit" variant="primary" size="lg" block>set
-                                            connection</Button>
-                                    </form>
-                                </div>
+                                    </div>)
+                                }
                             </Col>
                         </Row>
-                    ) : (
-                        <div>
-                        </div>
-                    )
 
-                    }
 
-                    {this.state.new_path.length > 0 &&
-                    this.state.daemon_host.length > 0 &&
-                    this.state.password.length < 1 ?
-                        (<div>
-                            <Col>
-                                <div>
-                                    <form id="set_password" onSubmit={this.set_password}>
-                                        <Form.Control name="password" type="password"
-                                                      placedholder="set the ip address of the safex blockchain"/>
-                                        <Form.Control name="repeat_password" type="password"
-                                                      placedholder="set the port of the safex blockchain"/>
-                                        <Button type="submit" variant="primary" size="lg" block>set password</Button>
-                                    </form>
-                                </div>
-                            </Col>
-
-                        </div>) :
-                        (
-                            <div>
-
-                            </div>
-                        )
-                    }
-
-                    {
-                        this.state.new_path.length > 0 &&
-                        this.state.daemon_host.length > 0 &&
-                        this.state.password.length > 0 ?
-                            (
-                                <div>
-                                    <Row className="justify-content-md-center">
-                                        <Col>
-                                            <Button onClick={this.make_wallet} variant="primary" size="lg" block>Make
-                                                the New Wallet</Button>
-                                        </Col>
-                                    </Row>
-                                </div>
+                        {this.state.new_path.length > 0 && this.state.daemon_host.length < 1 ? (
+                                <Row className="justify-content-md-center">
+                                    <Col sm={6}>
+                                        <div>
+                                            <form id="set_daemon" onSubmit={this.set_daemon_state}>
+                                                <Form.Control name="daemon_host" defaultValue="rpc.safex.org"
+                                                              placedholder="set the ip address of the safex blockchain"/>
+                                                <Form.Control name="daemon_port" defaultValue="17402"
+                                                              placedholder="set the port of the safex blockchain"/>
+                                                <Button type="submit" variant="primary" size="lg" block>set
+                                                    connection</Button>
+                                            </form>
+                                        </div>
+                                    </Col>
+                                </Row>
                             ) :
-                            (
-                                <div>
+                            (<div>
+                            </div>)
 
-                                </div>
-                            )
+                        }
+
+                        {this.state.new_path.length > 0 &&
+                        this.state.daemon_host.length > 0 &&
+                        this.state.password.length < 1 ?
+                            (<div>
+                                <Row className="justify-content-md-center">
+                                    <Col sm={6}>
+                                        <div>
+                                            <form id="set_password" onSubmit={this.set_password}>
+                                                enter a password <Form.Control name="password" type="password"
+                                                                               placedholder="set the ip address of the safex blockchain"/>
+                                                repeat to confirm <Form.Control name="repeat_password" type="password"
+                                                                                placedholder="set the port of the safex blockchain"/>
+                                                <Button type="submit" variant="primary" size="lg" block>set
+                                                    password</Button>
+                                            </form>
+                                        </div>
+                                    </Col>
+                                </Row>
+                            </div>) :
+                            (<div>
+                            </div>)
+                        }
+
+                        {
+                            this.state.new_path.length > 0 &&
+                            this.state.daemon_host.length > 0 &&
+                            this.state.password.length > 0 ?
+                                (
+                                    <div>
+                                        <Row className="justify-content-md-center">
+                                            <Col sm={6}>
+                                                <Button onClick={this.make_wallet} variant="primary" size="lg" block>Make
+                                                    the New Wallet</Button>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                ) :
+                                (<div>
+                                </div>)
+                        }
 
 
-                    }
-
-
-                </Container>
+                    </Container>)}
             </div>
         );
     }
