@@ -64,7 +64,7 @@
     "react-tooltip": "^3.11.3",
     "safe-buffer": "^5.2.0",
     "safex-addressjs": "git+https://github.com/safex/safex_addressjs.git",
-    "safex-nodejs-libwallet": "git+https://github.com/ddabek/safex-nodejs-libwallet.git"
+    "safex-nodejs-libwallet": "git+https://github.com/safex/safex-nodejs-libwallet.git"
   },
   "main": "src/electron.js",
   "scripts": {
