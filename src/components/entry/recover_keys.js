@@ -80,7 +80,8 @@ export default class RecoverKeys extends React.Component {
         e.preventDefault();
         try {
             let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
-            let wallet = await recover_from_keys(this.state.new_path,
+            let wallet = await recover_from_keys(
+                this.state.new_path,
                 this.state.password,
                 0,
                 this.state.network,
