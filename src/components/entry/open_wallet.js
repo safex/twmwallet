@@ -55,11 +55,6 @@ export default class OpenWallet extends React.Component {
         console.log(e.target.daemon_host.value);
     };
 
-    change_daemon = (e) => {
-        e.preventDefault();
-        this.setState({daemon_host: '', daemon_port: 0});
-    };
-
     open_wallet = async (e) => {
         e.preventDefault();
         try {
@@ -75,6 +70,7 @@ export default class OpenWallet extends React.Component {
         } catch (err) {
             console.error(err);
             console.error("error on initial recovery");
+            alert(err);
         }
     };
 

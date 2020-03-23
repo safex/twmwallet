@@ -28,13 +28,9 @@ export default class SelectEntry extends React.Component {
             legacy_wallet: '',
             legacy_detected: false
         };
-
     }
 
-    //TODO: add a safexwallet.dat selector
-
     async componentDidMount() {
-
         try {
             let wallet = await read_legacy_wallet(DEFAULT_WALLET_PATH);
 
@@ -44,12 +40,10 @@ export default class SelectEntry extends React.Component {
             } else {
                 this.setState({legacy_wallet: wallet, legacy_detected: true});
             }
-
         } catch (err) {
             console.error(err);
             console.error("error at reading legacy wallet");
         }
-
     }
 
     open_existing = (e) => {
@@ -76,10 +70,6 @@ export default class SelectEntry extends React.Component {
         e.preventDefault();
         this.props.history.push({pathname: '/legacy_password', state: {legacy_wallet: this.state.wallet}});
     };
-    bypass = (e) => {
-        e.preventDefault();
-        this.props.history.push({pathname: '/wallet_home', state: {legacy_wallet: this.state.wallet}});
-    };
 
     render() {
         return (<div>
@@ -90,15 +80,14 @@ export default class SelectEntry extends React.Component {
                             Open Existing
                         </Button>
                     </Col>
-
                 </Row>
+
                 <Row className="justify-content-md-center">
                     <Col>
                         <Button onClick={this.create_new} variant="primary" size="lg" block>
                             Create New
                         </Button>
                     </Col>
-
                 </Row>
 
                 <Row className="justify-content-md-center">
