@@ -1,9 +1,10 @@
 .wallet {
     padding: 10px;
-    background-color: #d2d16f;
+    background-color: #38bdd2;
     border: 6px solid #fff;
     color: #fff;
     width: 100%;
+    min-height: 120px;
 }
 
 .wallet ul {
