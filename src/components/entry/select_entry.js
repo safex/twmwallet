@@ -68,7 +68,7 @@ export default class SelectEntry extends React.Component {
 
     restore_legacy = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/legacy_password', state: {legacy_wallet: this.state.wallet}});
+        this.props.history.push({pathname: '/legacy_password', state: {legacy_wallet: this.state.legacy_wallet}});
     };
 
     render() {
