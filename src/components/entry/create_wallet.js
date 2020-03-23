@@ -38,7 +38,13 @@ export default class CreateWallet extends React.Component {
         let sails_path = dialog.showSaveDialogSync();
         let new_path = sails_path;
 
-        this.setState({new_path: new_path})
+        try {
+            if (new_path.length > 0) {
+                this.setState({new_path: new_path});
+            }
+        } catch(err) {
+            console.log("cancelled, no path set");
+        }
     };
 
     change_path = (e) => {
@@ -73,8 +79,9 @@ export default class CreateWallet extends React.Component {
         e.preventDefault();
         try {
             let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
-            let wallet = await create_wallet(this.state.new_path, this.state.password, this.state.network, daemon_string);
+            let wallet = await create_wallet(this.state.new_path, this.state.password, 0, this.state.network, daemon_string);
             console.log(wallet);
+            wallet.setSeedLanguage("English");
             this.setState({wallet_made: true, wallet: wallet});
         } catch (err) {
             console.error(err);
@@ -101,7 +108,12 @@ export default class CreateWallet extends React.Component {
     show_password = (e) => {
         e.preventDefault();
         alert(this.state.password);
-    }
+    };
+
+    exit_home = (e) => {
+        e.preventDefault();
+        this.props.history.push({pathname: '/'});
+    };
 
     render() {
         return (
@@ -112,13 +124,11 @@ export default class CreateWallet extends React.Component {
                             wallet={this.state.wallet}/>
                     </div>) :
                     (<Container>
+                        <button onClick={this.exit_home}>exit home</button>
                         <Row className="justify-content-md-center">
                             <Col sm={6}>
                                 <p>
-                                    Here you will establish your new wallet file.
-                                    When this procedure is finished you will still have the safexwallet.dat
-                                    in your home directory, as well as a marker that the safexwallet.dat was merged
-                                    into the new wallet file.
+                                    This path creates a new set of keys and a Safex Wallet.
                                 </p>
                                 <p>
                                     <input
@@ -131,16 +141,7 @@ export default class CreateWallet extends React.Component {
                         </Row>
 
                         {this.state.new_path.length > 0 ?
-                            (<Row className="justify-content-md-center">
-                                <Col sm={6}>
-                                    <div>
-                                        <p>
-                                            this file will be saved to {this.state.new_path} <Button
-                                            onClick={this.change_path}>change path?</Button>
-                                        </p>
-                                    </div>
-                                </Col>
-                            </Row>) :
+                            (<div></div>) :
                             (<Row className="justify-content-md-center">
                                 <Col sm={6}>
                                     <div>
@@ -161,7 +162,7 @@ export default class CreateWallet extends React.Component {
                                 <Col sm={6}>
                                     <div>
                                         <Form id="set_daemon" onSubmit={this.set_daemon_state}>
-                                            <Form.Control name="daemon_host" defaultValue="127.0.0.1"
+                                            <Form.Control name="daemon_host" defaultValue="http://127.0.0.1"
                                                           placedholder="set the ip address of the safex blockchain"/>
                                             <Form.Control name="daemon_port" defaultValue="17402"
                                                           placedholder="set the port of the safex blockchain"/>
@@ -227,6 +228,12 @@ export default class CreateWallet extends React.Component {
                         this.state.password.length > 0 ?
                             (<Row className="justify-content-md-center">
                                 <Col sm={6}>
+                                            <div>
+                                                <p>
+                                                    this file will be saved to {this.state.new_path} <Button
+                                                    onClick={this.change_path}>change path?</Button>
+                                                </p>
+                                            </div>
                                     <div>
                                         <Button onClick={this.make_wallet} variant="primary" size="lg" block>Make
                                             the New Wallet</Button>
@@ -236,7 +243,6 @@ export default class CreateWallet extends React.Component {
                             (<div>
                             </div>)
                         }
-
                     </Container>)
                 }
             </div>
