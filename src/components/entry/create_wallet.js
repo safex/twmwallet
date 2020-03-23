@@ -162,7 +162,7 @@ export default class CreateWallet extends React.Component {
                                 <Col sm={6}>
                                     <div>
                                         <Form id="set_daemon" onSubmit={this.set_daemon_state}>
-                                            <Form.Control name="daemon_host" defaultValue="http://127.0.0.1"
+                                            <Form.Control name="daemon_host" defaultValue="rpc.safex.org"
                                                           placedholder="set the ip address of the safex blockchain"/>
                                             <Form.Control name="daemon_port" defaultValue="17402"
                                                           placedholder="set the port of the safex blockchain"/>
