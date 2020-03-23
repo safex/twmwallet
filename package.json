@@ -42,13 +42,13 @@
     "electron-rebuild": "^1.10.0",
     "electron-winstaller": "^4.0.0",
     "foreman": "^3.0.1",
+    "electron-builder": "^22.1.0",
     "react-scripts": "^3.2.0"
   },
   "dependencies": {
     "axios": "^0.19.0",
     "binstring": "^0.2.1",
     "bootstrap": "^4.3.1",
-    "electron-builder": "^22.1.0",
     "child_process": "^1.0.2",
     "electron-context-menu": "^0.16.0",
     "os": "^0.1.1",
@@ -75,6 +75,7 @@
     "electron": "electron .",
     "dev": "nf -e .env.foreman start -p 8000",
     "dist": "build",
+    "postinstall": "electron-builder install-app-deps",
     "make-mac-installer": "npm run build && electron-builder build -m",
     "make-win-installer": "npm run build && electron-builder build -w --x64",
     "make-linux-installer": "npm run build && electron-builder build -l",
