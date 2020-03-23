@@ -75,7 +75,7 @@ export default class SelectEntry extends React.Component {
         return (<div>
             <Container>
                 <Row className="justify-content-md-center">
-                    <Col>
+                    <Col sm={6}>
                         <Button onClick={this.open_existing} variant="primary" size="lg" block>
                             Open Existing
                         </Button>
@@ -83,7 +83,7 @@ export default class SelectEntry extends React.Component {
                 </Row>
 
                 <Row className="justify-content-md-center">
-                    <Col>
+                    <Col sm={6}>
                         <Button onClick={this.create_new} variant="primary" size="lg" block>
                             Create New
                         </Button>
@@ -91,14 +91,14 @@ export default class SelectEntry extends React.Component {
                 </Row>
 
                 <Row className="justify-content-md-center">
-                    <Col><Button onClick={this.restore_keys} variant="primary" size="lg" block>
+                    <Col sm={6}><Button onClick={this.restore_keys} variant="primary" size="lg" block>
                         Recover From Keys
                     </Button>
                     </Col>
                 </Row>
 
                 <Row className="justify-content-md-center">
-                    <Col>
+                    <Col sm={6}>
                         <Button onClick={this.seed_phrase} variant="primary" size="lg" block>
                             Recover From Seed Phrase
                         </Button>
@@ -107,7 +107,7 @@ export default class SelectEntry extends React.Component {
 
                 {this.state.legacy_detected ? (
                     <Row className="justify-content-md-center">
-                        <Col>
+                        <Col sm={6}>
                             <Button onClick={this.restore_legacy} variant="primary" size="lg" block>
                                 Load from a Legacy Wallet
                             </Button>
