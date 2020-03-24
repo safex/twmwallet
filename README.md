@@ -17,7 +17,7 @@ installing nodejs 13 on Ubuntu
 $ curl -sL https://deb.nodesource.com/setup_13.x | sudo bash -
 $ sudo apt-get install -y nodejs
 $ $ node -v
-$ v13.1.0
+$ v13.10.0
 ```
 
 ```
