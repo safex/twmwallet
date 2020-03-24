@@ -11,6 +11,15 @@ You can download the latest release from (https://github.com/safex/twmwallet/rel
 
 #### Linux
 
+You should have NodeJS 13.8+ installed
+```
+installing nodejs 13 on Ubuntu
+$ curl -sL https://deb.nodesource.com/setup_13.x | sudo bash -
+$ sudo apt-get install -y nodejs
+$ $ node -v
+$ v13.1.0
+```
+
 ```
 $ sudo apt update && sudo apt install build-essential cmake pkg-config \
     libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libminiupnpc-dev \
