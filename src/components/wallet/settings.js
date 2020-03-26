@@ -1,12 +1,11 @@
 import React from 'react';
 
-import Navigation from '../partials/Navigation';
+import Navigation from './Navigation';
 
 import {Row, Col, Container, Button, Table} from 'react-bootstrap';
 
-import {get_chain_info} from '../../utils/safexd_calls';
 
-export default class WalletHome extends React.Component {
+export default class Settings extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -18,6 +17,8 @@ export default class WalletHome extends React.Component {
     }
 
     async componentDidMount() {
+        console.log("load settings");
+        console.log(this.props.wallet);
 
     };
 
