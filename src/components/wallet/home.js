@@ -220,11 +220,12 @@ export default class WalletHome extends React.Component {
 
     handleClose = () => {
         this.setState({show: false})
-    }
+    };
 
     handleShow = () => {
         this.setState({show: true});
-    }
+    };
+
     token_send = async (e) => {
         e.preventDefault();
         e.persist();
