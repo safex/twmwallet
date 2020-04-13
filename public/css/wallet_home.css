@@ -1,13 +1,28 @@
 .wallet {
-    padding: 10px;
+    padding: 3px;
     background-color: #38bdd2;
-    border: 6px solid #fff;
+    border: 2px solid #fff;
     color: #fff;
     width: 100%;
-    min-height: 120px;
+    min-height: 140px;
+    margin: 0 -10px;
+    max-height: 500px;
 }
 
-.wallet ul {
+ul {
     list-style-type: none;
     padding: 0;
+}
+
+.account_list {
+    list-style-type: none;
+    height: 200px;
+    padding: 0;
+    overflow: hidden;
+    overflow-y: scroll;
+}
+
+.account_element {
+    margin: 4px;
+    border: 2px solid #ffffff;
 }

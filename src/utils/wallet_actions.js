@@ -41,3 +41,4 @@ export async function send_cash(wallet, address, amount, mixin) {
         })
     });
 }
+

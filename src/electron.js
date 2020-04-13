@@ -23,9 +23,9 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         backgroundColor: "#021d32",
         width: 1024,
-        height: 650,
+        height: 728,
         minWidth: 1024,
-        minHeight: 650,
+        minHeight: 728,
         webPreferences: {
             webSecurity: false,
             nodeIntegration: true
@@ -61,7 +61,7 @@ function createWindow() {
                 label: "TWM Wallet",
                 submenu: [
                     {
-                        label: "About TWM Wallet",
+                        label: "About TWM Wallet v0.0.2",
                         selector: "orderFrontStandardAboutPanel:"
                     },
                     { type: "separator" },

@@ -2,11 +2,13 @@ import React from 'react';
 
 import Navigation from './Navigation';
 
-import {Row, Col, Container, Button, Table, Form} from 'react-bootstrap';
+import {Row, Col, Container, Button, Table, Form, Image} from 'react-bootstrap';
 
 import {normalize_8decimals} from '../../utils/wallet_creation';
 
 import {send_cash, send_tokens, commit_txn} from "../../utils/wallet_actions";
+
+import {create_account} from "../../utils/account_actions";
 
 var wallet;
 
@@ -28,8 +30,10 @@ export default class WalletHome extends React.Component {
             wallet_height: 0,
             blockchain_height: 0,
             username: '',
+            usernames: [],
             connection_status: 'Connecting to the Safex Blockchain Network...',
             timer: '',
+            first_refresh: false,
         };
     }
 
@@ -37,7 +41,7 @@ export default class WalletHome extends React.Component {
         try {
             console.log(this.props.wallet);
             wallet = this.props.wallet;
-            //var r = wallet.createSafexAccount("test", "Test account");
+
             this.setState({
                 wallet_height: wallet.blockchainHeight(),
                 blockchain_height: wallet.daemonBlockchainHeight()
@@ -75,6 +79,14 @@ export default class WalletHome extends React.Component {
             console.log(wallet.synchronized());
 
             this.setState({loading: false, address: wallet.address(), wallet: wallet});
+
+
+            var accs = wallet.getSafexAccounts();
+
+
+            console.log(accs);
+            console.log(`accounts`);
+            this.setState({usernames: accs});
         } catch (err) {
             console.error(err);
             console.log("errors on startup");
@@ -92,12 +104,15 @@ export default class WalletHome extends React.Component {
                     pending_cash: normalize_8decimals(
                         Math.abs(m_wallet.balance() - m_wallet.unlockedBalance())
                     ),
+                    synced: m_wallet.synchronized() ? true : false,
                     wallet_height: wallet.blockchainHeight(),
                     blockchain_height: wallet.daemonBlockchainHeight(),
                     cash: normalize_8decimals(m_wallet.unlockedBalance()),
                     pending_tokens: normalize_8decimals(m_wallet.tokenBalance() - m_wallet.unlockedTokenBalance()),
-                    tokens: normalize_8decimals(m_wallet.unlockedTokenBalance())
+                    tokens: normalize_8decimals(m_wallet.unlockedTokenBalance()),
+                    first_refresh: true
                 });
+
             })
                 .catch((err) => {
                     console.log("unable to store wallet refresh: " + err);
@@ -150,11 +165,6 @@ export default class WalletHome extends React.Component {
         e.preventDefault();
     };
 
-    refresh = (e) => {
-        e.preventDefault();
-        wallet.startRefresh();
-        console.log("ended wallet sync");
-    };
 
     rescan = (e) => {
         let confirmed = window.confirm("are you sure you want to continue, " +
@@ -246,12 +256,123 @@ export default class WalletHome extends React.Component {
         }
     };
 
+    register_account = async (e) => {
+        e.preventDefault();
+        if (this.state.tokens >= 5000 && this.state.first_refresh === true) {
+            try {
+                let vees = e.target;
+
+                console.log(vees);
+
+                let d_obj = {};
+                if (vees.avatar.value.length > 0) {
+                    d_obj.avatar = vees.avatar.value;
+                }
+                if (vees.twitter.value.length > 0) {
+                    d_obj.twitter = vees.twitter.value;
+                }
+                if (vees.facebook.value.length > 0) {
+                    d_obj.facebook = vees.facebook.value;
+                }
+                if (vees.biography.value.length > 0) {
+                    d_obj.biography = vees.biography.value;
+                }
+                if (vees.website.value.length > 0) {
+                    d_obj.website = vees.website.value;
+                }
+                if (vees.website.value.length > 0) {
+                    d_obj.website = vees.website.value;
+                }
+                if (vees.location.value.length > 0) {
+                    d_obj.location = vees.location.value;
+                }
+                console.log(JSON.stringify(d_obj));
+                let account = wallet.createSafexAccount(e.target.username.value, JSON.stringify(d_obj));
+                console.log(account);
+                console.log(`account registered`);
+
+                var accs = wallet.getSafexAccounts();
+
+                console.log(accs);
+                console.log(`accounts`);
+                if (account) {
+                    console.log(`let's register it`);
+
+                    let confirm_registration = wallet.createAdvancedTransaction({
+                        tx_type: '6',
+                        safex_username: e.target.username.value
+                    }).then((tx) => {
+                        console.log(tx);
+                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${tx.fee() / 10000000000} SFX Safex Cash`);
+                        let fee = tx.fee();
+                        let txid = tx.transactionsIds();
+                        if (confirmed_fee) {
+                            tx.commit().then(() => {
+                                console.log("committed transaction");
+                                alert(`transaction successfully submitted 
+                        transaction id: ${txid}
+                        tokens locked for 500 blocks: 5000 SFT
+                        fee: ${fee / 10000000000}`);
+
+                                this.setState({usernames: accs});
+
+                            })
+                        } else {
+                            alert(`your transaction was cancelled, no account registration was completed`);
+                        }
+
+                    }).catch((err) => {
+                        console.error(err);
+                        alert(`error when committing the transaction: likely has not gone through`)
+                    })
+                } else {
+                    alert(`not enough tokens`);
+                }
+
+            } catch (err) {
+                console.error(err);
+                console.error("error at the register account function");
+            }
+        } else {
+            alert(`please wait until the wallet has fully loaded before performing registration actions`)
+        }
+    };
+
     render() {
+
+        var accounts_table = this.state.usernames.map((user, key) => {
+            console.log(user);
+            console.log(key);
+            try {
+                let usee_d = JSON.parse(user.data);
+
+                return <Row className="account_element" key={key}>
+                    <Col sm={4}>
+                        <Image width={100} height={100} src={usee_d.avatar} roundedCircle/>
+                    </Col>
+                    <Col sm={8}>
+                        <ul>
+                            <li>{user.username}</li>
+                            <li>{usee_d.location}</li>
+                            <li>{usee_d.biography}</li>
+                            <li>{usee_d.website}</li>
+                            <li>{usee_d.twitter}</li>
+                        </ul>
+                    </Col>
+                </Row>
+
+            } catch (err) {
+                console.error(`failed to properly parse the user data formatting`);
+                console.error(err);
+            }
+
+        });
+
         return (
             <div style={{position: 'relative'}}>
                 <Container>
                     <Row>
-                        <Navigation wallet={this.state.wallet} hello={"hello"}/>
+                        <Navigation wallet={this.props.wallet}/>
                     </Row>
 
                     <Row>
@@ -368,13 +489,30 @@ export default class WalletHome extends React.Component {
 
                         <Col className="wallet" md={8}>
 
-                            Marketplace
-                            {this.state.username.length < 1 ?
-                                (<h3>
-                                    Username
-                                </h3>) :
-                                (<h3>{this.state.username}</h3>)
-                            }
+                            <Col className="account_list" md={8}>
+                                Your accounts:
+                                {accounts_table}
+
+                            </Col>
+                            <Col md={4}>
+                                <Form id="create_account" onSubmit={this.register_account}>
+                                    username <Form.Control name="username"
+                                                           placedholder="enter your desired username"/>
+                                    avatar url <Form.Control name="avatar"
+                                                             placedholder="enter the url of your avatar"/>
+                                    twitter link <Form.Control name="twitter" defaultValue="twitter.com"
+                                                               placedholder="enter the link to your twitter handle"/>
+                                    facebook link <Form.Control name="facebook" defaultValue="facebook.com"
+                                                                placedholder="enter the to of your facebook page"/>
+                                    biography <Form.Control as="textarea" name="biography"
+                                                            placedholder="type up your biography"/>
+                                    website <Form.Control name="website" defaultValue="safex.org"
+                                                          placedholder="if you have your own website: paste your link here"/>
+                                    location <Form.Control name="location" defaultValue="Earth"
+                                                           placedholder="your location"/>
+                                    <button type="submit">create account</button>
+                                </Form>
+                            </Col>
                         </Col>
                     </Row>
                 </Container>

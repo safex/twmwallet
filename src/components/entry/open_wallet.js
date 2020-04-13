@@ -164,9 +164,9 @@ export default class OpenWallet extends React.Component {
 
                                         </ul>
                                         <Form id="set_daemon" onSubmit={this.set_daemon_state}>
-                                            Safexd Host <Form.Control name="daemon_host" defaultValue="rpc.safex.org"
+                                            Safexd Host <Form.Control name="daemon_host" defaultValue="testnetrpc.safex.org"
                                                                       placedholder="set the ip address of the safex blockchain"/>
-                                            Safexd Port <Form.Control name="daemon_port" defaultValue="17402"
+                                            Safexd Port <Form.Control name="daemon_port" defaultValue="29393"
                                                                       placedholder="set the port of the safex blockchain"/>
                                             <Button type="submit" variant="primary" size="lg" block>set
                                                 connection</Button>

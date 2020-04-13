@@ -1,8 +1,8 @@
 {
   "name": "twmwallet",
   "description": "graphical user interface to the world marketplace application on the safex blockchain",
-  "version": "v0.0.1",
-  "homepage": ".",
+  "version": "v0.0.3",
+  "homepage": "./",
   "repository": {
     "type": "git",
     "url": "git://github.com/safex/twmwallet.git"
