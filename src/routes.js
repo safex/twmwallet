@@ -8,6 +8,7 @@ import React from 'react';
 import CreateWallet from './components/entry/create_wallet';
 import OpenWallet from './components/entry/open_wallet';
 import RecoverKeys from "./components/entry/recover_keys";
+import RecoverSeed from "./components/entry/recover_seed";
 
 import SelectEntry from './components/entry/select_entry';
 import LegacyPassword from './components/entry/legacy/1password';
@@ -25,6 +26,7 @@ const routes = (
             <Switch>
                 <Route exact path="/" component={SelectEntry}/>
                 <Route exact path="/recover_keys" component={RecoverKeys}/>
+                <Route exact path="/recover_seed" component={RecoverSeed}/>
                 <Route exact path="/legacy_password" component={LegacyPassword}/>
                 <Route exact path="/legacy_keys" component={LegacyKeys}/>
                 <Route exact path="/from_legacy_wallet" component={ConvertLegacy}/>

@@ -43,7 +43,7 @@ export async function recover_from_keys(path, password, restore_height, network,
 };
 
 export async function recover_from_seed(path, password, restore_height, network, daemon, menmonic_string) {
-    return safex.createWalletFromKeys({
+    return safex.recoveryWallet({
         path: path,
         password: password,
         network: network,

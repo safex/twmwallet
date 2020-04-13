@@ -2,7 +2,7 @@ import React from 'react';
 
 import Navigation from './Navigation';
 
-import {Row, Col, Container, Button, Table, Form, Image} from 'react-bootstrap';
+import {Row, Col, Container, Button, Table, Form, Image, Modal} from 'react-bootstrap';
 
 import {normalize_8decimals} from '../../utils/wallet_creation';
 
@@ -34,6 +34,7 @@ export default class WalletHome extends React.Component {
             connection_status: 'Connecting to the Safex Blockchain Network...',
             timer: '',
             first_refresh: false,
+            show: false
         };
     }
 
@@ -161,8 +162,39 @@ export default class WalletHome extends React.Component {
         }
     };
 
-    send_tokens = (e) => {
+    send_tokens = async(e) => {
         e.preventDefault();
+        e.persist();
+        try {
+            let mixins = e.target.mixins.value - 1;
+            if (mixins >= 0) {
+                let confirmed = window.confirm(`are you sure you want to send ${e.target.amount.value} SFT Safex Token, ` +
+                    `to ${e.target.destination.value}`);
+                console.log(confirmed);
+                if (confirmed) {
+                    let token_txn = await send_tokens(wallet, e.target.destination.value, e.target.amount.value, mixins);
+                    let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${token_txn.fee() / 10000000000} SFX Safex Cash`);
+                    let fee = token_txn.fee();
+                    let txid = token_txn.transactionsIds();
+                    let amount = e.target.amount.value;
+                    if (confirmed_fee) {
+                        let committed_txn = await commit_txn(token_txn);
+                        console.log(committed_txn);
+                        console.log(token_txn);
+                        alert(`transaction successfully submitted 
+                        transaction id: ${txid}
+                        amount: ${amount}
+                        fee: ${fee / 10000000000}`);
+                    }
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            if (err.toString().startsWith('not enough outputs')) {
+                alert(`choose fewer mixins`);
+            }
+            console.error(`error at the cash transaction`);
+        }
     };
 
 
@@ -186,6 +218,13 @@ export default class WalletHome extends React.Component {
         }
     };
 
+    handleClose = () => {
+        this.setState({show: false})
+    }
+
+    handleShow = () => {
+        this.setState({show: true});
+    }
     token_send = async (e) => {
         e.preventDefault();
         e.persist();
@@ -396,6 +435,37 @@ export default class WalletHome extends React.Component {
                                 <li>{this.state.connection_status}</li>
                                 <li>
                                     <button onClick={this.rescan}>hard rescan</button>
+                                </li>
+                                <li> <Button variant="primary" onClick={this.handleShow}>
+                                    Show keys
+                                </Button>
+
+                                    <Modal animation={false} show={this.state.show} onHide={this.handleClose}>
+                                        <Modal.Header closeButton>
+                                            <Modal.Title>Your Private Keys</Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body>
+                                            <ul>
+                                                <li>
+                                                    address {this.props.wallet.address()}
+                                                </li>
+                                                <li>
+                                                    secret spend key <br /> {this.props.wallet.secretSpendKey()}
+                                                </li>
+                                                <li>
+                                                    secret view key <br /> {this.props.wallet.secretViewKey()}
+                                                </li>
+                                                <li>
+                                                    mnemonic seed <br /> {this.props.wallet.seed()}
+                                                </li>
+                                            </ul>
+                                        </Modal.Body>
+                                        <Modal.Footer>
+                                            <Button variant="secondary" onClick={this.handleClose}>
+                                                Close
+                                            </Button>
+                                        </Modal.Footer>
+                                    </Modal>
                                 </li>
                                 {this.state.synced === false ?
                                     (<li>
