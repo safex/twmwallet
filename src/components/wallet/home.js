@@ -8,8 +8,6 @@ import {normalize_8decimals} from '../../utils/wallet_creation';
 
 import {send_cash, send_tokens, commit_txn} from "../../utils/wallet_actions";
 
-import {create_account} from "../../utils/account_actions";
-
 var wallet;
 
 var lastHeight = 0;
@@ -34,7 +32,10 @@ export default class WalletHome extends React.Component {
             connection_status: 'Connecting to the Safex Blockchain Network...',
             timer: '',
             first_refresh: false,
-            show: false
+            show: false,
+            marketplace_view: false,
+            twm_offers: [],
+            non_offers: []
         };
     }
 
@@ -100,6 +101,9 @@ export default class WalletHome extends React.Component {
         try {
             m_wallet.store().then(() => {
                 console.log("wallet stored refresh");
+
+                var accs = wallet.getSafexAccounts();
+
                 this.setState({
                     address: m_wallet.address(),
                     pending_cash: normalize_8decimals(
@@ -111,7 +115,8 @@ export default class WalletHome extends React.Component {
                     cash: normalize_8decimals(m_wallet.unlockedBalance()),
                     pending_tokens: normalize_8decimals(m_wallet.tokenBalance() - m_wallet.unlockedTokenBalance()),
                     tokens: normalize_8decimals(m_wallet.unlockedTokenBalance()),
-                    first_refresh: true
+                    first_refresh: true,
+                    usernames: accs
                 });
 
             })
@@ -162,41 +167,6 @@ export default class WalletHome extends React.Component {
         }
     };
 
-    send_tokens = async(e) => {
-        e.preventDefault();
-        e.persist();
-        try {
-            let mixins = e.target.mixins.value - 1;
-            if (mixins >= 0) {
-                let confirmed = window.confirm(`are you sure you want to send ${e.target.amount.value} SFT Safex Token, ` +
-                    `to ${e.target.destination.value}`);
-                console.log(confirmed);
-                if (confirmed) {
-                    let token_txn = await send_tokens(wallet, e.target.destination.value, e.target.amount.value, mixins);
-                    let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${token_txn.fee() / 10000000000} SFX Safex Cash`);
-                    let fee = token_txn.fee();
-                    let txid = token_txn.transactionsIds();
-                    let amount = e.target.amount.value;
-                    if (confirmed_fee) {
-                        let committed_txn = await commit_txn(token_txn);
-                        console.log(committed_txn);
-                        console.log(token_txn);
-                        alert(`transaction successfully submitted 
-                        transaction id: ${txid}
-                        amount: ${amount}
-                        fee: ${fee / 10000000000}`);
-                    }
-                }
-            }
-        } catch (err) {
-            console.error(err);
-            if (err.toString().startsWith('not enough outputs')) {
-                alert(`choose fewer mixins`);
-            }
-            console.error(`error at the cash transaction`);
-        }
-    };
-
 
     rescan = (e) => {
         let confirmed = window.confirm("are you sure you want to continue, " +
@@ -242,16 +212,25 @@ export default class WalletHome extends React.Component {
                     let txid = token_txn.transactionsIds();
                     let amount = e.target.amount.value;
                     if (confirmed_fee) {
-                        let commited_txn = await commit_txn(token_txn);
-                        console.log(token_txn);
-                        alert(`transaction successfully submitted 
+                        try {
+
+                            let committed_txn = await commit_txn(token_txn);
+                            console.log(committed_txn);
+                            console.log(token_txn);
+                            alert(`transaction successfully submitted 
                         transaction id: ${txid}
-                        amount: ${amount}
-                        fee: ${fee / 10000000000}`);
+                        amount: ${amount} SFT
+                        fee: ${fee / 10000000000} SFX`);
+                        } catch (err) {
+                            console.error(err);
+                            console.error(`error when trying to commit the transaction to the blockchain`);
+                            alert(`error when trying to commit the transaction to the blockchain`);
+                        }
+                    } else {
+                        console.log("transaction cancelled");
                     }
                 }
             }
-
         } catch (err) {
             console.error(err);
             if (err.toString().startsWith('not enough outputs')) {
@@ -294,6 +273,46 @@ export default class WalletHome extends React.Component {
             }
             console.error(`error at the cash transaction`);
         }
+    };
+
+    show_marketplace = () => {
+        var offrs = wallet.listSafexOffers(true);
+        let non_offers = [];
+        let twm_offers = [];
+
+        for (var i in offrs) {/*
+            console.log("Safex offer " + i + " title: " + offrs[i].title);
+            console.log("Safex offer description: " + offrs[i].description);
+            console.log("Safex offer quantity: " + offrs[i].quantity);
+            console.log("Safex offer price: " + offrs[i].price);
+            console.log("Safex offer minSfxPrice: " + offrs[i].minSfxPrice);
+            console.log("Safex offer pricePegUsed: " + offrs[i].pricePegUsed);
+            console.log("Safex offer pricePegID: " + offrs[i].pricePegID);
+            console.log("Safex offer seller: " + offrs[i].seller);
+            console.log("Safex offer active: " + offrs[i].active);
+            console.log("Safex offer offerID: " + offrs[i].offerID);
+            console.log("Safex offer currency: " + offrs[i].currency);
+*/
+            try {
+                let offer_description = JSON.parse(offrs[i].description);
+                if (offer_description.version > 0) {
+                    offrs[i].descprition = offer_description;
+                    twm_offers.push(offrs[i]);
+
+                } else {
+                    non_offers.push(offrs[i]);
+                    console.log("not a twm structured offer");
+                }
+
+            } catch (err) {
+                console.error(`error at parsing json from description`);
+                console.error(err);
+                non_offers.push(offrs[i]);
+            }
+        }
+
+
+        this.setState({twm_offers: twm_offers, non_offers: non_offers, marketplace_view: !this.state.marketplace_view});
     };
 
     register_account = async (e) => {
@@ -347,7 +366,8 @@ export default class WalletHome extends React.Component {
                         let fee = tx.fee();
                         let txid = tx.transactionsIds();
                         if (confirmed_fee) {
-                            tx.commit().then(() => {
+                            tx.commit().then((commit) => {
+                                console.log(commit);
                                 console.log("committed transaction");
                                 alert(`transaction successfully submitted 
                         transaction id: ${txid}
@@ -356,6 +376,10 @@ export default class WalletHome extends React.Component {
 
                                 this.setState({usernames: accs});
 
+                            }).catch((err) => {
+                                console.error(err);
+                                console.error(`error at the committing of the account registration transaction`);
+                                alert(`there was an error at committing the transaction to the blockchain`);
                             })
                         } else {
                             alert(`your transaction was cancelled, no account registration was completed`);
@@ -379,7 +403,6 @@ export default class WalletHome extends React.Component {
     };
 
     render() {
-
         var accounts_table = this.state.usernames.map((user, key) => {
             console.log(user);
             console.log(key);
@@ -400,6 +423,51 @@ export default class WalletHome extends React.Component {
                         </ul>
                     </Col>
                 </Row>
+
+            } catch (err) {
+                console.error(`failed to properly parse the user data formatting`);
+                console.error(err);
+            }
+
+        });
+
+        var twm_listings_table = this.state.twm_offers.map((listing, key) => {
+            console.log(key);
+            try {
+                return <tr key={key}>
+                    <td>{listing.title}</td>
+                    <td>{listing.quantity}</td>
+                    <td>{listing.price}</td>
+                    <td>{listing.seller}</td>
+                    <td>{listing.offerID}</td>
+                </tr>
+
+            } catch (err) {
+                console.error(`failed to properly parse the user data formatting`);
+                console.error(err);
+            }
+
+        });
+
+        var non_listings_table = this.state.non_offers.map((listing, key) => {
+            console.log(key);
+            try {
+                return <tr key={key}>
+                    <td>{listing.title}</td>
+                    <td>{listing.quantity}</td>
+                    <td>{listing.price / 10000000000}</td>
+                    <td>{listing.seller}</td>
+                    <td>{listing.offerID}</td>
+                    <td><select id="quantity">
+                        <option value="1">1</option>
+                    </select></td>
+                    <td>
+                        <button>buy</button>
+                    </td>
+                    <td>
+                        <button>contact</button>
+                    </td>
+                </tr>
 
             } catch (err) {
                 console.error(`failed to properly parse the user data formatting`);
@@ -436,8 +504,9 @@ export default class WalletHome extends React.Component {
                                 <li>{this.state.connection_status}</li>
                                 <li>
                                     <button onClick={this.rescan}>hard rescan</button>
+                                    <button type="confirm" onClick={this.show_marketplace}>open marketplace</button>
                                 </li>
-                                <li> <Button variant="primary" onClick={this.handleShow}>
+                                <li><Button variant="primary" onClick={this.handleShow}>
                                     Show keys
                                 </Button>
 
@@ -451,13 +520,13 @@ export default class WalletHome extends React.Component {
                                                     address {this.props.wallet.address()}
                                                 </li>
                                                 <li>
-                                                    secret spend key <br /> {this.props.wallet.secretSpendKey()}
+                                                    secret spend key <br/> {this.props.wallet.secretSpendKey()}
                                                 </li>
                                                 <li>
-                                                    secret view key <br /> {this.props.wallet.secretViewKey()}
+                                                    secret view key <br/> {this.props.wallet.secretViewKey()}
                                                 </li>
                                                 <li>
-                                                    mnemonic seed <br /> {this.props.wallet.seed()}
+                                                    mnemonic seed <br/> {this.props.wallet.seed()}
                                                 </li>
                                             </ul>
                                         </Modal.Body>
@@ -475,117 +544,153 @@ export default class WalletHome extends React.Component {
                                     ''}
                             </ul>
                         </Col>
-
                     </Row>
 
-                    <Row>
-                        <Col md={4}>
-                            <Row className="wallet">
-                                <Col>
-                                    <div>
+                    {this.state.marketplace_view ? (<div>
+                        <Row>
+                            <Col md={12}>
+                                {this.state.twm_offers.length > 1 ? (<Table>
+                                    <thead>
+                                    <th>title</th>
+                                    <th>quantity</th>
+                                    <th>price (SFX)</th>
+                                    <th>seller</th>
+                                    <th>offer id</th>
+                                    </thead>
+                                    <tbody>
+                                    {twm_listings_table}
+                                    </tbody>
+                                </Table>) : (<div></div>)}
 
-                                        <ul>
-                                            <li>{this.state.cash} SFX</li>
-                                            {this.state.pending_cash > 0 ?
-                                                (<li>{this.state.pending_cash} Pending</li>) : ''}
-                                            {this.state.pending_cash > 0 ?
-                                                (<li>{this.state.cash + this.state.pending_cash} NET</li>) : ''}
-                                        </ul>
-                                        <p>
-                                            Safex Cash
-                                        </p>
-                                    </div>
-                                </Col>
-                                <Col>
-                                    <ul>
-                                        <li>
 
-                                            <Button onClick={this.show_cash_send}>Send Cash</Button>
-                                        </li>
-                                        <li>
-                                            <Form id="send_cash" onSubmit={this.cash_send}>
-                                                destination address <Form.Control name="destination"
-                                                                                  defaultValue="Safex5..."
-                                                                                  placedholder="the destination address"/>
-                                                amount (cash)<Form.Control name="amount" defaultValue="0"
-                                                                           placedholder="the amount to send"/>
-                                                mixin ring size <Form.Control name="mixins" defaultValue="7"
-                                                                              placedholder="choose the number of mixins"/>
-                                                <Button type="submit" variant="primary" size="lg" block>send the
-                                                    cash</Button>
-                                            </Form>
-                                        </li>
-                                    </ul>
-                                </Col>
-                            </Row>
+                                <Table>
+                                    <thead>
+                                    <th>title</th>
+                                    <th>quantity</th>
+                                    <th>price (SFX)</th>
+                                    <th>seller</th>
+                                    <th>offer id</th>
+                                    <th>actions</th>
+                                    </thead>
 
-                            <Row className="wallet">
-                                <Col>
-                                    <div>
-                                        <ul>
-                                            <li>{this.state.tokens} SFT</li>
-                                            {this.state.pending_tokens > 0 ?
-                                                (<li>{this.state.pending_tokens} Pending</li>) : ''}
-                                            {this.state.pending_tokens > 0 ?
-                                                (<li>{this.state.tokens + this.state.pending_tokens} NET</li>) : ''}
-                                        </ul>
-                                        <p>
-                                            Safex Token
-                                        </p>
-                                    </div>
-                                </Col>
-                                <Col>
-                                    <ul>
-                                        <li>
-
-                                            <Button onClick={this.show_token_send}>Send Tokens</Button>
-                                        </li>
-                                        <li>
-                                            <Form id="send_token" onSubmit={this.token_send}>
-                                                destination address <Form.Control name="destination"
-                                                                                  defaultValue="Safex5..."
-                                                                                  placedholder="the destination address"/>
-                                                amount (tokens)<Form.Control name="amount" defaultValue="0"
-                                                                             placedholder="the amount to send"/>
-                                                mixin ring size <Form.Control name="mixins" defaultValue="7"
-                                                                              placedholder="choose the number of mixins"/>
-                                                <Button type="submit" variant="primary" size="lg" block>send the
-                                                    tokens</Button>
-                                            </Form>
-                                        </li>
-                                    </ul>
-                                </Col>
-                            </Row>
-                        </Col>
-
-                        <Col className="wallet" md={8}>
-
-                            <Col className="account_list" md={8}>
-                                Your accounts:
-                                {accounts_table}
-
+                                    <tbody>
+                                    {non_listings_table}
+                                    </tbody>
+                                </Table>
                             </Col>
+                        </Row>
+                    </div>) : (<div>
+                        <Row>
                             <Col md={4}>
-                                <Form id="create_account" onSubmit={this.register_account}>
-                                    username <Form.Control name="username"
-                                                           placedholder="enter your desired username"/>
-                                    avatar url <Form.Control name="avatar"
-                                                             placedholder="enter the url of your avatar"/>
-                                    twitter link <Form.Control name="twitter" defaultValue="twitter.com"
-                                                               placedholder="enter the link to your twitter handle"/>
-                                    facebook link <Form.Control name="facebook" defaultValue="facebook.com"
-                                                                placedholder="enter the to of your facebook page"/>
-                                    biography <Form.Control as="textarea" name="biography"
-                                                            placedholder="type up your biography"/>
-                                    website <Form.Control name="website" defaultValue="safex.org"
-                                                          placedholder="if you have your own website: paste your link here"/>
-                                    location <Form.Control name="location" defaultValue="Earth"
-                                                           placedholder="your location"/>
-                                    <button type="submit">create account</button>
-                                </Form>
+                                <Row className="wallet">
+                                    <Col>
+                                        <div>
+
+                                            <ul>
+                                                <li>{this.state.cash} SFX</li>
+                                                {this.state.pending_cash > 0 ?
+                                                    (<li>{this.state.pending_cash} Pending</li>) : ''}
+                                                {this.state.pending_cash > 0 ?
+                                                    (<li>{this.state.cash + this.state.pending_cash} NET</li>) : ''}
+                                            </ul>
+                                            <p>
+                                                Safex Cash
+                                            </p>
+                                        </div>
+                                    </Col>
+                                    <Col>
+                                        <ul>
+                                            <li>
+
+                                                <Button onClick={this.show_cash_send}>Send Cash</Button>
+                                            </li>
+                                            <li>
+                                                <Form id="send_cash" onSubmit={this.cash_send}>
+                                                    destination address <Form.Control name="destination"
+                                                                                      defaultValue="Safex5..."
+                                                                                      placedholder="the destination address"/>
+                                                    amount (cash)<Form.Control name="amount" defaultValue="0"
+                                                                               placedholder="the amount to send"/>
+                                                    mixin ring size <Form.Control name="mixins" defaultValue="7"
+                                                                                  placedholder="choose the number of mixins"/>
+                                                    <Button type="submit" variant="primary" size="lg" block>send the
+                                                        cash</Button>
+                                                </Form>
+                                            </li>
+                                        </ul>
+                                    </Col>
+                                </Row>
+
+                                <Row className="wallet">
+                                    <Col>
+                                        <div>
+                                            <ul>
+                                                <li>{this.state.tokens} SFT</li>
+                                                {this.state.pending_tokens > 0 ?
+                                                    (<li>{this.state.pending_tokens} Pending</li>) : ''}
+                                                {this.state.pending_tokens > 0 ?
+                                                    (<li>{this.state.tokens + this.state.pending_tokens} NET</li>) : ''}
+                                            </ul>
+                                            <p>
+                                                Safex Token
+                                            </p>
+                                        </div>
+                                    </Col>
+                                    <Col>
+                                        <ul>
+                                            <li>
+
+                                                <Button onClick={this.show_token_send}>Send Tokens</Button>
+                                            </li>
+                                            <li>
+                                                <Form id="send_token" onSubmit={this.token_send}>
+                                                    destination address <Form.Control name="destination"
+                                                                                      defaultValue="Safex5..."
+                                                                                      placedholder="the destination address"/>
+                                                    amount (tokens)<Form.Control name="amount" defaultValue="0"
+                                                                                 placedholder="the amount to send"/>
+                                                    mixin ring size <Form.Control name="mixins" defaultValue="7"
+                                                                                  placedholder="choose the number of mixins"/>
+                                                    <Button type="submit" variant="primary" size="lg" block>send the
+                                                        tokens</Button>
+                                                </Form>
+                                            </li>
+                                        </ul>
+                                    </Col>
+                                </Row>
                             </Col>
-                        </Col>
-                    </Row>
+
+                            <Col className="wallet" md={8}>
+
+                                <Col className="account_list" md={8}>
+                                    Your accounts:
+                                    {accounts_table}
+
+                                </Col>
+                                <Col md={4}>
+                                    <Form id="create_account" onSubmit={this.register_account}>
+                                        username <Form.Control name="username"
+                                                               placedholder="enter your desired username"/>
+                                        avatar url <Form.Control name="avatar"
+                                                                 placedholder="enter the url of your avatar"/>
+                                        twitter link <Form.Control name="twitter" defaultValue="twitter.com"
+                                                                   placedholder="enter the link to your twitter handle"/>
+                                        facebook link <Form.Control name="facebook" defaultValue="facebook.com"
+                                                                    placedholder="enter the to of your facebook page"/>
+                                        biography <Form.Control as="textarea" name="biography"
+                                                                placedholder="type up your biography"/>
+                                        website <Form.Control name="website" defaultValue="safex.org"
+                                                              placedholder="if you have your own website: paste your link here"/>
+                                        location <Form.Control name="location" defaultValue="Earth"
+                                                               placedholder="your location"/>
+                                        <button type="submit">create account</button>
+                                        mixins <Form.Control name="mixins" defaultValue="7"
+                                                             placedholder="your location"/>
+                                    </Form>
+                                </Col>
+                            </Col>
+                        </Row>
+                    </div>)}
                 </Container>
             </div>
         );
