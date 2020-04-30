@@ -315,6 +315,20 @@ export default class WalletHome extends React.Component {
         this.setState({twm_offers: twm_offers, non_offers: non_offers, marketplace_view: !this.state.marketplace_view});
     };
 
+    remove_account = async(user) => {
+        try {
+            let removed = wallet.removeSafexAccount(user);
+            if (removed) {
+                console.log(`successfully removed ${user}`);
+            } else {
+                console.error(`error at trying to remove ${user}`);
+            }
+        } catch(err) {
+            console.error(err);
+            console.error(`error at trying to remove an account`);
+        }
+    };
+
     register_account = async (e) => {
         e.preventDefault();
         if (this.state.tokens >= 5000 && this.state.first_refresh === true) {
@@ -354,12 +368,14 @@ export default class WalletHome extends React.Component {
 
                 console.log(accs);
                 console.log(`accounts`);
+                let mixins = e.target.mixins.value - 1;
                 if (account) {
                     console.log(`let's register it`);
 
                     let confirm_registration = wallet.createAdvancedTransaction({
                         tx_type: '6',
-                        safex_username: e.target.username.value
+                        safex_username: e.target.username.value,
+                        mixin: mixins
                     }).then((tx) => {
                         console.log(tx);
                         let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${tx.fee() / 10000000000} SFX Safex Cash`);
@@ -420,6 +436,9 @@ export default class WalletHome extends React.Component {
                             <li>{usee_d.biography}</li>
                             <li>{usee_d.website}</li>
                             <li>{usee_d.twitter}</li>
+                            {user.status == 0 ? (
+                                <li><button onClick={() => this.remove_account(user.username)}>remove</button></li>
+                            ) : ''}
                         </ul>
                     </Col>
                 </Row>
