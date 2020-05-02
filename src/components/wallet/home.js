@@ -18,21 +18,16 @@ export default class WalletHome extends React.Component {
         this.state = {
             address: '',
             wallet_path: '',
-            safex_key: null,
             cash: 0,
             tokens: 0,
-            refresh_timer: 0,
-            refresh_interval: '',
-            syncing: false,
             synced: false,
             wallet_height: 0,
             blockchain_height: 0,
-            username: '',
             usernames: [],
             connection_status: 'Connecting to the Safex Blockchain Network...',
             timer: '',
             first_refresh: false,
-            show: false,
+            show_market: false,
             marketplace_view: false,
             twm_offers: [],
             non_offers: []
@@ -189,11 +184,11 @@ export default class WalletHome extends React.Component {
     };
 
     handleClose = () => {
-        this.setState({show: false})
+        this.setState({show_market: false});
     };
 
     handleShow = () => {
-        this.setState({show: true});
+        this.setState({show_market: true});
     };
 
     token_send = async (e) => {
@@ -206,28 +201,33 @@ export default class WalletHome extends React.Component {
                     `to ${e.target.destination.value}`);
                 console.log(confirmed);
                 if (confirmed) {
-                    let token_txn = await send_tokens(wallet, e.target.destination.value, e.target.amount.value, mixins);
-                    let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${token_txn.fee() / 10000000000} SFX Safex Cash`);
-                    let fee = token_txn.fee();
-                    let txid = token_txn.transactionsIds();
-                    let amount = e.target.amount.value;
-                    if (confirmed_fee) {
-                        try {
-
-                            let committed_txn = await commit_txn(token_txn);
-                            console.log(committed_txn);
-                            console.log(token_txn);
-                            alert(`transaction successfully submitted 
-                        transaction id: ${txid}
-                        amount: ${amount} SFT
-                        fee: ${fee / 10000000000} SFX`);
-                        } catch (err) {
-                            console.error(err);
-                            console.error(`error when trying to commit the transaction to the blockchain`);
-                            alert(`error when trying to commit the transaction to the blockchain`);
+                    try {
+                        let token_txn = await send_tokens(wallet, e.target.destination.value, e.target.amount.value, mixins);
+                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${token_txn.fee() / 10000000000} SFX Safex Cash`);
+                        let fee = token_txn.fee();
+                        let txid = token_txn.transactionsIds();
+                        let amount = e.target.amount.value;
+                        if (confirmed_fee) {
+                            try {
+                                let committed_txn = await commit_txn(token_txn);
+                                console.log(committed_txn);
+                                console.log(token_txn);
+                                alert(`token transaction successfully submitted 
+                                        transaction id: ${txid}
+                                        amount: ${amount} SFT
+                                        fee: ${fee / 10000000000} SFX`);
+                            } catch (err) {
+                                console.error(err);
+                                console.error(`error when trying to commit the token transaction to the blockchain`);
+                                alert(`error when trying to commit the token transaction to the blockchain`);
+                            }
+                        } else {
+                            console.log("token transaction cancelled");
                         }
-                    } else {
-                        console.log("transaction cancelled");
+                    } catch (err) {
+                        console.error(err);
+                        console.error(`error at the token transaction formation it was not commited`);
+                        alert(`error at the token transaction formation it was not commited`);
                     }
                 }
             }
@@ -250,19 +250,35 @@ export default class WalletHome extends React.Component {
                     `to ${e.target.destination.value}`);
                 console.log(confirmed);
                 if (confirmed) {
-                    let cash_txn = await send_cash(wallet, e.target.destination.value, e.target.amount.value, mixins);
-                    let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${cash_txn.fee() / 10000000000} SFX Safex Cash`);
-                    let fee = cash_txn.fee();
-                    let txid = cash_txn.transactionsIds();
-                    let amount = e.target.amount.value;
-                    if (confirmed_fee) {
-                        let committed_txn = await commit_txn(cash_txn);
-                        console.log(committed_txn);
+                    try {
+                        let cash_txn = await send_cash(wallet, e.target.destination.value, e.target.amount.value, mixins);
                         console.log(cash_txn);
-                        alert(`transaction successfully submitted 
-                        transaction id: ${txid}
-                        amount: ${amount}
-                        fee: ${fee / 10000000000}`);
+                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${cash_txn.fee() / 10000000000} SFX Safex Cash`);
+                        let fee = cash_txn.fee();
+                        let txid = cash_txn.transactionsIds();
+                        let amount = e.target.amount.value;
+                        if (confirmed_fee) {
+                            try {
+
+                                let committed_txn = await commit_txn(cash_txn);
+                                console.log(committed_txn);
+                                console.log(cash_txn);
+                                alert(`cash transaction successfully submitted 
+                                        transaction id: ${txid}
+                                        amount: ${amount}
+                                        fee: ${fee / 10000000000}`);
+                            } catch (err) {
+                                console.error(err);
+                                console.error(`error at commiting the cash transaction to the blockchain network`);
+                                alert(`error at commiting the cash transaction to the blockchain network`);
+                            }
+                        } else {
+                            alert(`the cash transaction was cancelled`)
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        console.error(`error at the cash transaction formation it was not commited`);
+                        alert(`error at the cash transaction formation it was not commited`);
                     }
                 }
             }
@@ -315,7 +331,7 @@ export default class WalletHome extends React.Component {
         this.setState({twm_offers: twm_offers, non_offers: non_offers, marketplace_view: !this.state.marketplace_view});
     };
 
-    remove_account = async(user) => {
+    remove_account = async (user) => {
         try {
             let removed = wallet.removeSafexAccount(user);
             if (removed) {
@@ -323,7 +339,7 @@ export default class WalletHome extends React.Component {
             } else {
                 console.error(`error at trying to remove ${user}`);
             }
-        } catch(err) {
+        } catch (err) {
             console.error(err);
             console.error(`error at trying to remove an account`);
         }
@@ -437,7 +453,9 @@ export default class WalletHome extends React.Component {
                             <li>{usee_d.website}</li>
                             <li>{usee_d.twitter}</li>
                             {user.status == 0 ? (
-                                <li><button onClick={() => this.remove_account(user.username)}>remove</button></li>
+                                <li>
+                                    <button onClick={() => this.remove_account(user.username)}>remove</button>
+                                </li>
                             ) : ''}
                         </ul>
                     </Col>
@@ -529,7 +547,7 @@ export default class WalletHome extends React.Component {
                                     Show keys
                                 </Button>
 
-                                    <Modal animation={false} show={this.state.show} onHide={this.handleClose}>
+                                    <Modal animation={false} show={this.state.show_market} onHide={this.handleClose}>
                                         <Modal.Header closeButton>
                                             <Modal.Title>Your Private Keys</Modal.Title>
                                         </Modal.Header>
