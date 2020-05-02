@@ -33,12 +33,8 @@ export async function send_cash(wallet, address, amount, mixin) {
         amount: amount * 10000000000,
         mixin: mixi
     }).then((tx) => {
-        console.log("token transaction created: " + tx.transactionsIds());
-
-        tx.commit().then(() => {
-            console.log("transaction commited successfully");
-            return tx;
-        })
+        console.log("cash transaction created: " + tx.transactionsIds());
+        return tx;
     });
 }
 
