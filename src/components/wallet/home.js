@@ -1,18 +1,13 @@
 import React from 'react';
 
-import Navigation from './Navigation';
-
 import {Row, Col, Container, Button, Table, Form, Image, Modal} from 'react-bootstrap';
 
 import {normalize_8decimals} from '../../utils/wallet_creation';
 
 import {send_cash, send_tokens, commit_txn} from "../../utils/wallet_actions";
-import {Link} from "react-router-dom";
-
 
 var wallet;
 
-var lastHeight = 0;
 
 export default class WalletHome extends React.Component {
     constructor(props) {
@@ -447,6 +442,10 @@ export default class WalletHome extends React.Component {
         this.setState({marketplace_view: false});
     };
 
+    show_merchandizing = () => {
+
+    };
+
     render() {
         var accounts_table = this.state.usernames.map((user, key) => {
             console.log(user);
@@ -543,7 +542,7 @@ export default class WalletHome extends React.Component {
                                         <a className="menu__link" href="javascript:void(0)" onClick={this.show_marketplace}>Market</a>
                                     </li>
                                     <li className="menu__list-item">
-                                        <a className="menu__link" href="#">Merchant</a>
+                                        <a className="menu__link" href="javascript:void(0)" onClick={this.show_merchandizing}>Merchant</a>
                                     </li>
                                     <li className="menu__list-item">
                                         <a className="menu__link" href="#">Tokens</a>
