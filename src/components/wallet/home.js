@@ -6,6 +6,8 @@ import {normalize_8decimals} from '../../utils/wallet_creation';
 
 import {send_cash, send_tokens, commit_txn} from "../../utils/wallet_actions";
 
+const openpgp = require('openpgp');
+
 var wallet;
 
 
