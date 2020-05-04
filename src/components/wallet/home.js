@@ -7,6 +7,8 @@ import {Row, Col, Container, Button, Table, Form, Image, Modal} from 'react-boot
 import {normalize_8decimals} from '../../utils/wallet_creation';
 
 import {send_cash, send_tokens, commit_txn} from "../../utils/wallet_actions";
+import {Link} from "react-router-dom";
+
 
 var wallet;
 
@@ -27,7 +29,7 @@ export default class WalletHome extends React.Component {
             connection_status: 'Connecting to the Safex Blockchain Network...',
             timer: '',
             first_refresh: false,
-            show_market: false,
+            show_keys: false,
             marketplace_view: false,
             twm_offers: [],
             non_offers: []
@@ -113,13 +115,10 @@ export default class WalletHome extends React.Component {
                     first_refresh: true,
                     usernames: accs
                 });
-
-            })
-                .catch((err) => {
-                    console.log("unable to store wallet refresh: " + err);
-                    console.error(err);
-                });
-
+            }).catch((err) => {
+                console.log("unable to store wallet refresh: " + err);
+                console.error(err);
+            });
         } catch (err) {
             console.error(err);
             console.error("error getting height");
@@ -140,7 +139,7 @@ export default class WalletHome extends React.Component {
             //m_wallet.on('refreshed', this.refresh_action());
             this.props.wallet.on('newBlock', (height) => {
                 console.log(height)
-            })
+            });
             this.setState({connection_status: 'Connected to the Safex Blockchain Network'});
         } else {
             this.setState({connection_status: 'Unable to connect to the Safex Blockchain Network'});
@@ -162,7 +161,6 @@ export default class WalletHome extends React.Component {
         }
     };
 
-
     rescan = (e) => {
         let confirmed = window.confirm("are you sure you want to continue, " +
             "this will halt the wallet operation while the rescan is in progress");
@@ -175,7 +173,6 @@ export default class WalletHome extends React.Component {
             }).catch((err) => {
                 console.log("unable to store wallet: " + err)
             });
-
             wallet.on('refreshed', () => {
                 console.log();
                 this.refresh_action();
@@ -184,11 +181,11 @@ export default class WalletHome extends React.Component {
     };
 
     handleClose = () => {
-        this.setState({show_market: false});
+        this.setState({show_keys: false});
     };
 
     handleShow = () => {
-        this.setState({show_market: true});
+        this.setState({show_keys: true});
     };
 
     token_send = async (e) => {
@@ -327,8 +324,11 @@ export default class WalletHome extends React.Component {
             }
         }
 
-
-        this.setState({twm_offers: twm_offers, non_offers: non_offers, marketplace_view: !this.state.marketplace_view});
+        this.setState({
+            twm_offers: twm_offers,
+            non_offers: non_offers,
+            marketplace_view: !this.state.marketplace_view
+        });
     };
 
     remove_account = async (user) => {
@@ -343,6 +343,17 @@ export default class WalletHome extends React.Component {
             console.error(err);
             console.error(`error at trying to remove an account`);
         }
+    };
+
+    logout = () => {
+        wallet.close(true)
+            .then(() => {
+                console.log("wallet closed")
+                this.props.history.push({pathname: '/'});
+            })
+            .catch((e) => {
+                console.log("unable to close wallet: " + e)
+            });
     };
 
     register_account = async (e) => {
@@ -398,15 +409,13 @@ export default class WalletHome extends React.Component {
                         let fee = tx.fee();
                         let txid = tx.transactionsIds();
                         if (confirmed_fee) {
-                            tx.commit().then((commit) => {
+                            tx.commit().then(async (commit) => {
                                 console.log(commit);
                                 console.log("committed transaction");
                                 alert(`transaction successfully submitted 
                         transaction id: ${txid}
                         tokens locked for 500 blocks: 5000 SFT
                         fee: ${fee / 10000000000}`);
-
-                                this.setState({usernames: accs});
 
                             }).catch((err) => {
                                 console.error(err);
@@ -432,6 +441,10 @@ export default class WalletHome extends React.Component {
         } else {
             alert(`please wait until the wallet has fully loaded before performing registration actions`)
         }
+    };
+
+    go_home = () => {
+        this.setState({marketplace_view: false});
     };
 
     render() {
@@ -517,7 +530,34 @@ export default class WalletHome extends React.Component {
             <div style={{position: 'relative'}}>
                 <Container>
                     <Row>
-                        <Navigation wallet={this.props.wallet}/>
+                        <div className="container center">
+                        <nav className="menu">
+                            <h1 className="menu__logo"></h1>
+
+                            <div className="menu__right">
+                                <ul className="menu__list">
+                                    <li className="menu__list-item">
+                                        <a className="menu__link" href="javascript:void(0)" onClick={this.go_home}>Home</a>
+                                    </li>
+                                    <li className="menu__list-item">
+                                        <a className="menu__link" href="javascript:void(0)" onClick={this.show_marketplace}>Market</a>
+                                    </li>
+                                    <li className="menu__list-item">
+                                        <a className="menu__link" href="#">Merchant</a>
+                                    </li>
+                                    <li className="menu__list-item">
+                                        <a className="menu__link" href="#">Tokens</a>
+                                    </li>
+                                    <li className="menu__list-item">
+                                        <a className="menu__link" href="#">Settings</a>
+                                    </li>
+                                    <li className="menu__list-item">
+                                        <a className="menu__link" onClick={this.logout}>Exit</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
                     </Row>
 
                     <Row>
@@ -547,7 +587,7 @@ export default class WalletHome extends React.Component {
                                     Show keys
                                 </Button>
 
-                                    <Modal animation={false} show={this.state.show_market} onHide={this.handleClose}>
+                                    <Modal animation={false} show={this.state.show_keys} onHide={this.handleClose}>
                                         <Modal.Header closeButton>
                                             <Modal.Title>Your Private Keys</Modal.Title>
                                         </Modal.Header>
@@ -588,26 +628,29 @@ export default class WalletHome extends React.Component {
                             <Col md={12}>
                                 {this.state.twm_offers.length > 1 ? (<Table>
                                     <thead>
-                                    <th>title</th>
-                                    <th>quantity</th>
-                                    <th>price (SFX)</th>
-                                    <th>seller</th>
-                                    <th>offer id</th>
+                                        <tr>
+                                            <th>title</th>
+                                            <th>quantity</th>
+                                            <th>price (SFX)</th>
+                                            <th>seller</th>
+                                            <th>offer id</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
                                     {twm_listings_table}
                                     </tbody>
                                 </Table>) : (<div></div>)}
 
-
                                 <Table>
                                     <thead>
-                                    <th>title</th>
-                                    <th>quantity</th>
-                                    <th>price (SFX)</th>
-                                    <th>seller</th>
-                                    <th>offer id</th>
-                                    <th>actions</th>
+                                        <tr>
+                                            <th>title</th>
+                                            <th>quantity</th>
+                                            <th>price (SFX)</th>
+                                            <th>seller</th>
+                                            <th>offer id</th>
+                                            <th>actions</th>
+                                        </tr>
                                     </thead>
 
                                     <tbody>
