@@ -28,9 +28,9 @@ export default class WalletHome extends React.Component {
             timer: '',
             first_refresh: false,
             show_keys: false,
-            marketplace_view: false,
             twm_offers: [],
-            non_offers: []
+            non_offers: [],
+            selected_user: {} //merchant element
         };
     }
 
@@ -77,9 +77,7 @@ export default class WalletHome extends React.Component {
 
             this.setState({loading: false, address: wallet.address(), wallet: wallet});
 
-
             var accs = wallet.getSafexAccounts();
-
 
             console.log(accs);
             console.log(`accounts`);
@@ -177,9 +175,6 @@ export default class WalletHome extends React.Component {
             });
         }
     };
-
-
-
 
     remove_account = async (user) => {
         try {
@@ -475,6 +470,13 @@ export default class WalletHome extends React.Component {
         this.setState({show_keys: true});
     };
 
+
+    //merchant
+    load_offers = (username, index) => {
+        this.setState({selected_user: {username: username, index: index}});
+        console.log(username);
+    };
+
     render() {
 
 
@@ -632,14 +634,13 @@ export default class WalletHome extends React.Component {
                     );
                 }
                 case "market":
-
                     var twm_listings_table = this.state.twm_offers.map((listing, key) => {
                         console.log(key);
                         try {
                             return <tr key={key}>
                                 <td>{listing.title}</td>
                                 <td>{listing.quantity}</td>
-                                <td>{listing.price}</td>
+                                <td>{listing.price / 10000000000}</td>
                                 <td>{listing.seller}</td>
                                 <td>{listing.offerID}</td>
                             </tr>
@@ -713,14 +714,144 @@ export default class WalletHome extends React.Component {
                                 </Table>
                             </Col>
                         </Row>
-                    </div>) ;
-                case "merchant":
+                    </div>);
+                case "merchant": {
+
+                    var twm_listings_table = this.state.twm_offers.map((listing, key) => {
+                        console.log(key);
+                        try {
+                            if (listing.seller === this.state.selected_user) {
+                                return <tr key={key}>
+                                    <td>{listing.title}</td>
+                                    <td>{listing.quantity}</td>
+                                    <td>{listing.price / 10000000000}</td>
+                                    <td>{listing.seller}</td>
+                                    <td>{listing.offerID}</td>
+                                </tr>
+                            }
+                        } catch (err) {
+                            console.error(`failed to properly parse the user data formatting`);
+                            console.error(err);
+                        }
+
+                    });
+
+                    var non_listings_table = this.state.non_offers.map((listing, key) => {
+                        console.log(listing);
+                        try {
+                            if (listing.seller === this.state.selected_user) {
+                                return <tr key={key}>
+                                    <td>{listing.title}</td>
+                                    <td>{listing.quantity}</td>
+                                    <td>{listing.price / 10000000000}</td>
+                                    <td>{listing.seller}</td>
+                                    <td>{listing.offerID}</td>
+                                    <td>
+                                        <Button>edit</Button>
+                                    </td>
+                                </tr>
+                            }
+                        } catch (err) {
+                            console.error(`failed to properly parse the user data formatting`);
+                            console.error(err);
+                        }
+                    });
+
+                    var accounts_table = this.state.usernames.map((user, key) => {
+                        console.log(user);
+                        console.log(key);
+                        try {
+                            let usee_d = JSON.parse(user.data);
+
+                            return <Row
+                                className={this.state.selected_user.username === user.username ? "selected_account_element" : "account_element"}
+                                key={key}>
+                                <Col sm={4}>
+                                    <Image width={100} height={100} src={usee_d.avatar} roundedCircle/>
+                                </Col>
+                                <Col sm={6}>
+                                    <ul onClick={() => this.load_offers(user.username)}>
+                                        <li>{user.username}</li>
+                                        <li>{usee_d.location}</li>
+                                        <li>{usee_d.biography}</li>
+                                        <li>{usee_d.website}</li>
+                                        <li>{usee_d.twitter}</li>
+                                        {user.status == 0 ? (
+                                            <li>
+                                                <button onClick={() => this.remove_account(user.username, key)}>remove
+                                                </button>
+                                            </li>
+                                        ) : ''}
+                                    </ul>
+                                </Col>
+                            </Row>
+
+                        } catch (err) {
+                            console.error(`failed to properly parse the user data formatting`);
+                            console.error(err);
+                        }
+
+                    });
+
+                    var selected = this.state.usernames[this.state.selected_user.index];
+                    return (
+                        <Row>
+                            <Col sm={4}>
+                                <Row className="account_list">
+                                    {accounts_table}
+                                </Row>
+                                <Row className="merchant_profile_view">
+                                    <ul>
+                                        <li><Image width={100} height={100} src={selected.avatar} roundedCircle/></li>
+                                        <li>username: {selected.username}</li>
+                                    </ul>
+                                </Row>
+                            </Col>
+                            <Col className="merchant_product_view" sm={8}>
+                                {this.state.twm_offers.length > 1 ? (<Table>
+                                    <thead>
+                                    <tr>
+                                        <th>title</th>
+                                        <th>quantity</th>
+                                        <th>price (SFX)</th>
+                                        <th>seller</th>
+                                        <th>offer id</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {twm_listings_table}
+                                    </tbody>
+                                </Table>) : (<div></div>)}
+
+                                <Table>
+                                    <thead>
+                                    <tr>
+                                        <th>title</th>
+                                        <th>quantity</th>
+                                        <th>price (SFX)</th>
+                                        <th>seller</th>
+                                        <th>offer id</th>
+                                        <th>actions</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {non_listings_table}
+                                    </tbody>
+                                </Table>
+                            </Col>
+                        </Row>
+
+                    );
+                }
+
+                case "Tokens":
                     return (<div></div>);
                 case "settings":
                     return (<div></div>);
 
                 default:
-                    return <h1>No project match</h1>
+                    return <h1>Major Error</h1>
             }
         };
 
@@ -735,6 +866,12 @@ export default class WalletHome extends React.Component {
 
                                 <div className="menu__right">
                                     <ul className="menu__list">
+                                        <li className="menu__list-item">
+                                            SFX: {this.state.cash}
+                                        </li>
+                                        <li className="menu__list-item">
+                                            SFT: {this.state.tokens}
+                                        </li>
                                         <li className="menu__list-item">
                                             <a className="menu__link" href="javascript:void(0)"
                                                onClick={this.go_home}>Home</a>
@@ -763,6 +900,7 @@ export default class WalletHome extends React.Component {
                     <Row>
                         <Col sm={8}>
                             <ul>
+
                                 <li>
                                     Public Address: Receive SFT and SFX here (share this to get paid)
                                 </li>
@@ -780,12 +918,11 @@ export default class WalletHome extends React.Component {
                                     </li>) : ''}
                                 <li>{this.state.connection_status}</li>
                                 <li>
-                                    <button onClick={this.rescan}>hard rescan</button>
-                                    <button type="confirm" onClick={this.test_sign}>open marketplace</button>
-                                </li>
-                                <li><Button variant="primary" onClick={this.handleShow}>
-                                    Show keys
-                                </Button>
+                                    {this.state.synced === false ? (<Button onClick={this.check}>check</Button>) : ''}
+                                    <Button variant="danger" onClick={this.rescan}>hard rescan</Button>
+                                    <Button variant="primary" onClick={this.handleShow}>
+                                        Show keys
+                                    </Button>
 
                                     <Modal animation={false} show={this.state.show_keys} onHide={this.handleClose}>
                                         <Modal.Header closeButton>
@@ -794,7 +931,7 @@ export default class WalletHome extends React.Component {
                                         <Modal.Body>
                                             <ul>
                                                 <li>
-                                                    address {this.props.wallet.address()}
+                                                    address <br/> {this.props.wallet.address()}
                                                 </li>
                                                 <li>
                                                     secret spend key <br/> {this.props.wallet.secretSpendKey()}
@@ -814,11 +951,7 @@ export default class WalletHome extends React.Component {
                                         </Modal.Footer>
                                     </Modal>
                                 </li>
-                                {this.state.synced === false ?
-                                    (<li>
-                                        <button onClick={this.check}>check</button>
-                                    </li>) :
-                                    ''}
+
                             </ul>
                         </Col>
                     </Row>
