@@ -30,7 +30,9 @@ export default class WalletHome extends React.Component {
             show_keys: false,
             twm_offers: [],
             non_offers: [],
-            selected_user: {} //merchant element
+            selected_user: {}, //merchant element
+            show_new_offer_form: false,
+            show_new_account_form: false
         };
     }
 
@@ -81,7 +83,7 @@ export default class WalletHome extends React.Component {
 
             console.log(accs);
             console.log(`accounts`);
-            this.setState({usernames: accs});
+            this.setState({usernames: accs, selected_user: {index: 0, username: accs[0].username}});
         } catch (err) {
             console.error(err);
             console.log("errors on startup");
@@ -460,6 +462,12 @@ export default class WalletHome extends React.Component {
             });
     };
 
+    //open new account
+
+
+    //open new sell offer
+
+
     //close modal of private keys
     handleClose = () => {
         this.setState({show_keys: false});
@@ -470,11 +478,26 @@ export default class WalletHome extends React.Component {
         this.setState({show_keys: true});
     };
 
+    handleCloseNewOfferForm = () => {
+        this.setState({show_new_offer_form: false});
+    };
 
+    handleShowNewOfferForm = () => {
+        this.setState({show_new_offer_form: true});
+    };
+
+    handleCloseNewAccountForm = () => {
+        this.setState({show_new_account_form: false});
+    };
+
+    handleShowNewAccountForm = () => {
+        this.setState({show_new_account_form: true});
+    };
     //merchant
     load_offers = (username, index) => {
         this.setState({selected_user: {username: username, index: index}});
         console.log(username);
+        console.log(index);
     };
 
     render() {
@@ -608,25 +631,7 @@ export default class WalletHome extends React.Component {
 
                                     </Col>
                                     <Col md={4}>
-                                        <Form id="create_account" onSubmit={this.register_account}>
-                                            username <Form.Control name="username"
-                                                                   placedholder="enter your desired username"/>
-                                            avatar url <Form.Control name="avatar"
-                                                                     placedholder="enter the url of your avatar"/>
-                                            twitter link <Form.Control name="twitter" defaultValue="twitter.com"
-                                                                       placedholder="enter the link to your twitter handle"/>
-                                            facebook link <Form.Control name="facebook" defaultValue="facebook.com"
-                                                                        placedholder="enter the to of your facebook page"/>
-                                            biography <Form.Control as="textarea" name="biography"
-                                                                    placedholder="type up your biography"/>
-                                            website <Form.Control name="website" defaultValue="safex.org"
-                                                                  placedholder="if you have your own website: paste your link here"/>
-                                            location <Form.Control name="location" defaultValue="Earth"
-                                                                   placedholder="your location"/>
-                                            <button type="submit">create account</button>
-                                            mixins <Form.Control name="mixins" defaultValue="7"
-                                                                 placedholder="your location"/>
-                                        </Form>
+
                                     </Col>
                                 </Col>
                             </Row>
@@ -716,11 +721,10 @@ export default class WalletHome extends React.Component {
                         </Row>
                     </div>);
                 case "merchant": {
-
                     var twm_listings_table = this.state.twm_offers.map((listing, key) => {
                         console.log(key);
                         try {
-                            if (listing.seller === this.state.selected_user) {
+                            if (listing.seller === this.state.selected_user.username) {
                                 return <tr key={key}>
                                     <td>{listing.title}</td>
                                     <td>{listing.quantity}</td>
@@ -739,7 +743,7 @@ export default class WalletHome extends React.Component {
                     var non_listings_table = this.state.non_offers.map((listing, key) => {
                         console.log(listing);
                         try {
-                            if (listing.seller === this.state.selected_user) {
+                            if (listing.seller === this.state.selected_user.username) {
                                 return <tr key={key}>
                                     <td>{listing.title}</td>
                                     <td>{listing.quantity}</td>
@@ -765,12 +769,12 @@ export default class WalletHome extends React.Component {
 
                             return <Row
                                 className={this.state.selected_user.username === user.username ? "selected_account_element" : "account_element"}
-                                key={key}>
-                                <Col sm={4}>
-                                    <Image width={100} height={100} src={usee_d.avatar} roundedCircle/>
+                                key={key} onClick={() => this.load_offers(user.username, key)}>
+                                <Col>
+                                    <Image width={80} height={80} src={usee_d.avatar} roundedCircle/>
                                 </Col>
-                                <Col sm={6}>
-                                    <ul onClick={() => this.load_offers(user.username)}>
+                                <Col>
+                                    <ul>
                                         <li>{user.username}</li>
                                         <li>{usee_d.location}</li>
                                         <li>{usee_d.biography}</li>
@@ -785,66 +789,145 @@ export default class WalletHome extends React.Component {
                                     </ul>
                                 </Col>
                             </Row>
-
                         } catch (err) {
                             console.error(`failed to properly parse the user data formatting`);
                             console.error(err);
                         }
-
                     });
+                    try {
+                        var selected = this.state.usernames[this.state.selected_user.index];
+                        console.log(selected);
+                        console.log("selewcted");
+                        var data = JSON.parse(selected.data);
+                        return (
+                            <Row>
+                                <Col sm={4}>
+                                    <Row>
+                                        <Button variant="primary" onClick={this.handleShowNewAccountForm}>
+                                            New Account
+                                        </Button>
 
-                    var selected = this.state.usernames[this.state.selected_user.index];
-                    return (
-                        <Row>
-                            <Col sm={4}>
-                                <Row className="account_list">
-                                    {accounts_table}
-                                </Row>
-                                <Row className="merchant_profile_view">
-                                    <ul>
-                                        <li><Image width={100} height={100} src={selected.avatar} roundedCircle/></li>
-                                        <li>username: {selected.username}</li>
-                                    </ul>
-                                </Row>
-                            </Col>
-                            <Col className="merchant_product_view" sm={8}>
-                                {this.state.twm_offers.length > 1 ? (<Table>
-                                    <thead>
-                                    <tr>
-                                        <th>title</th>
-                                        <th>quantity</th>
-                                        <th>price (SFX)</th>
-                                        <th>seller</th>
-                                        <th>offer id</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {twm_listings_table}
-                                    </tbody>
-                                </Table>) : (<div></div>)}
+                                        <Modal animation={false} show={this.state.show_new_account_form}
+                                               onHide={this.handleCloseNewAccountForm}>
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>List a new offer to sell</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                <Form id="create_account" onSubmit={this.register_account}>
+                                                    username <Form.Control name="username"
+                                                                           placedholder="enter your desired username"/>
+                                                    avatar url <Form.Control name="avatar"
+                                                                             placedholder="enter the url of your avatar"/>
+                                                    twitter link <Form.Control name="twitter" defaultValue="twitter.com"
+                                                                               placedholder="enter the link to your twitter handle"/>
+                                                    facebook link <Form.Control name="facebook"
+                                                                                defaultValue="facebook.com"
+                                                                                placedholder="enter the to of your facebook page"/>
+                                                    biography <Form.Control as="textarea" name="biography"
+                                                                            placedholder="type up your biography"/>
+                                                    website <Form.Control name="website" defaultValue="safex.org"
+                                                                          placedholder="if you have your own website: paste your link here"/>
+                                                    location <Form.Control name="location" defaultValue="Earth"
+                                                                           placedholder="your location"/>
+                                                    <button type="submit">create account</button>
+                                                    mixins <Form.Control name="mixins" defaultValue="7"
+                                                                         placedholder="your location"/>
+                                                </Form>
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={this.handleCloseNewAccountForm}>
+                                                    Close
+                                                </Button>
+                                            </Modal.Footer>
+                                        </Modal>
+                                    </Row>
 
-                                <Table>
-                                    <thead>
-                                    <tr>
-                                        <th>title</th>
-                                        <th>quantity</th>
-                                        <th>price (SFX)</th>
-                                        <th>seller</th>
-                                        <th>offer id</th>
-                                        <th>actions</th>
-                                    </tr>
-                                    </thead>
+                                    <Row className="account_list">
+                                        {accounts_table}
+                                    </Row>
+                                    <Row className="merchant_profile_view">
+                                        <Col>
+                                            <Row>
+                                                <ul>
+                                                    <li><Image width={100} height={100} src={data.avatar}
+                                                               roundedCircle/>
+                                                    </li>
+                                                    <li>username: {selected.username}</li>
+                                                </ul>
+                                            </Row>
+                                            <Row>
+                                                <Button>Edit</Button>
+                                                <Button>Remove</Button>
+                                            </Row>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                                <Col className="merchant_product_view" sm={8}>
+                                    <Row>
+                                        <Button variant="primary" onClick={this.handleShowNewOfferForm}>
+                                            New Offer
+                                        </Button>
 
-                                    <tbody>
-                                    {non_listings_table}
-                                    </tbody>
-                                </Table>
-                            </Col>
-                        </Row>
+                                        <Modal animation={false} show={this.state.show_new_offer_form}
+                                               onHide={this.handleCloseNewOfferForm}>
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>List a new offer to sell</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                <Form>
 
-                    );
+                                                </Form>
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={this.handleCloseNewOfferForm}>
+                                                    Close
+                                                </Button>
+                                            </Modal.Footer>
+                                        </Modal>
+                                    </Row>
+                                    <Row>
+                                        {this.state.twm_offers.length > 1 ? (<Table>
+                                            <thead>
+                                            <tr>
+                                                <th>title</th>
+                                                <th>quantity</th>
+                                                <th>price (SFX)</th>
+                                                <th>seller</th>
+                                                <th>offer id</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {twm_listings_table}
+                                            </tbody>
+                                        </Table>) : (<div></div>)}
+                                    </Row>
+
+                                    <Row>
+                                        <Table>
+                                            <thead>
+                                            <tr>
+                                                <th>title</th>
+                                                <th>quantity</th>
+                                                <th>price (SFX)</th>
+                                                <th>seller</th>
+                                                <th>offer id</th>
+                                                <th>actions</th>
+                                            </tr>
+                                            </thead>
+
+                                            <tbody>
+                                            {non_listings_table}
+                                            </tbody>
+                                        </Table>
+                                    </Row>
+                                </Col>
+                            </Row>);
+                    } catch (err) {
+                        console.log(err);
+                        alert(err);
+                        return (<div><p>error loading</p></div>);
+                    }
                 }
-
                 case "Tokens":
                     return (<div></div>);
                 case "settings":
