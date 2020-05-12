@@ -444,7 +444,46 @@ export default class WalletHome extends React.Component {
     };
 
     show_merchant = () => {
-        this.setState({interface_view: 'merchant'})
+        var offrs = wallet.listSafexOffers(true);
+        let non_offers = [];
+        let twm_offers = [];
+
+        for (var i in offrs) {/*
+            console.log("Safex offer " + i + " title: " + offrs[i].title);
+            console.log("Safex offer description: " + offrs[i].description);
+            console.log("Safex offer quantity: " + offrs[i].quantity);
+            console.log("Safex offer price: " + offrs[i].price);
+            console.log("Safex offer minSfxPrice: " + offrs[i].minSfxPrice);
+            console.log("Safex offer pricePegUsed: " + offrs[i].pricePegUsed);
+            console.log("Safex offer pricePegID: " + offrs[i].pricePegID);
+            console.log("Safex offer seller: " + offrs[i].seller);
+            console.log("Safex offer active: " + offrs[i].active);
+            console.log("Safex offer offerID: " + offrs[i].offerID);
+            console.log("Safex offer currency: " + offrs[i].currency);
+*/
+            try {
+                let offer_description = JSON.parse(offrs[i].description);
+                if (offer_description.version > 0) {
+                    offrs[i].descprition = offer_description;
+                    twm_offers.push(offrs[i]);
+
+                } else {
+                    non_offers.push(offrs[i]);
+                    console.log("not a twm structured offer");
+                }
+
+            } catch (err) {
+                console.error(`error at parsing json from description`);
+                console.error(err);
+                non_offers.push(offrs[i]);
+            }
+        }
+
+        this.setState({
+            twm_offers: twm_offers,
+            non_offers: non_offers,
+            interface_view: 'merchant'
+        });
     };
 
     show_settings = () => {
@@ -498,6 +537,56 @@ export default class WalletHome extends React.Component {
         this.setState({selected_user: {username: username, index: index}});
         console.log(username);
         console.log(index);
+    };
+
+    list_new_offer = (e) => {
+        e.preventDefault();
+        e.persist();
+        console.log(`let's register it`);
+
+
+
+        try {
+            let mixins = e.target.mixins.value - 1;
+            let confirm_registration = wallet.createAdvancedTransaction({
+                tx_type: '8',
+                safex_username: e.target.username.value,
+                safex_offer_title: e.target.title.value,
+                safex_offer_price: e.target.price.value * 10000000000,
+                safex_offer_quantity: e.target.quantity.value,
+                safex_offer_description: 'hello',
+                safex_offer_price_peg_used: 0,
+                mixin: mixins
+            }).then((tx) => {
+                console.log(tx);
+                let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${tx.fee() / 10000000000} SFX Safex Cash`);
+                let fee = tx.fee();
+                let txid = tx.transactionsIds();
+                if (confirmed_fee) {
+                    tx.commit().then(async (commit) => {
+                        console.log(commit);
+                        console.log("committed transaction");
+                        alert(`transaction successfully submitted 
+                        transaction id: ${txid}
+                        fee: ${fee / 10000000000}`);
+
+                    }).catch((err) => {
+                        console.error(err);
+                        console.error(`error at the committing of the account registration transaction`);
+                        alert(`there was an error at committing the transaction to the blockchain`);
+                    })
+                } else {
+                    alert(`your transaction was cancelled, no account registration was completed`);
+                }
+
+            }).catch((err) => {
+                console.error(err);
+                alert(`error when committing the transaction: likely has not gone through`)
+            })
+        } catch (err) {
+            console.error(err);
+            console.error("error at listing the offer");
+        }
     };
 
     render() {
@@ -874,8 +963,20 @@ export default class WalletHome extends React.Component {
                                                 <Modal.Title>List a new offer to sell</Modal.Title>
                                             </Modal.Header>
                                             <Modal.Body>
-                                                <Form>
-
+                                                <Form id="list_new_offer" onSubmit={this.list_new_offer}>
+                                                    username <Form.Control name="username"
+                                                                           value={selected.username}/>
+                                                    thumbnail image url <Form.Control name="thumbnail"/>
+                                                    title <Form.Control name="title"/>
+                                                    description <Form.Control as="textarea" name="description"/>
+                                                    price SFX <Form.Control name="price"/>
+                                                    available quantity <Form.Control name="quantity"/>
+                                                    shipping destinations <Form.Control name="location"
+                                                                                        defaultValue="Earth"
+                                                                                        placedholder="your location"/>
+                                                    <Button type="submit">List Offer</Button>
+                                                    mixins <Form.Control name="mixins" defaultValue="7"
+                                                                         placedholder="your location"/>
                                                 </Form>
                                             </Modal.Body>
                                             <Modal.Footer>
@@ -972,7 +1073,8 @@ export default class WalletHome extends React.Component {
                                                onClick={this.show_settings}>Settings</a>
                                         </li>
                                         <li className="menu__list-item">
-                                            <a className="menu__link" onClick={this.logout}>Exit</a>
+                                            <a className="menu__link" href="javascript:void(0)"
+                                               onClick={this.logout}>Exit</a>
                                         </li>
                                     </ul>
                                 </div>
