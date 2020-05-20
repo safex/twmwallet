@@ -2,16 +2,18 @@ import React from 'react';
 
 import {Row, Col, Container, Button, Table, Form, Image, Modal} from 'react-bootstrap';
 
+import {withRouter} from 'react-router-dom';
+
 import {normalize_8decimals} from '../../utils/wallet_creation';
 
 import {send_cash, send_tokens, stake_tokens, unstake_tokens, commit_txn} from "../../utils/wallet_actions";
 
-var nacl = window.require('tweetnacl')
+var nacl = window.require('tweetnacl');
 
 var wallet;
 
 
-export default class WalletHome extends React.Component {
+class WalletHome extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -987,7 +989,7 @@ export default class WalletHome extends React.Component {
                         var selected = this.state.usernames[this.state.selected_user.index];
                         console.log(selected);
                         var data = JSON.parse(selected.data);
-                    } catch(err) {
+                    } catch (err) {
                         console.error(err);
                         console.error(`error at the point of parsing selected user data`);
                     }
@@ -1022,12 +1024,14 @@ export default class WalletHome extends React.Component {
                                                                           placedholder="if you have your own website: paste your link here"/>
                                                     location <Form.Control name="location" defaultValue="Earth"
                                                                            placedholder="your location"/>
-                                                    <button type="submit">create account</button>
                                                     mixins <Form.Control name="mixins" defaultValue="7"
                                                                          placedholder="your location"/>
+
+                                                    <Button variant="primary" type="submit">create account</Button>
                                                 </Form>
                                             </Modal.Body>
                                             <Modal.Footer>
+
                                                 <Button variant="secondary" onClick={this.handleCloseNewAccountForm}>
                                                     Close
                                                 </Button>
@@ -1038,60 +1042,60 @@ export default class WalletHome extends React.Component {
                                     <Row className="account_list">
                                         {accounts_table}
                                     </Row>
-                                    {selected !== void(0) ? (<Row className="merchant_profile_view">
-                                            <Col>
-                                                <Row>
-                                                    <ul>
-                                                        <li><Image width={100} height={100} src={data.avatar}
-                                                                   roundedCircle/>
-                                                        </li>
-                                                        <li>username: {selected.username}</li>
-                                                    </ul>
-                                                </Row>
-                                                <Row>
-                                                    <Button>Edit</Button>
-                                                    <Button>Remove</Button>
-                                                </Row>
-                                            </Col>
-                                        </Row>): ''}
+                                    {selected !== void (0) ? (<Row className="merchant_profile_view">
+                                        <Col>
+                                            <Row>
+                                                <ul>
+                                                    <li><Image width={100} height={100} src={data.avatar}
+                                                               roundedCircle/>
+                                                    </li>
+                                                    <li>username: {selected.username}</li>
+                                                </ul>
+                                            </Row>
+                                            <Row>
+                                                <Button>Edit</Button>
+                                                <Button>Remove</Button>
+                                            </Row>
+                                        </Col>
+                                    </Row>) : ''}
 
                                 </Col>
                                 <Col className="merchant_product_view" sm={8}>
-                                    {selected !== void(0) ? (
-                                    <Row>
-                                        <Button variant="primary" onClick={this.handleShowNewOfferForm}>
-                                            New Offer
-                                        </Button>
+                                    {selected !== void (0) ? (
+                                        <Row>
+                                            <Button variant="primary" onClick={this.handleShowNewOfferForm}>
+                                                New Offer
+                                            </Button>
 
-                                        <Modal animation={false} show={this.state.show_new_offer_form}
-                                               onHide={this.handleCloseNewOfferForm}>
-                                            <Modal.Header closeButton>
-                                                <Modal.Title>List a new offer to sell</Modal.Title>
-                                            </Modal.Header>
-                                            <Modal.Body>
-                                                <Form id="list_new_offer" onSubmit={this.list_new_offer}>
-                                                    username <Form.Control name="username"
-                                                                           value={selected.username}/>
-                                                    thumbnail image url <Form.Control name="thumbnail"/>
-                                                    title <Form.Control name="title"/>
-                                                    description <Form.Control as="textarea" name="description"/>
-                                                    price SFX <Form.Control name="price"/>
-                                                    available quantity <Form.Control name="quantity"/>
-                                                    shipping destinations <Form.Control name="location"
-                                                                                        defaultValue="Earth"
-                                                                                        placedholder="your location"/>
-                                                    <Button type="submit">List Offer</Button>
-                                                    mixins <Form.Control name="mixins" defaultValue="7"
-                                                                         placedholder="your location"/>
-                                                </Form>
-                                            </Modal.Body>
-                                            <Modal.Footer>
-                                                <Button variant="secondary" onClick={this.handleCloseNewOfferForm}>
-                                                    Close
-                                                </Button>
-                                            </Modal.Footer>
-                                        </Modal>
-                                    </Row>):''}
+                                            <Modal animation={false} show={this.state.show_new_offer_form}
+                                                   onHide={this.handleCloseNewOfferForm}>
+                                                <Modal.Header closeButton>
+                                                    <Modal.Title>List a new offer to sell</Modal.Title>
+                                                </Modal.Header>
+                                                <Modal.Body>
+                                                    <Form id="list_new_offer" onSubmit={this.list_new_offer}>
+                                                        username <Form.Control name="username"
+                                                                               value={selected.username}/>
+                                                        thumbnail image url <Form.Control name="thumbnail"/>
+                                                        title <Form.Control name="title"/>
+                                                        description <Form.Control as="textarea" name="description"/>
+                                                        price SFX <Form.Control name="price"/>
+                                                        available quantity <Form.Control name="quantity"/>
+                                                        shipping destinations <Form.Control name="location"
+                                                                                            defaultValue="Earth"
+                                                                                            placedholder="your location"/>
+                                                        <Button type="submit">List Offer</Button>
+                                                        mixins <Form.Control name="mixins" defaultValue="7"
+                                                                             placedholder="your location"/>
+                                                    </Form>
+                                                </Modal.Body>
+                                                <Modal.Footer>
+                                                    <Button variant="secondary" onClick={this.handleCloseNewOfferForm}>
+                                                        Close
+                                                    </Button>
+                                                </Modal.Footer>
+                                            </Modal>
+                                        </Row>) : ''}
                                     <Row>
                                         {this.state.twm_offers.length > 1 ? (<Table>
                                             <thead>
@@ -1155,9 +1159,12 @@ export default class WalletHome extends React.Component {
                                         <ul>
                                             <li>number of tokens staked in the blockchain</li>
                                             <li>your staked tokens in the
-                                                blockchain {unlocked_tokens} {pending_stake > 0 ? ( <span>{pending_stake} pending</span>) : ''}</li>
+                                                blockchain {unlocked_tokens} {pending_stake > 0 ? (
+                                                    <span>{pending_stake} pending</span>) : ''}</li>
                                             <li>current blockheight {this.state.blockchain_height}</li>
-                                            <li>next payout interval in {10 - (this.state.blockchain_height % 10)} blocks</li>
+                                            <li>next payout interval
+                                                in {10 - (this.state.blockchain_height % 10)} blocks
+                                            </li>
                                             <li>next payout amount</li>
                                         </ul>
                                     </div>
@@ -1176,11 +1183,13 @@ export default class WalletHome extends React.Component {
                                         </li>
                                         <li>
                                             <Form id="unstake_tokens" onSubmit={this.make_token_unstake}>
-                                                amount (tokens) (MAX: {unlocked_tokens})<Form.Control name="amount" defaultValue="0"
-                                                                             placedholder="the amount to send"/>
+                                                amount (tokens) (MAX: {unlocked_tokens})<Form.Control name="amount"
+                                                                                                      defaultValue="0"
+                                                                                                      placedholder="the amount to send"/>
                                                 mixin ring size <Form.Control name="mixins" defaultValue="7"
                                                                               placedholder="choose the number of mixins"/>
-                                                <Button type="submit" variant="primary" size="lg" block>unstake and collect</Button>
+                                                <Button type="submit" variant="primary" size="lg" block>unstake and
+                                                    collect</Button>
                                             </Form>
                                         </li>
                                     </ul>
@@ -1310,3 +1319,5 @@ export default class WalletHome extends React.Component {
         );
     }
 }
+
+export default withRouter(WalletHome);
