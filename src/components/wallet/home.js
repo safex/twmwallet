@@ -444,6 +444,7 @@ export default class WalletHome extends React.Component {
     };
 
     show_merchant = () => {
+
         var offrs = wallet.listSafexOffers(true);
         let non_offers = [];
         let twm_offers = [];
@@ -985,8 +986,12 @@ export default class WalletHome extends React.Component {
                     try {
                         var selected = this.state.usernames[this.state.selected_user.index];
                         console.log(selected);
-                        console.log("selewcted");
                         var data = JSON.parse(selected.data);
+                    } catch(err) {
+                        console.error(err);
+                        console.error(`error at the point of parsing selected user data`);
+                    }
+                    try {
                         return (
                             <Row>
                                 <Col sm={4}>
@@ -1033,24 +1038,26 @@ export default class WalletHome extends React.Component {
                                     <Row className="account_list">
                                         {accounts_table}
                                     </Row>
-                                    <Row className="merchant_profile_view">
-                                        <Col>
-                                            <Row>
-                                                <ul>
-                                                    <li><Image width={100} height={100} src={data.avatar}
-                                                               roundedCircle/>
-                                                    </li>
-                                                    <li>username: {selected.username}</li>
-                                                </ul>
-                                            </Row>
-                                            <Row>
-                                                <Button>Edit</Button>
-                                                <Button>Remove</Button>
-                                            </Row>
-                                        </Col>
-                                    </Row>
+                                    {selected !== void(0) ? (<Row className="merchant_profile_view">
+                                            <Col>
+                                                <Row>
+                                                    <ul>
+                                                        <li><Image width={100} height={100} src={data.avatar}
+                                                                   roundedCircle/>
+                                                        </li>
+                                                        <li>username: {selected.username}</li>
+                                                    </ul>
+                                                </Row>
+                                                <Row>
+                                                    <Button>Edit</Button>
+                                                    <Button>Remove</Button>
+                                                </Row>
+                                            </Col>
+                                        </Row>): ''}
+
                                 </Col>
                                 <Col className="merchant_product_view" sm={8}>
+                                    {selected !== void(0) ? (
                                     <Row>
                                         <Button variant="primary" onClick={this.handleShowNewOfferForm}>
                                             New Offer
@@ -1084,7 +1091,7 @@ export default class WalletHome extends React.Component {
                                                 </Button>
                                             </Modal.Footer>
                                         </Modal>
-                                    </Row>
+                                    </Row>):''}
                                     <Row>
                                         {this.state.twm_offers.length > 1 ? (<Table>
                                             <thead>
