@@ -4,7 +4,7 @@ import {Row, Col, Container, Button, Table, Form, Image, Modal} from 'react-boot
 
 import {normalize_8decimals} from '../../utils/wallet_creation';
 
-import {send_cash, send_tokens, commit_txn} from "../../utils/wallet_actions";
+import {send_cash, send_tokens, stake_tokens, unstake_tokens, commit_txn} from "../../utils/wallet_actions";
 
 var nacl = window.require('tweetnacl')
 
@@ -486,6 +486,10 @@ export default class WalletHome extends React.Component {
         });
     };
 
+    show_staking = () => {
+        this.setState({interface_view: 'staking'})
+    };
+
     show_settings = () => {
         this.setState({interface_view: 'settings'})
     };
@@ -545,7 +549,6 @@ export default class WalletHome extends React.Component {
         console.log(`let's register it`);
 
 
-
         try {
             let mixins = e.target.mixins.value - 1;
             let confirm_registration = wallet.createAdvancedTransaction({
@@ -586,6 +589,102 @@ export default class WalletHome extends React.Component {
         } catch (err) {
             console.error(err);
             console.error("error at listing the offer");
+        }
+    };
+
+    make_token_stake = async (e) => {
+        e.preventDefault();
+        e.persist();
+        try {
+            let mixins = e.target.mixins.value - 1;
+            if (mixins >= 0) {
+                let confirmed = window.confirm(`are you sure you want to stake ${e.target.amount.value} SFT Safex Tokens?`);
+                console.log(confirmed);
+                if (confirmed) {
+                    try {
+                        let stake_txn = await stake_tokens(wallet, e.target.amount.value, mixins);
+                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${stake_txn.fee() / 10000000000} SFX Safex Cash`);
+                        let fee = stake_txn.fee();
+                        let txid = stake_txn.transactionsIds();
+                        let amount = e.target.amount.value;
+                        if (confirmed_fee) {
+                            try {
+                                let committed_txn = await commit_txn(stake_txn);
+                                console.log(committed_txn);
+                                console.log(stake_txn);
+                                alert(`token staking transaction successfully submitted 
+                                        transaction id: ${txid}
+                                        amount: ${amount} SFT
+                                        fee: ${fee / 10000000000} SFX`);
+                            } catch (err) {
+                                console.error(err);
+                                console.error(`error when trying to commit the token staking transaction to the blockchain`);
+                                alert(`error when trying to commit the token staking transaction to the blockchain`);
+                            }
+                        } else {
+                            console.log("token staking transaction cancelled");
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        console.error(`error at the token staking transaction formation it was not commited`);
+                        alert(`error at the token staking transaction formation it was not commited`);
+                    }
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            if (err.toString().startsWith('not enough outputs')) {
+                alert(`choose fewer mixins`);
+            }
+            console.error(`error at the token transaction`);
+        }
+    };
+
+    make_token_unstake = async (e) => {
+        e.preventDefault();
+        e.persist();
+        try {
+            let mixins = e.target.mixins.value - 1;
+            if (mixins >= 0) {
+                let confirmed = window.confirm(`are you sure you want to stake ${e.target.amount.value} SFT Safex Tokens?`);
+                console.log(confirmed);
+                if (confirmed) {
+                    try {
+                        let unstake_txn = await unstake_tokens(wallet, e.target.amount.value, mixins);
+                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${unstake_txn.fee() / 10000000000} SFX Safex Cash`);
+                        let fee = unstake_txn.fee();
+                        let txid = unstake_txn.transactionsIds();
+                        let amount = e.target.amount.value;
+                        if (confirmed_fee) {
+                            try {
+                                let committed_txn = await commit_txn(unstake_txn);
+                                console.log(committed_txn);
+                                console.log(unstake_txn);
+                                alert(`token unstake transaction committed  
+                                        transaction id: ${txid}
+                                        amount: ${amount} SFT
+                                        fee: ${fee / 10000000000} SFX`);
+                            } catch (err) {
+                                console.error(err);
+                                console.error(`error when trying to commit the token staking transaction to the blockchain`);
+                                alert(`error when trying to commit the token staking transaction to the blockchain`);
+                            }
+                        } else {
+                            console.log("token staking transaction cancelled");
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        console.error(`error at the token staking transaction formation it was not commited`);
+                        alert(`error at the token staking transaction formation it was not commited`);
+                    }
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            if (err.toString().startsWith('not enough outputs')) {
+                alert(`choose fewer mixins`);
+            }
+            console.error(`error at the token transaction`);
         }
     };
 
@@ -1029,8 +1128,60 @@ export default class WalletHome extends React.Component {
                         return (<div><p>error loading</p></div>);
                     }
                 }
-                case "Tokens":
-                    return (<div></div>);
+                case "staking": {
+                    let staked_tokens = wallet.stakedTokenBalance() / 10000000000;
+                    let unlocked_tokens = wallet.unlockedStakedTokenBalance() / 10000000000;
+                    let pending_stake = (staked_tokens - unlocked_tokens);
+                    return (
+                        <div>
+                            <Row className="wallet">
+                                <Col>
+                                    <div>
+                                        <ul>
+                                            <li>{this.state.tokens} SFT</li>
+                                            {this.state.pending_tokens > 0 ?
+                                                (<li>{this.state.pending_tokens} Pending</li>) : ''}
+                                            {this.state.pending_tokens > 0 ?
+                                                (
+                                                    <li>{this.state.tokens + this.state.pending_tokens} NET</li>) : ''}
+                                        </ul>
+                                        <ul>
+                                            <li>number of tokens staked in the blockchain</li>
+                                            <li>your staked tokens in the
+                                                blockchain {unlocked_tokens} {pending_stake > 0 ? ( <span>{pending_stake} pending</span>) : ''}</li>
+                                            <li>current blockheight {this.state.blockchain_height}</li>
+                                            <li>next payout interval in {10 - (this.state.blockchain_height % 10)} blocks</li>
+                                            <li>next payout amount</li>
+                                        </ul>
+                                    </div>
+                                </Col>
+                                <Col>
+                                    <ul>
+                                        <li>
+                                            <Form id="stake_tokens" onSubmit={this.make_token_stake}>
+                                                amount (tokens)<Form.Control name="amount" defaultValue="0"
+                                                                             placedholder="the amount to send"/>
+                                                mixin ring size <Form.Control name="mixins" defaultValue="7"
+                                                                              placedholder="choose the number of mixins"/>
+                                                <Button type="submit" variant="primary" size="lg" block>stake the
+                                                    tokens</Button>
+                                            </Form>
+                                        </li>
+                                        <li>
+                                            <Form id="unstake_tokens" onSubmit={this.make_token_unstake}>
+                                                amount (tokens) (MAX: {unlocked_tokens})<Form.Control name="amount" defaultValue="0"
+                                                                             placedholder="the amount to send"/>
+                                                mixin ring size <Form.Control name="mixins" defaultValue="7"
+                                                                              placedholder="choose the number of mixins"/>
+                                                <Button type="submit" variant="primary" size="lg" block>unstake and collect</Button>
+                                            </Form>
+                                        </li>
+                                    </ul>
+                                </Col>
+                            </Row>
+                        </div>
+                    );
+                }
                 case "settings":
                     return (<div></div>);
 
@@ -1067,6 +1218,10 @@ export default class WalletHome extends React.Component {
                                         <li className="menu__list-item">
                                             <a className="menu__link" href="javascript:void(0)"
                                                onClick={this.show_merchant}>Merchant</a>
+                                        </li>
+                                        <li className="menu__list-item">
+                                            <a className="menu__link" href="javascript:void(0)"
+                                               onClick={this.show_staking}>Staking</a>
                                         </li>
                                         <li className="menu__list-item">
                                             <a className="menu__link" href="javascript:void(0)"
