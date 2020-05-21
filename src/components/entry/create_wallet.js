@@ -121,7 +121,10 @@ export default class CreateWallet extends React.Component {
                 {this.state.wallet_made ?
                     (<div>
                         <WalletHome
-                            wallet={this.state.wallet}/>
+                            wallet={this.state.wallet}
+                            daemon_host={this.state.daemon_host}
+                            daemon_port={this.state.daemon_port}
+                        />
                     </div>) :
                     (<Container>
                         <button onClick={this.exit_home}>exit home</button>

@@ -11,20 +11,31 @@ export async function get_chain_info(obj) {
 }
 
 export async function get_staked_tokens(obj) {
+    let d_obj = {};
+    d_obj.interval = obj.interval;
     return axios({
-        method: 'get',
+        method: 'post',
         url: 'http://' + obj.daemon_host + ':' + obj.daemon_port + '/get_staked_tokens',
-        data: obj,
+        data: d_obj,
+        headers: {
+            'Content-Type': 'application/json'
+        }
     }).then((resp) => {
         return resp.data;
     });
 }
 
 export async function get_interest_map(obj) {
+    let d_obj = {};
+    d_obj.begin_interval = obj.begin_interval;
+    d_obj.end_interval = obj.end_interval;
     return axios({
-        method: 'get',
+        method: 'post',
         url: 'http://' + obj.daemon_host + ':' + obj.daemon_port + '/get_interest_map',
-        data: obj,
+        data: d_obj,
+        headers: {
+            'Content-Type': 'application/json'
+        }
     }).then((resp) => {
         return resp.data;
     });

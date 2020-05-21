@@ -8,6 +8,8 @@ import {normalize_8decimals} from '../../utils/wallet_creation';
 
 import {send_cash, send_tokens, stake_tokens, unstake_tokens, commit_txn} from "../../utils/wallet_actions";
 
+import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
+
 var nacl = window.require('tweetnacl');
 
 var wallet;
@@ -25,6 +27,8 @@ class WalletHome extends React.Component {
             synced: false,
             wallet_height: 0,
             blockchain_height: 0,
+            daemon_host: '',
+            daemon_port: 0,
             usernames: [],
             connection_status: 'Connecting to the Safex Blockchain Network...',
             timer: '',
@@ -34,7 +38,10 @@ class WalletHome extends React.Component {
             non_offers: [],
             selected_user: {}, //merchant element
             show_new_offer_form: false,
-            show_new_account_form: false
+            show_new_account_form: false,
+            blockchain_tokens_staked: 0,
+            blockchain_interest_history: [],
+            blockchain_current_interest: {}
         };
     }
 
@@ -45,7 +52,9 @@ class WalletHome extends React.Component {
 
             this.setState({
                 wallet_height: wallet.blockchainHeight(),
-                blockchain_height: wallet.daemonBlockchainHeight()
+                blockchain_height: wallet.daemonBlockchainHeight(),
+                daemon_host: this.props.daemon_host,
+                daemon_port: this.props.daemon_port
             });
 
             if (wallet.connected() !== 'disconnected') {
@@ -92,14 +101,45 @@ class WalletHome extends React.Component {
         }
     };
 
-    refresh_action = () => {
+    refresh_action = async () => {
         let m_wallet = wallet;
         console.log("refreshing rn");
+        try {
+            let gst_obj = {};
+            gst_obj.interval = 0;
+            gst_obj.daemon_host = this.state.daemon_host;
+            gst_obj.daemon_port = this.state.daemon_port;
+            let gst = await get_staked_tokens(gst_obj);
+            try {
+                let height = wallet.daemonBlockchainHeight();
+                console.log(height);
+                let previous_interval = (height - (height % 10)) / 10;
+                let gim_obj = {};
+                gim_obj.begin_interval = previous_interval - 3;
+                gim_obj.end_interval = previous_interval + 1;
+                gim_obj.daemon_host = this.state.daemon_host;
+                gim_obj.daemon_port = this.state.daemon_port;
+                let gim = await get_interest_map(gim_obj);
+
+                this.setState({
+                    blockchain_tokens_staked: gst.pairs[0].amount / 10000000000,
+                    blockchain_interest_history: gim.interest_per_interval.slice(0, 4),
+                    blockchain_current_interest: gim.interest_per_interval[4]
+                });
+            } catch (err) {
+                console.error(err);
+                console.error(`error at getting the period interest`);
+            }
+        } catch (err) {
+            console.error(err);
+            console.error(`error at getting the staked tokens from the blockchain`);
+        }
         try {
             m_wallet.store().then(() => {
                 console.log("wallet stored refresh");
 
                 var accs = wallet.getSafexAccounts();
+
 
                 this.setState({
                     address: m_wallet.address(),
@@ -951,7 +991,6 @@ class WalletHome extends React.Component {
                             console.error(err);
                         }
                     });
-
                     var accounts_table = this.state.usernames.map((user, key) => {
                         console.log(user);
                         console.log(key);
@@ -993,6 +1032,8 @@ class WalletHome extends React.Component {
                         console.error(err);
                         console.error(`error at the point of parsing selected user data`);
                     }
+
+
                     try {
                         return (
                             <Row>
@@ -1143,12 +1184,21 @@ class WalletHome extends React.Component {
                     let staked_tokens = wallet.stakedTokenBalance() / 10000000000;
                     let unlocked_tokens = wallet.unlockedStakedTokenBalance() / 10000000000;
                     let pending_stake = (staked_tokens - unlocked_tokens);
+
+
                     return (
                         <div>
                             <Row className="wallet">
                                 <Col>
                                     <div>
                                         <ul>
+                                            <li>{this.state.cash} SFX</li>
+                                            {this.state.pending_cash > 0 ?
+                                                (<li>{this.state.pending_cash} Pending</li>) : ''}
+                                            {this.state.pending_cash > 0 ?
+                                                (
+                                                    <li>{this.state.cash + this.state.pending_cash} NET</li>) : ''}
+                                                    <br/>
                                             <li>{this.state.tokens} SFT</li>
                                             {this.state.pending_tokens > 0 ?
                                                 (<li>{this.state.pending_tokens} Pending</li>) : ''}
@@ -1157,15 +1207,36 @@ class WalletHome extends React.Component {
                                                     <li>{this.state.tokens + this.state.pending_tokens} NET</li>) : ''}
                                         </ul>
                                         <ul>
-                                            <li>number of tokens staked in the blockchain</li>
+                                            <li>number of tokens staked in the
+                                                blockchain {this.state.blockchain_tokens_staked}</li>
                                             <li>your staked tokens in the
                                                 blockchain {unlocked_tokens} {pending_stake > 0 ? (
-                                                    <span>{pending_stake} pending</span>) : ''}</li>
+                                                    <span>| {pending_stake} pending</span>) : ''}</li>
                                             <li>current blockheight {this.state.blockchain_height}</li>
                                             <li>next payout interval
                                                 in {10 - (this.state.blockchain_height % 10)} blocks
                                             </li>
-                                            <li>next payout amount</li>
+                                            <li>
+                                                current accruing
+                                                interest {this.state.blockchain_current_interest.cash_per_token / 10000000000} SFX
+                                                per token
+                                            </li>
+                                            <li>
+                                                <ul>
+                                                    <li>block interval {this.state.blockchain_interest_history[3].interval * 10}
+                                                         : {this.state.blockchain_interest_history[3].cash_per_token / 10000000000} SFX per token
+                                                    </li>
+                                                    <li>block interval {this.state.blockchain_interest_history[2].interval * 10}
+                                                         : {this.state.blockchain_interest_history[2].cash_per_token / 10000000000} SFX per token
+                                                    </li>
+                                                    <li>block interval {this.state.blockchain_interest_history[1].interval * 10}
+                                                         : {this.state.blockchain_interest_history[1].cash_per_token / 10000000000} SFX per token
+                                                    </li>
+                                                    <li>block interval {this.state.blockchain_interest_history[0].interval * 10}
+                                                         : {this.state.blockchain_interest_history[0].cash_per_token / 10000000000} SFX per token
+                                                    </li>
+                                                </ul>
+                                            </li>
                                         </ul>
                                     </div>
                                 </Col>
