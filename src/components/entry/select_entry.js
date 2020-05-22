@@ -73,8 +73,8 @@ export default class SelectEntry extends React.Component {
 
     render() {
         return (<div>
-            <Container>
-                <Row className="justify-content-md-center">
+            <Container className="pt-5">
+                <Row className="justify-content-md-center justify-content-center p-2">
                     <Col sm={6}>
                         <Button onClick={this.open_existing} variant="primary" size="lg" block>
                             Open Existing
@@ -82,7 +82,7 @@ export default class SelectEntry extends React.Component {
                     </Col>
                 </Row>
 
-                <Row className="justify-content-md-center">
+                <Row className="justify-content-md-center justify-content-center p-2">
                     <Col sm={6}>
                         <Button onClick={this.create_new} variant="primary" size="lg" block>
                             Create New
@@ -90,14 +90,14 @@ export default class SelectEntry extends React.Component {
                     </Col>
                 </Row>
 
-                <Row className="justify-content-md-center">
+                <Row className="justify-content-md-center justify-content-center p-2">
                     <Col sm={6}><Button onClick={this.restore_keys} variant="primary" size="lg" block>
                         Recover From Keys
                     </Button>
                     </Col>
                 </Row>
 
-                <Row className="justify-content-md-center">
+                <Row className="justify-content-md-center justify-content-center p-2">
                     <Col sm={6}>
                         <Button onClick={this.seed_phrase} variant="primary" size="lg" block>
                             Recover From Seed Phrase
@@ -106,7 +106,7 @@ export default class SelectEntry extends React.Component {
                 </Row>
 
                 {this.state.legacy_detected ? (
-                    <Row className="justify-content-md-center">
+                    <Row className="justify-content-md-center p-2">
                         <Col sm={6}>
                             <Button onClick={this.restore_legacy} variant="primary" size="lg" block>
                                 Load from a Legacy Wallet

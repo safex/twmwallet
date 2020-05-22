@@ -806,8 +806,7 @@ class WalletHome extends React.Component {
                                                                                    placedholder="the amount to send"/>
                                                         mixin ring size <Form.Control name="mixins" defaultValue="7"
                                                                                       placedholder="choose the number of mixins"/>
-                                                        <Button type="submit" variant="primary" size="lg" block>send the
-                                                            cash</Button>
+                                                        <Button type="submit" variant="primary" size="lg" block>Send Cash</Button>
                                                     </Form>
                                                 </li>
                                             </ul>
@@ -845,8 +844,7 @@ class WalletHome extends React.Component {
                                                                                      placedholder="the amount to send"/>
                                                         mixin ring size <Form.Control name="mixins" defaultValue="7"
                                                                                       placedholder="choose the number of mixins"/>
-                                                        <Button type="submit" variant="primary" size="lg" block>send the
-                                                            tokens</Button>
+                                                        <Button type="submit" variant="primary" size="lg" block>Send Tokens</Button>
                                                     </Form>
                                                 </li>
                                             </ul>
@@ -901,10 +899,10 @@ class WalletHome extends React.Component {
                                     <option value="1">1</option>
                                 </select></td>
                                 <td>
-                                    <button>buy</button>
+                                    <Button variant="success">BUY</Button>
                                 </td>
                                 <td>
-                                    <button>contact</button>
+                                    <Button variant="info">CONTACT</Button>
                                 </td>
                             </tr>
 
@@ -1125,9 +1123,9 @@ class WalletHome extends React.Component {
                                                         shipping destinations <Form.Control name="location"
                                                                                             defaultValue="Earth"
                                                                                             placedholder="your location"/>
-                                                        <Button type="submit">List Offer</Button>
                                                         mixins <Form.Control name="mixins" defaultValue="7"
                                                                              placedholder="your location"/>
+                                                        <Button type="submit">List Offer</Button>
                                                     </Form>
                                                 </Modal.Body>
                                                 <Modal.Footer>
@@ -1137,8 +1135,8 @@ class WalletHome extends React.Component {
                                                 </Modal.Footer>
                                             </Modal>
                                         </Row>) : ''}
-                                    <Row>
-                                        {this.state.twm_offers.length > 1 ? (<Table>
+                                    <Row className="offer__container">
+                                        {this.state.twm_offers.length > 1 ? (<Table className="offer__container">
                                             <thead>
                                             <tr>
                                                 <th>title</th>
@@ -1154,7 +1152,7 @@ class WalletHome extends React.Component {
                                         </Table>) : (<div></div>)}
                                     </Row>
 
-                                    <Row>
+                                    <Row className="overflow-x">
                                         <Table>
                                             <thead>
                                             <tr>
@@ -1338,17 +1336,17 @@ class WalletHome extends React.Component {
                         </Col>
                         <Col>
                             <ul>
-                                <li>Blockchain Height: {this.state.blockchain_height}</li>
+                                <li className="mb-2">Blockchain Height: <b>{this.state.blockchain_height}</b></li>
                                 {this.state.wallet_height < this.state.blockchain_height ?
                                     (<li>
                                         {this.state.wallet_height} / {this.state.blockchain_height}
                                     </li>) : ''}
                                 <li>{this.state.connection_status}</li>
                                 <li>
-                                    {this.state.synced === false ? (<Button onClick={this.check}>check</Button>) : ''}
-                                    <Button variant="danger" onClick={this.rescan}>hard rescan</Button>
-                                    <Button variant="primary" onClick={this.handleShow}>
-                                        Show keys
+                                    {this.state.synced === false ? (<Button className="m-1" onClick={this.check}>Check</Button>) : ''}
+                                    <Button className="m-1" variant="danger" onClick={this.rescan}>Hard Rescan</Button>
+                                    <Button className="m-1" variant="primary" onClick={this.handleShow}>
+                                        Show Keys
                                     </Button>
 
                                     <Modal animation={false} show={this.state.show_keys} onHide={this.handleClose}>
@@ -1358,16 +1356,16 @@ class WalletHome extends React.Component {
                                         <Modal.Body>
                                             <ul>
                                                 <li>
-                                                    address <br/> {this.props.wallet.address()}
+                                                    <b>Address:</b> <br/> {this.props.wallet.address()}
                                                 </li>
                                                 <li>
-                                                    secret spend key <br/> {this.props.wallet.secretSpendKey()}
+                                                    <b>Secret Spend Key:</b> <br/> {this.props.wallet.secretSpendKey()}
                                                 </li>
                                                 <li>
-                                                    secret view key <br/> {this.props.wallet.secretViewKey()}
+                                                    <b>Secret View Key:</b> <br/> {this.props.wallet.secretViewKey()}
                                                 </li>
                                                 <li>
-                                                    mnemonic seed <br/> {this.props.wallet.seed()}
+                                                    <b>Mnemonic Seed:</b> <br/> {this.props.wallet.seed()}
                                                 </li>
                                             </ul>
                                         </Modal.Body>

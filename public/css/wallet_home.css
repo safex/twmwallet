@@ -31,6 +31,10 @@
     max-height: 800px;
 }
 
+.overflow-x {
+    overflow-x: auto!important;
+}
+
 ul {
     list-style-type: none;
     padding: 0;
@@ -55,7 +59,8 @@ ul {
 }
 
 .selected_account_element {
-    margin: 4px;
+    margin: 10px!important;
+    padding: 4px!important;
     border: 2px solid #5cb85c;
     width: 100%;
     height: 120px;
@@ -72,3 +77,6 @@ td, th {
 }
 
 
+li {
+    word-wrap: break-word
+}
