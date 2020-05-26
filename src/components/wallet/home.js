@@ -273,9 +273,6 @@ class WalletHome extends React.Component {
                 if (vees.website.value.length > 0) {
                     d_obj.website = vees.website.value;
                 }
-                if (vees.website.value.length > 0) {
-                    d_obj.website = vees.website.value;
-                }
                 if (vees.location.value.length > 0) {
                     d_obj.location = vees.location.value;
                 }
@@ -318,7 +315,6 @@ class WalletHome extends React.Component {
                         } else {
                             alert(`your transaction was cancelled, no account registration was completed`);
                         }
-
                     }).catch((err) => {
                         console.error(err);
                         alert(`error when committing the transaction: likely has not gone through`)
@@ -806,7 +802,8 @@ class WalletHome extends React.Component {
                                                                                    placedholder="the amount to send"/>
                                                         mixin ring size <Form.Control name="mixins" defaultValue="7"
                                                                                       placedholder="choose the number of mixins"/>
-                                                        <Button type="submit" variant="primary" size="lg" block>Send Cash</Button>
+                                                        <Button type="submit" variant="primary" size="lg" block>Send
+                                                            Cash</Button>
                                                     </Form>
                                                 </li>
                                             </ul>
@@ -844,7 +841,8 @@ class WalletHome extends React.Component {
                                                                                      placedholder="the amount to send"/>
                                                         mixin ring size <Form.Control name="mixins" defaultValue="7"
                                                                                       placedholder="choose the number of mixins"/>
-                                                        <Button type="submit" variant="primary" size="lg" block>Send Tokens</Button>
+                                                        <Button type="submit" variant="primary" size="lg" block>Send
+                                                            Tokens</Button>
                                                     </Form>
                                                 </li>
                                             </ul>
@@ -1196,7 +1194,7 @@ class WalletHome extends React.Component {
                                             {this.state.pending_cash > 0 ?
                                                 (
                                                     <li>{this.state.cash + this.state.pending_cash} NET</li>) : ''}
-                                                    <br/>
+                                            <br/>
                                             <li>{this.state.tokens} SFT</li>
                                             {this.state.pending_tokens > 0 ?
                                                 (<li>{this.state.pending_tokens} Pending</li>) : ''}
@@ -1221,17 +1219,25 @@ class WalletHome extends React.Component {
                                             </li>
                                             <li>
                                                 <ul>
-                                                    <li>block interval {this.state.blockchain_interest_history[3].interval * 10}
-                                                         : {this.state.blockchain_interest_history[3].cash_per_token / 10000000000} SFX per token
+                                                    <li>block
+                                                        interval {this.state.blockchain_interest_history[3].interval * 10}
+                                                        : {this.state.blockchain_interest_history[3].cash_per_token / 10000000000} SFX
+                                                        per token
                                                     </li>
-                                                    <li>block interval {this.state.blockchain_interest_history[2].interval * 10}
-                                                         : {this.state.blockchain_interest_history[2].cash_per_token / 10000000000} SFX per token
+                                                    <li>block
+                                                        interval {this.state.blockchain_interest_history[2].interval * 10}
+                                                        : {this.state.blockchain_interest_history[2].cash_per_token / 10000000000} SFX
+                                                        per token
                                                     </li>
-                                                    <li>block interval {this.state.blockchain_interest_history[1].interval * 10}
-                                                         : {this.state.blockchain_interest_history[1].cash_per_token / 10000000000} SFX per token
+                                                    <li>block
+                                                        interval {this.state.blockchain_interest_history[1].interval * 10}
+                                                        : {this.state.blockchain_interest_history[1].cash_per_token / 10000000000} SFX
+                                                        per token
                                                     </li>
-                                                    <li>block interval {this.state.blockchain_interest_history[0].interval * 10}
-                                                         : {this.state.blockchain_interest_history[0].cash_per_token / 10000000000} SFX per token
+                                                    <li>block
+                                                        interval {this.state.blockchain_interest_history[0].interval * 10}
+                                                        : {this.state.blockchain_interest_history[0].cash_per_token / 10000000000} SFX
+                                                        per token
                                                     </li>
                                                 </ul>
                                             </li>
@@ -1343,7 +1349,8 @@ class WalletHome extends React.Component {
                                     </li>) : ''}
                                 <li>{this.state.connection_status}</li>
                                 <li>
-                                    {this.state.synced === false ? (<Button className="m-1" onClick={this.check}>Check</Button>) : ''}
+                                    {this.state.synced === false ? (
+                                        <Button className="m-1" onClick={this.check}>Check</Button>) : ''}
                                     <Button className="m-1" variant="danger" onClick={this.rescan}>Hard Rescan</Button>
                                     <Button className="m-1" variant="primary" onClick={this.handleShow}>
                                         Show Keys
