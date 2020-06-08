@@ -50,6 +50,7 @@ class WalletHome extends React.Component {
             console.log(this.props.wallet);
             wallet = this.props.wallet;
 
+
             this.setState({
                 wallet_height: wallet.blockchainHeight(),
                 blockchain_height: wallet.daemonBlockchainHeight(),
@@ -57,6 +58,39 @@ class WalletHome extends React.Component {
                 daemon_port: this.props.daemon_port
             });
 
+            try {
+                let gst_obj = {};
+                gst_obj.interval = 0;
+                gst_obj.daemon_host = this.props.daemon_host;
+                gst_obj.daemon_port = this.props.daemon_port;
+                let gst = await get_staked_tokens(gst_obj);
+                try {
+                    let height = wallet.daemonBlockchainHeight();
+                    console.log(height);
+                    let previous_interval = (height - (height % 10)) / 10;
+                    let gim_obj = {};
+                    gim_obj.begin_interval = previous_interval - 3;
+                    gim_obj.end_interval = previous_interval + 1;
+                    gim_obj.daemon_host = this.props.daemon_host;
+                    gim_obj.daemon_port = this.props.daemon_port;
+
+                    console.log(`gim object`);
+                    console.log(gim_obj);
+                    let gim = await get_interest_map(gim_obj);
+
+                    this.setState({
+                        blockchain_tokens_staked: gst.pairs[0].amount / 10000000000,
+                        blockchain_interest_history: gim.interest_per_interval.slice(0, 4),
+                        blockchain_current_interest: gim.interest_per_interval[4]
+                    });
+                } catch (err) {
+                    console.error(err);
+                    console.error(`error at getting the period interest`);
+                }
+            } catch (err) {
+                console.error(err);
+                console.error(`error at getting the staked tokens from the blockchain`);
+            }
             if (wallet.connected() !== 'disconnected') {
                 this.setState({connection_status: 'Connected to the Safex Blockchain Network'});
 
@@ -119,6 +153,9 @@ class WalletHome extends React.Component {
                 gim_obj.end_interval = previous_interval + 1;
                 gim_obj.daemon_host = this.state.daemon_host;
                 gim_obj.daemon_port = this.state.daemon_port;
+
+                console.log(`gim object`);
+                console.log(gim_obj);
                 let gim = await get_interest_map(gim_obj);
 
                 this.setState({
@@ -276,6 +313,7 @@ class WalletHome extends React.Component {
                 if (vees.location.value.length > 0) {
                     d_obj.location = vees.location.value;
                 }
+                d_obj.twm_version = 1;
                 console.log(JSON.stringify(d_obj));
                 let account = wallet.createSafexAccount(e.target.username.value, JSON.stringify(d_obj));
                 console.log(account);
