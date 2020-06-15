@@ -54,6 +54,23 @@ export async function unstake_tokens(wallet, amount, mixin) {
     });
 }
 
+
+export async function purchase_offer(wallet, amount, offer_id, quantity, address, mixin) {
+    let mixi = mixin >= 0 ? mixin : 6;
+    return wallet.createAdvancedTransaction({
+        tx_type: '5',
+        address: address,
+        amount: amount * 10000000000,
+        safex_offer_id: offer_id,
+        safex_purchase_quantity: quantity,
+        mixin: mixi
+    }).then((tx) => {
+        console.log(`purchase transaction created: ${tx.transactionsIds()}`);
+        return tx;
+    });
+}
+
+
 export async function commit_txn(txn) {
     return txn.commit().then((commit) => {
         console.log(`commit ${commit}`);
