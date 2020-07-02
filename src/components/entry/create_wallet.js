@@ -2,6 +2,7 @@ import React from 'react';
 import {Row, Col, Container, Button, Form} from 'react-bootstrap';
 import path from 'path';
 import {create_wallet} from '../../utils/wallet_creation';
+import { FaBackward } from 'react-icons/fa'
 
 import WalletHome from "../wallet/home";
 
@@ -117,7 +118,7 @@ export default class CreateWallet extends React.Component {
 
     render() {
         return (
-            <div>
+            <Container fluid className="safex_blue d-flex flex-column justify-content-center ">
                 {this.state.wallet_made ?
                     (<div>
                         <WalletHome
@@ -126,129 +127,138 @@ export default class CreateWallet extends React.Component {
                             daemon_port={this.state.daemon_port}
                         />
                     </div>) :
-                    (<Container>
-                        <button onClick={this.exit_home}>exit home</button>
-                        <Row className="justify-content-md-center">
-                            <Col sm={6}>
-                                <p>
-                                    This path creates a new set of keys and a Safex Wallet.
-                                </p>
-                                <p>
-                                    <input
-                                        name="isTestnet"
-                                        type="checkbox"
-                                        checked={this.state.testnet}
-                                        onChange={this.set_to_testnet}/>
-                                </p>
-                            </Col>
+                    (<Container fluid className="font-size-small b-r25 grey-back d-flex flex-column safex_blue white-text" >
+                        <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
+                        
+                        <Row className="align-items-center mb-5 justify-content-center">   
+                            <h1>Create New Wallet</h1>
                         </Row>
+                        
+                        <Col sm={8} className="d-flex justify-content-center align-self-center flex-column text-center" >
+                            
+                            
+                            <p>
+                                This path creates a new set of keys and a Safex Wallet.
+                            </p>
+                            <p className="border border-danger b-r25">
+                                If you are participating in the testnet, tick this box
+                                <input
+                                    name="isTestnet"
+                                    type="checkbox"
+                                    checked={this.state.testnet}
+                                    onChange={this.set_to_testnet}
+                                    className="ml-2"
+                                />
+                            </p>
+                        
+                       
 
                         {this.state.new_path.length > 0 ?
                             (<div></div>) :
-                            (<Row className="justify-content-md-center">
-                                <Col sm={6}>
-                                    <div>
+                            (
+                                    <div className="mt-2 border border-warning  b-r25">
                                         <p>
                                             Set the path where to save your new wallet file
                                         </p>
-                                        <Form id="set_path" onSubmit={this.set_path}>
-                                            <Button type="submit" variant="primary" size="lg" block>Select File
+                                        <Form className="mt-2 mb-2" id="set_path" onSubmit={this.set_path}>
+                                            <Button type="submit" variant="primary" size="lg">Select File
                                                 Path</Button>
                                         </Form>
                                     </div>
-                                </Col>
-                            </Row>)
+                                )
                         }
-
+                        
                         {this.state.new_path.length > 0 && this.state.daemon_host.length < 1 ?
-                            (<Row className="justify-content-md-center">
-                                <Col sm={6}>
-                                    <div>
-                                        <Form id="set_daemon" onSubmit={this.set_daemon_state}>
-                                            <Form.Control name="daemon_host" defaultValue="rpc.safex.org"
+                            (
+                                    <Col className="mb-2 mt-2 border border-warning b-r25">
+                                        <Form  id="set_daemon" className="auto_margin_50" onSubmit={this.set_daemon_state}>
+                                            <Form.Control className="mt-2 mb-2"  name="daemon_host" defaultValue="rpc.safex.org"
                                                           placedholder="set the ip address of the safex blockchain"/>
-                                            <Form.Control name="daemon_port" defaultValue="17402"
+                                            <Form.Control className="mt-2 mb-2"  name="daemon_port" defaultValue="17402"
                                                           placedholder="set the port of the safex blockchain"/>
-                                            <Button type="submit" variant="primary" size="lg" block>set
-                                                connection</Button>
+                                            <Button className="mb-2" type="submit" variant="primary" size="lg">Set
+                                                Connection</Button>
                                         </Form>
-                                    </div>
+                                    </Col>
+                               ) :
+                            (
+                                <Col className="d-flex flex-column mb-2 mt-2 border border-warning b-r25">
+                                    <p className="mt-2 mb-2">
+                                        You will be connected
+                                        to <b>{this.state.daemon_host}:{this.state.daemon_port}</b> for
+                                        blockchain synchronization
+                                        <br/>
+                                    </p>
+                                        <Button
+                                            className="align-self-center mb-2 mt-2"
+                                            onClick={this.change_daemon}>Change Safex Network Connection
+                                        </Button>
+                                    
                                 </Col>
-                            </Row>) :
-                            (<Row className="justify-content-md-center">
-                                <Col sm={6}>
-                                    <div>
-                                        <p>
-                                            you will be connected
-                                            to {this.state.daemon_host}:{this.state.daemon_port} for
-                                            blockchain synchronization<Button
-                                            onClick={this.change_daemon}>change safex network connection?</Button>
-                                        </p>
-                                    </div>
-                                </Col>
-                            </Row>)
+                            )
                         }
 
                         {this.state.new_path.length > 0 &&
                         this.state.daemon_host.length > 0 &&
                         this.state.password.length < 1 ?
-                            (<Row className="justify-content-md-center">
-                                <Col sm={6}>
-                                    <div>
-                                        <div>
-                                            <Form id="set_password" onSubmit={this.set_password}>
-                                                <Form.Control name="password" type="password"
-                                                              placedholder="set the ip address of the safex blockchain"/>
-                                                <Form.Control name="repeat_password" type="password"
-                                                              placedholder="set the port of the safex blockchain"/>
-                                                <Button type="submit" variant="primary" size="lg" block>set
-                                                    password</Button>
-                                            </Form>
-                                        </div>
-
-                                    </div>
+                            
+                                   
+                            (<Col className="mb-2 mt-2 border border-warning b-r25 ">
+                                <Form id="set_password" className="auto_margin_50" onSubmit={this.set_password}>
+                                    <Form.Control name="password" className="mt-2 mb-2" type="password"
+                                                    placedholder="Set the ip address of the Safex blockchain"/>
+                                    <Form.Control name="repeat_password" className="mt-2 mb-2" type="password"
+                                                    placedholder="Set the port of the Safex blockchain"/>
+                                    <Button type="submit" variant="primary" className="mb-2" size="lg" block>Set
+                                        Password</Button>
+                                </Form>
+                            </Col>
+                        
+                            ) :
+                            (
+                                <Col className="d-flex flex-column mb-5 border border-warning b-r25">
+                                    <p className="mt-2 mb-2">
+                                        Your chosen password is: {[...Array(this.state.password.length)].map(() =>
+                                        <span>♦</span>)}
+                                    </p>
+                                    <Row className="align-self-center mt-2 mb-2">
+                                        <Button className="mt-2 mr-2"
+                                            onClick={this.show_password}>Show Password</Button>
+                                        <Button className="mt-2"
+                                            onClick={this.change_password}>Change Password</Button>
+                                    </Row>
                                 </Col>
-                            </Row>) :
-                            (<Row className="justify-content-md-center">
-                                <Col sm={6}>
-                                    <div>
-                                        <p>
-                                            your chosen password is : {[...Array(this.state.password.length)].map(() =>
-                                            <span>♦</span>)}
-
-                                            <Button
-                                                onClick={this.show_password}>show password</Button>
-                                            <Button
-                                                onClick={this.change_password}>change password</Button>
-                                        </p>
-                                    </div>
-                                </Col>
-                            </Row>)
+                            )
                         }
 
                         {this.state.new_path.length > 0 &&
                         this.state.daemon_host.length > 0 &&
                         this.state.password.length > 0 ?
-                            (<Row className="justify-content-md-center">
-                                <Col sm={6}>
-                                            <div>
-                                                <p>
-                                                    this file will be saved to {this.state.new_path} <Button
-                                                    onClick={this.change_path}>change path?</Button>
-                                                </p>
-                                            </div>
-                                    <div>
-                                        <Button onClick={this.make_wallet} variant="primary" size="lg" block>Make
-                                            the New Wallet</Button>
+                            (   <Col className="mt-5">
+                                    <Col className="p-2 justify-content-between align-items-baseline border border-warning b-r25">
+                                        <p>
+                                            This file will be saved to: <b>{this.state.new_path}</b>
+                                        </p>
+                                        <Button onClick={this.change_path}>
+                                            Change Path
+                                        </Button>
+                                    </Col>
+                                    
+                                    <div className="mt-5 mb-5">
+                                        <Button onClick={this.make_wallet} variant="primary" size="lg">
+                                            Create New Wallet
+                                        </Button>
                                     </div>
-                                </Col>
-                            </Row>) :
+
+                                </Col>    
+                                ) :
                             (<div>
                             </div>)
                         }
+                        </Col>
                     </Container>)
                 }
-            </div>
+            </Container>
         );
     }
 }

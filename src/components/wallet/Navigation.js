@@ -29,7 +29,7 @@ export default class Navigation extends React.Component {
 
     render() {
         return (
-            <div className="container center">
+            <div className="container center white-text">
                 <nav className="menu">
                     <h1 className="menu__logo"></h1>
 
