@@ -14,7 +14,7 @@ export async function get_staked_tokens(obj) {
     let d_obj = {};
     d_obj.interval = obj.interval;
     return axios({
-        method: 'post',
+        method: 'get',
         url: 'http://' + obj.daemon_host + ':' + obj.daemon_port + '/get_staked_tokens',
         data: d_obj,
         headers: {

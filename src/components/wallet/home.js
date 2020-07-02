@@ -10,7 +10,9 @@ import {send_cash, send_tokens, stake_tokens, unstake_tokens, commit_txn} from "
 
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
 
+const openpgp = window.require('openpgp');
 var nacl = window.require('tweetnacl');
+
 
 var wallet;
 
@@ -41,7 +43,8 @@ class WalletHome extends React.Component {
             show_new_account_form: false,
             blockchain_tokens_staked: 0,
             blockchain_interest_history: [],
-            blockchain_current_interest: {}
+            blockchain_current_interest: {},
+            twm_file: {}
         };
     }
 
@@ -49,13 +52,17 @@ class WalletHome extends React.Component {
         try {
             console.log(this.props.wallet);
             wallet = this.props.wallet;
+            let twm_ls = localStorage.getItem('twm_file');
+            console.log(twm_ls);
+            let twm_file = JSON.parse(twm_ls);
 
 
             this.setState({
                 wallet_height: wallet.blockchainHeight(),
                 blockchain_height: wallet.daemonBlockchainHeight(),
                 daemon_host: this.props.daemon_host,
-                daemon_port: this.props.daemon_port
+                daemon_port: this.props.daemon_port,
+                twm_file: twm_file
             });
 
             try {
@@ -67,7 +74,10 @@ class WalletHome extends React.Component {
                 try {
                     let height = wallet.daemonBlockchainHeight();
                     console.log(height);
-                    let previous_interval = (height - (height % 10)) / 10;
+                    if (height === 0) {
+                        height = 95000;
+                    }
+                    let previous_interval = (height - (height % 100)) / 100;
                     let gim_obj = {};
                     gim_obj.begin_interval = previous_interval - 3;
                     gim_obj.end_interval = previous_interval + 1;
@@ -147,7 +157,7 @@ class WalletHome extends React.Component {
             try {
                 let height = wallet.daemonBlockchainHeight();
                 console.log(height);
-                let previous_interval = (height - (height % 10)) / 10;
+                let previous_interval = (height - (height % 100)) / 100;
                 let gim_obj = {};
                 gim_obj.begin_interval = previous_interval - 3;
                 gim_obj.end_interval = previous_interval + 1;
@@ -272,19 +282,6 @@ class WalletHome extends React.Component {
     };
 
 
-    test_sign = async () => {
-        try {
-            let keys = nacl.sign.keyPair.fromSecretKey(Buffer.from(this.state.usernames[0].privateKey));
-            console.log(keys);
-
-            console.log(this.state.usernames[0].privateKey);
-            console.log(this.state.usernames[0].publicKey)
-
-            console.log(String.fromCharCode.apply(null, keys.secretKey));
-        } catch (err) {
-            console.error(err);
-        }
-    };
 
     register_account = async (e) => {
         e.preventDefault();
@@ -313,8 +310,8 @@ class WalletHome extends React.Component {
                 if (vees.location.value.length > 0) {
                     d_obj.location = vees.location.value;
                 }
+
                 d_obj.twm_version = 1;
-                console.log(JSON.stringify(d_obj));
                 let account = wallet.createSafexAccount(e.target.username.value, JSON.stringify(d_obj));
                 console.log(account);
                 console.log(`account registered`);
@@ -628,7 +625,7 @@ class WalletHome extends React.Component {
 
         try {
             let mixins = e.target.mixins.value - 1;
-            let confirm_registration = wallet.createAdvancedTransaction({
+            let new_offer_transaction = wallet.createAdvancedTransaction({
                 tx_type: '8',
                 safex_username: e.target.username.value,
                 safex_offer_title: e.target.title.value,
@@ -765,9 +762,38 @@ class WalletHome extends React.Component {
         }
     };
 
+
+    register_twmapi = async(user, twm_api_url = 'http://127.0.0.1:17700 ') => {
+        console.log(user);
+
+        //here we contact the api and check if this user is already registered or not.
+        //if it is, let's download the data.
+        //if it isn't let's generate for this user the pgp keys and pack them sign them and register with the api.
+
+        //edit twm file and save
+        let twm_file = this.state.twm_file;
+
+        if (twm_file.accounts.hasOwnProperty(user)) {
+
+        }
+        try {
+            const key = await openpgp.generateKey({
+                rsaBits: 4096,                                              // RSA key size
+                passphrase: this.state.password           // protects the private key
+            });
+            let keys = nacl.sign.keyPair.fromSecretKey(Buffer.from(this.state.usernames[0].privateKey));
+            console.log(keys);
+
+            console.log(this.state.usernames[0].privateKey);
+            console.log(this.state.usernames[0].publicKey);
+
+            console.log(String.fromCharCode.apply(null, keys.secretKey));
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     render() {
-
-
         const twmwallet = () => {
             switch (this.state.interface_view) {
 
@@ -1130,6 +1156,7 @@ class WalletHome extends React.Component {
                                             <Row>
                                                 <Button>Edit</Button>
                                                 <Button>Remove</Button>
+                                                <Button onClick={() => this.register_twmapi(selected)}>Register API</Button>
                                             </Row>
                                         </Col>
                                     </Row>) : ''}
@@ -1218,6 +1245,20 @@ class WalletHome extends React.Component {
                     let staked_tokens = wallet.stakedTokenBalance() / 10000000000;
                     let unlocked_tokens = wallet.unlockedStakedTokenBalance() / 10000000000;
                     let pending_stake = (staked_tokens - unlocked_tokens);
+                    let interval = [0,0,0,0];
+                    let interest = [0,0,0,0];
+
+                    try {
+                        for (const [i, bit] of this.state.blockchain_interest_history.entries()) {
+                            console.log(`bit ${bit}`);
+                            interval[i] = bit.interval * 100;
+                            interest[i] = bit.cash_per_token / 10000000000;
+                        }
+
+                    } catch(err) {
+                        console.error(err);
+                        console.error(`error at the interval loading of stacking`);
+                    }
 
 
                     return (
@@ -1248,7 +1289,7 @@ class WalletHome extends React.Component {
                                                     <span>| {pending_stake} pending</span>) : ''}</li>
                                             <li>current blockheight {this.state.blockchain_height}</li>
                                             <li>next payout interval
-                                                in {10 - (this.state.blockchain_height % 10)} blocks
+                                                in {100 - (this.state.blockchain_height % 100)} blocks
                                             </li>
                                             <li>
                                                 current accruing
@@ -1258,23 +1299,23 @@ class WalletHome extends React.Component {
                                             <li>
                                                 <ul>
                                                     <li>block
-                                                        interval {this.state.blockchain_interest_history[3].interval * 10}
-                                                        : {this.state.blockchain_interest_history[3].cash_per_token / 10000000000} SFX
+                                                        interval {interval[3]}
+                                                        : {interest[3]} SFX
                                                         per token
                                                     </li>
                                                     <li>block
-                                                        interval {this.state.blockchain_interest_history[2].interval * 10}
-                                                        : {this.state.blockchain_interest_history[2].cash_per_token / 10000000000} SFX
+                                                        interval {interval[2] * 10}
+                                                        : {interest[2]} SFX
                                                         per token
                                                     </li>
                                                     <li>block
-                                                        interval {this.state.blockchain_interest_history[1].interval * 10}
-                                                        : {this.state.blockchain_interest_history[1].cash_per_token / 10000000000} SFX
+                                                        interval {interval[1] * 10}
+                                                        : {interest[1]} SFX
                                                         per token
                                                     </li>
                                                     <li>block
-                                                        interval {this.state.blockchain_interest_history[0].interval * 10}
-                                                        : {this.state.blockchain_interest_history[0].cash_per_token / 10000000000} SFX
+                                                        interval {interval[0] * 10}
+                                                        : {interest[0]} SFX
                                                         per token
                                                     </li>
                                                 </ul>
