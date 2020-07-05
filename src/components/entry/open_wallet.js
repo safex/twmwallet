@@ -1,6 +1,5 @@
 import React from 'react';
 import {Row, Col, OverlayTrigger, Container, Button, Form} from 'react-bootstrap';
-import path from 'path';
 import {open_wallet} from '../../utils/wallet_creation';
 import {FaBackward} from 'react-icons/fa';
 import WalletHome from '../wallet/home';

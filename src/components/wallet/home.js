@@ -12,14 +12,13 @@ import {send_cash, send_tokens, stake_tokens, unstake_tokens, commit_txn} from "
 
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
 
-const openpgp = window.require('openpgp');
 // Icon Imports
 import { FaCogs, FaSearch } from 'react-icons/fa'
 import { GiExitDoor } from 'react-icons/gi'
 import { GrCubes } from 'react-icons/gr'
 import { IconContext } from 'react-icons'
 
-
+const openpgp = window.require('openpgp');
 
 var nacl = window.require('tweetnacl');
 
