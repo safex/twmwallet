@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Row, Col, Container, Button, Table, Form, Image, Modal} from 'react-bootstrap';
 
-import { MDBDataTable } from 'mdbreact'
+import {MDBDataTable} from 'mdbreact'
 
 import {withRouter} from 'react-router-dom';
 
@@ -13,10 +13,10 @@ import {send_cash, send_tokens, stake_tokens, unstake_tokens, commit_txn} from "
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
 
 // Icon Imports
-import { FaCogs, FaSearch } from 'react-icons/fa'
-import { GiExitDoor } from 'react-icons/gi'
-import { GrCubes } from 'react-icons/gr'
-import { IconContext } from 'react-icons'
+import {FaCogs, FaSearch} from 'react-icons/fa'
+import {GiExitDoor} from 'react-icons/gi'
+import {GrCubes} from 'react-icons/gr'
+import {IconContext} from 'react-icons'
 
 const openpgp = window.require('openpgp');
 
@@ -290,7 +290,6 @@ class WalletHome extends React.Component {
     };
 
 
-
     register_account = async (e) => {
         e.preventDefault();
         if (this.state.tokens >= 5000 && this.state.first_refresh === true) {
@@ -300,6 +299,7 @@ class WalletHome extends React.Component {
                 console.log(vees);
 
                 let d_obj = {};
+                d_obj.twm_version = 1;
                 if (vees.avatar.value.length > 0) {
                     d_obj.avatar = vees.avatar.value;
                 }
@@ -308,6 +308,12 @@ class WalletHome extends React.Component {
                 }
                 if (vees.facebook.value.length > 0) {
                     d_obj.facebook = vees.facebook.value;
+                }
+                if (vees.linkedin.value.length > 0) {
+                    d_obj.linkedin = vees.linkedin.value;
+                }
+                if (vees.email.value.length > 0) {
+                    d_obj.email_address = vees.email.value;
                 }
                 if (vees.biography.value.length > 0) {
                     d_obj.biography = vees.biography.value;
@@ -318,7 +324,6 @@ class WalletHome extends React.Component {
                 if (vees.location.value.length > 0) {
                     d_obj.location = vees.location.value;
                 }
-                d_obj.twm_version = 1;
                 let account = wallet.createSafexAccount(e.target.username.value, JSON.stringify(d_obj));
                 console.log(account);
                 console.log(`account registered`);
@@ -770,7 +775,7 @@ class WalletHome extends React.Component {
     };
 
 
-    register_twmapi = async(user, twm_api_url = 'http://127.0.0.1:17700 ') => {
+    register_twmapi = async (user, twm_api_url = 'http://127.0.0.1:17700 ') => {
         console.log(user);
 
         //here we contact the api and check if this user is already registered or not.
@@ -813,7 +818,7 @@ class WalletHome extends React.Component {
 
     copyAddressToClipboard = () => {
         alert("This button is not wokring :/")
-      }
+    }
 
 
     render() {
@@ -853,165 +858,168 @@ class WalletHome extends React.Component {
                         } catch (err) {
                             console.error(`failed to properly parse the user data formatting`);
                             console.error(err);
-                    }
-                    // End of creating the accounts table variable
-
-                     // Creates the new items table variable
-                     /*
-                    var new_listings_table = this.state.twm_offers.map((listing, key) => {
-                        console.log(key);
-                        try {
-                            return <tr key={key}>
-                                <td>{listing.title}</td>
-                                <td>{listing.quantity}</td>
-                                <td>{listing.price / 10000000000}</td>
-                                <td>{listing.seller}</td>
-                                <td>{listing.offerID}</td>
-                            </tr>
-
-                        } catch (err) {
-                            console.error(`failed to properly parse the user data formatting`);
-                            console.error(err);
                         }
+                        // End of creating the accounts table variable
 
-                    });
-                    */
-                    // End of creating new items table variable
+                        // Creates the new items table variable
+                        /*
+                       var new_listings_table = this.state.twm_offers.map((listing, key) => {
+                           console.log(key);
+                           try {
+                               return <tr key={key}>
+                                   <td>{listing.title}</td>
+                                   <td>{listing.quantity}</td>
+                                   <td>{listing.price / 10000000000}</td>
+                                   <td>{listing.seller}</td>
+                                   <td>{listing.offerID}</td>
+                               </tr>
+
+                           } catch (err) {
+                               console.error(`failed to properly parse the user data formatting`);
+                               console.error(err);
+                           }
+
+                       });
+                       */
+                        // End of creating new items table variable
 
 
                     });
                     return (
                         <Row lg>
 
-                                <Col sm={4}>
+                            <Col sm={4}>
 
-                                        <div className="wallet-box mb-2 mr-2 ml-2 p-2 font-size-small">
+                                <div className="wallet-box mb-2 mr-2 ml-2 p-2 font-size-small">
 
-                                            <h3> Safex Cash </h3>
+                                    <h3> Safex Cash </h3>
 
+                                    <ul>
+                                        <li>{this.state.cash} SFX</li>
+
+                                        {this.state.pending_cash > 0 ?
+                                            (<li>{this.state.pending_cash} Pending</li>) : ''}
+
+                                        {this.state.pending_cash > 0 ?
+                                            (<li>{this.state.cash + this.state.pending_cash} NET</li>) : ''}
+                                    </ul>
+
+                                    <Form id="send_cash" onSubmit={this.cash_send}>
+                                        Destination Address <Form.Control name="destination"
+                                                                          defaultValue="Safex5..."
+                                                                          placedholder="the destination address"/>
+                                        Amount (SFX)<Form.Control name="amount" defaultValue="0"
+                                                                  placedholder="the amount to send"/>
+                                        Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
+                                                                      placedholder="choose the number of mixins"/>
+                                        <Button className="mt-2" type="submit" variant="warning" size="lg" block>
+                                            Send Cash
+                                        </Button>
+                                    </Form>
+
+                                </div>
+
+
+                                <div className="wallet-box m-2 p-2 font-size-small">
+
+                                    <h3> Safex Token </h3>
+
+                                    <ul>
+                                        <li>{this.state.tokens} SFT</li>
+                                        {this.state.pending_tokens > 0 ?
+                                            (<li>{this.state.pending_tokens} Pending</li>) : ''}
+                                        {this.state.pending_tokens > 0 ?
+                                            (
+                                                <li>{this.state.tokens + this.state.pending_tokens} NET</li>) : ''}
+                                    </ul>
+
+                                    <Form id="send_token" onSubmit={this.token_send}>
+                                        Destination Address <Form.Control name="destination"
+                                                                          defaultValue="Safex5..."
+                                                                          placedholder="the destination address"/>
+                                        Amount (SFT)<Form.Control name="amount" defaultValue="0"
+                                                                  placedholder="the amount to send"/>
+                                        Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
+                                                                      placedholder="choose the number of mixins"/>
+                                        <Button className="mt-2" type="submit" variant="warning" size="lg" block>
+                                            Send Tokens
+                                        </Button>
+                                    </Form>
+                                </div>
+
+                            </Col>
+
+
+                            <Col className="accounts" sm={8}>
+                                <div className="account-list">
+                                    <h2 className="text-center m-2"> Accounts </h2>
+                                    {accounts_table}
+                                    <div className="accounts-box">
+                                        <Col sm={4}>
+                                            <Image width={100} height={100} src={require("./../../img/sails-logo.png")}
+                                                   roundedCircle/>
+                                        </Col>
+                                        <Col sm={8}>
                                             <ul>
-                                                <li>{this.state.cash} SFX</li>
-
-                                                {this.state.pending_cash > 0 ?
-                                                    (<li>{this.state.pending_cash} Pending</li>) : ''}
-
-                                                {this.state.pending_cash > 0 ?
-                                                    (<li>{this.state.cash + this.state.pending_cash} NET</li>) : ''}
+                                                <li>User Name</li>
+                                                <li>Bio</li>
+                                                <li>Location</li>
+                                                <li>Website</li>
+                                                <li>Twitter</li>
+                                                {0 == 0 ? (
+                                                    <li>
+                                                        <Button className="m-1" variant="danger"
+                                                                onClick={() => alert("catfish")}>
+                                                            Remove
+                                                        </Button>
+                                                    </li>
+                                                ) : ''}
                                             </ul>
-
-                                            <Form id="send_cash" onSubmit={this.cash_send}>
-                                                Destination Address <Form.Control name="destination"
-                                                                                    defaultValue="Safex5..."
-                                                                                    placedholder="the destination address"/>
-                                                Amount (SFX)<Form.Control name="amount" defaultValue="0"
-                                                                            placedholder="the amount to send"/>
-                                                Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
-                                                                                placedholder="choose the number of mixins"/>
-                                                <Button className="mt-2" type="submit" variant="warning" size="lg" block>
-                                                    Send Cash
-                                                </Button>
-                                            </Form>
-
-                                        </div>
-
-
-
-                                        <div className="wallet-box m-2 p-2 font-size-small">
-
-                                            <h3> Safex Token </h3>
-
+                                        </Col>
+                                    </div>
+                                    <div className="accounts-box">
+                                        <Col sm={4}>
+                                            <Image width={100} height={100} src={require("./../../img/sails-logo.png")}
+                                                   roundedCircle/>
+                                        </Col>
+                                        <Col sm={8}>
                                             <ul>
-                                                <li>{this.state.tokens} SFT</li>
-                                                {this.state.pending_tokens > 0 ?
-                                                    (<li>{this.state.pending_tokens} Pending</li>) : ''}
-                                                {this.state.pending_tokens > 0 ?
-                                                    (
-                                                        <li>{this.state.tokens + this.state.pending_tokens} NET</li>) : ''}
+                                                <li>User Name</li>
+                                                <li>Bio</li>
+                                                <li>Location</li>
+                                                <li>Website</li>
+                                                <li>Twitter</li>
+                                                {0 == 0 ? (
+                                                    <li>
+                                                        <Button className="m-1" variant="danger"
+                                                                onClick={() => alert("catfish")}>
+                                                            Remove
+                                                        </Button>
+                                                    </li>
+                                                ) : ''}
                                             </ul>
-
-                                            <Form id="send_token" onSubmit={this.token_send}>
-                                                Destination Address <Form.Control name="destination"
-                                                                                    defaultValue="Safex5..."
-                                                                                    placedholder="the destination address"/>
-                                                Amount (SFT)<Form.Control name="amount" defaultValue="0"
-                                                                                placedholder="the amount to send"/>
-                                                Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
-                                                                                placedholder="choose the number of mixins"/>
-                                                <Button className="mt-2" type="submit" variant="warning" size="lg" block>
-                                                    Send Tokens
-                                                </Button>
-                                            </Form>
-                                        </div>
-
-                                </Col>
-
-
-                                <Col className="accounts" sm={8}>
-                                    <div className="account-list">
-                                        <h2 className="text-center m-2"> Accounts </h2>
-                                        {accounts_table}
-                                        <div className="accounts-box">
-                                            <Col sm={4}>
-                                                <Image width={100} height={100} src={require("./../../img/sails-logo.png")} roundedCircle/>
-                                            </Col>
-                                            <Col sm={8}>
-                                                <ul>
-                                                    <li>User Name</li>
-                                                    <li>Bio</li>
-                                                    <li>Location</li>
-                                                    <li>Website</li>
-                                                    <li>Twitter</li>
-                                                    {0 == 0 ? (
-                                                        <li>
-                                                            <Button className="m-1" variant="danger" onClick={() => alert("catfish")}>
-                                                                Remove
-                                                            </Button>
-                                                        </li>
-                                                    ) : ''}
-                                                </ul>
-                                            </Col>
-                                        </div>
-                                        <div className="accounts-box">
-                                            <Col sm={4}>
-                                                <Image width={100} height={100} src={require("./../../img/sails-logo.png")} roundedCircle/>
-                                            </Col>
-                                            <Col sm={8}>
-                                                <ul>
-                                                    <li>User Name</li>
-                                                    <li>Bio</li>
-                                                    <li>Location</li>
-                                                    <li>Website</li>
-                                                    <li>Twitter</li>
-                                                    {0 == 0 ? (
-                                                        <li>
-                                                            <Button className="m-1" variant="danger" onClick={() => alert("catfish")}>
-                                                                Remove
-                                                            </Button>
-                                                        </li>
-                                                    ) : ''}
-                                                </ul>
-                                            </Col>
-                                        </div>
-
+                                        </Col>
                                     </div>
-                                    <div className="account-list">
-                                        <thead>
-                                        <tr>
-                                            <th>Title</th>
-                                            <th>Quantity</th>
-                                            <th>Price (SFX)</th>
-                                            <th>Seller</th>
-                                            <th>Offer id</th>
-                                        </tr>
-                                        </thead>
-                                        <td>TITLE</td>
-                                        <td>QUANTITY</td>
-                                        <td>PRICE</td>
-                                        <td>SELLER</td>
-                                        <td>ID</td>
 
-                                    </div>
-                                </Col>
+                                </div>
+                                <div className="account-list">
+                                    <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Quantity</th>
+                                        <th>Price (SFX)</th>
+                                        <th>Seller</th>
+                                        <th>Offer id</th>
+                                    </tr>
+                                    </thead>
+                                    <td>TITLE</td>
+                                    <td>QUANTITY</td>
+                                    <td>PRICE</td>
+                                    <td>SELLER</td>
+                                    <td>ID</td>
+
+                                </div>
+                            </Col>
                         </Row>
                     );
                 }
@@ -1061,83 +1069,107 @@ class WalletHome extends React.Component {
 
                     });
                     return (
-                    <div className="overflow-y">
-                        <Row>
-                            <Col className="max-h500px white-text overflow-y" md={12}>
-                                <Col className="search-box d-flex flex-column align-items-center border border-white light-blue-back" >
+                        <div className="overflow-y">
+                            <Row>
+                                <Col className="max-h500px white-text overflow-y" md={12}>
+                                    <Col
+                                        className="search-box d-flex flex-column align-items-center border border-white light-blue-back">
 
-                                    <div class="row width100 border-bottom border-white" id="search">
-                                        <form className="width100 no-gutters p-2" id="search-form" action="" method="POST" enctype="multipart/form-data">
-                                            <div class="form-group col-sm-9">
-                                                <input class="form-control" type="text" placeholder="eg. api.theworldmarketplace.com" />
-                                            </div>
-                                            <div class="form-group col-sm-3">
-                                                <button type="submit" class="btn btn-block btn-primary">Set Market API</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div class="row" id="search">
-                                        <form className="no-gutters p-2" id="search-form" action="" method="POST" enctype="multipart/form-data">
-                                            <div class="form-group col-sm-9">
-                                                <input class="form-control" type="text" placeholder="Search" />
-                                            </div>
-                                            <div class="form-group col-sm-3">
-                                                <button type="submit" class="btn btn-block btn-primary">Search</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div class="row" id="filter">
-                                        <form>
-                                            <div class="form-group col-sm-3 col-xs-6">
-                                                <select data-filter="make" class="filter-make filter form-control">
-                                                    <option value="">Category</option>
-                                                    <option value="">Any</option>
-                                                    <option value="">Category</option>
-                                                    <option value="">Books</option>
-                                                    <option value="">Clothes</option>
-                                                    <option value="">Digital</option>
-                                                    <option value="">Toys</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group col-sm-3 col-xs-6">
-                                                <select data-filter="model" class="filter-model filter form-control">
-                                                    <option value="">Location</option>
-                                                    <option value="">Any</option>
-                                                    <option value="">Africa</option>
-                                                    <option value="">Asia</option>
-                                                    <option value="">Africa</option>
-                                                    <option value="">Europe</option>
-                                                    <option value="">North America</option>
-                                                    <option value="">South America</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group col-sm-3 col-xs-6">
-                                                <select data-filter="type" class="filter-type filter form-control">
-                                                    <option value="">Price Range</option>
-                                                    <option value="">$0 - $24.99</option>
-                                                    <option value="">$25 - $49.99</option>
-                                                    <option value="">$50 - $199.99</option>
-                                                    <option value="">$200 - $499.99</option>
-                                                    <option value="">$500 - $999.99</option>
-                                                    <option value="">$1000+</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group col-sm-3 col-xs-6">
-                                                <select data-filter="price" class="filter-price filter form-control">
-                                                    <option value="">Sort by...</option>
-                                                    <option value="">$$$ Asc</option>
-                                                    <option value="">$$$ Dec</option>
-                                                    <option value="">Rating Asc</option>
-                                                    <option value="">Rating Dec</option>
-                                                </select>
-                                            </div>
-                                        </form>
-                                    </div>
+                                        <div class="row width100 border-bottom border-white" id="search">
+                                            <form className="width100 no-gutters p-2" id="search-form" action=""
+                                                  method="POST" enctype="multipart/form-data">
+                                                <div class="form-group col-sm-9">
+                                                    <input class="form-control" type="text"
+                                                           placeholder="eg. api.theworldmarketplace.com"/>
+                                                </div>
+                                                <div class="form-group col-sm-3">
+                                                    <button type="submit" class="btn btn-block btn-primary">Set Market
+                                                        API
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="row" id="search">
+                                            <form className="no-gutters p-2" id="search-form" action="" method="POST"
+                                                  enctype="multipart/form-data">
+                                                <div class="form-group col-sm-9">
+                                                    <input class="form-control" type="text" placeholder="Search"/>
+                                                </div>
+                                                <div class="form-group col-sm-3">
+                                                    <button type="submit" class="btn btn-block btn-primary">Search
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="row" id="filter">
+                                            <form>
+                                                <div class="form-group col-sm-3 col-xs-6">
+                                                    <select data-filter="make" class="filter-make filter form-control">
+                                                        <option value="">Category</option>
+                                                        <option value="">Any</option>
+                                                        <option value="">Category</option>
+                                                        <option value="">Books</option>
+                                                        <option value="">Clothes</option>
+                                                        <option value="">Digital</option>
+                                                        <option value="">Toys</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-sm-3 col-xs-6">
+                                                    <select data-filter="model"
+                                                            class="filter-model filter form-control">
+                                                        <option value="">Location</option>
+                                                        <option value="">Any</option>
+                                                        <option value="">Africa</option>
+                                                        <option value="">Asia</option>
+                                                        <option value="">Africa</option>
+                                                        <option value="">Europe</option>
+                                                        <option value="">North America</option>
+                                                        <option value="">South America</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-sm-3 col-xs-6">
+                                                    <select data-filter="type" class="filter-type filter form-control">
+                                                        <option value="">Price Range</option>
+                                                        <option value="">$0 - $24.99</option>
+                                                        <option value="">$25 - $49.99</option>
+                                                        <option value="">$50 - $199.99</option>
+                                                        <option value="">$200 - $499.99</option>
+                                                        <option value="">$500 - $999.99</option>
+                                                        <option value="">$1000+</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-sm-3 col-xs-6">
+                                                    <select data-filter="price"
+                                                            class="filter-price filter form-control">
+                                                        <option value="">Sort by...</option>
+                                                        <option value="">$$$ Asc</option>
+                                                        <option value="">$$$ Dec</option>
+                                                        <option value="">Rating Asc</option>
+                                                        <option value="">Rating Dec</option>
+                                                    </select>
+                                                </div>
+                                            </form>
+                                        </div>
 
-                                </Col>
+                                    </Col>
 
-                                {this.state.twm_offers.length > 1 ? (
-                                    <Table color="white" className="white-text border border-white b-r10">
+                                    {this.state.twm_offers.length > 1 ? (
+                                        <Table color="white" className="white-text border border-white b-r10">
+                                            <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Quantity</th>
+                                                <th>Price (SFX)</th>
+                                                <th>Seller</th>
+                                                <th>Offer ID</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {twm_listings_table}
+                                            </tbody>
+                                        </Table>) : (<div></div>)}
+
+                                    <Table>
                                         <thead>
                                         <tr>
                                             <th>Title</th>
@@ -1145,34 +1177,19 @@ class WalletHome extends React.Component {
                                             <th>Price (SFX)</th>
                                             <th>Seller</th>
                                             <th>Offer ID</th>
+                                            <th>Actions</th>
+                                            <th></th>
+                                            <th></th>
                                         </tr>
                                         </thead>
+
                                         <tbody>
-                                        {twm_listings_table}
+                                        {non_listings_table}
                                         </tbody>
-                                    </Table>) : (<div></div>)}
-
-                                <Table>
-                                    <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Quantity</th>
-                                        <th>Price (SFX)</th>
-                                        <th>Seller</th>
-                                        <th>Offer ID</th>
-                                        <th>Actions</th>
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                    </thead>
-
-                                    <tbody>
-                                    {non_listings_table}
-                                    </tbody>
-                                </Table>
-                            </Col>
-                        </Row>
-                    </div>);
+                                    </Table>
+                                </Col>
+                            </Row>
+                        </div>);
                 case "merchant": {
                     var twm_listings_table = this.state.twm_offers.map((listing, key) => {
                         console.log(key);
@@ -1248,14 +1265,16 @@ class WalletHome extends React.Component {
                     });
                     try {
                         var selected = this.state.usernames[this.state.selected_user.index];
-                        console.log(selected);
-                        var data = JSON.parse(selected.data);
+                        if (selected) {
+                            console.log(selected);
+                            var data = JSON.parse(selected.data);
+                        } else {
+                            console.log(`no user selected`);
+                        }
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the point of parsing selected user data`);
                     }
-
-
                     try {
                         return (
                             <Row>
@@ -1281,12 +1300,18 @@ class WalletHome extends React.Component {
                                                     facebook link <Form.Control name="facebook"
                                                                                 defaultValue="facebook.com"
                                                                                 placedholder="enter the to of your facebook page"/>
+                                                    linkedin link <Form.Control name="linkedin"
+                                                                                defaultValue="linkedin.com"
+                                                                                placedholder="enter the link to your linkedin handle"/>
                                                     biography <Form.Control as="textarea" name="biography"
                                                                             placedholder="type up your biography"/>
                                                     website <Form.Control name="website" defaultValue="safex.org"
                                                                           placedholder="if you have your own website: paste your link here"/>
                                                     location <Form.Control name="location" defaultValue="Earth"
                                                                            placedholder="your location"/>
+                                                    email address <Form.Control name="email"
+                                                                                defaultValue="xyz@example.com"
+                                                                                placedholder="your location"/>
                                                     mixins <Form.Control name="mixins" defaultValue="7"
                                                                          placedholder="your location"/>
 
@@ -1318,7 +1343,8 @@ class WalletHome extends React.Component {
                                             <Row>
                                                 <Button>Edit</Button>
                                                 <Button>Remove</Button>
-                                                <Button onClick={() => this.register_twmapi(selected)}>Register API</Button>
+                                                <Button onClick={() => this.register_twmapi(selected)}>Register
+                                                    API</Button>
                                             </Row>
                                         </Col>
                                     </Row>) : ''}
@@ -1410,8 +1436,8 @@ class WalletHome extends React.Component {
                     let staked_tokens = wallet.stakedTokenBalance() / 10000000000;
                     let unlocked_tokens = wallet.unlockedStakedTokenBalance() / 10000000000;
                     let pending_stake = (staked_tokens - unlocked_tokens);
-                    let interval = [0,0,0,0];
-                    let interest = [0,0,0,0];
+                    let interval = [0, 0, 0, 0];
+                    let interest = [0, 0, 0, 0];
 
                     try {
                         for (const [i, bit] of this.state.blockchain_interest_history.entries()) {
@@ -1420,7 +1446,7 @@ class WalletHome extends React.Component {
                             interest[i] = bit.cash_per_token / 10000000000;
                         }
 
-                    } catch(err) {
+                    } catch (err) {
                         console.error(err);
                         console.error(`error at the interval loading of stacking`);
                     }
@@ -1530,126 +1556,126 @@ class WalletHome extends React.Component {
             <Container className="height100 justify-content-between" fluid>
                 <Container fluid className="no-gutters mt-5 mb-2 p-2 border border-light b-r10 white-text">
 
-                                <Row className="justify-content-between align-items-center">
+                    <Row className="justify-content-between align-items-center">
 
-                                    <Col sm={2} className="p-1 align-self-center b-r10 light-blue-back">
+                        <Col sm={2} className="p-1 align-self-center b-r10 light-blue-back">
 
-                                        <div className="d-flex flex-row justify-content-center align-items-end">
-                                            <IconContext.Provider value={{ color: 'white', size: '20px' }}>
-                                                    <div className="white-text">
-                                                    <GrCubes className="m-1 white-text"/>
-                                                    </div>
-                                            </IconContext.Provider>
-                                            <p className="mb-2"> <b>{this.state.blockchain_height}</b></p>
-                                        </div>
-
-                                            {this.state.wallet_height < this.state.blockchain_height ?
-                                                (<p className="mb-2">
-                                                    {this.state.wallet_height} / {this.state.blockchain_height}
-                                                </p>) : ''}
-                                            <p className="mb-2">{this.state.connection_status}</p>
-
-                                    </Col>
-
-                                    <div className="menu-logo">
-                                        <Image className=" align-content-center" src={require("./../../img/sails-logo.png")}/>
+                            <div className="d-flex flex-row justify-content-center align-items-end">
+                                <IconContext.Provider value={{color: 'white', size: '20px'}}>
+                                    <div className="white-text">
+                                        <GrCubes className="m-1 white-text"/>
                                     </div>
+                                </IconContext.Provider>
+                                <p className="mb-2"><b>{this.state.blockchain_height}</b></p>
+                            </div>
 
-                                    <Col sm={7} className="menu">
-                                        <ul className="menu__list">
-                                            <li className="menu__list-item">
-                                                <a className="menu__link" href="javascript:void(0)"
-                                                onClick={this.go_home}>Home</a>
-                                            </li>
-                                            <li className="menu__list-item">
-                                                <a className="menu__link" href="javascript:void(0)"
-                                                onClick={this.show_market}>Market</a>
-                                            </li>
-                                            <li className="menu__list-item">
-                                                <a className="menu__link" href="javascript:void(0)"
-                                                onClick={this.show_merchant}>Merchant</a>
-                                            </li>
-                                            <li className="menu__list-item">
-                                                <a className="menu__link" href="javascript:void(0)"
-                                                onClick={this.show_staking}>Staking</a>
-                                            </li>
+                            {this.state.wallet_height < this.state.blockchain_height ?
+                                (<p className="mb-2">
+                                    {this.state.wallet_height} / {this.state.blockchain_height}
+                                </p>) : ''}
+                            <p className="mb-2">{this.state.connection_status}</p>
 
+                        </Col>
 
-                                        </ul>
+                        <div className="menu-logo">
+                            <Image className=" align-content-center" src={require("./../../img/sails-logo.png")}/>
+                        </div>
 
-                                    </Col>
-                                    <div className="d-flex flex-column">
-                                        <a className="menu__link" href="javascript:void(0)"
-                                        onClick={this.show_settings}><FaCogs className="m-3"/></a>
-
-
-                                        <a className="menu__link" href="javascript:void(0)"
-                                        onClick={this.logout}><GiExitDoor className="m-3"/></a>
-                                    </div>
-                                </Row>
-
-
-
-
-                        <Row className="no-gutters p-2 justify-content-between align-items-center b-r10 grey-back white-text">
-                            <Col sm={3}>
-                                <li className="mr-2">
-                                    SFX: {this.state.cash}
+                        <Col sm={7} className="menu">
+                            <ul className="menu__list">
+                                <li className="menu__list-item">
+                                    <a className="menu__link" href="javascript:void(0)"
+                                       onClick={this.go_home}>Home</a>
                                 </li>
-                                <li className="">
-                                    SFT: {this.state.tokens}
+                                <li className="menu__list-item">
+                                    <a className="menu__link" href="javascript:void(0)"
+                                       onClick={this.show_market}>Market</a>
                                 </li>
-                            </Col>
-                            <Col className="just" sm={6}>
-                                <p >SFX + SFT Public Address: <b>{this.to_ellipsis(this.state.address)}</b></p>
-                                <Button onClick={this.copyAddressToClipboard}>
-                                    Copy Address
-                                </Button>
-                            </Col>
-                            <Col className="d-flex justify-content-center" sm={3}>
+                                <li className="menu__list-item">
+                                    <a className="menu__link" href="javascript:void(0)"
+                                       onClick={this.show_merchant}>Merchant</a>
+                                </li>
+                                <li className="menu__list-item">
+                                    <a className="menu__link" href="javascript:void(0)"
+                                       onClick={this.show_staking}>Staking</a>
+                                </li>
 
-                                        {this.state.synced === false ? (
-                                        <Button className="m-1" onClick={this.check}>
-                                            Check
-                                        </Button>) : ''}
 
-                                        <Button className="m-1" variant="danger" onClick={this.rescan}>
-                                            Hard Rescan
-                                        </Button>
+                            </ul>
 
-                                        <Button className="m-1" variant="primary" onClick={this.handleShow}>
-                                            Show Keys
-                                        </Button>
+                        </Col>
+                        <div className="d-flex flex-column">
+                            <a className="menu__link" href="javascript:void(0)"
+                               onClick={this.show_settings}><FaCogs className="m-3"/></a>
 
-                                        <Modal className="width100 black-text" animation={false} show={this.state.show_keys} onHide={this.handleClose}>
-                                            <Modal.Header closeButton>
-                                                <Modal.Title>Your Private Keys</Modal.Title>
-                                            </Modal.Header>
-                                            <Modal.Body>
-                                                <ul>
-                                                    <li>
-                                                        <b>Address:</b> <br/> {this.props.wallet.address()}
-                                                    </li>
-                                                    <li>
-                                                        <b>Secret Spend Key:</b> <br/> {this.props.wallet.secretSpendKey()}
-                                                    </li>
-                                                    <li>
-                                                        <b>Secret View Key:</b> <br/> {this.props.wallet.secretViewKey()}
-                                                    </li>
-                                                    <li>
-                                                        <b>Mnemonic Seed:</b> <br/> {this.props.wallet.seed().toUpperCase()}
-                                                    </li>
-                                                </ul>
-                                            </Modal.Body>
-                                            <Modal.Footer>
-                                                <Button variant="secondary" onClick={this.handleClose}>
-                                                    Close
-                                                </Button>
-                                            </Modal.Footer>
-                                        </Modal>
 
-                            </Col>
-                        </Row>
+                            <a className="menu__link" href="javascript:void(0)"
+                               onClick={this.logout}><GiExitDoor className="m-3"/></a>
+                        </div>
+                    </Row>
+
+
+                    <Row
+                        className="no-gutters p-2 justify-content-between align-items-center b-r10 grey-back white-text">
+                        <Col sm={3}>
+                            <li className="mr-2">
+                                SFX: {this.state.cash}
+                            </li>
+                            <li className="">
+                                SFT: {this.state.tokens}
+                            </li>
+                        </Col>
+                        <Col className="just" sm={6}>
+                            <p>SFX + SFT Public Address: <b>{this.to_ellipsis(this.state.address)}</b></p>
+                            <Button onClick={this.copyAddressToClipboard}>
+                                Copy Address
+                            </Button>
+                        </Col>
+                        <Col className="d-flex justify-content-center" sm={3}>
+
+                            {this.state.synced === false ? (
+                                <Button className="m-1" onClick={this.check}>
+                                    Check
+                                </Button>) : ''}
+
+                            <Button className="m-1" variant="danger" onClick={this.rescan}>
+                                Hard Rescan
+                            </Button>
+
+                            <Button className="m-1" variant="primary" onClick={this.handleShow}>
+                                Show Keys
+                            </Button>
+
+                            <Modal className="width100 black-text" animation={false} show={this.state.show_keys}
+                                   onHide={this.handleClose}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Your Private Keys</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <ul>
+                                        <li>
+                                            <b>Address:</b> <br/> {this.props.wallet.address()}
+                                        </li>
+                                        <li>
+                                            <b>Secret Spend Key:</b> <br/> {this.props.wallet.secretSpendKey()}
+                                        </li>
+                                        <li>
+                                            <b>Secret View Key:</b> <br/> {this.props.wallet.secretViewKey()}
+                                        </li>
+                                        <li>
+                                            <b>Mnemonic Seed:</b> <br/> {this.props.wallet.seed().toUpperCase()}
+                                        </li>
+                                    </ul>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={this.handleClose}>
+                                        Close
+                                    </Button>
+                                </Modal.Footer>
+                            </Modal>
+
+                        </Col>
+                    </Row>
                 </Container>
 
                 {twmwallet()}
