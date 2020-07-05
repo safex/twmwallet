@@ -2,6 +2,8 @@ import React from 'react';
 
 import {Row, Col, Container, Button, Table, Form, Image, Modal} from 'react-bootstrap';
 
+import { MDBDataTable } from 'mdbreact'
+
 import {withRouter} from 'react-router-dom';
 
 import {normalize_8decimals} from '../../utils/wallet_creation';
@@ -11,8 +13,15 @@ import {send_cash, send_tokens, stake_tokens, unstake_tokens, commit_txn} from "
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
 
 const openpgp = window.require('openpgp');
-var nacl = window.require('tweetnacl');
+// Icon Imports
+import { FaCogs, FaSearch } from 'react-icons/fa'
+import { GiExitDoor } from 'react-icons/gi'
+import { GrCubes } from 'react-icons/gr'
+import { IconContext } from 'react-icons'
 
+
+
+var nacl = window.require('tweetnacl');
 
 var wallet;
 
@@ -310,7 +319,6 @@ class WalletHome extends React.Component {
                 if (vees.location.value.length > 0) {
                     d_obj.location = vees.location.value;
                 }
-
                 d_obj.twm_version = 1;
                 let account = wallet.createSafexAccount(e.target.username.value, JSON.stringify(d_obj));
                 console.log(account);
@@ -793,11 +801,29 @@ class WalletHome extends React.Component {
         }
     };
 
+    to_ellipsis = (text) => {
+        const text_to_ellipse = text
+
+        const ellipse = `${text_to_ellipse.substring(0, 10)}.....${text_to_ellipse.substring(text_to_ellipse.length - 10, text_to_ellipse.length)}`
+
+        return (
+            ellipse
+        )
+
+    }
+
+    copyAddressToClipboard = () => {
+        alert("This button is not wokring :/")
+      }
+
+
     render() {
         const twmwallet = () => {
             switch (this.state.interface_view) {
 
                 case "home": {
+
+                    // Creates the accounts table variable
                     var accounts_table = this.state.usernames.map((user, key) => {
                         console.log(user);
                         console.log(key);
@@ -817,7 +843,7 @@ class WalletHome extends React.Component {
                                         <li>{usee_d.twitter}</li>
                                         {user.status == 0 ? (
                                             <li>
-                                                <button onClick={() => this.remove_account(user.username)}>remove
+                                                <button onClick={() => this.remove_account(user.username)}>Remove
                                                 </button>
                                             </li>
                                         ) : ''}
@@ -828,112 +854,173 @@ class WalletHome extends React.Component {
                         } catch (err) {
                             console.error(`failed to properly parse the user data formatting`);
                             console.error(err);
+                    }
+                    // End of creating the accounts table variable
+
+                     // Creates the new items table variable
+                     /*
+                    var new_listings_table = this.state.twm_offers.map((listing, key) => {
+                        console.log(key);
+                        try {
+                            return <tr key={key}>
+                                <td>{listing.title}</td>
+                                <td>{listing.quantity}</td>
+                                <td>{listing.price / 10000000000}</td>
+                                <td>{listing.seller}</td>
+                                <td>{listing.offerID}</td>
+                            </tr>
+
+                        } catch (err) {
+                            console.error(`failed to properly parse the user data formatting`);
+                            console.error(err);
                         }
 
                     });
+                    */
+                    // End of creating new items table variable
+
+
+                    });
                     return (
-                        <div>
-                            <Row>
-                                <Col md={4}>
-                                    <Row className="wallet">
-                                        <Col>
-                                            <div>
+                        <Row lg>
 
-                                                <ul>
-                                                    <li>{this.state.cash} SFX</li>
-                                                    {this.state.pending_cash > 0 ?
-                                                        (<li>{this.state.pending_cash} Pending</li>) : ''}
-                                                    {this.state.pending_cash > 0 ?
-                                                        (<li>{this.state.cash + this.state.pending_cash} NET</li>) : ''}
-                                                </ul>
-                                                <p>
-                                                    Safex Cash
-                                                </p>
-                                            </div>
-                                        </Col>
-                                        <Col>
+                                <Col sm={4}>
+
+                                        <div className="wallet-box mb-2 mr-2 ml-2 p-2 font-size-small">
+
+                                            <h3> Safex Cash </h3>
+
                                             <ul>
-                                                <li>
+                                                <li>{this.state.cash} SFX</li>
 
-                                                    <Button onClick={this.show_cash_send}>Send Cash</Button>
-                                                </li>
-                                                <li>
-                                                    <Form id="send_cash" onSubmit={this.cash_send}>
-                                                        destination address <Form.Control name="destination"
-                                                                                          defaultValue="Safex5..."
-                                                                                          placedholder="the destination address"/>
-                                                        amount (cash)<Form.Control name="amount" defaultValue="0"
-                                                                                   placedholder="the amount to send"/>
-                                                        mixin ring size <Form.Control name="mixins" defaultValue="7"
-                                                                                      placedholder="choose the number of mixins"/>
-                                                        <Button type="submit" variant="primary" size="lg" block>Send
-                                                            Cash</Button>
-                                                    </Form>
-                                                </li>
+                                                {this.state.pending_cash > 0 ?
+                                                    (<li>{this.state.pending_cash} Pending</li>) : ''}
+
+                                                {this.state.pending_cash > 0 ?
+                                                    (<li>{this.state.cash + this.state.pending_cash} NET</li>) : ''}
                                             </ul>
-                                        </Col>
-                                    </Row>
 
-                                    <Row className="wallet">
-                                        <Col>
-                                            <div>
-                                                <ul>
-                                                    <li>{this.state.tokens} SFT</li>
-                                                    {this.state.pending_tokens > 0 ?
-                                                        (<li>{this.state.pending_tokens} Pending</li>) : ''}
-                                                    {this.state.pending_tokens > 0 ?
-                                                        (
-                                                            <li>{this.state.tokens + this.state.pending_tokens} NET</li>) : ''}
-                                                </ul>
-                                                <p>
-                                                    Safex Token
-                                                </p>
-                                            </div>
-                                        </Col>
-                                        <Col>
+                                            <Form id="send_cash" onSubmit={this.cash_send}>
+                                                Destination Address <Form.Control name="destination"
+                                                                                    defaultValue="Safex5..."
+                                                                                    placedholder="the destination address"/>
+                                                Amount (SFX)<Form.Control name="amount" defaultValue="0"
+                                                                            placedholder="the amount to send"/>
+                                                Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
+                                                                                placedholder="choose the number of mixins"/>
+                                                <Button className="mt-2" type="submit" variant="warning" size="lg" block>
+                                                    Send Cash
+                                                </Button>
+                                            </Form>
+
+                                        </div>
+
+
+
+                                        <div className="wallet-box m-2 p-2 font-size-small">
+
+                                            <h3> Safex Token </h3>
+
                                             <ul>
-                                                <li>
-
-                                                    <Button onClick={this.show_token_send}>Send Tokens</Button>
-                                                </li>
-                                                <li>
-                                                    <Form id="send_token" onSubmit={this.token_send}>
-                                                        destination address <Form.Control name="destination"
-                                                                                          defaultValue="Safex5..."
-                                                                                          placedholder="the destination address"/>
-                                                        amount (tokens)<Form.Control name="amount" defaultValue="0"
-                                                                                     placedholder="the amount to send"/>
-                                                        mixin ring size <Form.Control name="mixins" defaultValue="7"
-                                                                                      placedholder="choose the number of mixins"/>
-                                                        <Button type="submit" variant="primary" size="lg" block>Send
-                                                            Tokens</Button>
-                                                    </Form>
-                                                </li>
+                                                <li>{this.state.tokens} SFT</li>
+                                                {this.state.pending_tokens > 0 ?
+                                                    (<li>{this.state.pending_tokens} Pending</li>) : ''}
+                                                {this.state.pending_tokens > 0 ?
+                                                    (
+                                                        <li>{this.state.tokens + this.state.pending_tokens} NET</li>) : ''}
                                             </ul>
-                                        </Col>
-                                    </Row>
+
+                                            <Form id="send_token" onSubmit={this.token_send}>
+                                                Destination Address <Form.Control name="destination"
+                                                                                    defaultValue="Safex5..."
+                                                                                    placedholder="the destination address"/>
+                                                Amount (SFT)<Form.Control name="amount" defaultValue="0"
+                                                                                placedholder="the amount to send"/>
+                                                Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
+                                                                                placedholder="choose the number of mixins"/>
+                                                <Button className="mt-2" type="submit" variant="warning" size="lg" block>
+                                                    Send Tokens
+                                                </Button>
+                                            </Form>
+                                        </div>
+
                                 </Col>
 
-                                <Col className="wallet" md={8}>
 
-                                    <Col className="account_list" md={8}>
-                                        Your accounts:
+                                <Col className="accounts" sm={8}>
+                                    <div className="account-list">
+                                        <h2 className="text-center m-2"> Accounts </h2>
                                         {accounts_table}
+                                        <div className="accounts-box">
+                                            <Col sm={4}>
+                                                <Image width={100} height={100} src={require("./../../img/sails-logo.png")} roundedCircle/>
+                                            </Col>
+                                            <Col sm={8}>
+                                                <ul>
+                                                    <li>User Name</li>
+                                                    <li>Bio</li>
+                                                    <li>Location</li>
+                                                    <li>Website</li>
+                                                    <li>Twitter</li>
+                                                    {0 == 0 ? (
+                                                        <li>
+                                                            <Button className="m-1" variant="danger" onClick={() => alert("catfish")}>
+                                                                Remove
+                                                            </Button>
+                                                        </li>
+                                                    ) : ''}
+                                                </ul>
+                                            </Col>
+                                        </div>
+                                        <div className="accounts-box">
+                                            <Col sm={4}>
+                                                <Image width={100} height={100} src={require("./../../img/sails-logo.png")} roundedCircle/>
+                                            </Col>
+                                            <Col sm={8}>
+                                                <ul>
+                                                    <li>User Name</li>
+                                                    <li>Bio</li>
+                                                    <li>Location</li>
+                                                    <li>Website</li>
+                                                    <li>Twitter</li>
+                                                    {0 == 0 ? (
+                                                        <li>
+                                                            <Button className="m-1" variant="danger" onClick={() => alert("catfish")}>
+                                                                Remove
+                                                            </Button>
+                                                        </li>
+                                                    ) : ''}
+                                                </ul>
+                                            </Col>
+                                        </div>
 
-                                    </Col>
-                                    <Col md={4}>
+                                    </div>
+                                    <div className="account-list">
+                                        <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Quantity</th>
+                                            <th>Price (SFX)</th>
+                                            <th>Seller</th>
+                                            <th>Offer id</th>
+                                        </tr>
+                                        </thead>
+                                        <td>TITLE</td>
+                                        <td>QUANTITY</td>
+                                        <td>PRICE</td>
+                                        <td>SELLER</td>
+                                        <td>ID</td>
 
-                                    </Col>
+                                    </div>
                                 </Col>
-                            </Row>
-                        </div>
+                        </Row>
                     );
                 }
                 case "market":
                     var twm_listings_table = this.state.twm_offers.map((listing, key) => {
                         console.log(key);
                         try {
-                            return <tr key={key}>
+                            return <tr className="white-text" key={key}>
                                 <td>{listing.title}</td>
                                 <td>{listing.quantity}</td>
                                 <td>{listing.price / 10000000000}</td>
@@ -956,8 +1043,8 @@ class WalletHome extends React.Component {
                                 <td>{listing.quantity}</td>
                                 <td>{listing.price / 10000000000}</td>
                                 <td>{listing.seller}</td>
-                                <td>{listing.offerID}</td>
-                                <td><select id="quantity">
+                                <td>{this.to_ellipsis(listing.offerID)}</td>
+                                <td><select className="light-blue-back" id="quantity">
                                     <option value="1">1</option>
                                 </select></td>
                                 <td>
@@ -974,33 +1061,109 @@ class WalletHome extends React.Component {
                         }
 
                     });
-                    return (<div>
+                    return (
+                    <div className="overflow-y">
                         <Row>
-                            <Col md={12}>
-                                {this.state.twm_offers.length > 1 ? (<Table>
-                                    <thead>
-                                    <tr>
-                                        <th>title</th>
-                                        <th>quantity</th>
-                                        <th>price (SFX)</th>
-                                        <th>seller</th>
-                                        <th>offer id</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {twm_listings_table}
-                                    </tbody>
-                                </Table>) : (<div></div>)}
+                            <Col className="max-h500px white-text overflow-y" md={12}>
+                                <Col className="search-box d-flex flex-column align-items-center border border-white light-blue-back" >
+
+                                    <div class="row width100 border-bottom border-white" id="search">
+                                        <form className="width100 no-gutters p-2" id="search-form" action="" method="POST" enctype="multipart/form-data">
+                                            <div class="form-group col-sm-9">
+                                                <input class="form-control" type="text" placeholder="eg. api.theworldmarketplace.com" />
+                                            </div>
+                                            <div class="form-group col-sm-3">
+                                                <button type="submit" class="btn btn-block btn-primary">Set Market API</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="row" id="search">
+                                        <form className="no-gutters p-2" id="search-form" action="" method="POST" enctype="multipart/form-data">
+                                            <div class="form-group col-sm-9">
+                                                <input class="form-control" type="text" placeholder="Search" />
+                                            </div>
+                                            <div class="form-group col-sm-3">
+                                                <button type="submit" class="btn btn-block btn-primary">Search</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="row" id="filter">
+                                        <form>
+                                            <div class="form-group col-sm-3 col-xs-6">
+                                                <select data-filter="make" class="filter-make filter form-control">
+                                                    <option value="">Category</option>
+                                                    <option value="">Any</option>
+                                                    <option value="">Category</option>
+                                                    <option value="">Books</option>
+                                                    <option value="">Clothes</option>
+                                                    <option value="">Digital</option>
+                                                    <option value="">Toys</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-sm-3 col-xs-6">
+                                                <select data-filter="model" class="filter-model filter form-control">
+                                                    <option value="">Location</option>
+                                                    <option value="">Any</option>
+                                                    <option value="">Africa</option>
+                                                    <option value="">Asia</option>
+                                                    <option value="">Africa</option>
+                                                    <option value="">Europe</option>
+                                                    <option value="">North America</option>
+                                                    <option value="">South America</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-sm-3 col-xs-6">
+                                                <select data-filter="type" class="filter-type filter form-control">
+                                                    <option value="">Price Range</option>
+                                                    <option value="">$0 - $24.99</option>
+                                                    <option value="">$25 - $49.99</option>
+                                                    <option value="">$50 - $199.99</option>
+                                                    <option value="">$200 - $499.99</option>
+                                                    <option value="">$500 - $999.99</option>
+                                                    <option value="">$1000+</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-sm-3 col-xs-6">
+                                                <select data-filter="price" class="filter-price filter form-control">
+                                                    <option value="">Sort by...</option>
+                                                    <option value="">$$$ Asc</option>
+                                                    <option value="">$$$ Dec</option>
+                                                    <option value="">Rating Asc</option>
+                                                    <option value="">Rating Dec</option>
+                                                </select>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                </Col>
+
+                                {this.state.twm_offers.length > 1 ? (
+                                    <Table color="white" className="white-text border border-white b-r10">
+                                        <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Quantity</th>
+                                            <th>Price (SFX)</th>
+                                            <th>Seller</th>
+                                            <th>Offer ID</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {twm_listings_table}
+                                        </tbody>
+                                    </Table>) : (<div></div>)}
 
                                 <Table>
                                     <thead>
                                     <tr>
-                                        <th>title</th>
-                                        <th>quantity</th>
-                                        <th>price (SFX)</th>
-                                        <th>seller</th>
-                                        <th>offer id</th>
-                                        <th>actions</th>
+                                        <th>Title</th>
+                                        <th>Quantity</th>
+                                        <th>Price (SFX)</th>
+                                        <th>Seller</th>
+                                        <th>Offer ID</th>
+                                        <th>Actions</th>
+                                        <th></th>
+                                        <th></th>
                                     </tr>
                                     </thead>
 
@@ -1140,7 +1303,7 @@ class WalletHome extends React.Component {
                                         </Modal>
                                     </Row>
 
-                                    <Row className="account_list">
+                                    <Row className="account-list">
                                         {accounts_table}
                                     </Row>
                                     {selected !== void (0) ? (<Row className="merchant_profile_view">
@@ -1202,11 +1365,11 @@ class WalletHome extends React.Component {
                                         {this.state.twm_offers.length > 1 ? (<Table className="offer__container">
                                             <thead>
                                             <tr>
-                                                <th>title</th>
-                                                <th>quantity</th>
-                                                <th>price (SFX)</th>
-                                                <th>seller</th>
-                                                <th>offer id</th>
+                                                <th>Title</th>
+                                                <th>Quantity</th>
+                                                <th>Price (SFX)</th>
+                                                <th>Seller</th>
+                                                <th>Offer ID</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -1215,16 +1378,19 @@ class WalletHome extends React.Component {
                                         </Table>) : (<div></div>)}
                                     </Row>
 
-                                    <Row className="overflow-x">
+                                    <Row className="overflow-y">
                                         <Table>
                                             <thead>
                                             <tr>
-                                                <th>title</th>
-                                                <th>quantity</th>
-                                                <th>price (SFX)</th>
-                                                <th>seller</th>
-                                                <th>offer id</th>
-                                                <th>actions</th>
+                                                <th>Title</th>
+                                                <th>Quantity</th>
+                                                <th>Price (SFX)</th>
+                                                <th>Seller</th>
+                                                <th>Offer ID</th>
+                                                <th>Actions</th>
+                                                <th></th>
+                                                <th></th>
+
                                             </tr>
                                             </thead>
 
@@ -1362,115 +1528,135 @@ class WalletHome extends React.Component {
 
 
         return (
-            <div style={{position: 'relative'}}>
-                <Container>
-                    <Row>
-                        <div className="container center">
-                            <nav className="menu">
-                                <h1 className="menu__logo"></h1>
+            <Container className="height100 justify-content-between" fluid>
+                <Container fluid className="no-gutters mt-5 mb-2 p-2 border border-light b-r10 white-text">
 
-                                <div className="menu__right">
-                                    <ul className="menu__list">
-                                        <li className="menu__list-item">
-                                            SFX: {this.state.cash}
-                                        </li>
-                                        <li className="menu__list-item">
-                                            SFT: {this.state.tokens}
-                                        </li>
-                                        <li className="menu__list-item">
-                                            <a className="menu__link" href="javascript:void(0)"
-                                               onClick={this.go_home}>Home</a>
-                                        </li>
-                                        <li className="menu__list-item">
-                                            <a className="menu__link" href="javascript:void(0)"
-                                               onClick={this.show_market}>Market</a>
-                                        </li>
-                                        <li className="menu__list-item">
-                                            <a className="menu__link" href="javascript:void(0)"
-                                               onClick={this.show_merchant}>Merchant</a>
-                                        </li>
-                                        <li className="menu__list-item">
-                                            <a className="menu__link" href="javascript:void(0)"
-                                               onClick={this.show_staking}>Staking</a>
-                                        </li>
-                                        <li className="menu__list-item">
-                                            <a className="menu__link" href="javascript:void(0)"
-                                               onClick={this.show_settings}>Settings</a>
-                                        </li>
-                                        <li className="menu__list-item">
-                                            <a className="menu__link" href="javascript:void(0)"
-                                               onClick={this.logout}>Exit</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </nav>
-                        </div>
-                    </Row>
+                                <Row className="justify-content-between align-items-center">
 
-                    <Row>
-                        <Col sm={8}>
-                            <ul>
+                                    <Col sm={2} className="p-1 align-self-center b-r10 light-blue-back">
 
-                                <li>
-                                    Public Address: Receive SFT and SFX here (share this to get paid)
+                                        <div className="d-flex flex-row justify-content-center align-items-end">
+                                            <IconContext.Provider value={{ color: 'white', size: '20px' }}>
+                                                    <div className="white-text">
+                                                    <GrCubes className="m-1 white-text"/>
+                                                    </div>
+                                            </IconContext.Provider>
+                                            <p className="mb-2"> <b>{this.state.blockchain_height}</b></p>
+                                        </div>
+
+                                            {this.state.wallet_height < this.state.blockchain_height ?
+                                                (<p className="mb-2">
+                                                    {this.state.wallet_height} / {this.state.blockchain_height}
+                                                </p>) : ''}
+                                            <p className="mb-2">{this.state.connection_status}</p>
+
+                                    </Col>
+
+                                    <div className="menu-logo">
+                                        <Image className=" align-content-center" src={require("./../../img/sails-logo.png")}/>
+                                    </div>
+
+                                    <Col sm={7} className="menu">
+                                        <ul className="menu__list">
+                                            <li className="menu__list-item">
+                                                <a className="menu__link" href="javascript:void(0)"
+                                                onClick={this.go_home}>Home</a>
+                                            </li>
+                                            <li className="menu__list-item">
+                                                <a className="menu__link" href="javascript:void(0)"
+                                                onClick={this.show_market}>Market</a>
+                                            </li>
+                                            <li className="menu__list-item">
+                                                <a className="menu__link" href="javascript:void(0)"
+                                                onClick={this.show_merchant}>Merchant</a>
+                                            </li>
+                                            <li className="menu__list-item">
+                                                <a className="menu__link" href="javascript:void(0)"
+                                                onClick={this.show_staking}>Staking</a>
+                                            </li>
+
+
+                                        </ul>
+
+                                    </Col>
+                                    <div className="d-flex flex-column">
+                                        <a className="menu__link" href="javascript:void(0)"
+                                        onClick={this.show_settings}><FaCogs className="m-3"/></a>
+
+
+                                        <a className="menu__link" href="javascript:void(0)"
+                                        onClick={this.logout}><GiExitDoor className="m-3"/></a>
+                                    </div>
+                                </Row>
+
+
+
+
+                        <Row className="no-gutters p-2 justify-content-between align-items-center b-r10 grey-back white-text">
+                            <Col sm={3}>
+                                <li className="mr-2">
+                                    SFX: {this.state.cash}
                                 </li>
-                                <li>
-                                    {this.state.address}
+                                <li className="">
+                                    SFT: {this.state.tokens}
                                 </li>
-                            </ul>
-                        </Col>
-                        <Col>
-                            <ul>
-                                <li className="mb-2">Blockchain Height: <b>{this.state.blockchain_height}</b></li>
-                                {this.state.wallet_height < this.state.blockchain_height ?
-                                    (<li>
-                                        {this.state.wallet_height} / {this.state.blockchain_height}
-                                    </li>) : ''}
-                                <li>{this.state.connection_status}</li>
-                                <li>
-                                    {this.state.synced === false ? (
-                                        <Button className="m-1" onClick={this.check}>Check</Button>) : ''}
-                                    <Button className="m-1" variant="danger" onClick={this.rescan}>Hard Rescan</Button>
-                                    <Button className="m-1" variant="primary" onClick={this.handleShow}>
-                                        Show Keys
-                                    </Button>
+                            </Col>
+                            <Col className="just" sm={6}>
+                                <p >SFX + SFT Public Address: <b>{this.to_ellipsis(this.state.address)}</b></p>
+                                <Button onClick={this.copyAddressToClipboard}>
+                                    Copy Address
+                                </Button>
+                            </Col>
+                            <Col className="d-flex justify-content-center" sm={3}>
 
-                                    <Modal animation={false} show={this.state.show_keys} onHide={this.handleClose}>
-                                        <Modal.Header closeButton>
-                                            <Modal.Title>Your Private Keys</Modal.Title>
-                                        </Modal.Header>
-                                        <Modal.Body>
-                                            <ul>
-                                                <li>
-                                                    <b>Address:</b> <br/> {this.props.wallet.address()}
-                                                </li>
-                                                <li>
-                                                    <b>Secret Spend Key:</b> <br/> {this.props.wallet.secretSpendKey()}
-                                                </li>
-                                                <li>
-                                                    <b>Secret View Key:</b> <br/> {this.props.wallet.secretViewKey()}
-                                                </li>
-                                                <li>
-                                                    <b>Mnemonic Seed:</b> <br/> {this.props.wallet.seed()}
-                                                </li>
-                                            </ul>
-                                        </Modal.Body>
-                                        <Modal.Footer>
-                                            <Button variant="secondary" onClick={this.handleClose}>
-                                                Close
-                                            </Button>
-                                        </Modal.Footer>
-                                    </Modal>
-                                </li>
+                                        {this.state.synced === false ? (
+                                        <Button className="m-1" onClick={this.check}>
+                                            Check
+                                        </Button>) : ''}
 
-                            </ul>
-                        </Col>
-                    </Row>
+                                        <Button className="m-1" variant="danger" onClick={this.rescan}>
+                                            Hard Rescan
+                                        </Button>
 
-                    {twmwallet()}
+                                        <Button className="m-1" variant="primary" onClick={this.handleShow}>
+                                            Show Keys
+                                        </Button>
 
+                                        <Modal className="width100 black-text" animation={false} show={this.state.show_keys} onHide={this.handleClose}>
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>Your Private Keys</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                <ul>
+                                                    <li>
+                                                        <b>Address:</b> <br/> {this.props.wallet.address()}
+                                                    </li>
+                                                    <li>
+                                                        <b>Secret Spend Key:</b> <br/> {this.props.wallet.secretSpendKey()}
+                                                    </li>
+                                                    <li>
+                                                        <b>Secret View Key:</b> <br/> {this.props.wallet.secretViewKey()}
+                                                    </li>
+                                                    <li>
+                                                        <b>Mnemonic Seed:</b> <br/> {this.props.wallet.seed().toUpperCase()}
+                                                    </li>
+                                                </ul>
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={this.handleClose}>
+                                                    Close
+                                                </Button>
+                                            </Modal.Footer>
+                                        </Modal>
+
+                            </Col>
+                        </Row>
                 </Container>
-            </div>
+
+                {twmwallet()}
+
+
+            </Container>
         );
     }
 }

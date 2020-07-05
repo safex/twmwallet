@@ -1,7 +1,8 @@
 import React from 'react';
-import {Row, Col, Container, Button, Form} from 'react-bootstrap';
+import {Row, Col, OverlayTrigger, Container, Button, Form} from 'react-bootstrap';
+import path from 'path';
 import {open_wallet} from '../../utils/wallet_creation';
-
+import {FaBackward} from 'react-icons/fa';
 import WalletHome from '../wallet/home';
 import {open_twm_file, save_twm_file} from "../../utils/twm_actions";
 
@@ -187,65 +188,66 @@ export default class OpenWallet extends React.Component {
 
     render() {
         return (
-            <div>
+            <Container fluid className="mb-5 d-flex flex-column justify-content-center safex_blue">
                 {this.state.wallet_made ?
-                    (<div>
+                    (<Container fluid className="height100 justify-content-between">
                         <WalletHome
                             wallet={this.state.wallet}
                             daemon_host={this.state.daemon_host}
                             daemon_port={this.state.daemon_port}
                             password={this.state.password}
                         />
-                    </div>) :
-                    (<Container className="justify-content-center">
-                        <Button className="m-5 btn-secondary" onClick={this.exit_home}>Go Back</Button>
-                        <Row className="justify-content-md-center alert-box">
-                            <Col sm={6}>
-                                <p>
-                                    Open an existing Safex wallet by selecting the .keys file and
-                                    entering your password.
+                    </Container>) :
+                    (<Container fluid className="font-size-small b-r25 grey-back d-flex flex-column safex_blue white-text" >
+                    <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
+
+                    <Row className="align-items-center mb-5 justify-content-center">
+                        <h1>Open Wallet</h1>
+                    </Row>
+
+                        <Col sm={8} className="d-flex justify-content-center align-self-center flex-column text-center" >
+                            <p>
+                                Open an existing Safex wallet by selecting the .keys file and
+                                entering your password.
+                            </p>
+
+                            <div className="mt-4">
+                                <p className="border border-danger b-r25">
+                                    If you are participating in the testnet, tick this box
+                                    <input
+                                        name="isTestnet"
+                                        type="checkbox"
+                                        checked={this.state.testnet}
+                                        onChange={this.set_to_testnet}
+                                        className="ml-2"
+                                    />
                                 </p>
-                                <div className="mt-4">
-                                    <p className="border-warning">
-                                        If you are participating in the testnet, tick this box
-                                        <input
-                                            name="isTestnet"
-                                            type="checkbox"
-                                            checked={this.state.testnet}
-                                            onChange={this.set_to_testnet}
-                                            className="ml-2"
-                                        />
+                            </div>
+
+                            {this.state.new_path.length > 0 ?
+                                (<Col className="mb-2 mt-2 border border-warning b-r25">
+                                    <p className="mt-2">
+                                        Selected Wallet File: <b>{this.state.new_path}</b>
                                     </p>
-                                </div>
-                            </Col>
-                        </Row>
-                        <Row className="justify-content-md-center">
-                            <Col sm={6}>
+                                    <Button className="mt-2 mb-2" onClick={this.change_path}>
+                                        Change File
+                                    </Button>
 
-                                {this.state.new_path.length > 0 ?
-                                    (<div>
-                                        <p>
-                                            Selected Wallet File: <b>{this.state.new_path}</b> <Button className="ml-2"
-                                                                                                       onClick={this.change_path}>Change
-                                            File</Button>
-                                        </p>
-                                    </div>) :
-                                    (<div>
+                                </Col>) :
+                                (<div>
 
-                                        <Form id="set_path" onSubmit={this.set_path}>
-                                            <Button type="submit" variant="primary" size="lg" block>SELECT WALLET
-                                                FILE</Button>
-                                        </Form>
-                                    </div>)
-                                }
+                                    <Form id="set_path" onSubmit={this.set_path}>
+                                        <Button className="mt-5 mb-5" type="submit" variant="primary" size="lg" block>Select Wallet File</Button>
+                                    </Form>
+                                </div>)
+                            }
 
-                            </Col>
-                        </Row>
+                        </Col>
 
                         {this.state.new_path.length > 0 &&
                         this.state.daemon_host.length < 1 ?
-                            (<Row className="justify-content-md-center">
-                                <Col sm={6}>
+                            (
+                                <Col sm={8} className="d-flex justify-content-center align-self-center flex-column ">
                                     <div>
                                         <p>
                                             This is the URL used to connect to the Safex blockchain.
@@ -260,17 +262,15 @@ export default class OpenWallet extends React.Component {
 
                                         </ul>
                                         <Form id="set_daemon" onSubmit={this.set_daemon_state}>
-                                            <b>Safexd Host</b> <Form.Control className="mb-4" name="daemon_host"
-                                                                             defaultValue="stagenetrpc.safex.org"
-                                                                             placedholder="set the ip address of the safex blockchain"/>
-                                            <b>Safexd Port</b> <Form.Control name="daemon_port" defaultValue="30393"
-                                                                             placedholder="set the port of the safex blockchain"/>
-                                            <Button className="mt-5" type="submit" variant="primary" size="lg" block>Set
-                                                Connection</Button>
+                                            <b>Safexd Host</b> <Form.Control className="mb-4" name="daemon_host" defaultValue="stagenetrpc.safex.org"
+                                                                      placedholder="set the ip address of the safex blockchain"/>
+                                            <b>Safexd Port</b> <Form.Control  name="daemon_port" defaultValue="30393"
+                                                                      placedholder="set the port of the safex blockchain"/>
+                                            <Button className="mt-5 mb-5" type="submit" variant="primary" size="lg" block>Set Connection</Button>
                                         </Form>
                                     </div>
                                 </Col>
-                            </Row>) :
+                            ) :
                             (<div>
                             </div>)
 
@@ -279,20 +279,14 @@ export default class OpenWallet extends React.Component {
                         {this.state.new_path.length > 0 &&
                         this.state.daemon_host.length > 0 &&
                         this.state.password.length < 1 ?
-                            (<div>
-                                <Row className="justify-content-md-center">
-                                    <Col sm={6}>
-                                        <div>
-                                            <Form id="set_password" onSubmit={this.open_wallet}>
-                                                Enter Your Password: <Form.Control name="password" type="password"
-                                                                                   placedholder="enter your password and open your wallet"/>
-                                                <Button className="mt-5" type="submit" variant="primary" size="lg"
-                                                        block>OPEN WALLET</Button>
-                                            </Form>
-                                        </div>
-                                    </Col>
-                                </Row>
-                            </div>) :
+
+                            (<Col className="mt-2">
+                                <Form id="set_password" className="auto_margin_50" onSubmit={this.open_wallet}>
+                                    Enter Your Password: <Form.Control name="password" type="password"
+                                                    placedholder="enter your password and open your wallet"/>
+                                    <Button className="mt-2 mb-5" type="submit" variant="primary" size="lg" block>Open Wallet</Button>
+                                </Form>
+                            </Col>) :
                             (<div>
                             </div>)
                         }
@@ -303,7 +297,7 @@ export default class OpenWallet extends React.Component {
                             (<div>
                                 <Row className="justify-content-md-center">
                                     <Col sm={6}>
-                                        <p>opening your wallet...</p>
+                                        <p>Opening your wallet...</p>
                                     </Col>
                                 </Row>
                             </div>) :
@@ -311,6 +305,6 @@ export default class OpenWallet extends React.Component {
                             </div>)
                         }
                     </Container>)}
-            </div>);
+            </Container>);
     }
 }

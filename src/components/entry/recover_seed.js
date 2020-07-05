@@ -2,6 +2,8 @@ import React from 'react';
 import {Row, Col, Container, Button, Form} from 'react-bootstrap';
 import {recover_from_seed} from '../../utils/wallet_creation';
 
+import {FaBackward} from 'react-icons/fa'
+
 import WalletHome from "../wallet/home";
 
 const safex = window.require("safex-nodejs-libwallet");
@@ -152,7 +154,7 @@ export default class RecoverSeed extends React.Component {
 
     render() {
         return (
-            <div>
+            <Container fluid className="safex_blue d-flex flex-column justify-content-center mt-5 mb-5">
                 {this.state.wallet_made ?
                     (<div>
                         <WalletHome
@@ -162,44 +164,42 @@ export default class RecoverSeed extends React.Component {
                             password={this.state.password}
                         />
                     </div>) :
-                    (<Container>
-                        <button onClick={this.exit_home}>exit home</button>
-                        <Row className="justify-content-md-center">
-                            <Col sm={6}>
-                                <p>
-                                    This pathway will allow you to restore a wallet from your Safex public address,
-                                    private view and spend key.
-                                </p>
-                                <p>
-                                    <input
-                                        name="isTestnet"
-                                        type="checkbox"
-                                        checked={this.state.testnet}
-                                        onChange={this.set_to_testnet}/>
-                                </p>
-                            </Col>
+                    (<Container fluid className="font-size-small mt-5 pb-5 b-r25 grey-back d-flex flex-column safex_blue white-text" >
+                        <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
+                        
+                        <Row className="align-items-center mb-5 justify-content-center">   
+                            <h1>Recover From Seed</h1>
                         </Row>
-
+                        
+                        <Col sm={8} className="d-flex justify-content-center align-self-center flex-column text-center" >
+                            
+                            <p>
+                                This pathway will allow you to restore a wallet from your <b>Safex Public Address</b> 
+                                , <b>Private View</b> and <b>Spend Key</b>.
+                            </p>
+                            <p className="border border-danger b-r25">
+                                If you are participating in the testnet, tick this box
+                                <input
+                                    name="isTestnet"
+                                    type="checkbox"
+                                    checked={this.state.testnet}
+                                    onChange={this.set_to_testnet}
+                                    className="ml-2"
+                                />
+                            </p>
                         {this.state.seed_set ?
                             (<div></div>) :
-                            (<Row className="justify-content-md-center">
-                                <Col sm={6}>
-                                    <div>
-                                        <p>
-                                            Enter your Public Address, Private Spend Key, and Private View Key
-                                        </p>
-                                        <div>
-                                            <Form id="set_seed" onSubmit={this.set_seed}>
-                                                Seed Phrase (25 words) <Form.Control name="seed"
-                                                                                     as="textarea" rows="3"
-                                                                                     />
-                                                <Button type="submit" variant="primary" size="lg" block>set
-                                                    seed</Button>
-                                            </Form>
-                                        </div>
-                                    </div>
-                                </Col>
-                            </Row>)
+                            (<Col className="mb-2 mt-2 p-2 border border-warning b-r25">
+                                <p>
+                                    Enter your <b>25 Word Seed Phrase</b>
+                                </p>
+                                
+                                <Form id="set_seed" onSubmit={this.set_seed}>
+                                    <Form.Control name="seed" as="textarea" rows="3"/>
+                                    <Button className="mt-5" type="submit" variant="primary" size="lg" >Set
+                                        Seed</Button>
+                                </Form>
+                            </Col>)
                         }
 
                         {this.state.seed_set &&
@@ -208,7 +208,7 @@ export default class RecoverSeed extends React.Component {
                                 <Col sm={6}>
                                     <div>
                                         <p>
-                                            Set the path where to save your new wallet file
+                                            Set the path where to restore your wallet file
                                         </p>
                                         <Form id="set_path" onSubmit={this.set_path}>
                                             <Button type="submit" variant="primary" size="lg" block>Select File
@@ -223,23 +223,16 @@ export default class RecoverSeed extends React.Component {
                         {this.state.new_path.length > 0 &&
                         this.state.seed_set &&
                         this.state.password.length < 1 ?
-                            (<Row className="justify-content-md-center">
-                                <Col sm={6}>
-                                    <div>
-                                        <div>
-                                            <Form id="set_password" onSubmit={this.set_password}>
-                                                <Form.Control name="password" type="password"
-                                                              placedholder="set the ip address of the safex blockchain"/>
-                                                <Form.Control name="repeat_password" type="password"
-                                                              placedholder="set the port of the safex blockchain"/>
-                                                <Button type="submit" variant="primary" size="lg" block>set
-                                                    password</Button>
-                                            </Form>
-                                        </div>
-
-                                    </div>
-                                </Col>
-                            </Row>) :
+                            (<Col className="mb-2 mt-2 border border-warning b-r25 ">
+                                <Form id="set_password" className="auto_margin_50" onSubmit={this.set_password}>
+                                    <Form.Control name="password" className="mt-2 mb-2" type="password"
+                                                    placedholder="Set the ip address of the Safex blockchain"/>
+                                    <Form.Control name="repeat_password" className="mt-2 mb-2" type="password"
+                                                    placedholder="Set the port of the Safex blockchain"/>
+                                    <Button type="submit" variant="primary" className="mb-2" size="lg" >Set
+                                        Password</Button>
+                                </Form>
+                            </Col>) :
                             (<div></div>)
                         }
 
@@ -247,20 +240,16 @@ export default class RecoverSeed extends React.Component {
                         this.state.seed_set &&
                         this.state.password.length > 0 &&
                         this.state.daemon_host.length < 1 ?
-                            (<Row className="justify-content-md-center">
-                                <Col sm={6}>
-                                    <div>
-                                        <Form id="set_daemon" onSubmit={this.set_daemon_state}>
-                                            <Form.Control name="daemon_host" defaultValue="127.0.0.1"
-                                                          placedholder="set the ip address of the safex blockchain"/>
-                                            <Form.Control name="daemon_port" defaultValue="17402"
-                                                          placedholder="set the port of the safex blockchain"/>
-                                            <Button type="submit" variant="primary" size="lg" block>set
-                                                connection</Button>
-                                        </Form>
-                                    </div>
-                                </Col>
-                            </Row>) :
+                            (<Col className="mb-2 mt-2 border border-warning b-r25">
+                                <Form  id="set_daemon" className="auto_margin_50" onSubmit={this.set_daemon_state}>
+                                    <Form.Control className="mt-2 mb-2"  name="daemon_host" defaultValue="rpc.safex.org"
+                                                placedholder="set the ip address of the safex blockchain"/>
+                                    <Form.Control className="mt-2 mb-2"  name="daemon_port" defaultValue="17402"
+                                                placedholder="set the port of the safex blockchain"/>
+                                    <Button className="mb-2" type="submit" variant="primary" size="lg">Set
+                                        Connection</Button>
+                                </Form>
+                            </Col>) :
                             (<div></div>)
                         }
 
@@ -269,51 +258,54 @@ export default class RecoverSeed extends React.Component {
                         this.state.password.length > 0 &&
                         this.state.seed_set ?
                             (<Row className="justify-content-md-center">
-                                <Col sm={6}>
-                                    <div>
-                                        <div>
-                                            <ul>
-                                                <li>Your Seed:</li>
-                                                <li>{this.state.seed}</li>
-                                            </ul>
-                                        </div>
-                                        <div>
-                                            <p>
-                                                this file will be saved to {this.state.new_path} <Button
-                                                onClick={this.change_path}>change path?</Button>
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p>
-                                                your chosen password is
-                                                : {[...Array(this.state.password.length)].map((key) =>
-                                                <span key={key}>♦</span>)}
+                                <Col sm={8}>
+                                    
+                                    <Col className="p-2 justify-content-between align-items-baseline border border-warning b-r25">
+                                        <p>
+                                            This file will be saved to: <b>{this.state.new_path}</b>
+                                        </p>
+                                        <Button onClick={this.change_path}>
+                                            Change Path
+                                        </Button>
+                                    </Col>
 
-                                                <Button
-                                                    onClick={this.show_password}>show password</Button>
-                                                <Button
-                                                    onClick={this.change_password}>change password</Button>
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p>
-                                                you will be connected
-                                                to {this.state.daemon_host}:{this.state.daemon_port} for
-                                                blockchain synchronization<Button
-                                                onClick={this.change_daemon}>change safex network connection?</Button>
-                                            </p>
-                                        </div>
+                                    <Col className="p-2 mt-2 justify-content-between align-items-baseline border border-warning b-r25">
+                                        <p>
+                                            Your chosen password is: {[...Array(this.state.password.length)].map(() =>
+                                            <span>♦</span>)}
+                                            <br/>
+                                            <Button className="mt-2 mr-2"
+                                                onClick={this.show_password}>Show Password</Button>
+                                            <Button className="mt-2"
+                                                onClick={this.change_password}>Change Password</Button>
+                                        </p>
+                                    </Col>
+                                    <Col className="d-flex flex-column mb-2 mt-2 border border-warning b-r25">
+                                        <p className="mt-2 mb-2">
+                                            You will be connected
+                                            to <b>{this.state.daemon_host}:{this.state.daemon_port}</b> for
+                                            blockchain synchronization
+                                            <br/>
+                                        </p>
+                                            <Button
+                                                className="align-self-center mb-2 mt-2"
+                                                onClick={this.change_daemon}>Change Safex Network Connection
+                                            </Button>
+                                        
+                                    </Col>
 
-                                        <Button onClick={this.make_wallet} variant="primary" size="lg" block>Make
-                                            the New Wallet</Button>
-                                    </div>
+                                    <Button onClick={this.make_wallet} variant="primary" size="lg" block>
+                                        Restore Wallet
+                                    </Button>
+                                   
                                 </Col>
                             </Row>) :
                             (<div></div>)
                         }
+                        </Col>
                     </Container>)
                 }
-            </div>
+            </Container>
         );
     }
 }
