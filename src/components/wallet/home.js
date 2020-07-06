@@ -633,7 +633,36 @@ class WalletHome extends React.Component {
         e.preventDefault();
         e.persist();
         console.log(`let's register it`);
+        let vees = e.target;
 
+        let o_obj = {};
+        o_obj.twm_version = 1;
+
+
+        if (vees.description.value.length > 0) {
+            o_obj.description = vees.description.value;
+        }
+        if (vees.main_image.value.length > 0) {
+            o_obj.main_image = vees.main_image.value;
+        }
+        if (vees.sku.value.length > 0) {
+            o_obj.sku = vees.sku.value;
+        }
+        if (vees.barcode.value.length > 0) {
+            o_obj.barcode = vees.barcode.value;
+        }
+        if (vees.weight.value.length > 0) {
+            o_obj.weight = vees.weight.value;
+        }
+        if (vees.country.value.length > 0) {
+            o_obj.country = vees.country.value;
+        }
+        if (vees.message_type.value.length > 0) {
+            o_obj.message_type = vees.message_type.value;
+        }
+        if (vees.physical.value.length > 0) {
+            o_obj.physical = vees.physical.value;
+        }
 
         try {
             let mixins = e.target.mixins.value - 1;
@@ -643,7 +672,7 @@ class WalletHome extends React.Component {
                 safex_offer_title: e.target.title.value,
                 safex_offer_price: e.target.price.value * 10000000000,
                 safex_offer_quantity: e.target.quantity.value,
-                safex_offer_description: 'hello',
+                safex_offer_description: JSON.stringify(o_obj),
                 safex_offer_price_peg_used: 0,
                 mixin: mixins
             }).then((tx) => {
@@ -1371,7 +1400,13 @@ class WalletHome extends React.Component {
                                                         description <Form.Control as="textarea" name="description"/>
                                                         price SFX <Form.Control name="price"/>
                                                         available quantity <Form.Control name="quantity"/>
-                                                        shipping destinations <Form.Control name="location"
+                                                        SKU <Form.Control name="sku"/>
+                                                        Barcode (ISBN, UPC, GTIN, etc) <Form.Control name="barcode"/>
+
+                                                        Message Type <Form.Control name="message_type"/>
+                                                        Weight <Form.Control name="weight"/>
+                                                        Physical Item? <Form.Control name="physical" value="true"/>
+                                                        Country of Origin <Form.Control name="country"
                                                                                             defaultValue="Earth"
                                                                                             placedholder="your location"/>
                                                         mixins <Form.Control name="mixins" defaultValue="7"

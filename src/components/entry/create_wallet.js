@@ -88,7 +88,7 @@ export default class CreateWallet extends React.Component {
 
                 let twm_obj = {};
 
-                twm_obj.version = 2;
+                twm_obj.version = 1;
                 twm_obj.api = {};
                 twm_obj.api.urls = {};/*
                     twm_obj.api.urls.theworldmarketplace = {};
