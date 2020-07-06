@@ -154,7 +154,7 @@ export default class RecoverSeed extends React.Component {
 
     render() {
         return (
-            <Container fluid className="safex_blue d-flex flex-column justify-content-center mt-5 mb-5">
+            <Container fluid className="height100 d-flex flex-column justify-content-center safex-blue">
                 {this.state.wallet_made ?
                     (<div>
                         <WalletHome
@@ -164,7 +164,7 @@ export default class RecoverSeed extends React.Component {
                             password={this.state.password}
                         />
                     </div>) :
-                    (<Container fluid className="font-size-small mt-5 pb-5 b-r25 grey-back d-flex flex-column safex_blue white-text" >
+                    (<Container fluid className="font-size-small mt-5 pb-5 b-r25 grey-back d-flex flex-column safex-blue white-text" >
                         <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
                         
                         <Row className="align-items-center mb-5 justify-content-center">   

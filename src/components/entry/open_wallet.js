@@ -83,8 +83,8 @@ export default class OpenWallet extends React.Component {
 
             try {
 
-                console.log(`the path ${this.state.new_path[0]}`);
-                let twm_file = await open_twm_file(this.state.new_path[0] + '.twm', this.state.password);
+                console.log(`the path ${this.state.new_path}`);
+                let twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
                 if (twm_file.success) {
                     //parse the json and pack it into the local storage for usages
                     console.log(`success`);
@@ -136,11 +136,11 @@ export default class OpenWallet extends React.Component {
                     console.log(`password ${this.state.password}`)
                     console.log(JSON.stringify(twm_obj));
 
-                    let twm_save = await save_twm_file(this.state.new_path[0] + '.twm', crypted, this.state.password, hash1.digest('hex'));
+                    let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
 
                     try {
 
-                        let twm_file = await open_twm_file(this.state.new_path[0] + '.twm', this.state.password);
+                        let twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
                         console.log(twm_file);
 
                         localStorage.setItem('twm_file', JSON.stringify(twm_file.contents));
@@ -187,7 +187,7 @@ export default class OpenWallet extends React.Component {
 
     render() {
         return (
-            <Container fluid className="mb-5 d-flex flex-column justify-content-center safex_blue">
+            <Container fluid className="height100 d-flex flex-column justify-content-center safex-blue">
                 {this.state.wallet_made ?
                     (<Container fluid className="height100 justify-content-between">
                         <WalletHome
@@ -197,7 +197,7 @@ export default class OpenWallet extends React.Component {
                             password={this.state.password}
                         />
                     </Container>) :
-                    (<Container fluid className="font-size-small b-r25 grey-back d-flex flex-column safex_blue white-text" >
+                    (<Container fluid className="font-size-small b-r25 grey-back d-flex flex-column safex-blue white-text" >
                     <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
 
                     <Row className="align-items-center mb-5 justify-content-center">
