@@ -80,59 +80,59 @@ export default class SelectEntry extends React.Component {
 
     render() {
         return (
-            <div className="width100 height100 safex_blue d-flex flex-column text-center">
+            <div className="width100 height100 safex-blue d-flex flex-column text-center">
                 
-                <Container className="flex-column p-5 d-flex">
-                <Row className="row justify-content-md-center justify-content-center p-3">
-                <Image className="entry_image align-content-center mb-5" src={require("./../../img/safex-logo.png")}/>
-                </Row>
-                
-                <Row className="row justify-content-md-center justify-content-center p-3">
-                    <Col sm={10}>
-                        <Button onClick={this.open_existing} className="font_size_medium" variant="primary" size="lg" block>
-                            <FaFolderOpen className="mr-3"/>
-                            Open Existing
-                        </Button>
-                    </Col>
-                </Row>
-
-                <Row className="justify-content-md-center font_size_medium justify-content-center p-3">
-                    <Col sm={10}>
-                        <Button onClick={this.create_new} className="font_size_medium" variant="primary" size="lg" block>
-                            <FaFolderPlus className="mr-3"/>
-                            Create New
-                        </Button>
-                    </Col>
-                </Row>
-
-                <Row className="justify-content-md-center justify-content-center p-3">
-                    <Col sm={10}>
-                        <Button onClick={this.restore_keys} className="font_size_medium" variant="primary" size="lg" block>
-                            <FaKey className="mr-3"/>
-                            Recover From Keys
-                        </Button>
-                    </Col>
-                </Row>
-
-                <Row className="justify-content-md-center justify-content-center p-3">
-                    <Col sm={10}>
-                        <Button onClick={this.seed_phrase} className="font_size_medium" variant="primary" size="lg" block>
-                            <FaAlignLeft className="mr-3"/>
-                            Recover From Seed Phrase
-                        </Button>
-                    </Col>
-                </Row>
-
-                {this.state.legacy_detected ? (
-                    <Row className="justify-content-md-center justify-content-center p-3">
-                        <Col sm={8}>
-                            <Button onClick={this.restore_legacy} className="font_size_medium" variant="warning" size="lg" block>
-                                <FaHistory className="mr-3"/> 
-                                Open Legacy Wallet
+                <Container className="height100 flex-column p-5 d-flex">
+                    <Row className="row justify-content-md-center justify-content-center p-3">
+                        <Image className="entry_image align-content-center mb-5" src={require("./../../img/safex-logo.png")}/>
+                    </Row>
+                    
+                    <Row className="row justify-content-md-center justify-content-center p-3">
+                        <Col sm={10}>
+                            <Button onClick={this.open_existing} className="font_size_medium" variant="primary" size="lg" block>
+                                <FaFolderOpen className="mr-3"/>
+                                Open Existing
                             </Button>
                         </Col>
-                    </Row>) : (<div></div>)
-                }
+                    </Row>
+
+                    <Row className="justify-content-md-center font_size_medium justify-content-center p-3">
+                        <Col sm={10}>
+                            <Button onClick={this.create_new} className="font_size_medium" variant="primary" size="lg" block>
+                                <FaFolderPlus className="mr-3"/>
+                                Create New
+                            </Button>
+                        </Col>
+                    </Row>
+
+                    <Row className="justify-content-md-center justify-content-center p-3">
+                        <Col sm={10}>
+                            <Button onClick={this.restore_keys} className="font_size_medium" variant="primary" size="lg" block>
+                                <FaKey className="mr-3"/>
+                                Recover From Keys
+                            </Button>
+                        </Col>
+                    </Row>
+
+                    <Row className="justify-content-md-center justify-content-center p-3">
+                        <Col sm={10}>
+                            <Button onClick={this.seed_phrase} className="font_size_medium" variant="primary" size="lg" block>
+                                <FaAlignLeft className="mr-3"/>
+                                Recover From Seed Phrase
+                            </Button>
+                        </Col>
+                    </Row>
+
+                    {this.state.legacy_detected ? (
+                        <Row className="justify-content-md-center justify-content-center p-3">
+                            <Col sm={8}>
+                                <Button onClick={this.restore_legacy} className="font_size_medium" variant="warning" size="lg" block>
+                                    <FaHistory className="mr-3"/> 
+                                    Open Legacy Wallet
+                                </Button>
+                            </Col>
+                        </Row>) : (<div></div>)
+                    }
                 </Container>  
             </div>);
     }

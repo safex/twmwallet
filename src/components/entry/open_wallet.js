@@ -72,7 +72,6 @@ export default class OpenWallet extends React.Component {
             ipath = this.state.new_path;
         }
 
-        console.log(`ipath ${ipath}`)
         //now check if you can load the .twm file if not you have to make it
         try {
             let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
@@ -187,7 +186,7 @@ export default class OpenWallet extends React.Component {
 
     render() {
         return (
-            <Container fluid className="mb-5 d-flex flex-column justify-content-center safex_blue">
+            <Container fluid className="height100 d-flex flex-column justify-content-center safex-blue">
                 {this.state.wallet_made ?
                     (<Container fluid className="height100 justify-content-between">
                         <WalletHome
@@ -197,16 +196,14 @@ export default class OpenWallet extends React.Component {
                             password={this.state.password}
                         />
                     </Container>) :
-                    (<Container fluid
-                                className="font-size-small b-r25 grey-back d-flex flex-column safex_blue white-text">
-                        <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward
-                            className="mr-2"/>Go Back</Button>
+                    (<Container fluid className="font-size-small b-r25 grey-back d-flex flex-column safex-blue white-text" >
+                    <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
 
-                        <Row className="align-items-center mb-5 justify-content-center">
-                            <h1>Open Wallet</h1>
-                        </Row>
+                    <Row className="align-items-center mb-5 justify-content-center">
+                        <h1>Open Wallet</h1>
+                    </Row>
 
-                        <Col sm={8} className="d-flex justify-content-center align-self-center flex-column text-center">
+                        <Col sm={8} className="d-flex justify-content-center align-self-center flex-column text-center" >
                             <p>
                                 Open an existing Safex wallet by selecting the .keys file and
                                 entering your password.
@@ -238,8 +235,7 @@ export default class OpenWallet extends React.Component {
                                 (<div>
 
                                     <Form id="set_path" onSubmit={this.set_path}>
-                                        <Button className="mt-5 mb-5" type="submit" variant="primary" size="lg" block>Select
-                                            Wallet File</Button>
+                                        <Button className="mt-5 mb-5" type="submit" variant="primary" size="lg" block>Select Wallet File</Button>
                                     </Form>
                                 </div>)
                             }
@@ -264,13 +260,11 @@ export default class OpenWallet extends React.Component {
 
                                         </ul>
                                         <Form id="set_daemon" onSubmit={this.set_daemon_state}>
-                                            <b>Safexd Host</b> <Form.Control className="mb-4" name="daemon_host"
-                                                                             defaultValue="stagenetrpc.safex.org"
-                                                                             placedholder="set the ip address of the safex blockchain"/>
-                                            <b>Safexd Port</b> <Form.Control name="daemon_port" defaultValue="30393"
-                                                                             placedholder="set the port of the safex blockchain"/>
-                                            <Button className="mt-5 mb-5" type="submit" variant="primary" size="lg"
-                                                    block>Set Connection</Button>
+                                            <b>Safexd Host</b> <Form.Control className="mb-4" name="daemon_host" defaultValue="stagenetrpc.safex.org"
+                                                                      placedholder="set the ip address of the safex blockchain"/>
+                                            <b>Safexd Port</b> <Form.Control  name="daemon_port" defaultValue="30393"
+                                                                      placedholder="set the port of the safex blockchain"/>
+                                            <Button className="mt-5 mb-5" type="submit" variant="primary" size="lg" block>Set Connection</Button>
                                         </Form>
                                     </div>
                                 </Col>
@@ -287,9 +281,8 @@ export default class OpenWallet extends React.Component {
                             (<Col className="mt-2">
                                 <Form id="set_password" className="auto_margin_50" onSubmit={this.open_wallet}>
                                     Enter Your Password: <Form.Control name="password" type="password"
-                                                                       placedholder="enter your password and open your wallet"/>
-                                    <Button className="mt-2 mb-5" type="submit" variant="primary" size="lg" block>Open
-                                        Wallet</Button>
+                                                    placedholder="enter your password and open your wallet"/>
+                                    <Button className="mt-2 mb-5" type="submit" variant="primary" size="lg" block>Open Wallet</Button>
                                 </Form>
                             </Col>) :
                             (<div>
