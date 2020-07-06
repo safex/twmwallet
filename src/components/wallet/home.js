@@ -836,7 +836,7 @@ class WalletHome extends React.Component {
 
                             return <Row className="account_element" key={key}>
                                 <Col sm={4}>
-                                    <Image width={100} height={100} src={usee_d.avatar} roundedCircle/>
+                                    <Image width={100} height={100} src={require("./../../img/sails-logo.png")/*usee_d.avatar*/} roundedCircle/>
                                 </Col>
                                 <Col sm={8}>
                                     <ul>
@@ -858,168 +858,107 @@ class WalletHome extends React.Component {
                         } catch (err) {
                             console.error(`failed to properly parse the user data formatting`);
                             console.error(err);
+                    }
+                    // End of creating the accounts table variable
+
+                     // Creates the new items table variable
+                     /*
+                    var new_listings_table = this.state.twm_offers.map((listing, key) => {
+                        console.log(key);
+                        try {
+                            return <tr key={key}>
+                                <td>{listing.title}</td>
+                                <td>{listing.quantity}</td>
+                                <td>{listing.price / 10000000000}</td>
+                                <td>{listing.seller}</td>
+                                <td>{listing.offerID}</td>
+                            </tr>
+
+                        } catch (err) {
+                            console.error(`failed to properly parse the user data formatting`);
+                            console.error(err);
                         }
-                        // End of creating the accounts table variable
 
-                        // Creates the new items table variable
-                        /*
-                       var new_listings_table = this.state.twm_offers.map((listing, key) => {
-                           console.log(key);
-                           try {
-                               return <tr key={key}>
-                                   <td>{listing.title}</td>
-                                   <td>{listing.quantity}</td>
-                                   <td>{listing.price / 10000000000}</td>
-                                   <td>{listing.seller}</td>
-                                   <td>{listing.offerID}</td>
-                               </tr>
-
-                           } catch (err) {
-                               console.error(`failed to properly parse the user data formatting`);
-                               console.error(err);
-                           }
-
-                       });
-                       */
-                        // End of creating new items table variable
+                    });
+                    */
+                    // End of creating new items table variable
 
 
                     });
                     return (
                         <Row lg>
+                           
+                                <Col sm={4}>
+                                   
+                                        <div className="wallet-box mb-2 mr-2 ml-2 p-2 font-size-small">
+                                           
+                                            <h3> Safex Cash </h3> 
 
-                            <Col sm={4}>
-
-                                <div className="wallet-box mb-2 mr-2 ml-2 p-2 font-size-small">
-
-                                    <h3> Safex Cash </h3>
-
-                                    <ul>
-                                        <li>{this.state.cash} SFX</li>
-
-                                        {this.state.pending_cash > 0 ?
-                                            (<li>{this.state.pending_cash} Pending</li>) : ''}
-
-                                        {this.state.pending_cash > 0 ?
-                                            (<li>{this.state.cash + this.state.pending_cash} NET</li>) : ''}
-                                    </ul>
-
-                                    <Form id="send_cash" onSubmit={this.cash_send}>
-                                        Destination Address <Form.Control name="destination"
-                                                                          defaultValue="Safex5..."
-                                                                          placedholder="the destination address"/>
-                                        Amount (SFX)<Form.Control name="amount" defaultValue="0"
-                                                                  placedholder="the amount to send"/>
-                                        Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
-                                                                      placedholder="choose the number of mixins"/>
-                                        <Button className="mt-2" type="submit" variant="warning" size="lg" block>
-                                            Send Cash
-                                        </Button>
-                                    </Form>
-
-                                </div>
-
-
-                                <div className="wallet-box m-2 p-2 font-size-small">
-
-                                    <h3> Safex Token </h3>
-
-                                    <ul>
-                                        <li>{this.state.tokens} SFT</li>
-                                        {this.state.pending_tokens > 0 ?
-                                            (<li>{this.state.pending_tokens} Pending</li>) : ''}
-                                        {this.state.pending_tokens > 0 ?
-                                            (
-                                                <li>{this.state.tokens + this.state.pending_tokens} NET</li>) : ''}
-                                    </ul>
-
-                                    <Form id="send_token" onSubmit={this.token_send}>
-                                        Destination Address <Form.Control name="destination"
-                                                                          defaultValue="Safex5..."
-                                                                          placedholder="the destination address"/>
-                                        Amount (SFT)<Form.Control name="amount" defaultValue="0"
-                                                                  placedholder="the amount to send"/>
-                                        Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
-                                                                      placedholder="choose the number of mixins"/>
-                                        <Button className="mt-2" type="submit" variant="warning" size="lg" block>
-                                            Send Tokens
-                                        </Button>
-                                    </Form>
-                                </div>
-
-                            </Col>
-
-
-                            <Col className="accounts" sm={8}>
-                                <div className="account-list">
-                                    <h2 className="text-center m-2"> Accounts </h2>
-                                    {accounts_table}
-                                    <div className="accounts-box">
-                                        <Col sm={4}>
-                                            <Image width={100} height={100} src={require("./../../img/sails-logo.png")}
-                                                   roundedCircle/>
-                                        </Col>
-                                        <Col sm={8}>
                                             <ul>
-                                                <li>User Name</li>
-                                                <li>Bio</li>
-                                                <li>Location</li>
-                                                <li>Website</li>
-                                                <li>Twitter</li>
-                                                {0 == 0 ? (
-                                                    <li>
-                                                        <Button className="m-1" variant="danger"
-                                                                onClick={() => alert("catfish")}>
-                                                            Remove
-                                                        </Button>
-                                                    </li>
-                                                ) : ''}
+                                                <li>{this.state.cash} SFX</li>
+
+                                                {this.state.pending_cash > 0 ?
+                                                    (<li>{this.state.pending_cash} Pending</li>) : ''}
+
+                                                {this.state.pending_cash > 0 ?
+                                                    (<li>{this.state.cash + this.state.pending_cash} NET</li>) : ''}
                                             </ul>
-                                        </Col>
-                                    </div>
-                                    <div className="accounts-box">
-                                        <Col sm={4}>
-                                            <Image width={100} height={100} src={require("./../../img/sails-logo.png")}
-                                                   roundedCircle/>
-                                        </Col>
-                                        <Col sm={8}>
+
+                                            <Form id="send_cash" onSubmit={this.cash_send}>
+                                                Destination Address <Form.Control name="destination"
+                                                                                    defaultValue="Safex5..."
+                                                                                    placedholder="the destination address"/>
+                                                Amount (SFX)<Form.Control name="amount" defaultValue="0"
+                                                                            placedholder="the amount to send"/>
+                                                Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
+                                                                                placedholder="choose the number of mixins"/>
+                                                <Button className="mt-2 safex-cash-green" type="submit" size="lg" block>
+                                                    Send Cash
+                                                </Button>
+                                            </Form>
+                                                
+                                        </div>
+                                    
+
+                                    
+                                        <div className="wallet-box m-2 p-2 font-size-small">
+
+                                            <h3> Safex Token </h3>
+                                                
                                             <ul>
-                                                <li>User Name</li>
-                                                <li>Bio</li>
-                                                <li>Location</li>
-                                                <li>Website</li>
-                                                <li>Twitter</li>
-                                                {0 == 0 ? (
-                                                    <li>
-                                                        <Button className="m-1" variant="danger"
-                                                                onClick={() => alert("catfish")}>
-                                                            Remove
-                                                        </Button>
-                                                    </li>
-                                                ) : ''}
-                                            </ul>
-                                        </Col>
+                                                <li>{this.state.tokens} SFT</li>
+                                                {this.state.pending_tokens > 0 ?
+                                                    (<li>{this.state.pending_tokens} Pending</li>) : ''}
+                                                {this.state.pending_tokens > 0 ?
+                                                    (
+                                                        <li>{this.state.tokens + this.state.pending_tokens} NET</li>) : ''}
+                                            </ul>  
+
+                                            <Form id="send_token" onSubmit={this.token_send}>
+                                                Destination Address <Form.Control name="destination"
+                                                                                    defaultValue="Safex5..."
+                                                                                    placedholder="the destination address"/>
+                                                Amount (SFT)<Form.Control name="amount" defaultValue="0"
+                                                                                placedholder="the amount to send"/>
+                                                Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
+                                                                                placedholder="choose the number of mixins"/>
+                                                <Button className="mt-2" type="submit" variant="warning" size="lg" block>
+                                                    Send Tokens
+                                                </Button>
+                                            </Form>
+                                        </div>
+                                   
+                                </Col>
+
+                                
+                                <Col className="accounts" sm={8}>
+                                    <div className="account-list">
+                                        <h2 className="text-center m-2"> Accounts </h2>
+                                        {accounts_table}
+                                       
                                     </div>
-
-                                </div>
-                                <div className="account-list">
-                                    <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Quantity</th>
-                                        <th>Price (SFX)</th>
-                                        <th>Seller</th>
-                                        <th>Offer id</th>
-                                    </tr>
-                                    </thead>
-                                    <td>TITLE</td>
-                                    <td>QUANTITY</td>
-                                    <td>PRICE</td>
-                                    <td>SELLER</td>
-                                    <td>ID</td>
-
-                                </div>
-                            </Col>
+                                    
+                                </Col>
                         </Row>
                     );
                 }
@@ -1104,7 +1043,7 @@ class WalletHome extends React.Component {
                                         <div class="row" id="filter">
                                             <form>
                                                 <div class="form-group col-sm-3 col-xs-6">
-                                                    <select data-filter="make" class="filter-make filter form-control">
+                                                    <select data-filter="category" class="filter-make filter form-control">
                                                         <option value="">Category</option>
                                                         <option value="">Any</option>
                                                         <option value="">Category</option>
@@ -1115,7 +1054,7 @@ class WalletHome extends React.Component {
                                                     </select>
                                                 </div>
                                                 <div class="form-group col-sm-3 col-xs-6">
-                                                    <select data-filter="model"
+                                                    <select data-filter="location"
                                                             class="filter-model filter form-control">
                                                         <option value="">Location</option>
                                                         <option value="">Any</option>
@@ -1128,7 +1067,7 @@ class WalletHome extends React.Component {
                                                     </select>
                                                 </div>
                                                 <div class="form-group col-sm-3 col-xs-6">
-                                                    <select data-filter="type" class="filter-type filter form-control">
+                                                    <select data-filter="price" class="filter-type filter form-control">
                                                         <option value="">Price Range</option>
                                                         <option value="">$0 - $24.99</option>
                                                         <option value="">$25 - $49.99</option>
@@ -1139,7 +1078,7 @@ class WalletHome extends React.Component {
                                                     </select>
                                                 </div>
                                                 <div class="form-group col-sm-3 col-xs-6">
-                                                    <select data-filter="price"
+                                                    <select data-filter="sort"
                                                             class="filter-price filter form-control">
                                                         <option value="">Sort by...</option>
                                                         <option value="">$$$ Asc</option>
@@ -1453,94 +1392,142 @@ class WalletHome extends React.Component {
 
 
                     return (
-                        <div>
-                            <Row className="wallet">
-                                <Col>
-                                    <div>
-                                        <ul>
-                                            <li>{this.state.cash} SFX</li>
-                                            {this.state.pending_cash > 0 ?
-                                                (<li>{this.state.pending_cash} Pending</li>) : ''}
-                                            {this.state.pending_cash > 0 ?
-                                                (
-                                                    <li>{this.state.cash + this.state.pending_cash} NET</li>) : ''}
-                                            <br/>
-                                            <li>{this.state.tokens} SFT</li>
-                                            {this.state.pending_tokens > 0 ?
-                                                (<li>{this.state.pending_tokens} Pending</li>) : ''}
-                                            {this.state.pending_tokens > 0 ?
-                                                (
-                                                    <li>{this.state.tokens + this.state.pending_tokens} NET</li>) : ''}
-                                        </ul>
-                                        <ul>
-                                            <li>number of tokens staked in the
-                                                blockchain {this.state.blockchain_tokens_staked}</li>
-                                            <li>your staked tokens in the
-                                                blockchain {unlocked_tokens} {pending_stake > 0 ? (
-                                                    <span>| {pending_stake} pending</span>) : ''}</li>
-                                            <li>current blockheight {this.state.blockchain_height}</li>
-                                            <li>next payout interval
-                                                in {100 - (this.state.blockchain_height % 100)} blocks
-                                            </li>
-                                            <li>
-                                                current accruing
-                                                interest {this.state.blockchain_current_interest.cash_per_token / 10000000000} SFX
-                                                per token
-                                            </li>
-                                            <li>
-                                                <ul>
-                                                    <li>block
-                                                        interval {interval[3]}
-                                                        : {interest[3]} SFX
-                                                        per token
-                                                    </li>
-                                                    <li>block
-                                                        interval {interval[2] * 10}
-                                                        : {interest[2]} SFX
-                                                        per token
-                                                    </li>
-                                                    <li>block
-                                                        interval {interval[1] * 10}
-                                                        : {interest[1]} SFX
-                                                        per token
-                                                    </li>
-                                                    <li>block
-                                                        interval {interval[0] * 10}
-                                                        : {interest[0]} SFX
-                                                        per token
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </Col>
-                                <Col>
-                                    <ul>
-                                        <li>
-                                            <Form id="stake_tokens" onSubmit={this.make_token_stake}>
-                                                amount (tokens)<Form.Control name="amount" defaultValue="0"
-                                                                             placedholder="the amount to send"/>
-                                                mixin ring size <Form.Control name="mixins" defaultValue="7"
-                                                                              placedholder="choose the number of mixins"/>
-                                                <Button type="submit" variant="primary" size="lg" block>stake the
-                                                    tokens</Button>
-                                            </Form>
-                                        </li>
-                                        <li>
-                                            <Form id="unstake_tokens" onSubmit={this.make_token_unstake}>
-                                                amount (tokens) (MAX: {unlocked_tokens})<Form.Control name="amount"
-                                                                                                      defaultValue="0"
-                                                                                                      placedholder="the amount to send"/>
-                                                mixin ring size <Form.Control name="mixins" defaultValue="7"
-                                                                              placedholder="choose the number of mixins"/>
-                                                <Button type="submit" variant="primary" size="lg" block>unstake and
-                                                    collect</Button>
-                                            </Form>
-                                        </li>
-                                    </ul>
+                        
+                            <Row className="wallet no-gutters flex-column border-bottom border-white">
+
+                                <h2 className="text-center m-2"> Staking </h2>
+                                <Row className="no-gutters">
+                                    <Col className="wallet-box mb-2 mr-2 ml-2 p-2 font-size-small">
+                                        
+                                    <h3 className="text-center m-2"> Stake Tokens </h3>
+
+                                        <Form id="stake_tokens" onSubmit={this.make_token_stake}>
+                                            Amount (SFT)<Form.Control name="amount" defaultValue="0"
+                                                                        placedholder="The amount to stake"/>
+                                            Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
+                                                                        placedholder="Choose the number of mixins"/>
+                                            <Button className="mt-2" type="submit" variant="warning" size="lg" block>
+                                                Stake Tokens
+                                            </Button>
+                                        </Form>
+                                
+                                    </Col>
+                                    <Col className="height-fit-content align-self-center dark-orange">
+                                        <Table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <li>{this.state.cash} SFX</li>
+                                                        {this.state.pending_cash > 0 ?
+                                                            (<li>{this.state.pending_cash} Pending</li>) : ''}
+                                                        {this.state.pending_cash > 0 ?
+                                                            (
+                                                            <li>{this.state.cash + this.state.pending_cash} NET</li>) : ''}
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        <li>{this.state.tokens} SFT</li>
+                                                        {this.state.pending_tokens > 0 ?
+                                                            (<li>{this.state.pending_tokens} Pending</li>) : ''}
+                                                        {this.state.pending_tokens > 0 ?
+                                                            (
+                                                        <li>{this.state.tokens + this.state.pending_tokens} NET</li>) : ''}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <li>Total Staked Tokens: {this.state.blockchain_tokens_staked}</li>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        <li>Your Total Staked Tokens: {unlocked_tokens} {pending_stake > 0 ? (
+                                                            <span>| {pending_stake} pending</span>) : ''}</li>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <li>Current Block: {this.state.blockchain_height}</li>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <li>Next Payout: {100 - (this.state.blockchain_height % 100)} Blocks</li>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <li>
+                                                            Interest Accrued: {this.state.blockchain_current_interest.cash_per_token / 10000000000} SFX
+                                                            per token
+                                                        </li>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <tf>
+                                                        <li>Block Interval {interval[0] * 10} : {interest[0]} SFX per token  </li>     
+                                                    </tf>
+                                                </tr>
+                                            </tfoot>
+                                        </Table>
+                                        
+                                        
+                                    </Col>
+                                    
+                                    <Col className="wallet-box mb-2 mr-2 ml-2 p-2 font-size-small">
+
+                                        <h3 className="text-center m-2"> Unstake Tokens </h3>
+
+                                        <select className="dark-orange" id="stakes">
+                                            <option value="">Choose Stake ID</option>
+                                        </select>
+
+                                        <Form id="unstake_tokens" onSubmit={this.make_token_unstake}>
+
+                                            Amount (SFT) (MAX: {unlocked_tokens})<Form.Control name="amount"
+                                                                                                    defaultValue="0"
+                                                                                                    placedholder="the amount to send"/>
+                                            Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
+                                                                            placedholder="choose the number of mixins"/>
+                                            <Button className="mt-2" type="submit" variant="danger" size="lg" block>
+                                                Unstake and Collect
+                                            </Button>
+                                        </Form>
+                                    
+                                    </Col>
+                                </Row>
+                                <Col className="mt-2 search-box border border-white grey-back">
+
+                                <h2 className="text-center "> Stakes </h2>
+
+                                <Table color="white" className="white-text border border-white b-r10 light-blue-back ">
+                                            <thead className="dark-orange">
+                                                <tr>
+                                                    <th>TXID</th>
+                                                    <th>Amount (SFT)</th>
+                                                    <th>Interest (SFX)</th>
+                                                    <th>Block</th>
+                                                
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            
+                                            </tbody>
+                                        </Table>
+
                                 </Col>
                             </Row>
-                        </div>
+                        
                     );
                 }
                 case "settings":
@@ -1553,7 +1540,7 @@ class WalletHome extends React.Component {
 
 
         return (
-            <Container className="height100 justify-content-between" fluid>
+            <Container className="height100 justify-content-between whtie-text" fluid>
                 <Container fluid className="no-gutters mt-5 mb-2 p-2 border border-light b-r10 white-text">
 
                     <Row className="justify-content-between align-items-center">
@@ -1625,13 +1612,13 @@ class WalletHome extends React.Component {
                                 SFT: {this.state.tokens}
                             </li>
                         </Col>
-                        <Col className="just" sm={6}>
+                        <Col className="just" sm={5}>
                             <p>SFX + SFT Public Address: <b>{this.to_ellipsis(this.state.address)}</b></p>
                             <Button onClick={this.copyAddressToClipboard}>
                                 Copy Address
                             </Button>
                         </Col>
-                        <Col className="d-flex justify-content-center" sm={3}>
+                        <Col className="d-flex justify-content-center mr-2" sm={3}>
 
                             {this.state.synced === false ? (
                                 <Button className="m-1" onClick={this.check}>

@@ -22,7 +22,7 @@ import Settings from './components/wallet/settings';
 
 const routes = (
     <Router>
-        <div>
+        <div className="height100 safex-blue oflow-y-scroll">
             <Switch>
                 <Route exact path="/" component={SelectEntry}/>
                 <Route exact path="/recover_keys" component={RecoverKeys}/>
