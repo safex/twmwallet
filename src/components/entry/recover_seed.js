@@ -161,6 +161,7 @@ export default class RecoverSeed extends React.Component {
                             wallet={this.state.wallet}
                             daemon_host={this.state.daemon_host}
                             daemon_port={this.state.daemon_port}
+                            password={this.state.password}
                         />
                     </div>) :
                     (<Container fluid className="font-size-small mt-5 pb-5 b-r25 grey-back d-flex flex-column safex_blue white-text" >

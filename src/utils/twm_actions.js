@@ -58,7 +58,7 @@ export async function open_twm_file(filepath, password) {
             }
         } catch(err) {
             console.error(err);
-            return {error: `error parsing json formatting from encrypted file, perhaps wrong password supplied`, contents:dec};
+            return {error: `error parsing json formatting from encrypted file, perhaps wrong password supplied`, contents: dec};
         }
     } catch (err) {
         console.error(err);

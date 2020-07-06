@@ -4,12 +4,15 @@ import { FaHistory, FaAlignLeft, FaKey, FaFolderPlus, FaFolderOpen } from 'react
 
 
 
+import {save_twm_file, open_twm_file} from "../../utils/twm_actions";
 const os = window.require('os');
 const fs = window.require('fs').promises;
 const libPath = window.require('path');
+const crypto = window.require('crypto');
 
 const WALLET_FILENAME = 'safexwallet.dat';
 const DEFAULT_WALLET_PATH = libPath.resolve(os.homedir(), WALLET_FILENAME);
+
 
 
 async function read_legacy_wallet(wallet_path) {
@@ -34,6 +37,7 @@ export default class SelectEntry extends React.Component {
     }
 
     async componentDidMount() {
+
         try {
             let wallet = await read_legacy_wallet(DEFAULT_WALLET_PATH);
 

@@ -163,6 +163,7 @@ export default class RecoverKeys extends React.Component {
                             wallet={this.state.wallet}
                             daemon_host={this.state.daemon_host}
                             daemon_port={this.state.daemon_port}
+                            password={this.state.password}
                         />
                     </div>) :
                     (<Container fluid className="font-size-small b-r25 grey-back d-flex flex-column safex_blue white-text" >
