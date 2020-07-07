@@ -57,10 +57,13 @@
     width: 100%;
 }
 
+<<<<<<< HEAD
 .width-fit-content {
     width: fit-content;
 }
 
+=======
+>>>>>>> 41005fe1442ae79b7e71f9fe92a2755744374e72
 .auto_margin_50 {
     width: 50%;
     margin: auto;
@@ -128,6 +131,7 @@ table {
     max-height: 500px!important;
 }
 
+<<<<<<< HEAD
 /* Market CSS End */
 
 /* Merchant CSS Start */
@@ -167,3 +171,6 @@ table {
 }
 
 /* Merchant CSS End */
+=======
+/* Market CSS End */
+>>>>>>> 41005fe1442ae79b7e71f9fe92a2755744374e72
