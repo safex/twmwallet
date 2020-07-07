@@ -1311,7 +1311,6 @@ class WalletHome extends React.Component {
                                                     <Modal.Title>Create New Account</Modal.Title>
                                                 </Modal.Header>
                                                 <Modal.Body>
-<<<<<<< HEAD
                                                     <Form id="create_account" onSubmit={this.register_account}>
                                                         Username <Form.Control name="username"
                                                                             placedholder="enter your desired username"/>
@@ -1338,28 +1337,6 @@ class WalletHome extends React.Component {
                                                                             placedholder="your location"/>
 
                                                         <Button block lg variant="success" type="submit">Create Account</Button>
-=======
-                                                    <Form id="list_new_offer" onSubmit={this.list_new_offer}>
-                                                        username <Form.Control name="username"
-                                                                               value={selected.username}/>
-                                                        thumbnail image url <Form.Control name="thumbnail"/>
-                                                        title <Form.Control name="title"/>
-                                                        description <Form.Control as="textarea" name="description"/>
-                                                        price SFX <Form.Control name="price"/>
-                                                        available quantity <Form.Control name="quantity"/>
-                                                        SKU <Form.Control name="sku"/>
-                                                        Barcode (ISBN, UPC, GTIN, etc) <Form.Control name="barcode"/>
-
-                                                        Message Type <Form.Control name="message_type"/>
-                                                        Weight <Form.Control name="weight"/>
-                                                        Physical Item? <Form.Control name="physical" value="true"/>
-                                                        Country of Origin <Form.Control name="country"
-                                                                                            defaultValue="Earth"
-                                                                                            placedholder="your location"/>
-                                                        mixins <Form.Control name="mixins" defaultValue="7"
-                                                                             placedholder="your location"/>
-                                                        <Button type="submit">List Offer</Button>
->>>>>>> 41005fe1442ae79b7e71f9fe92a2755744374e72
                                                     </Form>
                                                 </Modal.Body>
                                                 <Modal.Footer className="align-self-start">
