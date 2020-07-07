@@ -33,11 +33,11 @@ export default class OpenWallet extends React.Component {
         e.preventDefault();
 
         let sails_path = dialog.showOpenDialogSync();
-        let new_path = sails_path;
+        console.log(sails_path);
 
         try {
-            if (new_path.length > 0) {
-                this.setState({new_path: new_path});
+            if (sails_path.length > 0) {
+                this.setState({new_path: sails_path[0]});
             }
         } catch (err) {
             console.log("cancelled, no path set");
@@ -50,7 +50,6 @@ export default class OpenWallet extends React.Component {
     };
     set_daemon_state = (e) => {
         e.preventDefault();
-        console.log(this.state.new_path);
         this.setState({daemon_host: e.target.daemon_host.value, daemon_port: parseInt(e.target.daemon_port.value)})
         console.log(e.target.daemon_host.value);
     };
@@ -59,21 +58,24 @@ export default class OpenWallet extends React.Component {
         e.preventDefault();
 
         let the_password = e.target.password.value;
+        let ipath = '';
 
-        if (this.state.new_path[0].includes('.keys')) {
-            this.setState({new_path: this.state.new_path[0].substring(0, this.state.new_path[0].length - 5)});
-        } else if (this.state.new_path[0].includes('.safex_account_keys')) {
-            this.setState({new_path: this.state.new_path[0].substring(0, this.state.new_path[0].length - 19)});
-        } else if (this.state.new_path[0].includes('.address.txt')) {
-            this.setState({new_path: this.state.new_path[0].substring(0, this.state.new_path[0].length - 12)});
-        } else if (this.state.new_path[0].includes('.twm')) {
-            this.setState({new_path: this.state.new_path[0].substring(0, this.state.new_path[0].length - 4)});
+        if (this.state.new_path.includes('.keys')) {
+            ipath = this.state.new_path.substring(0, this.state.new_path.length - 5);
+        } else if (this.state.new_path.includes('.safex_account_keys')) {
+            ipath = this.state.new_path.substring(0, this.state.new_path.length - 19);
+        } else if (this.state.new_path.includes('.address.txt')) {
+            ipath = this.state.new_path.substring(0, this.state.new_path.length - 12);
+        } else if (this.state.new_path.includes('.twm')) {
+            ipath = this.state.new_path.substring(0, this.state.new_path.length - 4);
+        } else {
+            ipath = this.state.new_path;
         }
 
         //now check if you can load the .twm file if not you have to make it
         try {
             let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
-            let wallet = await open_wallet(this.state.new_path,
+            let wallet = await open_wallet(ipath,
                 e.target.password.value,
                 0,
                 this.state.network,
@@ -83,8 +85,8 @@ export default class OpenWallet extends React.Component {
 
             try {
 
-                console.log(`the path ${this.state.new_path}`);
-                let twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
+                console.log(`the path ${ipath}`);
+                let twm_file = await open_twm_file(ipath + '.twm', this.state.password);
                 if (twm_file.success) {
                     //parse the json and pack it into the local storage for usages
                     console.log(`success`);
@@ -102,7 +104,7 @@ export default class OpenWallet extends React.Component {
 
                     let twm_obj = {};
 
-                    twm_obj.version = 2;
+                    twm_obj.version = 1;
                     twm_obj.api = {};
                     twm_obj.api.urls = {};/*
                     twm_obj.api.urls.theworldmarketplace = {};
@@ -120,10 +122,10 @@ export default class OpenWallet extends React.Component {
                         twm_obj.accounts[acc.username].safex_public_key = acc.publicKey;
                         twm_obj.accounts[acc.username].safex_private_key = acc.privateKey;
                         twm_obj.accounts[acc.username].urls = {};
-/*
-                        twm_obj.accounts[acc.username].urls.theworldmarketplace = {};
-                        twm_obj.accounts[acc.username].urls.theworldmarketplace.url = 'api.theworldmarketplace.com';
-*/
+                        /*
+                                                twm_obj.accounts[acc.username].urls.theworldmarketplace = {};
+                                                twm_obj.accounts[acc.username].urls.theworldmarketplace.url = 'api.theworldmarketplace.com';
+                        */
                     }
 
                     const algorithm = 'aes-256-ctr';
@@ -133,23 +135,20 @@ export default class OpenWallet extends React.Component {
 
                     const hash1 = crypto.createHash('sha256');
                     hash1.update(JSON.stringify(twm_obj));
-                    console.log(`password ${this.state.password}`)
+                    console.log(`password ${this.state.password}`);
                     console.log(JSON.stringify(twm_obj));
 
-                    let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
+                    let twm_save = await save_twm_file(ipath + '.twm', crypted, this.state.password, hash1.digest('hex'));
 
                     try {
-
-                        let twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
+                        let twm_file = await open_twm_file(ipath + '.twm', this.state.password);
                         console.log(twm_file);
-
                         localStorage.setItem('twm_file', JSON.stringify(twm_file.contents));
                     } catch (err) {
                         console.error(err);
                         console.error(`error opening twm file after save to verify`);
                     }
                     console.log(twm_save);
-
                 } catch (err) {
                     console.error(err);
                     console.error(`error at initial save of the twm file`);
