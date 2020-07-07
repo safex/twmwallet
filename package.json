@@ -51,6 +51,7 @@
     "binstring": "^0.2.1",
     "bootstrap": "^4.3.1",
     "child_process": "^1.0.2",
+    "copy-to-clipboard": "^3.3.1",
     "electron-context-menu": "^0.16.0",
     "mdbreact": "^4.27.0",
     "openpgp": "^4.10.4",
@@ -70,6 +71,7 @@
     "safe-buffer": "^5.2.0",
     "safex-addressjs": "git+https://github.com/safex/safex_addressjs.git",
     "safex-nodejs-libwallet": "git+https://github.com/safex/safex-nodejs-libwallet.git",
+    "save": "^2.4.0",
     "tweetnacl": "^1.0.3"
   },
   "main": "src/electron.js",

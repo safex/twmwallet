@@ -9,19 +9,10 @@
     max-height: 500px;
 }
 
-.merchant_product_view {
-    padding: 3px;
-    background-color: #38bdd2;
-    border: 2px solid #fff;
-    color: #fff;
-    width: 100%;
-    min-height: 140px;
-    margin: 0 -10px;
-    max-height: 1000px;
-}
+
 
 .merchant_profile_view {
-    padding: 3px;
+    
     background-color: #38bdd2;
     border: 2px solid #fff;
     color: #fff;
