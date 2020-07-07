@@ -18,6 +18,8 @@ import {GiExitDoor} from 'react-icons/gi'
 import {GrCubes} from 'react-icons/gr'
 import {IconContext} from 'react-icons'
 
+import copy from "copy-to-clipboard"
+
 const openpgp = window.require('openpgp');
 
 var nacl = window.require('tweetnacl');
@@ -817,7 +819,9 @@ class WalletHome extends React.Component {
     }
 
     copyAddressToClipboard = () => {
-        alert("This button is not wokring :/")
+        copy(this.state.address)
+        alert('Copied address')
+       
     }
 
 
@@ -834,26 +838,38 @@ class WalletHome extends React.Component {
                         try {
                             let usee_d = JSON.parse(user.data);
 
-                            return <Row className="account_element" key={key}>
-                                <Col sm={4}>
-                                    <Image width={100} height={100} src={require("./../../img/sails-logo.png")/*usee_d.avatar*/} roundedCircle/>
-                                </Col>
-                                <Col sm={8}>
-                                    <ul>
-                                        <li>{user.username}</li>
-                                        <li>{usee_d.location}</li>
-                                        <li>{usee_d.biography}</li>
-                                        <li>{usee_d.website}</li>
-                                        <li>{usee_d.twitter}</li>
-                                        {user.status == 0 ? (
-                                            <li>
-                                                <button onClick={() => this.remove_account(user.username)}>Remove
-                                                </button>
-                                            </li>
-                                        ) : ''}
-                                    </ul>
-                                </Col>
-                            </Row>
+                            return (
+                            
+                                <Row 
+                                    className={
+                                        this.state.selected_user.username === user.username ? 
+                                        "border border-success no-gutters account-element dark-orange" 
+                                        : "border border-dark no-gutters account-element"}
+                                    key={key} 
+                                    onClick={() => this.load_offers(user.username, key)}
+                                >
+                                    <Col>
+                                        <Image width={80} height={80} src={usee_d.avatar} roundedCircle/>
+                                    </Col>
+                                    <Col>
+                                        <ul>
+                                            <li>{user.username}</li>
+                                            <li>{usee_d.location}</li>
+                                            <li>{usee_d.biography}</li>
+                                            <li>{usee_d.website}</li>
+                                            <li>{usee_d.twitter}</li>
+                                        </ul>
+
+                                    </Col>
+                                    {user.status == 0 ? (
+                                        
+                                            <Button variant="danger" onClick={() => this.remove_account(user.username, key)}>
+                                                Remove
+                                            </Button>
+                                        
+                                    ) : ''}
+                                </Row>
+                            )
 
                         } catch (err) {
                             console.error(`failed to properly parse the user data formatting`);
@@ -1154,15 +1170,16 @@ class WalletHome extends React.Component {
                         try {
                             if (listing.seller === this.state.selected_user.username) {
                                 return <tr key={key}>
-                                    <td>{listing.title}</td>
-                                    <td>{listing.quantity}</td>
-                                    <td>{listing.price / 10000000000}</td>
-                                    <td>{listing.seller}</td>
-                                    <td>{listing.offerID}</td>
-                                    <td>
-                                        <Button>edit</Button>
-                                    </td>
-                                </tr>
+                                <td>{listing.title}</td>
+                                <td>{listing.quantity}</td>
+                                <td>{listing.price / 10000000000}</td>
+                                <td>{listing.seller}</td>
+                                <td>{this.to_ellipsis(listing.offerID)}</td>
+                                
+                                <td>
+                                    <Button variant="warning">EDIT</Button>
+                                </td>
+                            </tr>
                             }
                         } catch (err) {
                             console.error(`failed to properly parse the user data formatting`);
@@ -1175,28 +1192,37 @@ class WalletHome extends React.Component {
                         try {
                             let usee_d = JSON.parse(user.data);
 
-                            return <Row
-                                className={this.state.selected_user.username === user.username ? "selected_account_element" : "account_element"}
-                                key={key} onClick={() => this.load_offers(user.username, key)}>
-                                <Col>
-                                    <Image width={80} height={80} src={usee_d.avatar} roundedCircle/>
-                                </Col>
-                                <Col>
-                                    <ul>
-                                        <li>{user.username}</li>
-                                        <li>{usee_d.location}</li>
-                                        <li>{usee_d.biography}</li>
-                                        <li>{usee_d.website}</li>
-                                        <li>{usee_d.twitter}</li>
-                                        {user.status == 0 ? (
-                                            <li>
-                                                <button onClick={() => this.remove_account(user.username, key)}>remove
-                                                </button>
-                                            </li>
-                                        ) : ''}
-                                    </ul>
-                                </Col>
-                            </Row>
+                            return (
+                                <Row 
+                                    className={
+                                        this.state.selected_user.username === user.username ? 
+                                        "border border-success no-gutters account-element dark-orange" 
+                                        : "border border-dark no-gutters account-element"}
+                                    key={key} 
+                                    onClick={() => this.load_offers(user.username, key)}
+                                >
+                                    <Col>
+                                        <Image width={80} height={80} src={usee_d.avatar} roundedCircle/>
+                                    </Col>
+                                    <Col>
+                                        <ul>
+                                            <li>{user.username}</li>
+                                            <li>{usee_d.location}</li>
+                                            <li>{usee_d.biography}</li>
+                                            <li>{usee_d.website}</li>
+                                            <li>{usee_d.twitter}</li>
+                                        </ul>
+
+                                    </Col>
+                                    {user.status == 0 ? (
+                                        
+                                            <Button variant="danger" onClick={() => this.remove_account(user.username, key)}>
+                                                Remove
+                                            </Button>
+                                        
+                                    ) : ''}
+                                </Row>
+                            )
                         } catch (err) {
                             console.error(`failed to properly parse the user data formatting`);
                             console.error(err);
@@ -1217,152 +1243,158 @@ class WalletHome extends React.Component {
                     try {
                         return (
                             <Row>
-                                <Col sm={4}>
-                                    <Row>
-                                        <Button variant="primary" onClick={this.handleShowNewAccountForm}>
-                                            New Account
-                                        </Button>
-
-                                        <Modal animation={false} show={this.state.show_new_account_form}
-                                               onHide={this.handleCloseNewAccountForm}>
-                                            <Modal.Header closeButton>
-                                                <Modal.Title>List a new offer to sell</Modal.Title>
-                                            </Modal.Header>
-                                            <Modal.Body>
-                                                <Form id="create_account" onSubmit={this.register_account}>
-                                                    username <Form.Control name="username"
-                                                                           placedholder="enter your desired username"/>
-                                                    avatar url <Form.Control name="avatar"
-                                                                             placedholder="enter the url of your avatar"/>
-                                                    twitter link <Form.Control name="twitter" defaultValue="twitter.com"
-                                                                               placedholder="enter the link to your twitter handle"/>
-                                                    facebook link <Form.Control name="facebook"
-                                                                                defaultValue="facebook.com"
-                                                                                placedholder="enter the to of your facebook page"/>
-                                                    linkedin link <Form.Control name="linkedin"
-                                                                                defaultValue="linkedin.com"
-                                                                                placedholder="enter the link to your linkedin handle"/>
-                                                    biography <Form.Control as="textarea" name="biography"
-                                                                            placedholder="type up your biography"/>
-                                                    website <Form.Control name="website" defaultValue="safex.org"
-                                                                          placedholder="if you have your own website: paste your link here"/>
-                                                    location <Form.Control name="location" defaultValue="Earth"
-                                                                           placedholder="your location"/>
-                                                    email address <Form.Control name="email"
-                                                                                defaultValue="xyz@example.com"
-                                                                                placedholder="your location"/>
-                                                    mixins <Form.Control name="mixins" defaultValue="7"
-                                                                         placedholder="your location"/>
-
-                                                    <Button variant="primary" type="submit">create account</Button>
-                                                </Form>
-                                            </Modal.Body>
-                                            <Modal.Footer>
-
-                                                <Button variant="secondary" onClick={this.handleCloseNewAccountForm}>
-                                                    Close
-                                                </Button>
-                                            </Modal.Footer>
-                                        </Modal>
-                                    </Row>
-
-                                    <Row className="account-list">
-                                        {accounts_table}
-                                    </Row>
-                                    {selected !== void (0) ? (<Row className="merchant_profile_view">
-                                        <Col>
+                                <Col>
+                                    <Row className="no-gutters justify-content-between">
+                                    
+                                        <Col md={5} className="account-list no-gutters">
+                                            {accounts_table}
+                                        </Col>
+                                        
+                                   
+                                    {selected !== void (0) ? (
+                                        <Col md={3} className="no-gutters d-flex flex-column align-items-center merchant_profile_view">
                                             <Row>
                                                 <ul>
                                                     <li><Image width={100} height={100} src={data.avatar}
-                                                               roundedCircle/>
+                                                            roundedCircle/>
                                                     </li>
-                                                    <li>username: {selected.username}</li>
+                                                    <li>Username: {selected.username}</li>
                                                 </ul>
                                             </Row>
-                                            <Row>
+                                            <Col className="d-flex flex-column">
                                                 <Button>Edit</Button>
+                                                <Button onClick={() => this.register_twmapi(selected)}>
+                                                    Register API
+                                                </Button>
                                                 <Button>Remove</Button>
-                                                <Button onClick={() => this.register_twmapi(selected)}>Register
-                                                    API</Button>
-                                            </Row>
+                                            </Col>
                                         </Col>
-                                    </Row>) : ''}
+                                    ) : ''}
 
-                                </Col>
-                                <Col className="merchant_product_view" sm={8}>
-                                    {selected !== void (0) ? (
-                                        <Row>
-                                            <Button variant="primary" onClick={this.handleShowNewOfferForm}>
-                                                New Offer
+                                        <Col className="align-self-center" md={2}>
+                                            <Button block lg variant="success" onClick={this.handleShowNewAccountForm}>
+                                                New Account
                                             </Button>
-
-                                            <Modal animation={false} show={this.state.show_new_offer_form}
-                                                   onHide={this.handleCloseNewOfferForm}>
+                                                
+                                            <Modal className="new-account-form" animation={false} show={this.state.show_new_account_form}
+                                                onHide={this.handleCloseNewAccountForm}>
                                                 <Modal.Header closeButton>
-                                                    <Modal.Title>List a new offer to sell</Modal.Title>
+                                                    <Modal.Title>Create New Account</Modal.Title>
                                                 </Modal.Header>
                                                 <Modal.Body>
-                                                    <Form id="list_new_offer" onSubmit={this.list_new_offer}>
-                                                        username <Form.Control name="username"
-                                                                               value={selected.username}/>
-                                                        thumbnail image url <Form.Control name="thumbnail"/>
-                                                        title <Form.Control name="title"/>
-                                                        description <Form.Control as="textarea" name="description"/>
-                                                        price SFX <Form.Control name="price"/>
-                                                        available quantity <Form.Control name="quantity"/>
-                                                        shipping destinations <Form.Control name="location"
-                                                                                            defaultValue="Earth"
-                                                                                            placedholder="your location"/>
-                                                        mixins <Form.Control name="mixins" defaultValue="7"
-                                                                             placedholder="your location"/>
-                                                        <Button type="submit">List Offer</Button>
+                                                    <Form id="create_account" onSubmit={this.register_account}>
+                                                        Username <Form.Control name="username"
+                                                                            placedholder="enter your desired username"/>
+                                                        Avatar URL <Form.Control name="avatar"
+                                                                                placedholder="enter the url of your avatar"/>
+                                                        Twitter Link <Form.Control name="twitter" defaultValue="twitter.com"
+                                                                                placedholder="enter the link to your twitter handle"/>
+                                                        Facebook Link <Form.Control name="facebook"
+                                                                                    defaultValue="facebook.com"
+                                                                                    placedholder="enter the to of your facebook page"/>
+                                                        LinkedIn Link <Form.Control name="linkedin"
+                                                                                    defaultValue="linkedin.com"
+                                                                                    placedholder="enter the link to your linkedin handle"/>
+                                                        Biography <Form.Control maxLength="200" as="textarea" name="biography"
+                                                                                placedholder="type up your biography"/>
+                                                        Website <Form.Control name="website" defaultValue="safex.org"
+                                                                            placedholder="if you have your own website: paste your link here"/>
+                                                        Location <Form.Control name="location" defaultValue="Earth"
+                                                                            placedholder="your location"/>
+                                                        Email <Form.Control name="email"
+                                                                                    defaultValue="xyz@example.com"
+                                                                                    placedholder="your location"/>
+                                                        Mixins <Form.Control name="mixins" defaultValue="7"
+                                                                            placedholder="your location"/>
+
+                                                        <Button block lg variant="success" type="submit">Create Account</Button>
                                                     </Form>
                                                 </Modal.Body>
-                                                <Modal.Footer>
-                                                    <Button variant="secondary" onClick={this.handleCloseNewOfferForm}>
+                                                <Modal.Footer className="align-self-start">
+
+                                                    <Button variant="danger" onClick={this.handleCloseNewAccountForm}>
                                                         Close
                                                     </Button>
                                                 </Modal.Footer>
                                             </Modal>
-                                        </Row>) : ''}
-                                    <Row className="offer__container">
-                                        {this.state.twm_offers.length > 1 ? (<Table className="offer__container">
-                                            <thead>
-                                            <tr>
-                                                <th>Title</th>
-                                                <th>Quantity</th>
-                                                <th>Price (SFX)</th>
-                                                <th>Seller</th>
-                                                <th>Offer ID</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {twm_listings_table}
-                                            </tbody>
-                                        </Table>) : (<div></div>)}
+                                        </Col>
                                     </Row>
 
-                                    <Row className="overflow-y">
-                                        <Table>
-                                            <thead>
-                                            <tr>
-                                                <th>Title</th>
-                                                <th>Quantity</th>
-                                                <th>Price (SFX)</th>
-                                                <th>Seller</th>
-                                                <th>Offer ID</th>
-                                                <th>Actions</th>
-                                                <th></th>
-                                                <th></th>
+                               
+                                    <Col lg className="merchant_product_view no-gutters mt-5" >
+                                        {selected !== void (0) ? (
+                                            <Row>
+                                                <Button lg variant="success" onClick={this.handleShowNewOfferForm}>
+                                                    New Offer
+                                                </Button>
 
-                                            </tr>
-                                            </thead>
+                                                <Modal className="new-account-form" animation={false} show={this.state.show_new_offer_form}
+                                                    onHide={this.handleCloseNewOfferForm}>
+                                                    <Modal.Header closeButton>
+                                                        <Modal.Title>Create New Offer</Modal.Title>
+                                                    </Modal.Header>
+                                                    <Modal.Body>
+                                                        <Form id="list_new_offer" onSubmit={this.list_new_offer}>
+                                                            Username <Form.Control name="username"
+                                                                                value={selected.username}/>
+                                                            Thumbnail Image URL <Form.Control name="thumbnail"/>
+                                                            Title <Form.Control name="title"/>
+                                                            Description <Form.Control maxLength="200" as="textarea" name="description"/>
+                                                            Price (SFX) <Form.Control name="price"/>
+                                                            Available Quantity <Form.Control name="quantity"/>
+                                                            Shipping Destinations <Form.Control name="location"
+                                                                                                defaultValue="Earth"
+                                                                                                placedholder="your location"/>
+                                                            Mixins <Form.Control name="mixins" defaultValue="7"
+                                                                                placedholder="your location"/>
+                                                            <Button block lg variant="success" type="submit">List Offer</Button>
+                                                        </Form>
+                                                    </Modal.Body>
+                                                    <Modal.Footer className="align-self-start">
+                                                        <Button variant="danger" onClick={this.handleCloseNewOfferForm}>
+                                                            Close
+                                                        </Button>
+                                                    </Modal.Footer>
+                                                </Modal>
+                                            </Row>) : ''}
+                                        <Row className="offer__container">
+                                        {this.state.twm_offers.length > 1 ? (
+                                            <Table color="white" className="white-text border border-white b-r10">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Title</th>
+                                                        <th>Quantity</th>
+                                                        <th>Price (SFX)</th>
+                                                        <th>Seller</th>
+                                                        <th>Offer ID</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {twm_listings_table}
+                                                    </tbody>
+                                            </Table>) 
+                                        : (<div></div>)}
 
-                                            <tbody>
-                                            {non_listings_table}
-                                            </tbody>
-                                        </Table>
-                                    </Row>
+                                            <Table>
+                                                <thead>
+                                                <tr>
+                                                    <th>Title</th>
+                                                    <th>Quantity</th>
+                                                    <th>Price (SFX)</th>
+                                                    <th>Seller</th>
+                                                    <th>Offer ID</th>
+                                                    <th>Actions</th>
+                                                    <th></th>
+                                                    <th></th>
+                                                </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    {non_listings_table}
+                                                </tbody>
+                                            </Table>
+                                        </Row>
+                                    </Col>
                                 </Col>
                             </Row>);
                     } catch (err) {
@@ -1640,7 +1672,7 @@ class WalletHome extends React.Component {
                                 </Modal.Header>
                                 <Modal.Body>
                                     <ul>
-                                        <li>
+                                        <li >
                                             <b>Address:</b> <br/> {this.props.wallet.address()}
                                         </li>
                                         <li>
