@@ -22,8 +22,8 @@ import Settings from './components/wallet/settings';
 
 const routes = (
     <Router>
-        <div className="height100 safex-blue oflow-y-scroll">
-            <Switch>
+        <div className="height100 p-2 safex-blue oflow-y-scroll">
+            <Switch className="height100 safex-blue">
                 <Route exact path="/" component={SelectEntry}/>
                 <Route exact path="/recover_keys" component={RecoverKeys}/>
                 <Route exact path="/recover_seed" component={RecoverSeed}/>
