@@ -19,6 +19,7 @@ import {GrCubes} from 'react-icons/gr'
 import {IconContext} from 'react-icons'
 
 import copy from "copy-to-clipboard"
+import {open_twm_file, save_twm_file} from "../../utils/twm_actions";
 
 const openpgp = window.require('openpgp');
 
@@ -367,7 +368,9 @@ class WalletHome extends React.Component {
                         }
                     }
 
+                    console.log(`this_account`);
                     console.log(this_account);
+                    console.log(`this_account`);
 
                     let confirm_registration = wallet.createAdvancedTransaction({
                         tx_type: '6',
@@ -381,20 +384,50 @@ class WalletHome extends React.Component {
                         if (confirmed_fee) {
                             tx.commit().then(async (commit) => {
 
-                                /*
+                                let twm_file = this.state.twm_file;
+                                console.log(twm_file.accounts);
+                                console.log(`before`);
 
-                                                                let twm_file = this.state.twm_file;
+                                twm_file.accounts[this_account.username] = {};
+                                twm_file.accounts[this_account.username].username = this_account.username;
+                                twm_file.accounts[this_account.username].data = this_account.data;
+                                twm_file.accounts[this_account.username].safex_public_key = this_account.publicKey;
+                                twm_file.accounts[this_account.username].safex_private_key = this_account.privateKey;
+                                twm_file.accounts[this_account.username].urls = {};
 
-                                                                twm_file.accounts[e.target.username.value] = {};
+                                console.log(`before`);
+                                console.log(twm_file.accounts);
+                                console.log(`after`);
 
+                                try {
+                                    const algorithm = 'aes-256-ctr';
+                                    const cipher = crypto.createCipher(algorithm, this.state.password);
+                                    let crypted = cipher.update(JSON.stringify(twm_file), 'utf8', 'hex');
+                                    crypted += cipher.final('hex');
 
-                                                                twm_obj.accounts[acc.username] = {};
-                                                                twm_obj.accounts[e.target.username.value].username = this_accou;
-                                                                twm_obj.accounts[e.target.username.value].data = JSON.stringify(d_obj);
-                                                                twm_obj.accounts[e.target.username.value].safex_public_key = acc.publicKey;
-                                                                twm_obj.accounts[acc.username].safex_private_key = acc.privateKey;
-                                                                twm_obj.accounts[acc.username].urls = {};
-                                */
+                                    const hash1 = crypto.createHash('sha256');
+                                    hash1.update(JSON.stringify(twm_file));
+                                    console.log(`password ${this.state.password}`);
+                                    console.log(JSON.stringify(twm_file));
+
+                                    let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
+
+                                    try {
+
+                                        let open_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
+                                        console.log(open_twm_file);
+
+                                        localStorage.setItem('twm_file', JSON.stringify(open_twm_file.contents));
+                                    } catch (err) {
+                                        console.error(err);
+                                        console.error(`error opening twm file after save to verify`);
+                                    }
+                                    console.log(twm_save);
+
+                                } catch (err) {
+                                    console.error(err);
+                                    console.error(`error at initial save of the twm file`);
+                                }
 
 
                                 console.log(commit);
@@ -403,6 +436,9 @@ class WalletHome extends React.Component {
                         transaction id: ${txid}
                         tokens locked for 500 blocks: 5000 SFT
                         fee: ${fee / 10000000000}`);
+                                localStorage.setItem('twm_file', twm_file);
+
+                                this.setState({twm_file: twm_file});
 
                             }).catch((err) => {
                                 console.error(err);
@@ -436,8 +472,7 @@ class WalletHome extends React.Component {
         try {
             let mixins = e.target.mixins.value - 1;
             if (mixins >= 0) {
-                let confirmed = window.confirm(`are you sure you want to send ${e.target.amount.value} SFT Safex Tokens, ` +
-                    `to ${e.target.destination.value}`);
+                let confirmed = window.confirm(`are you sure you want to send ${e.target.amount.value} SFT Safex Tokens, to ${e.target.destination.value}`);
                 console.log(confirmed);
                 if (confirmed) {
                     try {
@@ -625,8 +660,8 @@ class WalletHome extends React.Component {
     };
 
     //open staking view from navigation
-    show_staking = () => {
-        this.setState({interface_view: 'staking'})
+    show_tokens = () => {
+        this.setState({interface_view: 'tokens'})
     };
 
     //open settings view from navigation
@@ -1269,7 +1304,7 @@ class WalletHome extends React.Component {
                                 console.log(selected);
 
                                 data = selected_data;
-                            } catch(err) {
+                            } catch (err) {
                                 console.error(err);
                                 console.error(`error at parsing the data of the selected user ${selected.username}`);
                             }
@@ -1459,7 +1494,7 @@ class WalletHome extends React.Component {
                         return (<div><p>error loading</p></div>);
                     }
                 }
-                case "staking": {
+                case "tokens": {
                     let staked_tokens = wallet.stakedTokenBalance() / 10000000000;
                     let unlocked_tokens = wallet.unlockedStakedTokenBalance() / 10000000000;
                     let pending_stake = (staked_tokens - unlocked_tokens);
@@ -1483,7 +1518,7 @@ class WalletHome extends React.Component {
 
                         <Row className="wallet no-gutters flex-column border-bottom border-white">
 
-                            <h2 className="text-center m-2"> Staking </h2>
+                            <h2 className="text-center m-2"> Token Management </h2>
                             <Row className="no-gutters">
                                 <Col className="wallet-box mb-2 mr-2 ml-2 p-2 font-size-small">
 
@@ -1674,7 +1709,7 @@ class WalletHome extends React.Component {
                                 </li>
                                 <li className="menu__list-item">
                                     <a className="menu__link" href="javascript:void(0)"
-                                       onClick={this.show_staking}>Staking</a>
+                                       onClick={this.show_tokens}>Tokens</a>
                                 </li>
 
 
