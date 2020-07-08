@@ -989,7 +989,7 @@ class WalletHome extends React.Component {
                                         Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
                                                                       placedholder="choose the number of mixins"/>
                                         <Button className="mt-2 safex-cash-green" type="submit" size="lg" block>
-                                            Send Cash
+                                            Send Safex
                                         </Button>
                                     </Form>
 
