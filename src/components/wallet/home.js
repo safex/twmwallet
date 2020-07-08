@@ -1731,10 +1731,10 @@ class WalletHome extends React.Component {
                         className="no-gutters p-2 justify-content-between align-items-center b-r10 grey-back white-text">
                         <Col sm={3}>
                             <li className="mr-2">
-                                SFX: {this.state.cash}
+                                SFX: {this.state.cash} {this.state.pending_cash > 0 ? `(${this.state.pending_cash} pending)`  : '' }
                             </li>
                             <li className="">
-                                SFT: {this.state.tokens}
+                                SFT: {this.state.tokens} {this.state.pending_tokens > 0 ? `(${this.state.pending_tokens} pending)`  : '' }
                             </li>
                         </Col>
                         <Col className="just" sm={5}>
