@@ -77,6 +77,7 @@ class WalletHome extends React.Component {
             let s_hash = storage_hash.digest('hex');
 
 
+
             const parse_hash = crypto.createHash('sha256');
             parse_hash.update(JSON.stringify(twm_file));
 
@@ -84,6 +85,7 @@ class WalletHome extends React.Component {
 
             if (p_hash === s_hash) {
                 this.setState({twm_file: twm_file});
+
 
             } else {
                 alert(`have an issue with the twm file!`);
@@ -905,6 +907,7 @@ class WalletHome extends React.Component {
 
         if (twm_file.accounts.hasOwnProperty(user.username)) {
 
+
             console.log(twm_file);
 
 
@@ -914,6 +917,7 @@ class WalletHome extends React.Component {
             //modify state
             //save
             //verify
+
 
             console.log(`it has`);
         }
@@ -965,16 +969,18 @@ class WalletHome extends React.Component {
 
                             <Col sm={4}>
 
+
                                 <div className="wallet-box mb-2 mr-2 ml-2 p-2 font-size-small">
 
-                                    <h3> Safex Cash </h3>
+                                    <h3> Send Safex </h3>
 
                                     <ul>
-                                        <li>{this.state.cash} SFX</li>
+                                        <Row>
+                                            <li>{this.state.cash} SFX  |</li>
 
-                                        {this.state.pending_cash > 0 ?
-                                            (<li>{this.state.pending_cash} Pending</li>) : ''}
-
+                                            {this.state.pending_cash > 0 ?
+                                                (<li>| {this.state.pending_cash} Pending</li>) : ''}
+                                        </Row>
                                         {this.state.pending_cash > 0 ?
                                             (<li>{this.state.cash + this.state.pending_cash} NET</li>) : ''}
                                     </ul>
@@ -988,38 +994,10 @@ class WalletHome extends React.Component {
                                         Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
                                                                       placedholder="choose the number of mixins"/>
                                         <Button className="mt-2 safex-cash-green" type="submit" size="lg" block>
-                                            Send Cash
+                                            Send Safex
                                         </Button>
                                     </Form>
 
-                                </div>
-
-
-                                <div className="wallet-box m-2 p-2 font-size-small">
-
-                                    <h3> Safex Token </h3>
-
-                                    <ul>
-                                        <li>{this.state.tokens} SFT</li>
-                                        {this.state.pending_tokens > 0 ?
-                                            (<li>{this.state.pending_tokens} Pending</li>) : ''}
-                                        {this.state.pending_tokens > 0 ?
-                                            (
-                                                <li>{this.state.tokens + this.state.pending_tokens} NET</li>) : ''}
-                                    </ul>
-
-                                    <Form id="send_token" onSubmit={this.token_send}>
-                                        Destination Address <Form.Control name="destination"
-                                                                          defaultValue="Safex5..."
-                                                                          placedholder="the destination address"/>
-                                        Amount (SFT)<Form.Control name="amount" defaultValue="0"
-                                                                  placedholder="the amount to send"/>
-                                        Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
-                                                                      placedholder="choose the number of mixins"/>
-                                        <Button className="mt-2" type="submit" variant="warning" size="lg" block>
-                                            Send Tokens
-                                        </Button>
-                                    </Form>
                                 </div>
 
                             </Col>
@@ -1031,6 +1009,7 @@ class WalletHome extends React.Component {
                                     {accounts_table}
 
                                 </div>
+
 
                             </Col>
                         </Row>
@@ -1267,19 +1246,20 @@ class WalletHome extends React.Component {
                             <Row
                                 className={
                                     this.state.selected_user.username === user.username ?
-                                        "border border-success no-gutters account-element dark-orange"
+
+                                        "border border-white no-gutters account-element dark-orange"
+
                                         : "border border-dark no-gutters account-element"}
                                 key={key}
                                 onClick={() => this.load_offers(user.username, key)}
                             >
 
                                 <Col>
-                                    <Image width={80} height={80} src={avatar} roundedCircle/>
+
+                                    <Image width={50} height={50} src={avatar} roundedCircle/>
                                 </Col>
                                 <Col>
-                                    <ul>
-                                        <li>{user.username}</li>
-                                    </ul>
+                                   <h2>{user.username}</h2>
 
                                 </Col>
                                 {user.status == 0 ? (
@@ -1319,22 +1299,27 @@ class WalletHome extends React.Component {
                         return (
                             <Row>
                                 <Col>
-                                    <Row className="no-gutters justify-content-between">
 
-                                        <Col md={5} className="account-list no-gutters">
+                                    <Row className="no-gutters p-3 justify-content-between grey-back b-r10">
+
+                                        <Col md={5} className="account-list no-gutters p-3">
+
                                             {accounts_table}
                                         </Col>
 
 
                                         {selected !== void (0) ? (
                                             <Col md={3}
-                                                 className="no-gutters d-flex flex-column align-items-center merchant_profile_view">
+
+                                                 className="no-gutters d-flex flex-column align-items-center merchant_profile_view text-align-center"
+                                            >
                                                 <Row>
                                                     <ul>
-                                                        <li><Image width={100} height={100} src={data.avatar}
-                                                                   roundedCircle/>
+                                                        <li>
+                                                            <Image width={100} height={100} src={data.avatar} roundedCircle/>
                                                         </li>
-                                                        <li>Username: {selected.username}</li>
+                                                        <h2>{selected.username}</h2>
+
                                                     </ul>
                                                 </Row>
                                                 <Col className="d-flex flex-column">
@@ -1348,7 +1333,7 @@ class WalletHome extends React.Component {
                                         ) : ''}
 
                                         <Col className="align-self-center" md={2}>
-                                            <Button block lg variant="success" onClick={this.handleShowNewAccountForm}>
+                                            <Button block size="lg" variant="success" onClick={this.handleShowNewAccountForm}>
                                                 New Account
                                             </Button>
 
@@ -1403,8 +1388,8 @@ class WalletHome extends React.Component {
 
                                     <Col lg className="merchant_product_view no-gutters mt-5">
                                         {selected !== void (0) ? (
-                                            <Row>
-                                                <Button lg variant="success" onClick={this.handleShowNewOfferForm}>
+                                            <Row className="p-2 justify-content-center">
+                                                <Button size="lg" variant="success" onClick={this.handleShowNewOfferForm}>
                                                     New Offer
                                                 </Button>
 
@@ -1448,17 +1433,19 @@ class WalletHome extends React.Component {
                                                     </Modal.Footer>
                                                 </Modal>
                                             </Row>) : ''}
-                                        <Row className="offer__container">
+
+                                        <Row >
                                             {this.state.twm_offers.length > 1 ? (
                                                     <Table color="white" className="white-text border border-white b-r10">
                                                         <thead>
-                                                        <tr>
-                                                            <th>Title</th>
-                                                            <th>Quantity</th>
-                                                            <th>Price (SFX)</th>
-                                                            <th>Seller</th>
-                                                            <th>Offer ID</th>
-                                                        </tr>
+                                                            <tr>
+                                                                <th>Title</th>
+                                                                <th>Quantity</th>
+                                                                <th>Price (SFX)</th>
+                                                                <th>Seller</th>
+                                                                <th>Offer ID</th>
+                                                            </tr>
+
                                                         </thead>
                                                         <tbody>
                                                         {twm_listings_table}
@@ -1468,16 +1455,15 @@ class WalletHome extends React.Component {
 
                                             <Table>
                                                 <thead>
-                                                <tr>
-                                                    <th>Title</th>
-                                                    <th>Quantity</th>
-                                                    <th>Price (SFX)</th>
-                                                    <th>Seller</th>
-                                                    <th>Offer ID</th>
-                                                    <th>Actions</th>
-                                                    <th>Active</th>
-                                                    <th></th>
-                                                </tr>
+                                                  <tr>
+                                                      <th>Title</th>
+                                                      <th>Quantity</th>
+                                                      <th>Price (SFX)</th>
+                                                      <th>Seller</th>
+                                                      <th>Offer ID</th>
+                                                      <th>Actions</th>
+
+                                                  </tr>
                                                 </thead>
 
                                                 <tbody>
@@ -1516,10 +1502,62 @@ class WalletHome extends React.Component {
 
                     return (
 
-                        <Row className="wallet no-gutters flex-column border-bottom border-white">
 
-                            <h2 className="text-center m-2"> Token Management </h2>
-                            <Row className="no-gutters">
+                        <div className="wallet no-gutters flex-column border-bottom border-white oflow-y-scroll">
+
+                            <h1 className="text-center m-2"> Token Management </h1>
+
+                            <Row className="no-gutters pt-3">
+                                <div className="wallet-box m-2 p-2 font-size-small">
+                                    <h3> Send Token </h3>
+
+                                    <ul>
+                                        <li>{this.state.tokens} SFT</li>
+                                        {this.state.pending_tokens > 0 ?
+                                            (<li>{this.state.pending_tokens} Pending</li>) : ''}
+                                        {this.state.pending_tokens > 0 ?
+                                            (
+                                                <li>{this.state.tokens + this.state.pending_tokens} NET</li>) : ''}
+                                    </ul>
+
+                                    <Form id="send_token" onSubmit={this.token_send}>
+                                        Destination Address <Form.Control name="destination"
+                                                                        defaultValue="Safex5..."
+                                                                        placedholder="the destination address"/>
+                                        Amount (SFT)<Form.Control name="amount" defaultValue="0"
+                                                                placedholder="the amount to send"/>
+                                        Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
+                                                                    placedholder="choose the number of mixins"/>
+                                        <Button className="mt-2" type="submit" variant="warning" size="lg" block>
+                                            Send Tokens
+                                        </Button>
+                                    </Form>
+                                </div>
+                               <Col className="mt-2 search-box border border-white grey-back">
+                                    <h2 className="text-center "> Stakes </h2>
+
+                                    <Table color="white" className="white-text border border-white b-r10 light-blue-back ">
+                                        <thead className="dark-orange">
+                                        <tr>
+                                            <th>TXID</th>
+                                            <th>Amount (SFT)</th>
+                                            <th>Interest (SFX)</th>
+                                            <th>Block</th>
+
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </Table>
+                                </Col>
+                                
+
+                            </Row>
+
+
+                            <Row className="no-gutters pt-3">
+
                                 <Col className="wallet-box mb-2 mr-2 ml-2 p-2 font-size-small">
 
                                     <h3 className="text-center m-2"> Stake Tokens </h3>
@@ -1631,27 +1669,7 @@ class WalletHome extends React.Component {
 
                                 </Col>
                             </Row>
-                            <Col className="mt-2 search-box border border-white grey-back">
 
-                                <h2 className="text-center "> Stakes </h2>
-
-                                <Table color="white" className="white-text border border-white b-r10 light-blue-back ">
-                                    <thead className="dark-orange">
-                                    <tr>
-                                        <th>TXID</th>
-                                        <th>Amount (SFT)</th>
-                                        <th>Interest (SFX)</th>
-                                        <th>Block</th>
-
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-
-                                    </tbody>
-                                </Table>
-
-                            </Col>
-                        </Row>
 
                     );
                 }
