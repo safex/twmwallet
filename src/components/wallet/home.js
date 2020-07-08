@@ -77,6 +77,7 @@ class WalletHome extends React.Component {
             let s_hash = storage_hash.digest('hex');
 
 
+
             const parse_hash = crypto.createHash('sha256');
             parse_hash.update(JSON.stringify(twm_file));
 
@@ -84,6 +85,7 @@ class WalletHome extends React.Component {
 
             if (p_hash === s_hash) {
                 this.setState({twm_file: twm_file});
+
 
             } else {
                 alert(`have an issue with the twm file!`);
@@ -905,6 +907,7 @@ class WalletHome extends React.Component {
 
         if (twm_file.accounts.hasOwnProperty(user.username)) {
 
+
             console.log(twm_file);
 
 
@@ -914,6 +917,7 @@ class WalletHome extends React.Component {
             //modify state
             //save
             //verify
+
 
             console.log(`it has`);
         }
@@ -965,6 +969,7 @@ class WalletHome extends React.Component {
 
                             <Col sm={4}>
 
+
                                 <div className="wallet-box mb-2 mr-2 ml-2 p-2 font-size-small">
 
                                     <h3> Send Safex </h3>
@@ -989,14 +994,11 @@ class WalletHome extends React.Component {
                                         Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
                                                                       placedholder="choose the number of mixins"/>
                                         <Button className="mt-2 safex-cash-green" type="submit" size="lg" block>
-                                            Send Cash
+                                            Send Safex
                                         </Button>
                                     </Form>
 
                                 </div>
-
-
-                                
 
                             </Col>
 
@@ -1007,6 +1009,7 @@ class WalletHome extends React.Component {
                                     {accounts_table}
 
                                 </div>
+
 
                             </Col>
                         </Row>
@@ -1243,17 +1246,21 @@ class WalletHome extends React.Component {
                             <Row
                                 className={
                                     this.state.selected_user.username === user.username ?
+
                                         "border border-white no-gutters account-element dark-orange"
+
                                         : "border border-dark no-gutters account-element"}
                                 key={key}
                                 onClick={() => this.load_offers(user.username, key)}
                             >
 
                                 <Col>
+
                                     <Image width={50} height={50} src={avatar} roundedCircle/>
                                 </Col>
                                 <Col>
                                    <h2>{user.username}</h2>
+
                                 </Col>
                                 {user.status == 0 ? (
 
@@ -1292,15 +1299,18 @@ class WalletHome extends React.Component {
                         return (
                             <Row>
                                 <Col>
+
                                     <Row className="no-gutters p-3 justify-content-between grey-back b-r10">
 
                                         <Col md={5} className="account-list no-gutters p-3">
+
                                             {accounts_table}
                                         </Col>
 
 
                                         {selected !== void (0) ? (
                                             <Col md={3}
+
                                                  className="no-gutters d-flex flex-column align-items-center merchant_profile_view text-align-center"
                                             >
                                                 <Row>
@@ -1309,6 +1319,7 @@ class WalletHome extends React.Component {
                                                             <Image width={100} height={100} src={data.avatar} roundedCircle/>
                                                         </li>
                                                         <h2>{selected.username}</h2>
+
                                                     </ul>
                                                 </Row>
                                                 <Col className="d-flex flex-column">
@@ -1422,6 +1433,7 @@ class WalletHome extends React.Component {
                                                     </Modal.Footer>
                                                 </Modal>
                                             </Row>) : ''}
+
                                         <Row >
                                             {this.state.twm_offers.length > 1 ? (
                                                     <Table color="white" className="white-text border border-white b-r10">
@@ -1433,6 +1445,7 @@ class WalletHome extends React.Component {
                                                                 <th>Seller</th>
                                                                 <th>Offer ID</th>
                                                             </tr>
+
                                                         </thead>
                                                         <tbody>
                                                         {twm_listings_table}
@@ -1442,14 +1455,15 @@ class WalletHome extends React.Component {
 
                                             <Table>
                                                 <thead>
-                                                <tr>
-                                                    <th>Title</th>
-                                                    <th>Quantity</th>
-                                                    <th>Price (SFX)</th>
-                                                    <th>Seller</th>
-                                                    <th>Offer ID</th>
-                                                    <th>Actions</th>
-                                                </tr>
+                                                  <tr>
+                                                      <th>Title</th>
+                                                      <th>Quantity</th>
+                                                      <th>Price (SFX)</th>
+                                                      <th>Seller</th>
+                                                      <th>Offer ID</th>
+                                                      <th>Actions</th>
+
+                                                  </tr>
                                                 </thead>
 
                                                 <tbody>
@@ -1487,6 +1501,7 @@ class WalletHome extends React.Component {
 
 
                     return (
+
 
                         <div className="wallet no-gutters flex-column border-bottom border-white oflow-y-scroll">
 
@@ -1654,8 +1669,7 @@ class WalletHome extends React.Component {
 
                                 </Col>
                             </Row>
-                            
-                        </div>
+
 
                     );
                 }
