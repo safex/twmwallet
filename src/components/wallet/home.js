@@ -56,7 +56,8 @@ class WalletHome extends React.Component {
             blockchain_tokens_staked: 0,
             blockchain_interest_history: [],
             blockchain_current_interest: {},
-            twm_file: {}
+            twm_file: {},
+            show_purchase_offer: {title: '', quantity: 0, offerID: '', seller: ''}
         };
     }
 
@@ -713,8 +714,8 @@ class WalletHome extends React.Component {
     };
 
     //show modal of Purchase Form
-    handleShowPurchaseForm = () => {
-        this.setState({show_purchase_form: true});
+    handleShowPurchaseForm = (listing) => {
+        this.setState({show_purchase_form: true, show_purchase_offer: listing});
     };
 
     //show modal of new account
@@ -1077,7 +1078,7 @@ class WalletHome extends React.Component {
                                 </select></td>
                                 <td>
                                     <Col className="align-self-center" md={2}>
-                                        <Button block size="lg" variant="success" onClick={this.handleShowPurchaseForm}>
+                                        <Button block size="lg" variant="success" onClick={() => this.handleShowPurchaseForm(listing)}>
                                             BUY
                                         </Button>
 
@@ -1085,22 +1086,22 @@ class WalletHome extends React.Component {
                                                show={this.state.show_purchase_form}
                                                onHide={this.handleClosePurchaseForm}>
                                             <Modal.Header closeButton>
-                                                <Modal.Title>Ready to Buy {listing.title}</Modal.Title>
+                                                <Modal.Title>Ready to Buy {this.state.show_purchase_offer.title}</Modal.Title>
                                             </Modal.Header>
                                             <Modal.Body>
 
                                                 <Form id="purchase_item" onSubmit={this.purchase_item}>
                                                     <ul>
 
-                                                        <li>{listing.title}</li>
-                                                        <li>{listing.price / 10000000000}</li>
-                                                        <li>{listing.seller}</li>
-                                                        <li>{this.to_ellipsis(listing.offerID)}</li>
+                                                        <li>{this.state.show_purchase_offer.title}</li>
+                                                        <li>{this.state.show_purchase_offer.price / 10000000000}</li>
+                                                        <li>{this.state.show_purchase_offer.seller}</li>
+                                                        <li>{this.to_ellipsis(this.state.show_purchase_offer.offerID)}</li>
                                                     </ul>
 
-                                                    <Form.Control className="light-blue-back"
+                                                    {this.state.show_purchase_offer.quantity} available <Form.Control className="light-blue-back"
                                                                   id="quantity"
-                                                                  name="quantity"/> {listing.quantity} available
+                                                                  name="quantity"/>
                                                     Send Message <Form.Control name="message"/>
                                                     Mixins <Form.Control name="mixins" defaultValue="7"/>
 
