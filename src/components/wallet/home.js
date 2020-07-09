@@ -8,7 +8,14 @@ import {withRouter} from 'react-router-dom';
 
 import {normalize_8decimals} from '../../utils/wallet_creation';
 
-import {send_cash, send_tokens, stake_tokens, unstake_tokens, commit_txn} from "../../utils/wallet_actions";
+import {
+    send_cash,
+    send_tokens,
+    stake_tokens,
+    unstake_tokens,
+    commit_txn,
+    purchase_offer
+} from "../../utils/wallet_actions";
 
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
 
@@ -962,7 +969,90 @@ class WalletHome extends React.Component {
         )
     };
 
-    purchase_item = () => {
+    purchase_item = async (e, listing) => {
+        e.preventDefault();
+        console.log(listing);
+        console.log(e.target.quantity.value);
+
+        let total_cost = e.target.quantity.value * (listing.price / 10000000000);
+
+        if (e.target.quantity.value <= listing.quantity && e.target.quantity.value > 0 && total_cost < this.state.cash) {
+
+        }
+        let alert_bool = false;
+        let alert_text = ``;
+
+        if (e.target.quantity.value < 1) {
+            alert_text += ` quantity can not be 0 or negative :)`;
+            alert_bool = true;
+        }
+        if (e.target.quantity.value > listing.quantity) {
+            alert_text += ` not enough quantity available: you wanted ${e.target.quantity.value} there are ${listing.quantity} available`;
+            alert_bool = true;
+        }
+        if (total_cost > this.state.cash) {
+            alert_text += ` not enough SFX available for this purchase: total cost: ${total_cost} SFX, your balance: ${this.state.cash} SFX`;
+            alert_bool = true;
+        }
+
+        if (alert_bool) {
+            alert(alert_text);
+        } else {
+            try {
+                let mixins = e.target.mixins.value - 1;
+                if (mixins >= 0) {
+
+                    let confirmed = window.confirm(`are you sure you want to purchase ${e.target.quantity.value} of ${listing.title} for a total of ${total_cost}?`);
+                    console.log(confirmed);
+                    if (confirmed) {
+                        try {
+                            let purchase_txn = await purchase_offer(
+                                wallet,
+                                e.target.quantity.value,
+                                listing.offerID,
+                                mixins
+                            );
+                            let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${purchase_txn.fee() / 10000000000} SFX Safex Cash`);
+                            let fee = purchase_txn.fee();
+                            let txid = purchase_txn.transactionsIds();
+                            let amount = e.target.quantity.value;
+                            console.log(purchase_txn);
+                            if (confirmed_fee) {
+                                try {
+                                    let committed_txn = await commit_txn(purchase_txn);
+                                    console.log(committed_txn);
+                                    console.log(purchase_txn);
+                                    alert(`token unstake transaction committed  
+                                        transaction id: ${txid}
+                                        amount: ${amount} of ${listing.title}
+                                        costing: ${total_cost} SFX
+                                        fee: ${fee / 10000000000} SFX`);
+                                } catch (err) {
+                                    console.error(err);
+                                    console.error(`error when trying to commit the token staking transaction to the blockchain`);
+                                    alert(`error when trying to commit the token staking transaction to the blockchain`);
+                                }
+                            } else {
+                                console.log("token staking transaction cancelled");
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            console.error(`error at the token staking transaction formation it was not commited`);
+                            alert(`error at the token staking transaction formation it was not commited`);
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                if (err.toString().startsWith('not enough outputs')) {
+                    alert(`choose fewer mixins`);
+                }
+                console.error(`error at the token transaction`);
+            }
+        }
+
+
+
 
         /*
         export async function purchase_offer(wallet, amount, offer_id, quantity, address, mixin) {
@@ -1078,7 +1168,8 @@ class WalletHome extends React.Component {
                                 </select></td>
                                 <td>
                                     <Col className="align-self-center" md={2}>
-                                        <Button block size="lg" variant="success" onClick={() => this.handleShowPurchaseForm(listing)}>
+                                        <Button block size="lg" variant="success"
+                                                onClick={() => this.handleShowPurchaseForm(listing)}>
                                             BUY
                                         </Button>
 
@@ -1086,11 +1177,13 @@ class WalletHome extends React.Component {
                                                show={this.state.show_purchase_form}
                                                onHide={this.handleClosePurchaseForm}>
                                             <Modal.Header closeButton>
-                                                <Modal.Title>Ready to Buy {this.state.show_purchase_offer.title}</Modal.Title>
+                                                <Modal.Title>Ready to
+                                                    Buy {this.state.show_purchase_offer.title}</Modal.Title>
                                             </Modal.Header>
                                             <Modal.Body>
 
-                                                <Form id="purchase_item" onSubmit={this.purchase_item}>
+                                                <Form id="purchase_item"
+                                                      onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
                                                     <ul>
 
                                                         <li>{this.state.show_purchase_offer.title}</li>
@@ -1099,14 +1192,15 @@ class WalletHome extends React.Component {
                                                         <li>{this.to_ellipsis(this.state.show_purchase_offer.offerID)}</li>
                                                     </ul>
 
-                                                    {this.state.show_purchase_offer.quantity} available <Form.Control className="light-blue-back"
-                                                                  id="quantity"
-                                                                  name="quantity"/>
+                                                    {this.state.show_purchase_offer.quantity} available <Form.Control
+                                                    className="light-blue-back"
+                                                    id="quantity"
+                                                    name="quantity"/>
                                                     Send Message <Form.Control name="message"/>
                                                     Mixins <Form.Control name="mixins" defaultValue="7"/>
 
 
-                                                    <Button variant="success">Confirm Payment</Button>
+                                                    <Button type="submit" variant="success">Confirm Payment</Button>
                                                 </Form>
                                             </Modal.Body>
                                             <Modal.Footer className="align-self-start">
