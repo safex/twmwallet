@@ -1505,7 +1505,7 @@ class WalletHome extends React.Component {
                                     <td>
                                     <Col className="align-self-center" md={2}>
                                             <Button size="lg" variant="success"
-                                                    onClick={() => this.handleShowEditOfferForm()}>
+                                                    onClick={() => this.handleShowEditOfferForm(listing)}>
                                                 EDIT
                                             </Button>
                                             <Modal className="new-account-form" animation={false}
