@@ -14,7 +14,8 @@ import {
     stake_tokens,
     unstake_tokens,
     commit_txn,
-    purchase_offer
+    purchase_offer,
+    edit_offer
 } from "../../utils/wallet_actions";
 
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
@@ -60,11 +61,13 @@ class WalletHome extends React.Component {
             show_new_offer_form: false,
             show_new_account_form: false,
             show_purchase_form: false,
+            show_edit_offer_form: false,
             blockchain_tokens_staked: 0,
             blockchain_interest_history: [],
             blockchain_current_interest: {},
             twm_file: {},
-            show_purchase_offer: {title: '', quantity: 0, offerID: '', seller: ''}
+            show_purchase_offer: {title: '', quantity: 0, offerID: '', seller: ''},
+            show_edit_offer: {}
         };
     }
 
@@ -730,6 +733,16 @@ class WalletHome extends React.Component {
         this.setState({show_new_account_form: true});
     };
 
+    //show modal of Edit Offer Form
+    handleShowEditOfferForm = (listing) => {
+        this.setState({show_edit_offer_form: true, show_edit_offer: listing});
+    };
+
+    //close modal of Edit Offer Form
+    handleCloseEditOfferForm = () => {
+        this.setState({show_edit_offer_form: false});
+    };
+
     //merchant
     load_offers = (username, index) => {
         this.setState({selected_user: {username: username, index: index}});
@@ -740,7 +753,7 @@ class WalletHome extends React.Component {
     list_new_offer = (e) => {
         e.preventDefault();
         e.persist();
-        console.log(`let's register it`);
+        console.log(`let's list the offer it`);
         let vees = e.target;
 
         let o_obj = {};
@@ -889,16 +902,16 @@ class WalletHome extends React.Component {
                                         fee: ${fee / 10000000000} SFX`);
                             } catch (err) {
                                 console.error(err);
-                                console.error(`error when trying to commit the token staking transaction to the blockchain`);
-                                alert(`error when trying to commit the token staking transaction to the blockchain`);
+                                console.error(`error when trying to commit the token unstaking transaction to the blockchain`);
+                                alert(`error when trying to commit the token unstaking transaction to the blockchain`);
                             }
                         } else {
                             console.log("token staking transaction cancelled");
                         }
                     } catch (err) {
                         console.error(err);
-                        console.error(`error at the token staking transaction formation it was not commited`);
-                        alert(`error at the token staking transaction formation it was not commited`);
+                        console.error(`error at the token unstaking transaction formation it was not commited`);
+                        alert(`error at the token unstaking transaction formation it was not commited`);
                     }
                 }
             }
@@ -907,7 +920,7 @@ class WalletHome extends React.Component {
             if (err.toString().startsWith('not enough outputs')) {
                 alert(`choose fewer mixins`);
             }
-            console.error(`error at the token transaction`);
+            console.error(`error at the token unstake transaction`);
         }
     };
 
@@ -978,9 +991,6 @@ class WalletHome extends React.Component {
 
         let total_cost = e.target.quantity.value * (listing.price / 10000000000);
 
-        if (e.target.quantity.value <= listing.quantity && e.target.quantity.value > 0 && total_cost < this.state.cash) {
-
-        }
         let alert_bool = false;
         let alert_text = ``;
 
@@ -1025,23 +1035,23 @@ class WalletHome extends React.Component {
                                     let committed_txn = await commit_txn(purchase_txn);
                                     console.log(committed_txn);
                                     console.log(purchase_txn);
-                                    alert(`token unstake transaction committed  
+                                    alert(`purchase transaction committed
                                         transaction id: ${txid}
                                         amount: ${amount} of ${listing.title}
                                         costing: ${total_cost} SFX
                                         fee: ${fee / 10000000000} SFX`);
                                 } catch (err) {
                                     console.error(err);
-                                    console.error(`error when trying to commit the token staking transaction to the blockchain`);
-                                    alert(`error when trying to commit the token staking transaction to the blockchain`);
+                                    console.error(`error when trying to commit the purchase transaction to the blockchain`);
+                                    alert(`error when trying to commit the purchase transaction to the blockchain`);
                                 }
                             } else {
-                                console.log("token staking transaction cancelled");
+                                console.log("purchase transaction cancelled");
                             }
                         } catch (err) {
                             console.error(err);
-                            console.error(`error at the token staking transaction formation it was not commited`);
-                            alert(`error at the token staking transaction formation it was not commited`);
+                            console.error(`error at the purchase transaction formation it was not commited`);
+                            alert(`error at the purchase transaction formation it was not commited`);
                         }
                     }
                 }
@@ -1050,29 +1060,9 @@ class WalletHome extends React.Component {
                 if (err.toString().startsWith('not enough outputs')) {
                     alert(`choose fewer mixins`);
                 }
-                console.error(`error at the token transaction`);
+                console.error(`error at the purchase transaction`);
             }
         }
-
-
-
-
-        /*
-        export async function purchase_offer(wallet, amount, offer_id, quantity, address, mixin) {
-    let mixi = mixin >= 0 ? mixin : 6;
-    return wallet.createAdvancedTransaction({
-        tx_type: '5',
-        address: address,
-        amount: amount * 10000000000,
-        safex_offer_id: offer_id,
-        safex_purchase_quantity: quantity,
-        mixin: mixi
-    }).then((tx) => {
-        console.log(`purchase transaction created: ${tx.transactionsIds()}`);
-        return tx;
-    });
-}
-         */
     };
 
     copyAddressToClipboard = () => {
@@ -1080,6 +1070,92 @@ class WalletHome extends React.Component {
         alert('Copied address');
     };
 
+    make_edit_offer = async (e) => {
+        e.preventDefault();
+        e.persist();
+        console.log(`let's list the offer it`);
+        let vees = e.target;
+
+        console.log(vees.offerid.value);
+
+        let o_obj = {};
+        o_obj.twm_version = 1;
+
+        if (vees.description.value.length > 0) {
+            o_obj.description = vees.description.value;
+        }
+        if (vees.main_image.value.length > 0) {
+            o_obj.main_image = vees.main_image.value;
+        }
+        if (vees.sku.value.length > 0) {
+            o_obj.sku = vees.sku.value;
+        }
+        if (vees.barcode.value.length > 0) {
+            o_obj.barcode = vees.barcode.value;
+        }
+        if (vees.weight.value.length > 0) {
+            o_obj.weight = vees.weight.value;
+        }
+        if (vees.country.value.length > 0) {
+            o_obj.country = vees.country.value;
+        }
+        if (vees.message_type.value.length > 0) {
+            o_obj.message_type = vees.message_type.value;
+        }
+        if (vees.physical.value.length > 0) {
+            o_obj.physical = vees.physical.value;
+        }
+        let active = 0;
+        if (vees.active.value === 'True' || vees.active.value === 'true') {
+            active = 1;
+        }
+        try {
+            let mixins = vees.mixins.value - 1;
+            if (mixins >= 0) {
+                let confirmed = window.confirm(`are you sure you want to edit ${vees.title.value} offer id:  ${vees.offerid.value}?`);
+                console.log(confirmed);
+                console.log(vees.offerid.value);
+                console.log(vees.username.value);
+                console.log(vees.offerid.value);
+                if (confirmed) {
+                    let edit_txn = await edit_offer(
+                        wallet,
+                        vees.offerid.value,
+                        vees.username.value,
+                        vees.title.value,
+                        vees.price.value,
+                        vees.quantity.value,
+                        JSON.stringify(o_obj),
+                        active,
+                        mixins
+                    );
+                    let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${edit_txn.fee() / 10000000000} SFX Safex Cash`);
+                    let fee = edit_txn.fee();
+                    let txid = edit_txn.transactionsIds();
+                    if (confirmed_fee) {
+                        try {
+                            let committed_edit_txn = await commit_txn(edit_txn);
+                            console.log(committed_edit_txn);
+                            console.log(edit_txn);
+                            alert(`edit offer committed 
+                                        transaction id: ${txid}
+                                        for offerid: ${vees.offerid.value}
+                                        titled: ${vees.title.value}
+                                        fee: ${fee / 10000000000} SFX`);
+                        } catch (err) {
+                            console.error(err);
+                            console.error(`error at committing the edit offer transaction for ${vees.offerid.value}`);
+                        }
+                    } else {
+                        alert(`your transaction was cancelled, no edit for the offer was completed`);
+                    }
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            console.error(`error at creating the edit offer transaction`);
+        }
+    };
 
     render() {
         const twmwallet = () => {
@@ -1375,8 +1451,50 @@ class WalletHome extends React.Component {
 
                     var non_listings_table = this.state.non_offers.map((listing, key) => {
                         console.log(listing);
+
                         try {
                             if (listing.seller === this.state.selected_user.username) {
+                                var data = {};
+                                data.description = '';
+                                data.main_image = '';
+                                data.sku = '';
+                                data.barcode = '';
+                                data.weight = '';
+                                data.country = '';
+                                data.message_type = '';
+                                data.physical = '';
+                                try {
+                                    let parsed_data = JSON.parse(listing.description);
+                                    console.log(parsed_data);
+                                    if (parsed_data.twm_version === 1) {
+                                        if (parsed_data.hasOwnProperty('main_image')) {
+                                            data.main_image = parsed_data.main_image;
+                                        }
+                                        if (parsed_data.hasOwnProperty('description')) {
+                                            data.description = parsed_data.description;
+                                        }
+                                        if (parsed_data.hasOwnProperty('sku')) {
+                                            data.sku = parsed_data.sku;
+                                        }
+                                        if (parsed_data.hasOwnProperty('barcode')) {
+                                            data.barcode = parsed_data.barcode;
+                                        }
+                                        if (parsed_data.hasOwnProperty('weight')) {
+                                            data.weight = parsed_data.weight;
+                                        }
+                                        if (parsed_data.hasOwnProperty('country')) {
+                                            data.country = parsed_data.country;
+                                        }
+                                        if (parsed_data.hasOwnProperty('message_type')) {
+                                            data.message_type = parsed_data.message_type;
+                                        }
+                                        if (parsed_data.hasOwnProperty('physical')) {
+                                            data.physical = parsed_data.physical;
+                                        }
+                                    }
+                                } catch (err) {
+                                    console.error(err);
+                                }
                                 return <tr key={key}>
                                     <td>{listing.title}</td>
                                     <td>{listing.quantity}</td>
@@ -1385,7 +1503,64 @@ class WalletHome extends React.Component {
                                     <td>{this.to_ellipsis(listing.offerID)}</td>
 
                                     <td>
-                                        <Button variant="warning">EDIT</Button>
+                                        <Col className="align-self-center" md={2}>
+                                            <Button block size="lg" variant="success"
+                                                    onClick={() => this.handleShowEditOfferForm(listing)}>
+                                                EDIT
+                                            </Button>
+                                            <Modal className="new-account-form" animation={false}
+                                                   show={this.state.show_edit_offer_form}
+                                                   onHide={this.handleCloseEditOfferForm}>
+                                                <Modal.Header closeButton>
+                                                    <Modal.Title>Editing {this.state.show_edit_offer.title}</Modal.Title>
+                                                </Modal.Header>
+                                                <Modal.Body>
+
+                                                    <Form id="edit_offer"
+                                                          onSubmit={(e) => this.make_edit_offer(e, this.state.show_edit_offer)}>
+
+                                                        Offer ID <Form.Control name="offerid"
+                                                                               value={this.state.show_edit_offer.offerID}/>
+                                                        username <Form.Control name="username"
+                                                                               value={this.state.show_edit_offer.seller}/>
+                                                        thumbnail image url <Form.Control name="main_image"
+                                                                                          defaultValue={data.main_image}/>
+                                                        title <Form.Control name="title"
+                                                                            defaultValue={this.state.show_edit_offer.title}/>
+                                                        description <Form.Control maxLength="200" as="textarea"
+                                                                                  name="description"
+                                                                                  defaultValue={data.description}/>
+                                                        price SFX <Form.Control name="price"
+                                                                                defaultValue={this.state.show_edit_offer.price / 10000000000}/>
+                                                        available quantity <Form.Control name="quantity"
+                                                                                         defaultValue={this.state.show_edit_offer.quantity}/>
+                                                        SKU <Form.Control name="sku" defaultValue={data.sku}/>
+                                                        Barcode (ISBN, UPC, GTIN, etc) <Form.Control
+                                                        name="barcode" defaultValue={data.barcode}/>
+
+                                                        Message Type <Form.Control name="message_type"
+                                                                                   defaultValue={data.message_type}/>
+                                                        Weight <Form.Control name="weight" defaultValue={data.weight}/>
+                                                        Physical Item? <Form.Control name="physical"
+                                                                                     defaultValue={data.physical}/>
+                                                        Country of Origin <Form.Control name="country"
+                                                                                        defaultValue={data.country}
+                                                                                        placedholder="your location"/>
+                                                        Set Active <Form.Control name="active"
+                                                                                 defaultValue={this.state.show_edit_offer.active}/>
+                                                        mixins <Form.Control name="mixins" defaultValue="7"
+                                                                             placedholder="your location"/>
+
+                                                        <Button type="submit" variant="success">Submit Edit</Button>
+                                                    </Form>
+                                                </Modal.Body>
+                                                <Modal.Footer className="align-self-start">
+                                                    <Button variant="danger" onClick={this.handleCloseEditOfferForm}>
+                                                        Close
+                                                    </Button>
+                                                </Modal.Footer>
+                                            </Modal>
+                                        </Col>
                                     </td>
                                 </tr>
                             }
@@ -1476,11 +1651,8 @@ class WalletHome extends React.Component {
 
                                             {accounts_table}
                                         </Col>
-
-
                                         {selected !== void (0) ? (
                                             <Col md={3}
-
                                                  className="no-gutters d-flex flex-column align-items-center merchant_profile_view text-align-center"
                                             >
                                                 <Row>
@@ -1557,7 +1729,6 @@ class WalletHome extends React.Component {
                                         </Col>
                                     </Row>
 
-
                                     <Col lg className="merchant_product_view no-gutters mt-5">
                                         {selected !== void (0) ? (
                                             <Row className="p-2 justify-content-center">
@@ -1618,7 +1789,6 @@ class WalletHome extends React.Component {
                                                             <th>Seller</th>
                                                             <th>Offer ID</th>
                                                         </tr>
-
                                                         </thead>
                                                         <tbody>
                                                         {twm_listings_table}
@@ -1635,10 +1805,8 @@ class WalletHome extends React.Component {
                                                     <th>Seller</th>
                                                     <th>Offer ID</th>
                                                     <th>Actions</th>
-
                                                 </tr>
                                                 </thead>
-
                                                 <tbody>
                                                 {non_listings_table}
                                                 </tbody>
@@ -1666,17 +1834,11 @@ class WalletHome extends React.Component {
                             interval[i] = bit.interval * 100;
                             interest[i] = bit.cash_per_token / 10000000000;
                         }
-
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the interval loading of stacking`);
                     }
-                
-
-
                     return (
-
-
                         <div className="wallet no-gutters flex-column border-bottom border-white oflow-y-scroll">
 
                             <h1 className="text-center m-2"> Token Management </h1>
@@ -1726,10 +1888,7 @@ class WalletHome extends React.Component {
                                         </tbody>
                                     </Table>
                                 </Col>
-
-
                             </Row>
-
 
                             <Row className="no-gutters pt-3">
 
@@ -1746,7 +1905,6 @@ class WalletHome extends React.Component {
                                             Stake Tokens
                                         </Button>
                                     </Form>
-
                                 </Col>
                                 <Col className="height-fit-content align-self-center dark-orange">
                                     <Table>
@@ -1818,8 +1976,6 @@ class WalletHome extends React.Component {
                                         </tr>
                                         </tfoot>
                                     </Table>
-
-
                                 </Col>
 
                                 <Col className="wallet-box mb-2 mr-2 ml-2 p-2 font-size-small">
@@ -1858,7 +2014,6 @@ class WalletHome extends React.Component {
                     return <h1>Major Error</h1>
             }
         };
-
 
         return (
             <Container className="height100 justify-content-between whtie-text" fluid>
