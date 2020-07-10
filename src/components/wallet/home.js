@@ -1400,7 +1400,32 @@ class WalletHome extends React.Component {
                         try {
                             let parsed_data = JSON.parse(listing.data);
                             if (parsed_data.twm_version === 1) {
-                                data = parsed_data;
+                                if (parsed_data.hasOwnProperty('main_image')) {
+                                    data.main_image = parsed_data.main_image;
+                                }
+                                if (parsed_data.hasOwnProperty('description')) {
+                                    data.description = parsed_data.description;
+                                }
+                                if (parsed_data.hasOwnProperty('sku')) {
+                                    data.sku = parsed_data.sku;
+                                }
+                                if (parsed_data.hasOwnProperty('barcode')) {
+                                    data.barcode = parsed_data.barcode;
+                                }
+                                if (parsed_data.hasOwnProperty('weight')) {
+                                    data.weight = parsed_data.weight;
+                                }
+                                if (parsed_data.hasOwnProperty('country')) {
+                                    data.country = parsed_data.country;
+                                }
+                                if (parsed_data.hasOwnProperty('message_type')) {
+                                    data.message_type = parsed_data.message_type;
+                                }
+                                if (parsed_data.hasOwnProperty('physical')) {
+                                    data.physical = parsed_data.physical;
+                                }
+
+
                             }
                         } catch (err) {
                             console.error(err);
@@ -1432,44 +1457,41 @@ class WalletHome extends React.Component {
 
                                                     <Form id="edit_offer"
                                                           onSubmit={(e) => this.edit_offer(e, this.state.show_edit_offer)}>
-                                                        <ul>
-                                                            username <Form.Control name="username"
-                                                                                   value={this.state.show_edit_offer.username}/>
-                                                            thumbnail image url <Form.Control name="main_image"
-                                                                                              defaultValue={data.main_image}/>
-                                                            title <Form.Control name="title"/>
-                                                            description <Form.Control maxLength="200" as="textarea"
-                                                                                      name="description"/>
-                                                            price SFX <Form.Control name="price"/>
-                                                            available quantity <Form.Control name="quantity"/>
-                                                            SKU <Form.Control name="sku"/>
-                                                            Barcode (ISBN, UPC, GTIN, etc) <Form.Control
-                                                            name="barcode"/>
 
-                                                            Message Type <Form.Control name="message_type"/>
-                                                            Weight <Form.Control name="weight"/>
-                                                            Physical Item? <Form.Control name="physical" value="true"/>
-                                                            Country of Origin <Form.Control name="country"
-                                                                                            defaultValue="Earth"
-                                                                                            placedholder="your location"/>
-                                                            mixins <Form.Control name="mixins" defaultValue="7"
-                                                                                 placedholder="your location"/>
+                                                        Offer ID <Form.Control name="offerid"
+                                                                               value={this.state.show_edit_offer.offerID}/>
+                                                        username <Form.Control name="username"
+                                                                               value={this.state.show_edit_offer.seller}/>
+                                                        thumbnail image url <Form.Control name="main_image"
+                                                                                          defaultValue={data.main_image}/>
+                                                        title <Form.Control name="title"
+                                                                            defaultValue={this.state.show_edit_offer.title}/>
+                                                        description <Form.Control maxLength="200" as="textarea"
+                                                                                  name="description"
+                                                                                  defaultValue={data.description}/>
+                                                        price SFX <Form.Control name="price"
+                                                                                defaultValue={this.state.show_edit_offer.price / 10000000000}/>
+                                                        available quantity <Form.Control name="quantity"
+                                                                                         defaultValue={this.state.show_edit_offer.quantity}/>
+                                                        SKU <Form.Control name="sku" defaultValue={data.sku}/>
+                                                        Barcode (ISBN, UPC, GTIN, etc) <Form.Control
+                                                        name="barcode" defaultValue={data.barcode}/>
 
-                                                            <li>{this.state.show_edit_offer.title}</li>
-                                                            <li>{this.state.show_edit_offer.price / 10000000000}</li>
-                                                            <li>{this.state.show_edit_offer.seller}</li>
-                                                            <li>{this.to_ellipsis(this.state.show_edit_offer.offerID)}</li>
-                                                        </ul>
-
-                                                        {this.state.show_edit_offer.quantity} available <Form.Control
-                                                        className="light-blue-back"
-                                                        id="quantity"
-                                                        name="quantity"/>
-                                                        Send Message <Form.Control name="message"/>
-                                                        Mixins <Form.Control name="mixins" value="1"/>
+                                                        Message Type <Form.Control name="message_type"
+                                                                                   defaultValue={data.message_type}/>
+                                                        Weight <Form.Control name="weight" defaultValue={data.weight}/>
+                                                        Physical Item? <Form.Control name="physical" value="true"
+                                                                                     defaultValue={data.physical}/>
+                                                        Country of Origin <Form.Control name="country"
+                                                                                        defaultValue={data.country}
+                                                                                        placedholder="your location"/>
+                                                        Set Active <Form.Control name="active"
+                                                                                 defaultValue={this.state.show_edit_offer.active}/>
+                                                        mixins <Form.Control name="mixins" defaultValue="7"
+                                                                             placedholder="your location"/>
 
 
-                                                        <Button type="submit" variant="success">Confirm Payment</Button>
+                                                        <Button type="submit" variant="success">Submit Edit</Button>
                                                     </Form>
                                                 </Modal.Body>
                                                 <Modal.Footer className="align-self-start">
