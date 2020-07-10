@@ -74,7 +74,7 @@ export async function edit_offer(wallet, offerid, username, offer_title, offer_p
         safex_offer_id: offerid,
         safex_username: username,
         safex_offer_title: offer_title,
-        safex_offer_price: offer_price,
+        safex_offer_price: offer_price * 10000000000,
         safex_offer_quantity: offer_quantity,
         safex_offer_description: offer_description,
         safex_offer_active: active,

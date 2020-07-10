@@ -14,7 +14,8 @@ import {
     stake_tokens,
     unstake_tokens,
     commit_txn,
-    purchase_offer
+    purchase_offer,
+    edit_offer
 } from "../../utils/wallet_actions";
 
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
@@ -752,7 +753,7 @@ class WalletHome extends React.Component {
     list_new_offer = (e) => {
         e.preventDefault();
         e.persist();
-        console.log(`let's register it`);
+        console.log(`let's list the offer it`);
         let vees = e.target;
 
         let o_obj = {};
@@ -1062,24 +1063,6 @@ class WalletHome extends React.Component {
                 console.error(`error at the purchase transaction`);
             }
         }
-
-
-        /*
-        export async function purchase_offer(wallet, amount, offer_id, quantity, address, mixin) {
-    let mixi = mixin >= 0 ? mixin : 6;
-    return wallet.createAdvancedTransaction({
-        tx_type: '5',
-        address: address,
-        amount: amount * 10000000000,
-        safex_offer_id: offer_id,
-        safex_purchase_quantity: quantity,
-        mixin: mixi
-    }).then((tx) => {
-        console.log(`purchase transaction created: ${tx.transactionsIds()}`);
-        return tx;
-    });
-}
-         */
     };
 
     copyAddressToClipboard = () => {
@@ -1087,8 +1070,92 @@ class WalletHome extends React.Component {
         alert('Copied address');
     };
 
-    edit_offer = async (e, listing) => {
+    make_edit_offer = async (e) => {
+        e.preventDefault();
+        e.persist();
+        console.log(`let's list the offer it`);
+        let vees = e.target;
 
+        console.log(vees.offerid.value);
+
+        let o_obj = {};
+        o_obj.twm_version = 1;
+
+
+        if (vees.description.value.length > 0) {
+            o_obj.description = vees.description.value;
+        }
+        if (vees.main_image.value.length > 0) {
+            o_obj.main_image = vees.main_image.value;
+        }
+        if (vees.sku.value.length > 0) {
+            o_obj.sku = vees.sku.value;
+        }
+        if (vees.barcode.value.length > 0) {
+            o_obj.barcode = vees.barcode.value;
+        }
+        if (vees.weight.value.length > 0) {
+            o_obj.weight = vees.weight.value;
+        }
+        if (vees.country.value.length > 0) {
+            o_obj.country = vees.country.value;
+        }
+        if (vees.message_type.value.length > 0) {
+            o_obj.message_type = vees.message_type.value;
+        }
+        if (vees.physical.value.length > 0) {
+            o_obj.physical = vees.physical.value;
+        }
+        let active = 0;
+        if (vees.active.value === 'True' || vees.active.value === 'true') {
+            active = 1;
+        }
+        try {
+            let mixins = vees.mixins.value - 1;
+            if (mixins >= 0) {
+                let confirmed = window.confirm(`are you sure you want to edit ${vees.title.value} offer id:  ${vees.offerid.value}?`);
+                console.log(confirmed);
+                console.log(vees.offerid.value);
+                console.log(vees.username.value);
+                console.log(vees.offerid.value);
+                if (confirmed) {
+                    let edit_txn = await edit_offer(
+                        wallet,
+                        vees.offerid.value,
+                        vees.username.value,
+                        vees.title.value,
+                        vees.price.value,
+                        vees.quantity.value,
+                        JSON.stringify(o_obj),
+                        active,
+                        mixins
+                    );
+                    let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${edit_txn.fee() / 10000000000} SFX Safex Cash`);
+                    let fee = edit_txn.fee();
+                    let txid = edit_txn.transactionsIds();
+                    if (confirmed_fee) {
+                        try {
+                            let committed_edit_txn = await commit_txn(edit_txn);
+                            console.log(committed_edit_txn);
+                            console.log(edit_txn);
+                            alert(`edit offer committed 
+                                        transaction id: ${txid}
+                                        for offerid: ${vees.offerid.value}
+                                        titled: ${vees.title.value}
+                                        fee: ${fee / 10000000000} SFX`);
+                        } catch (err) {
+                            console.error(err);
+                            console.error(`error at committing the edit offer transaction for ${vees.offerid.value}`);
+                        }
+                    } else {
+                        alert(`your transaction was cancelled, no edit for the offer was completed`);
+                    }
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            console.error(`error at creating the edit offer transaction`);
+        }
     };
 
     render() {
@@ -1454,7 +1521,7 @@ class WalletHome extends React.Component {
                                                 <Modal.Body>
 
                                                     <Form id="edit_offer"
-                                                          onSubmit={(e) => this.edit_offer(e, this.state.show_edit_offer)}>
+                                                          onSubmit={(e) => this.make_edit_offer(e, this.state.show_edit_offer)}>
 
                                                         Offer ID <Form.Control name="offerid"
                                                                                value={this.state.show_edit_offer.offerID}/>
@@ -1478,7 +1545,7 @@ class WalletHome extends React.Component {
                                                         Message Type <Form.Control name="message_type"
                                                                                    defaultValue={data.message_type}/>
                                                         Weight <Form.Control name="weight" defaultValue={data.weight}/>
-                                                        Physical Item? <Form.Control name="physical" value="true"
+                                                        Physical Item? <Form.Control name="physical"
                                                                                      defaultValue={data.physical}/>
                                                         Country of Origin <Form.Control name="country"
                                                                                         defaultValue={data.country}
