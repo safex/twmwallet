@@ -990,9 +990,6 @@ class WalletHome extends React.Component {
 
         let total_cost = e.target.quantity.value * (listing.price / 10000000000);
 
-        if (e.target.quantity.value <= listing.quantity && e.target.quantity.value > 0 && total_cost < this.state.cash) {
-
-        }
         let alert_bool = false;
         let alert_text = ``;
 
@@ -1092,7 +1089,7 @@ class WalletHome extends React.Component {
 
     edit_offer = async (e, listing) => {
 
-    }
+    };
 
     render() {
         const twmwallet = () => {
