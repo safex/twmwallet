@@ -292,8 +292,8 @@ class WalletHome extends React.Component {
     };
 
     rescan = (e) => {
-        let confirmed = window.confirm("are you sure you want to continue, " +
-            "this will halt the wallet operation while the rescan is in progress");
+        let confirmed = window.confirm("Are you sure you want to continue? " +
+            "This will halt the wallet operation while the rescan is in progress.");
         console.log(confirmed);
         if (confirmed) {
             wallet.off();
@@ -1067,7 +1067,7 @@ class WalletHome extends React.Component {
 
     copyAddressToClipboard = () => {
         copy(this.state.address);
-        alert('Copied address');
+        alert('Copied address!');
     };
 
     make_edit_offer = async (e) => {
@@ -1174,10 +1174,10 @@ class WalletHome extends React.Component {
 
                                     <ul>
                                         <Row>
-                                            <li>{this.state.cash} SFX |</li>
+                                            <li>{this.state.cash} SFX </li>
 
                                             {this.state.pending_cash > 0 ?
-                                                (<li>| {this.state.pending_cash} Pending</li>) : ''}
+                                                (<li>. || {this.state.pending_cash} Pending</li>) : ''}
                                         </Row>
                                         {this.state.pending_cash > 0 ?
                                             (<li>{this.state.cash + this.state.pending_cash} NET</li>) : ''}
@@ -1202,10 +1202,10 @@ class WalletHome extends React.Component {
 
 
                             <Col className="accounts" sm={8}>
-                                <div className="account-list">
-                                    <h2 className="text-center m-2"> Accounts </h2>
-                                    {accounts_table}
-
+                                <div className="account-list justify-content-center">
+                                    <h2 className="text-center m-2">If you are reading this,</h2> 
+                                    <h2 className="text-center m-2">You are part of the few chosen to help free humanity.</h2> 
+                                    <h1 className="text-center m-2">Together we can make history.</h1>
                                 </div>
 
 
@@ -1503,16 +1503,16 @@ class WalletHome extends React.Component {
                                     <td>{this.to_ellipsis(listing.offerID)}</td>
 
                                     <td>
-                                        <Col className="align-self-center" md={2}>
-                                            <Button block size="lg" variant="success"
-                                                    onClick={() => this.handleShowEditOfferForm(listing)}>
+                                    <Col className="align-self-center" md={2}>
+                                            <Button size="lg" variant="success"
+                                                    onClick={() => this.handleShowEditOfferForm()}>
                                                 EDIT
                                             </Button>
                                             <Modal className="new-account-form" animation={false}
                                                    show={this.state.show_edit_offer_form}
                                                    onHide={this.handleCloseEditOfferForm}>
                                                 <Modal.Header closeButton>
-                                                    <Modal.Title>Editing {this.state.show_edit_offer.title}</Modal.Title>
+                                                    <Modal.Title>Edit Offer {this.state.show_edit_offer.title}</Modal.Title>
                                                 </Modal.Header>
                                                 <Modal.Body>
 
@@ -1521,22 +1521,23 @@ class WalletHome extends React.Component {
 
                                                         Offer ID <Form.Control name="offerid"
                                                                                value={this.state.show_edit_offer.offerID}/>
-                                                        username <Form.Control name="username"
+                                                        Username <Form.Control name="username"
                                                                                value={this.state.show_edit_offer.seller}/>
-                                                        thumbnail image url <Form.Control name="main_image"
+                                                        Image URL <Form.Control name="main_image"
                                                                                           defaultValue={data.main_image}/>
-                                                        title <Form.Control name="title"
+                                                        Title <Form.Control name="title"
                                                                             defaultValue={this.state.show_edit_offer.title}/>
-                                                        description <Form.Control maxLength="200" as="textarea"
+                                                        Description <Form.Control maxLength="200" as="textarea"
                                                                                   name="description"
                                                                                   defaultValue={data.description}/>
-                                                        price SFX <Form.Control name="price"
+                                                        Price (SFX) <Form.Control name="price"
                                                                                 defaultValue={this.state.show_edit_offer.price / 10000000000}/>
-                                                        available quantity <Form.Control name="quantity"
+                                                        Available Quantity <Form.Control name="quantity"
                                                                                          defaultValue={this.state.show_edit_offer.quantity}/>
-                                                        SKU <Form.Control name="sku" defaultValue={data.sku}/>
-                                                        Barcode (ISBN, UPC, GTIN, etc) <Form.Control
-                                                        name="barcode" defaultValue={data.barcode}/>
+                                                        SKU <Form.Control name="sku" 
+                                                                          defaultValue={data.sku}/>
+                                                        Barcode (ISBN, UPC, GTIN, etc) <Form.Control name="barcode" 
+                                                                                                     defaultValue={data.barcode}/>
 
                                                         Message Type <Form.Control name="message_type"
                                                                                    defaultValue={data.message_type}/>
@@ -1548,14 +1549,14 @@ class WalletHome extends React.Component {
                                                                                         placedholder="your location"/>
                                                         Set Active <Form.Control name="active"
                                                                                  defaultValue={this.state.show_edit_offer.active}/>
-                                                        mixins <Form.Control name="mixins" defaultValue="7"
+                                                        Mixins <Form.Control name="mixins" defaultValue="7"
                                                                              placedholder="your location"/>
 
-                                                        <Button type="submit" variant="success">Submit Edit</Button>
+                                                        <Button block size="lg" type="submit" variant="success">Submit Edit</Button>
                                                     </Form>
                                                 </Modal.Body>
                                                 <Modal.Footer className="align-self-start">
-                                                    <Button variant="danger" onClick={this.handleCloseEditOfferForm}>
+                                                    <Button size="lg" variant="danger" onClick={this.handleCloseEditOfferForm}>
                                                         Close
                                                     </Button>
                                                 </Modal.Footer>
@@ -1715,7 +1716,7 @@ class WalletHome extends React.Component {
                                                         Mixins <Form.Control name="mixins" defaultValue="7"
                                                                              placedholder="your location"/>
 
-                                                        <Button block lg variant="success" type="submit">Create
+                                                        <Button block size="lg" variant="success" type="submit">Create
                                                             Account</Button>
                                                     </Form>
                                                 </Modal.Body>
@@ -1746,14 +1747,14 @@ class WalletHome extends React.Component {
                                                     <Modal.Body>
 
                                                         <Form id="list_new_offer" onSubmit={this.list_new_offer}>
-                                                            username <Form.Control name="username"
+                                                            Username <Form.Control name="username"
                                                                                    value={selected.username}/>
-                                                            thumbnail image url <Form.Control name="main_image"/>
-                                                            title <Form.Control name="title"/>
-                                                            description <Form.Control maxLength="200" as="textarea"
+                                                            Image URL <Form.Control name="main_image"/>
+                                                            Title <Form.Control name="title"/>
+                                                            Description <Form.Control maxLength="200" as="textarea"
                                                                                       name="description"/>
-                                                            price SFX <Form.Control name="price"/>
-                                                            available quantity <Form.Control name="quantity"/>
+                                                            Price (SFX) <Form.Control name="price"/>
+                                                            Available Quantity <Form.Control name="quantity"/>
                                                             SKU <Form.Control name="sku"/>
                                                             Barcode (ISBN, UPC, GTIN, etc) <Form.Control
                                                             name="barcode"/>
@@ -1764,14 +1765,15 @@ class WalletHome extends React.Component {
                                                             Country of Origin <Form.Control name="country"
                                                                                             defaultValue="Earth"
                                                                                             placedholder="your location"/>
-                                                            mixins <Form.Control name="mixins" defaultValue="7"
+                                                            Mixins <Form.Control name="mixins" defaultValue="7"
                                                                                  placedholder="your location"/>
-                                                            <Button block lg variant="success" type="submit">List
-                                                                Offer</Button>
+                                                            <Button block size="lg" variant="success" type="submit">
+                                                                List Offer
+                                                            </Button>
                                                         </Form>
                                                     </Modal.Body>
                                                     <Modal.Footer className="align-self-start">
-                                                        <Button variant="danger" onClick={this.handleCloseNewOfferForm}>
+                                                        <Button size="lg" variant="danger" onClick={this.handleCloseNewOfferForm}>
                                                             Close
                                                         </Button>
                                                     </Modal.Footer>
@@ -1808,7 +1810,7 @@ class WalletHome extends React.Component {
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                {non_listings_table}
+                                                    {non_listings_table}
                                                 </tbody>
                                             </Table>
                                         </Row>
