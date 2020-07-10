@@ -1200,7 +1200,7 @@ class WalletHome extends React.Component {
                                                     id="quantity"
                                                     name="quantity"/>
                                                     Send Message <Form.Control name="message"/>
-                                                    Mixins <Form.Control name="mixins" defaultValue="7"/>
+                                                    Mixins <Form.Control name="mixins" value="1"/>
 
 
                                                     <Button type="submit" variant="success">Confirm Payment</Button>
