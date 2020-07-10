@@ -67,6 +67,37 @@ export async function purchase_offer(wallet, cost, offer_id, quantity, mixin) {
     });
 }
 
+export async function edit_offer(wallet, offerid, username, offer_title, offer_price, offer_quantity, offer_description, active, mixin) {
+    let mixi = mixin >= 0 ? mixin : 6;
+    return wallet.createAdvancedTransaction({
+        tx_type: '9',
+        safex_offer_id: offerid,
+        safex_username: username,
+        safex_offer_title: offer_title,
+        safex_offer_price: offer_price,
+        safex_offer_quantity: offer_quantity,
+        safex_offer_description: offer_description,
+        safex_offer_active: active,
+        mixin: mixi
+    }).then((tx) => {
+        console.log(`edit offer transaction created: ${tx.transactionsIds()}`);
+        return tx;
+    });
+}
+
+export async function edit_account(wallet, username, data, mixin) {
+    let mixi = mixin >= 0 ? mixin : 6;
+    return wallet.createAdvancedTransaction({
+        tx_type: '7',
+        safex_username: username,
+        safex_data: data,
+        mixin: mixi
+    }).then((tx) => {
+        console.log(`edit account transaction created: ${tx.transactionsIds()}`);
+        return tx;
+    });
+}
+
 export async function create_price_oracle(wallet, title, creator, description, currency, rate, mixin) {
     let mixi = mixin >= 0 ? mixin : 6;
     return wallet.createAdvancedTransaction({
