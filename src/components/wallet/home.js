@@ -973,6 +973,8 @@ class WalletHome extends React.Component {
         e.preventDefault();
         console.log(listing);
         console.log(e.target.quantity.value);
+        console.log(`mixins`);
+        console.log(e.target.mixins.value);
 
         let total_cost = e.target.quantity.value * (listing.price / 10000000000);
 
@@ -1002,20 +1004,21 @@ class WalletHome extends React.Component {
                 let mixins = e.target.mixins.value - 1;
                 if (mixins >= 0) {
 
+                    let amount = e.target.quantity.value;
                     let confirmed = window.confirm(`are you sure you want to purchase ${e.target.quantity.value} of ${listing.title} for a total of ${total_cost}?`);
                     console.log(confirmed);
                     if (confirmed) {
                         try {
                             let purchase_txn = await purchase_offer(
                                 wallet,
-                                e.target.quantity.value,
+                                total_cost,
                                 listing.offerID,
+                                e.target.quantity.value,
                                 mixins
                             );
                             let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${purchase_txn.fee() / 10000000000} SFX Safex Cash`);
                             let fee = purchase_txn.fee();
                             let txid = purchase_txn.transactionsIds();
-                            let amount = e.target.quantity.value;
                             console.log(purchase_txn);
                             if (confirmed_fee) {
                                 try {

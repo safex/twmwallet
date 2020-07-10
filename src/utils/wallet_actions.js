@@ -51,12 +51,13 @@ export async function unstake_tokens(wallet, amount, mixin) {
     });
 }
 
-export async function purchase_offer(wallet, amount, offer_id, quantity, mixin) {
+export async function purchase_offer(wallet, cost, offer_id, quantity, mixin) {
     let mixi = mixin >= 0 ? mixin : 6;
+    console.log(mixin);
     return wallet.createAdvancedTransaction({
         tx_type: '5',
         address: wallet.address(),
-        amount: amount * 10000000000,
+        amount: cost * 10000000000,
         safex_offer_id: offer_id,
         safex_purchase_quantity: quantity,
         mixin: mixi
