@@ -60,11 +60,13 @@ class WalletHome extends React.Component {
             show_new_offer_form: false,
             show_new_account_form: false,
             show_purchase_form: false,
+            show_edit_offer_form: false,
             blockchain_tokens_staked: 0,
             blockchain_interest_history: [],
             blockchain_current_interest: {},
             twm_file: {},
-            show_purchase_offer: {title: '', quantity: 0, offerID: '', seller: ''}
+            show_purchase_offer: {title: '', quantity: 0, offerID: '', seller: ''},
+            show_edit_offer: {}
         };
     }
 
@@ -730,6 +732,16 @@ class WalletHome extends React.Component {
         this.setState({show_new_account_form: true});
     };
 
+    //show modal of Edit Offer Form
+    handleShowEditOfferForm = (listing) => {
+        this.setState({show_edit_offer_form: true, show_edit_offer: listing});
+    };
+
+    //close modal of Edit Offer Form
+    handleCloseEditOfferForm = () => {
+        this.setState({show_edit_offer_form: false});
+    };
+
     //merchant
     load_offers = (username, index) => {
         this.setState({selected_user: {username: username, index: index}});
@@ -1080,6 +1092,9 @@ class WalletHome extends React.Component {
         alert('Copied address');
     };
 
+    edit_offer = async (e, listing) => {
+
+    }
 
     render() {
         const twmwallet = () => {
@@ -1375,6 +1390,12 @@ class WalletHome extends React.Component {
 
                     var non_listings_table = this.state.non_offers.map((listing, key) => {
                         console.log(listing);
+                        var data = {};
+                        try {
+
+                        } catch(err) {
+                            console.error(err);
+                        }
                         try {
                             if (listing.seller === this.state.selected_user.username) {
                                 return <tr key={key}>
@@ -1385,6 +1406,71 @@ class WalletHome extends React.Component {
                                     <td>{this.to_ellipsis(listing.offerID)}</td>
 
                                     <td>
+                                        <Col className="align-self-center" md={2}>
+                                            <Button block size="lg" variant="success"
+                                                    onClick={() => this.handleShowEditOfferForm(listing)}>
+                                                BUY
+                                            </Button>
+
+                                            <Modal className="new-account-form" animation={false}
+                                                   show={this.state.show_edit_offer}
+                                                   onHide={this.handleCloseEditOfferForm}>
+                                                <Modal.Header closeButton>
+                                                    <Modal.Title>Ready to
+                                                        Buy {this.state.show_purchase_offer.title}</Modal.Title>
+                                                </Modal.Header>
+                                                <Modal.Body>
+
+                                                    <Form id="edit_offer"
+                                                          onSubmit={(e) => this.edit_offer(e, this.state.show_edit_offer)}>
+                                                        <ul>
+                                                            username <Form.Control name="username"
+                                                                                    value={selected.username}/>
+                                                            thumbnail image url <Form.Control name="main_image"
+                                                                                              />
+                                                            title <Form.Control name="title"/>
+                                                            description <Form.Control maxLength="200" as="textarea"
+                                                                                      name="description"/>
+                                                            price SFX <Form.Control name="price"/>
+                                                            available quantity <Form.Control name="quantity"/>
+                                                            SKU <Form.Control name="sku"/>
+                                                            Barcode (ISBN, UPC, GTIN, etc) <Form.Control
+                                                                name="barcode"/>
+
+                                                            Message Type <Form.Control name="message_type"/>
+                                                            Weight <Form.Control name="weight"/>
+                                                            Physical Item? <Form.Control name="physical" value="true"/>
+                                                            Country of Origin <Form.Control name="country"
+                                                                                            defaultValue="Earth"
+                                                                                            placedholder="your location"/>
+                                                            mixins <Form.Control name="mixins" defaultValue="7"
+                                                                                 placedholder="your location"/>
+
+                                                            <li>{this.state.show_edit_offer.title}</li>
+                                                            <li>{this.state.show_edit_offer.price / 10000000000}</li>
+                                                            <li>{this.state.show_edit_offer.seller}</li>
+                                                            <li>{this.to_ellipsis(this.state.show_edit_offer.offerID)}</li>
+                                                        </ul>
+
+                                                        {this.state.show_edit_offer.quantity} available <Form.Control
+                                                        className="light-blue-back"
+                                                        id="quantity"
+                                                        name="quantity"/>
+                                                        Send Message <Form.Control name="message"/>
+                                                        Mixins <Form.Control name="mixins" value="1"/>
+
+
+                                                        <Button type="submit" variant="success">Confirm Payment</Button>
+                                                    </Form>
+                                                </Modal.Body>
+                                                <Modal.Footer className="align-self-start">
+
+                                                    <Button variant="danger" onClick={this.handleCloseEditOfferForm}>
+                                                        Close
+                                                    </Button>
+                                                </Modal.Footer>
+                                            </Modal>
+                                        </Col>
                                         <Button variant="warning">EDIT</Button>
                                     </td>
                                 </tr>
