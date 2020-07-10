@@ -1081,7 +1081,6 @@ class WalletHome extends React.Component {
         let o_obj = {};
         o_obj.twm_version = 1;
 
-
         if (vees.description.value.length > 0) {
             o_obj.description = vees.description.value;
         }
@@ -1492,8 +1491,6 @@ class WalletHome extends React.Component {
                                         if (parsed_data.hasOwnProperty('physical')) {
                                             data.physical = parsed_data.physical;
                                         }
-
-
                                     }
                                 } catch (err) {
                                     console.error(err);
@@ -1511,7 +1508,6 @@ class WalletHome extends React.Component {
                                                     onClick={() => this.handleShowEditOfferForm(listing)}>
                                                 EDIT
                                             </Button>
-
                                             <Modal className="new-account-form" animation={false}
                                                    show={this.state.show_edit_offer_form}
                                                    onHide={this.handleCloseEditOfferForm}>
@@ -1555,12 +1551,10 @@ class WalletHome extends React.Component {
                                                         mixins <Form.Control name="mixins" defaultValue="7"
                                                                              placedholder="your location"/>
 
-
                                                         <Button type="submit" variant="success">Submit Edit</Button>
                                                     </Form>
                                                 </Modal.Body>
                                                 <Modal.Footer className="align-self-start">
-
                                                     <Button variant="danger" onClick={this.handleCloseEditOfferForm}>
                                                         Close
                                                     </Button>
@@ -1657,11 +1651,8 @@ class WalletHome extends React.Component {
 
                                             {accounts_table}
                                         </Col>
-
-
                                         {selected !== void (0) ? (
                                             <Col md={3}
-
                                                  className="no-gutters d-flex flex-column align-items-center merchant_profile_view text-align-center"
                                             >
                                                 <Row>
@@ -1738,7 +1729,6 @@ class WalletHome extends React.Component {
                                         </Col>
                                     </Row>
 
-
                                     <Col lg className="merchant_product_view no-gutters mt-5">
                                         {selected !== void (0) ? (
                                             <Row className="p-2 justify-content-center">
@@ -1799,7 +1789,6 @@ class WalletHome extends React.Component {
                                                             <th>Seller</th>
                                                             <th>Offer ID</th>
                                                         </tr>
-
                                                         </thead>
                                                         <tbody>
                                                         {twm_listings_table}
@@ -1816,10 +1805,8 @@ class WalletHome extends React.Component {
                                                     <th>Seller</th>
                                                     <th>Offer ID</th>
                                                     <th>Actions</th>
-
                                                 </tr>
                                                 </thead>
-
                                                 <tbody>
                                                 {non_listings_table}
                                                 </tbody>
@@ -1847,16 +1834,11 @@ class WalletHome extends React.Component {
                             interval[i] = bit.interval * 100;
                             interest[i] = bit.cash_per_token / 10000000000;
                         }
-
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the interval loading of stacking`);
                     }
-
-
                     return (
-
-
                         <div className="wallet no-gutters flex-column border-bottom border-white oflow-y-scroll">
 
                             <h1 className="text-center m-2"> Token Management </h1>
@@ -1906,10 +1888,7 @@ class WalletHome extends React.Component {
                                         </tbody>
                                     </Table>
                                 </Col>
-
-
                             </Row>
-
 
                             <Row className="no-gutters pt-3">
 
@@ -1926,7 +1905,6 @@ class WalletHome extends React.Component {
                                             Stake Tokens
                                         </Button>
                                     </Form>
-
                                 </Col>
                                 <Col className="height-fit-content align-self-center dark-orange">
                                     <Table>
@@ -1998,8 +1976,6 @@ class WalletHome extends React.Component {
                                         </tr>
                                         </tfoot>
                                     </Table>
-
-
                                 </Col>
 
                                 <Col className="wallet-box mb-2 mr-2 ml-2 p-2 font-size-small">
@@ -2038,7 +2014,6 @@ class WalletHome extends React.Component {
                     return <h1>Major Error</h1>
             }
         };
-
 
         return (
             <Container className="height100 justify-content-between whtie-text" fluid>
