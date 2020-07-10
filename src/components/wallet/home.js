@@ -1037,23 +1037,23 @@ class WalletHome extends React.Component {
                                     let committed_txn = await commit_txn(purchase_txn);
                                     console.log(committed_txn);
                                     console.log(purchase_txn);
-                                    alert(`token unstake transaction committed  
+                                    alert(`purchase transaction committed
                                         transaction id: ${txid}
                                         amount: ${amount} of ${listing.title}
                                         costing: ${total_cost} SFX
                                         fee: ${fee / 10000000000} SFX`);
                                 } catch (err) {
                                     console.error(err);
-                                    console.error(`error when trying to commit the token staking transaction to the blockchain`);
-                                    alert(`error when trying to commit the token staking transaction to the blockchain`);
+                                    console.error(`error when trying to commit the purchase transaction to the blockchain`);
+                                    alert(`error when trying to commit the purchase transaction to the blockchain`);
                                 }
                             } else {
-                                console.log("token staking transaction cancelled");
+                                console.log("purchase transaction cancelled");
                             }
                         } catch (err) {
                             console.error(err);
-                            console.error(`error at the token staking transaction formation it was not commited`);
-                            alert(`error at the token staking transaction formation it was not commited`);
+                            console.error(`error at the purchase transaction formation it was not commited`);
+                            alert(`error at the purchase transaction formation it was not commited`);
                         }
                     }
                 }
@@ -1062,11 +1062,9 @@ class WalletHome extends React.Component {
                 if (err.toString().startsWith('not enough outputs')) {
                     alert(`choose fewer mixins`);
                 }
-                console.error(`error at the token transaction`);
+                console.error(`error at the purchase transaction`);
             }
         }
-
-
 
 
         /*
@@ -1391,9 +1389,20 @@ class WalletHome extends React.Component {
                     var non_listings_table = this.state.non_offers.map((listing, key) => {
                         console.log(listing);
                         var data = {};
+                        data.description = '';
+                        data.main_image = '';
+                        data.sku = '';
+                        data.barcode = '';
+                        data.weight = '';
+                        data.country = '';
+                        data.message_type = '';
+                        data.physical = '';
                         try {
-
-                        } catch(err) {
+                            let parsed_data = JSON.parse(listing.data);
+                            if (parsed_data.twm_version === 1) {
+                                data = parsed_data;
+                            }
+                        } catch (err) {
                             console.error(err);
                         }
                         try {
@@ -1413,11 +1422,11 @@ class WalletHome extends React.Component {
                                             </Button>
 
                                             <Modal className="new-account-form" animation={false}
-                                                   show={this.state.show_edit_offer}
+                                                   show={this.state.show_edit_offer_form}
                                                    onHide={this.handleCloseEditOfferForm}>
                                                 <Modal.Header closeButton>
                                                     <Modal.Title>Ready to
-                                                        Buy {this.state.show_purchase_offer.title}</Modal.Title>
+                                                        Buy {this.state.show_edit_offer.title}</Modal.Title>
                                                 </Modal.Header>
                                                 <Modal.Body>
 
@@ -1425,9 +1434,9 @@ class WalletHome extends React.Component {
                                                           onSubmit={(e) => this.edit_offer(e, this.state.show_edit_offer)}>
                                                         <ul>
                                                             username <Form.Control name="username"
-                                                                                    value={selected.username}/>
+                                                                                   value={this.state.show_edit_offer.username}/>
                                                             thumbnail image url <Form.Control name="main_image"
-                                                                                              />
+                                                                                              defaultValue={data.main_image}/>
                                                             title <Form.Control name="title"/>
                                                             description <Form.Control maxLength="200" as="textarea"
                                                                                       name="description"/>
@@ -1435,7 +1444,7 @@ class WalletHome extends React.Component {
                                                             available quantity <Form.Control name="quantity"/>
                                                             SKU <Form.Control name="sku"/>
                                                             Barcode (ISBN, UPC, GTIN, etc) <Form.Control
-                                                                name="barcode"/>
+                                                            name="barcode"/>
 
                                                             Message Type <Form.Control name="message_type"/>
                                                             Weight <Form.Control name="weight"/>
