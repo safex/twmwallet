@@ -29,8 +29,8 @@ export default class LegacyKeys extends React.Component {
             this.setState({safex_keys: safex_array});
 
         } catch (e) {
-            console.log(`the parsed wallet didn't make it over to the component`);
-            alert("there was an error loading the wallet you might not have any safex keys");
+            console.log(`The parsed wallet didn't make it over to the component`);
+            alert("There was an error loading the wallet. You might not have any Safex keys.");
             this.props.history.push({pathname: '/'})
         }
     }
@@ -65,7 +65,7 @@ export default class LegacyKeys extends React.Component {
                 <tr>
                     <td>{safex_keys[key].public_addr.slice(0, 5) + "..." + safex_keys[key].public_addr.slice(96, 102)}</td>
                     <td>
-                        <button onClick={() => this.proceed_to_import(key)}>restore this key</button>
+                        <button onClick={() => this.proceed_to_import(key)}>Restore Key</button>
                     </td>
                 </tr>
             );
@@ -75,7 +75,7 @@ export default class LegacyKeys extends React.Component {
                 <Container className="d-flex">
                 <div className="entry-form">
                     <div className="align-self-start">
-                        <Button variant="warning" onClick={this.exit_home}>Home</Button>    
+                        <Button variant="danger" onClick={this.exit_home}>Home</Button>    
                     </div>
                     
                     
@@ -86,7 +86,7 @@ export default class LegacyKeys extends React.Component {
                             </p>
 
                             <div>
-                                <Button onClick={this.return_to_entry}>Exit Legacy Mode</Button>
+                                <Button variant="danger" onClick={this.return_to_entry}>Exit Legacy Mode</Button>
                             </div>
                         
                     

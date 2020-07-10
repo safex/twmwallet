@@ -8,7 +8,14 @@ import {withRouter} from 'react-router-dom';
 
 import {normalize_8decimals} from '../../utils/wallet_creation';
 
-import {send_cash, send_tokens, stake_tokens, unstake_tokens, commit_txn} from "../../utils/wallet_actions";
+import {
+    send_cash,
+    send_tokens,
+    stake_tokens,
+    unstake_tokens,
+    commit_txn,
+    purchase_offer
+} from "../../utils/wallet_actions";
 
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
 
@@ -52,10 +59,12 @@ class WalletHome extends React.Component {
             selected_user: {}, //merchant element
             show_new_offer_form: false,
             show_new_account_form: false,
+            show_purchase_form: false,
             blockchain_tokens_staked: 0,
             blockchain_interest_history: [],
             blockchain_current_interest: {},
-            twm_file: {}
+            twm_file: {},
+            show_purchase_offer: {title: '', quantity: 0, offerID: '', seller: ''}
         };
     }
 
@@ -75,7 +84,6 @@ class WalletHome extends React.Component {
             storage_hash.update(twm_ls);
 
             let s_hash = storage_hash.digest('hex');
-
 
 
             const parse_hash = crypto.createHash('sha256');
@@ -707,6 +715,16 @@ class WalletHome extends React.Component {
         this.setState({show_new_account_form: false});
     };
 
+    //close modal of Purchase Form
+    handleClosePurchaseForm = () => {
+        this.setState({show_purchase_form: false});
+    };
+
+    //show modal of Purchase Form
+    handleShowPurchaseForm = (listing) => {
+        this.setState({show_purchase_form: true, show_purchase_offer: listing});
+    };
+
     //show modal of new account
     handleShowNewAccountForm = () => {
         this.setState({show_new_account_form: true});
@@ -949,14 +967,118 @@ class WalletHome extends React.Component {
         return (
             ellipse
         )
+    };
 
-    }
+    purchase_item = async (e, listing) => {
+        e.preventDefault();
+        console.log(listing);
+        console.log(e.target.quantity.value);
+        console.log(`mixins`);
+        console.log(e.target.mixins.value);
+
+        let total_cost = e.target.quantity.value * (listing.price / 10000000000);
+
+        if (e.target.quantity.value <= listing.quantity && e.target.quantity.value > 0 && total_cost < this.state.cash) {
+
+        }
+        let alert_bool = false;
+        let alert_text = ``;
+
+        if (e.target.quantity.value < 1) {
+            alert_text += ` quantity can not be 0 or negative :)`;
+            alert_bool = true;
+        }
+        if (e.target.quantity.value > listing.quantity) {
+            alert_text += ` not enough quantity available: you wanted ${e.target.quantity.value} there are ${listing.quantity} available`;
+            alert_bool = true;
+        }
+        if (total_cost > this.state.cash) {
+            alert_text += ` not enough SFX available for this purchase: total cost: ${total_cost} SFX, your balance: ${this.state.cash} SFX`;
+            alert_bool = true;
+        }
+
+        if (alert_bool) {
+            alert(alert_text);
+        } else {
+            try {
+                let mixins = e.target.mixins.value - 1;
+                if (mixins >= 0) {
+
+                    let amount = e.target.quantity.value;
+                    let confirmed = window.confirm(`are you sure you want to purchase ${e.target.quantity.value} of ${listing.title} for a total of ${total_cost}?`);
+                    console.log(confirmed);
+                    if (confirmed) {
+                        try {
+                            let purchase_txn = await purchase_offer(
+                                wallet,
+                                total_cost,
+                                listing.offerID,
+                                e.target.quantity.value,
+                                mixins
+                            );
+                            let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${purchase_txn.fee() / 10000000000} SFX Safex Cash`);
+                            let fee = purchase_txn.fee();
+                            let txid = purchase_txn.transactionsIds();
+                            console.log(purchase_txn);
+                            if (confirmed_fee) {
+                                try {
+                                    let committed_txn = await commit_txn(purchase_txn);
+                                    console.log(committed_txn);
+                                    console.log(purchase_txn);
+                                    alert(`token unstake transaction committed  
+                                        transaction id: ${txid}
+                                        amount: ${amount} of ${listing.title}
+                                        costing: ${total_cost} SFX
+                                        fee: ${fee / 10000000000} SFX`);
+                                } catch (err) {
+                                    console.error(err);
+                                    console.error(`error when trying to commit the token staking transaction to the blockchain`);
+                                    alert(`error when trying to commit the token staking transaction to the blockchain`);
+                                }
+                            } else {
+                                console.log("token staking transaction cancelled");
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            console.error(`error at the token staking transaction formation it was not commited`);
+                            alert(`error at the token staking transaction formation it was not commited`);
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                if (err.toString().startsWith('not enough outputs')) {
+                    alert(`choose fewer mixins`);
+                }
+                console.error(`error at the token transaction`);
+            }
+        }
+
+
+
+
+        /*
+        export async function purchase_offer(wallet, amount, offer_id, quantity, address, mixin) {
+    let mixi = mixin >= 0 ? mixin : 6;
+    return wallet.createAdvancedTransaction({
+        tx_type: '5',
+        address: address,
+        amount: amount * 10000000000,
+        safex_offer_id: offer_id,
+        safex_purchase_quantity: quantity,
+        mixin: mixi
+    }).then((tx) => {
+        console.log(`purchase transaction created: ${tx.transactionsIds()}`);
+        return tx;
+    });
+}
+         */
+    };
 
     copyAddressToClipboard = () => {
-        copy(this.state.address)
-        alert('Copied address')
-
-    }
+        copy(this.state.address);
+        alert('Copied address');
+    };
 
 
     render() {
@@ -976,7 +1098,7 @@ class WalletHome extends React.Component {
 
                                     <ul>
                                         <Row>
-                                            <li>{this.state.cash} SFX  |</li>
+                                            <li>{this.state.cash} SFX |</li>
 
                                             {this.state.pending_cash > 0 ?
                                                 (<li>| {this.state.pending_cash} Pending</li>) : ''}
@@ -1036,6 +1158,7 @@ class WalletHome extends React.Component {
 
                     var non_listings_table = this.state.non_offers.map((listing, key) => {
                         console.log(key);
+
                         try {
                             return <tr key={key}>
                                 <td>{listing.title}</td>
@@ -1047,7 +1170,50 @@ class WalletHome extends React.Component {
                                     <option value="1">1</option>
                                 </select></td>
                                 <td>
-                                    <Button variant="success">BUY</Button>
+                                    <Col className="align-self-center" md={2}>
+                                        <Button block size="lg" variant="success"
+                                                onClick={() => this.handleShowPurchaseForm(listing)}>
+                                            BUY
+                                        </Button>
+
+                                        <Modal className="new-account-form" animation={false}
+                                               show={this.state.show_purchase_form}
+                                               onHide={this.handleClosePurchaseForm}>
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>Ready to
+                                                    Buy {this.state.show_purchase_offer.title}</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+
+                                                <Form id="purchase_item"
+                                                      onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
+                                                    <ul>
+
+                                                        <li>{this.state.show_purchase_offer.title}</li>
+                                                        <li>{this.state.show_purchase_offer.price / 10000000000}</li>
+                                                        <li>{this.state.show_purchase_offer.seller}</li>
+                                                        <li>{this.to_ellipsis(this.state.show_purchase_offer.offerID)}</li>
+                                                    </ul>
+
+                                                    {this.state.show_purchase_offer.quantity} available <Form.Control
+                                                    className="light-blue-back"
+                                                    id="quantity"
+                                                    name="quantity"/>
+                                                    Send Message <Form.Control name="message"/>
+                                                    Mixins <Form.Control name="mixins" value="1"/>
+
+
+                                                    <Button type="submit" variant="success">Confirm Payment</Button>
+                                                </Form>
+                                            </Modal.Body>
+                                            <Modal.Footer className="align-self-start">
+
+                                                <Button variant="danger" onClick={this.handleClosePurchaseForm}>
+                                                    Close
+                                                </Button>
+                                            </Modal.Footer>
+                                        </Modal>
+                                    </Col>
                                 </td>
                                 <td>
                                     <Button variant="info">CONTACT</Button>
@@ -1075,14 +1241,16 @@ class WalletHome extends React.Component {
                                                            placeholder="eg. api.theworldmarketplace.com"/>
                                                 </div>
                                                 <div class="form-group col-sm-3">
-                                                    <button type="submit" class="btn btn-block btn-primary">Set Market
+                                                    <button type="submit" class="btn btn-block btn-primary">Set
+                                                        Market
                                                         API
                                                     </button>
                                                 </div>
                                             </form>
                                         </div>
                                         <div class="row" id="search">
-                                            <form className="no-gutters p-2" id="search-form" action="" method="POST"
+                                            <form className="no-gutters p-2" id="search-form" action=""
+                                                  method="POST"
                                                   enctype="multipart/form-data">
                                                 <div class="form-group col-sm-9">
                                                     <input class="form-control" type="text" placeholder="Search"/>
@@ -1121,7 +1289,8 @@ class WalletHome extends React.Component {
                                                     </select>
                                                 </div>
                                                 <div class="form-group col-sm-3 col-xs-6">
-                                                    <select data-filter="price" class="filter-type filter form-control">
+                                                    <select data-filter="price"
+                                                            class="filter-type filter form-control">
                                                         <option value="">Price Range</option>
                                                         <option value="">$0 - $24.99</option>
                                                         <option value="">$25 - $49.99</option>
@@ -1182,7 +1351,8 @@ class WalletHome extends React.Component {
                                     </Table>
                                 </Col>
                             </Row>
-                        </div>);
+                        </div>
+                    );
                 case "merchant": {
                     var twm_listings_table = this.state.twm_offers.map((listing, key) => {
                         console.log(key);
@@ -1259,7 +1429,7 @@ class WalletHome extends React.Component {
                                     <Image width={50} height={50} src={avatar} roundedCircle/>
                                 </Col>
                                 <Col>
-                                   <h2>{user.username}</h2>
+                                    <h2>{user.username}</h2>
 
                                 </Col>
                                 {user.status == 0 ? (
@@ -1316,7 +1486,8 @@ class WalletHome extends React.Component {
                                                 <Row>
                                                     <ul>
                                                         <li>
-                                                            <Image width={100} height={100} src={data.avatar} roundedCircle/>
+                                                            <Image width={100} height={100} src={data.avatar}
+                                                                   roundedCircle/>
                                                         </li>
                                                         <h2>{selected.username}</h2>
 
@@ -1333,7 +1504,8 @@ class WalletHome extends React.Component {
                                         ) : ''}
 
                                         <Col className="align-self-center" md={2}>
-                                            <Button block size="lg" variant="success" onClick={this.handleShowNewAccountForm}>
+                                            <Button block size="lg" variant="success"
+                                                    onClick={this.handleShowNewAccountForm}>
                                                 New Account
                                             </Button>
 
@@ -1389,7 +1561,8 @@ class WalletHome extends React.Component {
                                     <Col lg className="merchant_product_view no-gutters mt-5">
                                         {selected !== void (0) ? (
                                             <Row className="p-2 justify-content-center">
-                                                <Button size="lg" variant="success" onClick={this.handleShowNewOfferForm}>
+                                                <Button size="lg" variant="success"
+                                                        onClick={this.handleShowNewOfferForm}>
                                                     New Offer
                                                 </Button>
 
@@ -1434,17 +1607,17 @@ class WalletHome extends React.Component {
                                                 </Modal>
                                             </Row>) : ''}
 
-                                        <Row >
+                                        <Row>
                                             {this.state.twm_offers.length > 1 ? (
                                                     <Table color="white" className="white-text border border-white b-r10">
                                                         <thead>
-                                                            <tr>
-                                                                <th>Title</th>
-                                                                <th>Quantity</th>
-                                                                <th>Price (SFX)</th>
-                                                                <th>Seller</th>
-                                                                <th>Offer ID</th>
-                                                            </tr>
+                                                        <tr>
+                                                            <th>Title</th>
+                                                            <th>Quantity</th>
+                                                            <th>Price (SFX)</th>
+                                                            <th>Seller</th>
+                                                            <th>Offer ID</th>
+                                                        </tr>
 
                                                         </thead>
                                                         <tbody>
@@ -1455,15 +1628,15 @@ class WalletHome extends React.Component {
 
                                             <Table>
                                                 <thead>
-                                                  <tr>
-                                                      <th>Title</th>
-                                                      <th>Quantity</th>
-                                                      <th>Price (SFX)</th>
-                                                      <th>Seller</th>
-                                                      <th>Offer ID</th>
-                                                      <th>Actions</th>
+                                                <tr>
+                                                    <th>Title</th>
+                                                    <th>Quantity</th>
+                                                    <th>Price (SFX)</th>
+                                                    <th>Seller</th>
+                                                    <th>Offer ID</th>
+                                                    <th>Actions</th>
 
-                                                  </tr>
+                                                </tr>
                                                 </thead>
 
                                                 <tbody>
@@ -1523,21 +1696,22 @@ class WalletHome extends React.Component {
 
                                     <Form id="send_token" onSubmit={this.token_send}>
                                         Destination Address <Form.Control name="destination"
-                                                                        defaultValue="Safex5..."
-                                                                        placedholder="the destination address"/>
+                                                                          defaultValue="Safex5..."
+                                                                          placedholder="the destination address"/>
                                         Amount (SFT)<Form.Control name="amount" defaultValue="0"
-                                                                placedholder="the amount to send"/>
+                                                                  placedholder="the amount to send"/>
                                         Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
-                                                                    placedholder="choose the number of mixins"/>
+                                                                      placedholder="choose the number of mixins"/>
                                         <Button className="mt-2" type="submit" variant="warning" size="lg" block>
                                             Send Tokens
                                         </Button>
                                     </Form>
                                 </div>
-                               <Col className="mt-2 search-box border border-white grey-back">
+                                <Col className="mt-2 search-box border border-white grey-back">
                                     <h2 className="text-center "> Stakes </h2>
 
-                                    <Table color="white" className="white-text border border-white b-r10 light-blue-back ">
+                                    <Table color="white"
+                                           className="white-text border border-white b-r10 light-blue-back ">
                                         <thead className="dark-orange">
                                         <tr>
                                             <th>TXID</th>
@@ -1552,7 +1726,7 @@ class WalletHome extends React.Component {
                                         </tbody>
                                     </Table>
                                 </Col>
-                                
+
 
                             </Row>
 
@@ -1671,11 +1845,14 @@ class WalletHome extends React.Component {
                                 </Col>
                             </Row>
 
+
                         </div>
                     );
                 }
-                case "settings": 
-                    return (<div></div>);
+                case "settings":
+                    return (
+                        <div></div>
+                    );
 
                 default:
                     return <h1>Major Error</h1>
@@ -1685,7 +1862,8 @@ class WalletHome extends React.Component {
 
         return (
             <Container className="height100 justify-content-between whtie-text" fluid>
-                <Container fluid className="no-gutters mt-5 mb-2 p-2 border border-light b-r10 white-text">
+                <Container fluid
+                           className="no-gutters mt-5 mb-2 p-2 border border-light b-r10 white-text">
 
                     <Row className="justify-content-between align-items-center">
 
@@ -1709,7 +1887,8 @@ class WalletHome extends React.Component {
                         </Col>
 
                         <div className="menu-logo">
-                            <Image className=" align-content-center" src={require("./../../img/sails-logo.png")}/>
+                            <Image className=" align-content-center"
+                                   src={require("./../../img/sails-logo.png")}/>
                         </div>
 
                         <Col sm={7} className="menu">
@@ -1750,14 +1929,15 @@ class WalletHome extends React.Component {
                         className="no-gutters p-2 justify-content-between align-items-center b-r10 grey-back white-text">
                         <Col sm={3}>
                             <li className="mr-2">
-                                SFX: {this.state.cash} {this.state.pending_cash > 0 ? `(${this.state.pending_cash} pending)`  : '' }
+                                SFX: {this.state.cash} {this.state.pending_cash > 0 ? `(${this.state.pending_cash} pending)` : ''}
                             </li>
                             <li className="">
-                                SFT: {this.state.tokens} {this.state.pending_tokens > 0 ? `(${this.state.pending_tokens} pending)`  : '' }
+                                SFT: {this.state.tokens} {this.state.pending_tokens > 0 ? `(${this.state.pending_tokens} pending)` : ''}
                             </li>
                         </Col>
                         <Col className="just" sm={5}>
-                            <p>SFX + SFT Public Address: <b>{this.to_ellipsis(this.state.address)}</b></p>
+                            <p>SFX + SFT Public Address: <b>{this.to_ellipsis(this.state.address)}</b>
+                            </p>
                             <Button onClick={this.copyAddressToClipboard}>
                                 Copy Address
                             </Button>
@@ -1777,7 +1957,8 @@ class WalletHome extends React.Component {
                                 Show Keys
                             </Button>
 
-                            <Modal className="width100 black-text" animation={false} show={this.state.show_keys}
+                            <Modal className="width100 black-text" animation={false}
+                                   show={this.state.show_keys}
                                    onHide={this.handleClose}>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Your Private Keys</Modal.Title>
@@ -1788,13 +1969,16 @@ class WalletHome extends React.Component {
                                             <b>Address:</b> <br/> {this.props.wallet.address()}
                                         </li>
                                         <li>
-                                            <b>Secret Spend Key:</b> <br/> {this.props.wallet.secretSpendKey()}
+                                            <b>Secret Spend Key:</b>
+                                            <br/> {this.props.wallet.secretSpendKey()}
                                         </li>
                                         <li>
-                                            <b>Secret View Key:</b> <br/> {this.props.wallet.secretViewKey()}
+                                            <b>Secret View Key:</b>
+                                            <br/> {this.props.wallet.secretViewKey()}
                                         </li>
                                         <li>
-                                            <b>Mnemonic Seed:</b> <br/> {this.props.wallet.seed().toUpperCase()}
+                                            <b>Mnemonic Seed:</b>
+                                            <br/> {this.props.wallet.seed().toUpperCase()}
                                         </li>
                                     </ul>
                                 </Modal.Body>
@@ -1810,7 +1994,6 @@ class WalletHome extends React.Component {
                 </Container>
 
                 {twmwallet()}
-
 
             </Container>
         );
