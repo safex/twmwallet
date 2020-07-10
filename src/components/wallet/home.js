@@ -901,16 +901,16 @@ class WalletHome extends React.Component {
                                         fee: ${fee / 10000000000} SFX`);
                             } catch (err) {
                                 console.error(err);
-                                console.error(`error when trying to commit the token staking transaction to the blockchain`);
-                                alert(`error when trying to commit the token staking transaction to the blockchain`);
+                                console.error(`error when trying to commit the token unstaking transaction to the blockchain`);
+                                alert(`error when trying to commit the token unstaking transaction to the blockchain`);
                             }
                         } else {
                             console.log("token staking transaction cancelled");
                         }
                     } catch (err) {
                         console.error(err);
-                        console.error(`error at the token staking transaction formation it was not commited`);
-                        alert(`error at the token staking transaction formation it was not commited`);
+                        console.error(`error at the token unstaking transaction formation it was not commited`);
+                        alert(`error at the token unstaking transaction formation it was not commited`);
                     }
                 }
             }
@@ -919,7 +919,7 @@ class WalletHome extends React.Component {
             if (err.toString().startsWith('not enough outputs')) {
                 alert(`choose fewer mixins`);
             }
-            console.error(`error at the token transaction`);
+            console.error(`error at the token unstake transaction`);
         }
     };
 
