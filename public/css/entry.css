@@ -181,7 +181,7 @@ table {
     max-height: 100px;
 }
 
-#new-account-form input {
+#new-account-form text {
     margin-top: .5rem;
     margin-bottom: .5rem;
     
