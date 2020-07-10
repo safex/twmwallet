@@ -60,11 +60,16 @@ export default class LegacyPassword extends React.Component {
 
     render() {
         return (
-            <div>
-                <Container>
-                    <button onClick={this.exit_home}>exit home</button>
-                    <Row className="justify-content-md-center">
-                        <Col sm={6}>
+           
+                <Container className="d-flex">
+                    <div className="entry-form">
+                    
+                        
+
+                            <div className="align-self-start">
+                                <Button variant="danger" onClick={this.exit_home}>Home</Button>
+                            </div>
+
                             <p>
                                 It appears that you have a wallet from the legacy wallets from where you migrated from
                                 Safe Exchange Coin and Bitcoin to the Safex Token and the Safex Blockchain.
@@ -79,24 +84,25 @@ export default class LegacyPassword extends React.Component {
                             </p>
                             <p>
                                 You can also exit this process and use the wallet along the other paths
-                                by clicking here: <Button onClick={this.returnSelect}>exit</Button>
+                                by clicking here:
                             </p>
+                            <div><button type="button" class="btn btn-warning">Exit</button></div>
                             <p>
                                 Otherwise enter the password to your legacy wallet, the wallet you used before
                                 to access your list of Safex keys and start using the Safex Blockchain.
                             </p>
-                        </Col>
-                    </Row>
-                    <Row className="justify-content-md-center">
-                        <Col sm={6}>
+                        
+                    
+                    
+                        <div>
                             <form onSubmit={this.submitLogin}>
                                 <Form.Control name="password" type="password" placedholder="Password"/>
                                 <Button type="submit" variant="primary" size="lg" block>Login</Button>
                             </form>
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>                
                 </Container>
-            </div>
+            
         );
     }
 }

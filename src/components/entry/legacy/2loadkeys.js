@@ -71,19 +71,25 @@ export default class LegacyKeys extends React.Component {
             );
         });
         return (
-            <div>
-                <Container>
-                    <button onClick={this.exit_home}>exit home</button>
-                    <Row className="justify-content-md-center">
-                        <Col sm={6}>
+            
+                <Container className="d-flex">
+                <div className="entry-form">
+                    <div className="align-self-start">
+                        <Button variant="warning" onClick={this.exit_home}>Home</Button>    
+                    </div>
+                    
+                    
+                    
                             <p>
                                 You can exit this process and use the wallet along the other paths
-                                by clicking this exit button: <Button onClick={this.return_to_entry}>exit button</Button>
+                                by clicking this exit button: 
                             </p>
-                        </Col>
-                    </Row>
-                    <Row className="justify-content-md-center">
-                        <Col sm={6}>
+
+                            <div>
+                                <Button onClick={this.return_to_entry}>Exit Legacy Mode</Button>
+                            </div>
+                        
+                    
                             <Table striped bordered hover>
                                 <thead>
                                 <tr>
@@ -97,10 +103,10 @@ export default class LegacyKeys extends React.Component {
 
                             </Table>
 
-                        </Col>
-                    </Row>
+                        
+                    </div>
                 </Container>
-            </div>
+            
         );
     }
 }

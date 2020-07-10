@@ -1498,6 +1498,7 @@ class WalletHome extends React.Component {
                         console.error(err);
                         console.error(`error at the interval loading of stacking`);
                     }
+                
 
 
                     return (
@@ -1670,10 +1671,10 @@ class WalletHome extends React.Component {
                                 </Col>
                             </Row>
 
-
+                        </div>
                     );
                 }
-                case "settings":
+                case "settings": 
                     return (<div></div>);
 
                 default:
