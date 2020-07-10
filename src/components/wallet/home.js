@@ -1388,50 +1388,52 @@ class WalletHome extends React.Component {
 
                     var non_listings_table = this.state.non_offers.map((listing, key) => {
                         console.log(listing);
-                        var data = {};
-                        data.description = '';
-                        data.main_image = '';
-                        data.sku = '';
-                        data.barcode = '';
-                        data.weight = '';
-                        data.country = '';
-                        data.message_type = '';
-                        data.physical = '';
-                        try {
-                            let parsed_data = JSON.parse(listing.data);
-                            if (parsed_data.twm_version === 1) {
-                                if (parsed_data.hasOwnProperty('main_image')) {
-                                    data.main_image = parsed_data.main_image;
-                                }
-                                if (parsed_data.hasOwnProperty('description')) {
-                                    data.description = parsed_data.description;
-                                }
-                                if (parsed_data.hasOwnProperty('sku')) {
-                                    data.sku = parsed_data.sku;
-                                }
-                                if (parsed_data.hasOwnProperty('barcode')) {
-                                    data.barcode = parsed_data.barcode;
-                                }
-                                if (parsed_data.hasOwnProperty('weight')) {
-                                    data.weight = parsed_data.weight;
-                                }
-                                if (parsed_data.hasOwnProperty('country')) {
-                                    data.country = parsed_data.country;
-                                }
-                                if (parsed_data.hasOwnProperty('message_type')) {
-                                    data.message_type = parsed_data.message_type;
-                                }
-                                if (parsed_data.hasOwnProperty('physical')) {
-                                    data.physical = parsed_data.physical;
-                                }
 
-
-                            }
-                        } catch (err) {
-                            console.error(err);
-                        }
                         try {
                             if (listing.seller === this.state.selected_user.username) {
+                                var data = {};
+                                data.description = '';
+                                data.main_image = '';
+                                data.sku = '';
+                                data.barcode = '';
+                                data.weight = '';
+                                data.country = '';
+                                data.message_type = '';
+                                data.physical = '';
+                                try {
+                                    let parsed_data = JSON.parse(listing.description);
+                                    console.log(parsed_data);
+                                    if (parsed_data.twm_version === 1) {
+                                        if (parsed_data.hasOwnProperty('main_image')) {
+                                            data.main_image = parsed_data.main_image;
+                                        }
+                                        if (parsed_data.hasOwnProperty('description')) {
+                                            data.description = parsed_data.description;
+                                        }
+                                        if (parsed_data.hasOwnProperty('sku')) {
+                                            data.sku = parsed_data.sku;
+                                        }
+                                        if (parsed_data.hasOwnProperty('barcode')) {
+                                            data.barcode = parsed_data.barcode;
+                                        }
+                                        if (parsed_data.hasOwnProperty('weight')) {
+                                            data.weight = parsed_data.weight;
+                                        }
+                                        if (parsed_data.hasOwnProperty('country')) {
+                                            data.country = parsed_data.country;
+                                        }
+                                        if (parsed_data.hasOwnProperty('message_type')) {
+                                            data.message_type = parsed_data.message_type;
+                                        }
+                                        if (parsed_data.hasOwnProperty('physical')) {
+                                            data.physical = parsed_data.physical;
+                                        }
+
+
+                                    }
+                                } catch (err) {
+                                    console.error(err);
+                                }
                                 return <tr key={key}>
                                     <td>{listing.title}</td>
                                     <td>{listing.quantity}</td>
@@ -1443,15 +1445,14 @@ class WalletHome extends React.Component {
                                         <Col className="align-self-center" md={2}>
                                             <Button block size="lg" variant="success"
                                                     onClick={() => this.handleShowEditOfferForm(listing)}>
-                                                BUY
+                                                EDIT
                                             </Button>
 
                                             <Modal className="new-account-form" animation={false}
                                                    show={this.state.show_edit_offer_form}
                                                    onHide={this.handleCloseEditOfferForm}>
                                                 <Modal.Header closeButton>
-                                                    <Modal.Title>Ready to
-                                                        Buy {this.state.show_edit_offer.title}</Modal.Title>
+                                                    <Modal.Title>Editing {this.state.show_edit_offer.title}</Modal.Title>
                                                 </Modal.Header>
                                                 <Modal.Body>
 
@@ -1502,7 +1503,6 @@ class WalletHome extends React.Component {
                                                 </Modal.Footer>
                                             </Modal>
                                         </Col>
-                                        <Button variant="warning">EDIT</Button>
                                     </td>
                                 </tr>
                             }
