@@ -166,7 +166,7 @@ export default class RecoverKeys extends React.Component {
                             password={this.state.password}
                         />
                     </div>) :
-                    (<Container fluid className="font-size-small b-r25 grey-back d-flex flex-column safex-blue white-text" >
+                    (<Container fluid className="font-size-small b-r25 grey-back d-flex flex-column white-text" >
                         <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
                         
                         <Row className="align-items-center mb-5 justify-content-center">   

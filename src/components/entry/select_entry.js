@@ -84,7 +84,7 @@ export default class SelectEntry extends React.Component {
                 
                 <Container className="height100 flex-column p-5 d-flex">
                     <Row className="row justify-content-md-center justify-content-center p-3">
-                        <Image className="entry_image align-content-center mb-5" src={require("./../../img/safex-logo.png")}/>
+                        <Image className="entry-image align-content-center mb-5" src={require("./../../img/safex-logo.png")}/>
                     </Row>
                     
                     <Row className="row justify-content-md-center justify-content-center p-3">
