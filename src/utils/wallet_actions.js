@@ -51,17 +51,49 @@ export async function unstake_tokens(wallet, amount, mixin) {
     });
 }
 
-export async function purchase_offer(wallet, amount, offer_id, quantity, address, mixin) {
+export async function purchase_offer(wallet, cost, offer_id, quantity, mixin) {
     let mixi = mixin >= 0 ? mixin : 6;
+    console.log(mixin);
     return wallet.createAdvancedTransaction({
         tx_type: '5',
-        address: address,
-        amount: amount * 10000000000,
+        address: wallet.address(),
+        amount: cost * 10000000000,
         safex_offer_id: offer_id,
         safex_purchase_quantity: quantity,
         mixin: mixi
     }).then((tx) => {
         console.log(`purchase transaction created: ${tx.transactionsIds()}`);
+        return tx;
+    });
+}
+
+export async function edit_offer(wallet, offerid, username, offer_title, offer_price, offer_quantity, offer_description, active, mixin) {
+    let mixi = mixin >= 0 ? mixin : 6;
+    return wallet.createAdvancedTransaction({
+        tx_type: '9',
+        safex_offer_id: offerid,
+        safex_username: username,
+        safex_offer_title: offer_title,
+        safex_offer_price: offer_price * 10000000000,
+        safex_offer_quantity: offer_quantity,
+        safex_offer_description: offer_description,
+        safex_offer_active: active,
+        mixin: mixi
+    }).then((tx) => {
+        console.log(`edit offer transaction created: ${tx.transactionsIds()}`);
+        return tx;
+    });
+}
+
+export async function edit_account(wallet, username, data, mixin) {
+    let mixi = mixin >= 0 ? mixin : 6;
+    return wallet.createAdvancedTransaction({
+        tx_type: '7',
+        safex_username: username,
+        safex_data: data,
+        mixin: mixi
+    }).then((tx) => {
+        console.log(`edit account transaction created: ${tx.transactionsIds()}`);
         return tx;
     });
 }
