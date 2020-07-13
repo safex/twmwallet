@@ -36,13 +36,7 @@ body {
     padding: 0 0px;
     position: relative;
 }
-
-.menu__right {
-    display: flex;
-    align-items: center;
-    height: 100%;
-}
-
+ 
 .menu__list {
     list-style-type: none;
     height: 100%;
@@ -53,7 +47,7 @@ body {
 .menu__list-item {
     display: inline-block;
     height: 100%;
-    margin-right: 2vmin;
+    
     color: #fff;
 }
 
@@ -77,8 +71,11 @@ body {
     color: #ffaa3b;
 }
 
-.menu__link--active {
-    color: #ffaa3b;
+.menu-link-active a {
+    display: inline-block;
+    height: 100%;
+    
+    color: #ffaa3b!important;
     border-top: 4px solid #ffaa3b;
     font-weight: 700;
 }

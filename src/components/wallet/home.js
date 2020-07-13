@@ -1168,7 +1168,7 @@ class WalletHome extends React.Component {
                             <Col sm={4}>
 
 
-                                <div className="wallet-box mb-2 mr-2 ml-2 p-2 font-size-small">
+                                <div className="wallet-box p-2 font-size-small">
 
                                     <h3> Send Safex </h3>
 
@@ -1846,7 +1846,7 @@ class WalletHome extends React.Component {
                             <h1 className="text-center m-2"> Token Management </h1>
 
                             <Row className="no-gutters pt-3">
-                                <div className="wallet-box m-2 p-2 font-size-small">
+                                <div className="wallet-box mr-2 p-2 font-size-small">
                                     <h3> Send Token </h3>
 
                                     <ul>
@@ -1908,7 +1908,7 @@ class WalletHome extends React.Component {
                                         </Button>
                                     </Form>
                                 </Col>
-                                <Col className="height-fit-content align-self-center dark-orange">
+                                <Col className="height-fit-content align-self-center b-r10 dark-orange">
                                     <Table>
                                         <thead>
                                         <tr>
@@ -1972,9 +1972,9 @@ class WalletHome extends React.Component {
                                         </tbody>
                                         <tfoot>
                                         <tr>
-                                            <tf>
+                                            <td>
                                                 <li>Block Interval {interval[0] * 10} : {interest[0]} SFX per token</li>
-                                            </tf>
+                                            </td>
                                         </tr>
                                         </tfoot>
                                     </Table>
@@ -2048,21 +2048,21 @@ class WalletHome extends React.Component {
                                    src={require("./../../img/sails-logo.png")}/>
                         </div>
 
-                        <Col sm={7} className="menu">
+                        <Col sm={6} className="menu">
                             <ul className="menu__list">
-                                <li className="menu__list-item">
-                                    <a className="menu__link" href="javascript:void(0)"
+                                <li className={this.state.interface_view === 'home'  ? "menu-link-active" : "menu__list-item"} >
+                                    <a className="menu__link" href="javascript:void(0)" 
                                        onClick={this.go_home}>Home</a>
                                 </li>
-                                <li className="menu__list-item">
+                                <li className={this.state.interface_view === 'market' ? "menu__list-item menu-link-active" : "menu__list-item"}>
                                     <a className="menu__link" href="javascript:void(0)"
                                        onClick={this.show_market}>Market</a>
                                 </li>
-                                <li className="menu__list-item">
+                                <li className={this.state.interface_view === 'merchant' ? "menu__list-item menu-link-active" : "menu__list-item"}>
                                     <a className="menu__link" href="javascript:void(0)"
                                        onClick={this.show_merchant}>Merchant</a>
                                 </li>
-                                <li className="menu__list-item">
+                                <li className={this.state.interface_view === 'tokens' ? "menu__list-item menu-link-active" : "menu__list-item"}>
                                     <a className="menu__link" href="javascript:void(0)"
                                        onClick={this.show_tokens}>Tokens</a>
                                 </li>
