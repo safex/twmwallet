@@ -1,0 +1,135 @@
+/* HTML Elements CSS Start */
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    table {
+        border-collapse: collapse;
+    }
+
+    td, th {
+        border: 1px solid #999;
+        padding: 0.5rem;
+        text-align: left;
+    }
+
+
+    li {
+        word-wrap: break-word
+    }
+
+/* HTML Elements CSS End */
+
+
+
+/* Dimensions CSS Start */
+
+    .w50 {
+        width: 50%!important;
+    }
+    .font_size_medium {
+        font-size: 2vmax!important;
+    }
+
+    .font-size-small {
+        font-size: 1.25rem!important;
+    }
+
+    .remove_container_padding {
+        padding-left: -15px!important;
+        padding-right: -15px!important;
+    }
+
+    .oflow-y-scroll {
+        overflow-y: scroll;
+    }
+
+    .overflow-x {
+        overflow-x: auto!important;
+    }
+
+    .height100v {
+        height: 100vh;
+    }
+
+    .height100 {
+        height: 100%;
+    }
+
+    .height-fit-content {
+        height: fit-content;
+    }
+
+    .height80 {
+        height: 80%!important;
+    }
+
+    .max-h500px {
+        max-height: 500px;
+    }
+
+    .width100 {
+        width: 100%;
+    }
+
+    .width-fit-content {
+        width: fit-content;
+    }
+
+    .auto_margin_50 {
+        width: 50%;
+        margin: auto;
+    }
+
+    .b-r25 {
+        border-radius: 25px;
+
+    }
+
+    .b-r10 {
+        border-radius: 10px;
+
+    }
+
+    .b-white-5 {
+        border: 5px!important;
+        border-color: #fff!important;
+    }
+
+/* Dimensions CSS End */
+
+
+
+/* Colors CSS Start */
+
+    .light-blue-back {
+        background-color: rgb(24, 190, 231);
+    }
+
+    .dark-orange {
+        background-color: darkorange;
+    }
+
+    .safex-cash-green {
+        background-color: rgb(38, 232, 185)!important;
+    }
+
+    .grey-back {
+        background-color: grey;
+    }
+
+    .safex-blue {
+        background-color: rgb(9, 51, 111);
+    }
+
+    .white-text {
+        color: #fff!important;
+    }
+
+    .black-text {
+        color: #000!important;
+    }
+
+/* Colors CSS End */
