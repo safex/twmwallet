@@ -208,19 +208,9 @@ export default class OpenWallet extends React.Component {
                                 Open an existing Safex wallet by selecting the .keys file and
                                 entering your password.
                             </p>
-
-                            <div className="mt-4">
-                                <p className="border border-danger b-r25">
-                                    If you are participating in the testnet, tick this box
-                                    <input
-                                        name="isTestnet"
-                                        type="checkbox"
-                                        checked={this.state.testnet}
-                                        onChange={this.set_to_testnet}
-                                        className="ml-2"
-                                    />
-                                </p>
-                            </div>
+                            <p>
+                                THIS WALLET IS STAGENET V1 THIS IS NOT A REGULAR SAFEX WALLET USE ONLY FOR TESTING ONLY JULY 13, 2020
+                            </p>
 
                             {this.state.new_path.length > 0 ?
                                 (<Col className="mb-2 mt-2 border border-warning b-r25">

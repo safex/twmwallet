@@ -198,17 +198,9 @@ export default class CreateWallet extends React.Component {
                             <p>
                                 This path creates a new set of keys and a Safex Wallet.
                             </p>
-                            <p className="border border-danger b-r25">
-                                If you are participating in the testnet, tick this box
-                                <input
-                                    name="isTestnet"
-                                    type="checkbox"
-                                    checked={this.state.testnet}
-                                    onChange={this.set_to_testnet}
-                                    className="ml-2"
-                                />
-                            </p>
-
+                    <p>
+                        THIS WALLET IS STAGENET V1 THIS IS NOT A REGULAR SAFEX WALLET USE ONLY FOR TESTING ONLY JULY 13, 2020
+                    </p>
 
 
                         {this.state.new_path.length > 0 ?

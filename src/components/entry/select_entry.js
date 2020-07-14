@@ -65,17 +65,17 @@ export default class SelectEntry extends React.Component {
 
     restore_keys = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/recover_keys'});
+        this.props.history.push({pathname: '/'});
     };
 
     seed_phrase = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/recover_seed'});
+        this.props.history.push({pathname: '/'});
     };
 
     restore_legacy = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/legacy_password', state: {legacy_wallet: this.state.legacy_wallet}});
+        this.props.history.push({pathname: '/', state: {legacy_wallet: this.state.legacy_wallet}});
     };
 
     render() {
