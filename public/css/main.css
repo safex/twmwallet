@@ -20,6 +20,11 @@
         word-wrap: break-word
     }
 
+    .vl {
+        border-left: 2px solid white;
+        height: auto;
+      }
+
 /* HTML Elements CSS End */
 
 
@@ -105,11 +110,11 @@
 /* Colors CSS Start */
 
     .light-blue-back {
-        background-color: rgb(24, 190, 231);
+        background-color: rgba(24, 189, 231, 0.5);
     }
 
-    .dark-orange {
-        background-color: darkorange;
+    .opaque-black {
+        background-color: rgba(0, 0, 0, 0.5);
     }
 
     .safex-cash-green {
@@ -117,7 +122,7 @@
     }
 
     .grey-back {
-        background-color: grey;
+        background-color: rgba(219, 219, 219, 0.5);
     }
 
     .safex-blue {

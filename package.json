@@ -67,7 +67,7 @@
     "react-number-format": "^4.3.1",
     "react-popper": "^2.2.3",
     "react-router-dom": "^5.1.2",
-    "react-tooltip": "^3.11.3",
+    "react-tooltip": "^3.11.6",
     "safe-buffer": "^5.2.0",
     "safex-addressjs": "git+https://github.com/safex/safex_addressjs.git",
     "safex-nodejs-libwallet": "git+https://github.com/safex/safex-nodejs-libwallet.git",

@@ -154,7 +154,7 @@ export default class RecoverSeed extends React.Component {
 
     render() {
         return (
-            <Container fluid className="height100 d-flex flex-column justify-content-center safex-blue">
+            <Container  className="height100 d-flex flex-column justify-content-center ">
                 {this.state.wallet_made ?
                     (<div>
                         <WalletHome
@@ -164,7 +164,8 @@ export default class RecoverSeed extends React.Component {
                             password={this.state.password}
                         />
                     </div>) :
-                    (<Container fluid className="font-size-small mt-5 pb-5 b-r25 grey-back d-flex flex-column white-text" >
+                    (<Container  className="font-size-small mt-5 pb-5 b-r25 grey-back d-flex flex-column white-text" >
+                        <div className="auto_margin_50 d-flex flex-column">
                         <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
                         
                         <Row className="align-items-center mb-5 justify-content-center">   
@@ -177,8 +178,8 @@ export default class RecoverSeed extends React.Component {
                                 This pathway will allow you to restore a wallet from your <b>Safex Public Address</b> 
                                 , <b>Private View</b> and <b>Spend Key</b>.
                             </p>
-                            <p className="border border-danger b-r25">
-                                If you are participating in the testnet, tick this box
+                            <p >
+                                Testnet
                                 <input
                                     name="isTestnet"
                                     type="checkbox"
@@ -189,7 +190,7 @@ export default class RecoverSeed extends React.Component {
                             </p>
                         {this.state.seed_set ?
                             (<div></div>) :
-                            (<Col className="mb-2 mt-2 p-2 border border-warning b-r25">
+                            (<Col className="mb-2 mt-2 p-2 border  b-r25">
                                 <p>
                                     Enter your <b>25 Word Seed Phrase</b>
                                 </p>
@@ -223,7 +224,7 @@ export default class RecoverSeed extends React.Component {
                         {this.state.new_path.length > 0 &&
                         this.state.seed_set &&
                         this.state.password.length < 1 ?
-                            (<Col className="mb-2 mt-2 border border-warning b-r25 ">
+                            (<Col className="mb-2 mt-2 border  b-r25 ">
                                 <Form id="set_password" className="auto_margin_50" onSubmit={this.set_password}>
                                     <Form.Control name="password" className="mt-2 mb-2" type="password"
                                                     placedholder="Set the ip address of the Safex blockchain"/>
@@ -240,7 +241,7 @@ export default class RecoverSeed extends React.Component {
                         this.state.seed_set &&
                         this.state.password.length > 0 &&
                         this.state.daemon_host.length < 1 ?
-                            (<Col className="mb-2 mt-2 border border-warning b-r25">
+                            (<Col className="mb-2 mt-2 border  b-r25">
                                 <Form  id="set_daemon" className="auto_margin_50" onSubmit={this.set_daemon_state}>
                                     <Form.Control className="mt-2 mb-2"  name="daemon_host" defaultValue="rpc.safex.org"
                                                 placedholder="set the ip address of the safex blockchain"/>
@@ -260,7 +261,7 @@ export default class RecoverSeed extends React.Component {
                             (<Row className="justify-content-md-center">
                                 <Col sm={8}>
                                     
-                                    <Col className="p-2 justify-content-between align-items-baseline border border-warning b-r25">
+                                    <Col className="p-2 justify-content-between align-items-baseline border  b-r25">
                                         <p>
                                             This file will be saved to: <b>{this.state.new_path}</b>
                                         </p>
@@ -269,7 +270,7 @@ export default class RecoverSeed extends React.Component {
                                         </Button>
                                     </Col>
 
-                                    <Col className="p-2 mt-2 justify-content-between align-items-baseline border border-warning b-r25">
+                                    <Col className="p-2 mt-2 justify-content-between align-items-baseline border  b-r25">
                                         <p>
                                             Your chosen password is: {[...Array(this.state.password.length)].map(() =>
                                             <span>♦</span>)}
@@ -280,7 +281,7 @@ export default class RecoverSeed extends React.Component {
                                                 onClick={this.change_password}>Change Password</Button>
                                         </p>
                                     </Col>
-                                    <Col className="d-flex flex-column mb-2 mt-2 border border-warning b-r25">
+                                    <Col className="d-flex flex-column mb-2 mt-2 border  b-r25">
                                         <p className="mt-2 mb-2">
                                             You will be connected
                                             to <b>{this.state.daemon_host}:{this.state.daemon_port}</b> for
@@ -303,6 +304,7 @@ export default class RecoverSeed extends React.Component {
                             (<div></div>)
                         }
                         </Col>
+                    </div>
                     </Container>)
                 }
             </Container>

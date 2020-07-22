@@ -156,7 +156,7 @@ export default class RecoverKeys extends React.Component {
 
     render() {
         return (
-            <Container fluid className="height100 d-flex flex-column justify-content-center safex-blue">
+            <Container  className="height100 d-flex flex-column justify-content-center ">
                 {this.state.wallet_made ?
                     (<div>
                         <WalletHome
@@ -166,7 +166,8 @@ export default class RecoverKeys extends React.Component {
                             password={this.state.password}
                         />
                     </div>) :
-                    (<Container fluid className="font-size-small b-r25 grey-back d-flex flex-column white-text" >
+                    (<Container  className="font-size-small b-r25 grey-back d-flex flex-column white-text" >
+                        <div className="auto_margin_50 d-flex flex-column">
                         <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
                         
                         <Row className="align-items-center mb-5 justify-content-center">   
@@ -180,8 +181,8 @@ export default class RecoverKeys extends React.Component {
                                 This pathway will allow you to restore a wallet from your <b>Safex Public Address</b> 
                                 , <b>Private View</b> and <b>Spend Key</b>.
                             </p>
-                            <p className="border border-danger b-r25">
-                                If you are participating in the testnet, tick this box
+                            <p >
+                                Testnet
                                 <input
                                     name="isTestnet"
                                     type="checkbox"
@@ -199,7 +200,7 @@ export default class RecoverKeys extends React.Component {
                                 <p>
                                     Enter your <b>Public Address</b>, <b>Private Spend Key</b> and <b>Private View Key</b>
                                 </p>
-                                <Col className="mb-2 mt-2 p-5 border border-warning b-r25">
+                                <Col className="mb-2 mt-2 p-5 border  b-r25">
                                     <Form id="set_keys" onSubmit={this.set_keys}>
                                         Public Address <Form.Control 
                                                             className="mb-3"
@@ -324,6 +325,7 @@ export default class RecoverKeys extends React.Component {
                             (<div></div>)
                         }
                         </Col>
+                    </div>
                     </Container>)
                 }
             </Container>
