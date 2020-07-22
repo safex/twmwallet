@@ -90,7 +90,7 @@
     "make-all-installers": "npm run build && electron-builder build -ml && electron-builder build -w --x64"
   },
   "build": {
-    "appId": "com.electron.safex_miner",
+    "appId": "com.electron.TWMWALLET",
     "npmRebuild": true,
     "extends": null,
     "files": [
