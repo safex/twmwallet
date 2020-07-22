@@ -2,15 +2,15 @@
                     <Row>
                         <div className="container center">
                             <nav className="menu">
-                            <Image className="entry_image align-content-center mb-5" src={require("./../../img/sails-logo.png")}/>
+                            <Image className="entry-image align-content-center mb-5" src={require("./../../img/sails-logo.png")}/>
 
                                 <div className="menu__right">
                                     <ul className="menu__list">
                                         <li className="menu__list-item">
-                                            SFX: {this.state.cash}
+                                            SFX: {this.state.cash.toLocaleString()}
                                         </li>
                                         <li className="menu__list-item">
-                                            SFT: {this.state.tokens}
+                                            SFT: {this.state.tokens.toLocaleString()}
                                         </li>
                                         <li className="menu__list-item">
                                             <a className="menu__link" href="javascript:void(0)"

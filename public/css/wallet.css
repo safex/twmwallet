@@ -1,0 +1,331 @@
+/* Header CSS Start */
+
+ /* Tooltip container */
+ .tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+  }
+  
+  /* Tooltip text */
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+  
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+  
+    /* Fade in tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  /* Tooltip arrow */
+  .tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+  }
+  
+  /* Show the tooltip text when you mouse over the tooltip container */
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  } 
+
+
+    #header #balances {
+        font-size: 1.3rem;
+    }
+
+    #header .blockchain-icon {
+        width: 20px;
+        color: turquoise;
+    }
+
+    #header modal {
+        font-size: 1.5rem;
+        width: 75%;
+    }
+
+    #header #header-buttons {
+        padding: .3rem;
+        justify-content: space-around;
+        width: 30vw;
+        min-width: 300px;
+        border-radius: 10px;
+        justify-content: space-around;
+
+    }
+
+    .menu {
+        height: fit-content;
+        flex-direction: column;
+    }
+
+    .menu-logo {
+        max-width: fit-content!important;
+    
+    }
+
+/* Home CSS Start */
+
+    .wallet {
+        padding: 1rem 1rem 4rem;
+        background-color: rgba(24, 189, 231, 0.5);
+        border: 2px solid #fff;
+        color: #fff;
+        width: 100%;
+        height: fit-content;
+        min-height: 140px;
+        max-height: 800px;
+        
+    }
+
+    .cash-box {
+        width: 20%;
+        min-width: 15vw;
+        max-width: 20vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+    
+        border: 2px solid #fff;
+        border-radius: 10px;
+        background-color: rgba(38, 232, 185, 0.5);
+        min-height: 25vh;
+        margin: auto 0;
+        
+    }
+    
+    .cash-box ul {
+        margin-bottom: 0px;
+    }
+
+    .cash-box li {
+        text-align: center!important;
+    }
+
+    #wallet-balance {
+        font-size: 1.8rem;
+        font-weight: bolder;
+    }
+
+    .cash-box input {
+        margin: 1rem 0;
+
+    }
+
+
+/* Home CSS End */
+
+
+/* Market CSS Start */
+
+    .search-box {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    table {
+        color: white!important;
+        overflow-y: scroll!important;
+        max-height: 500px!important;
+    }
+
+    .offer-tooltip {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 80vh;
+        height: 40vh;
+        min-width: 200px;
+        max-width: 500px;
+        min-height: 100px;
+        max-height: 500px;
+    }
+
+    .offer-tooltip img {
+       
+        height: 30vh;
+        
+    }
+
+/* Market CSS End */
+
+/* Merchant CSS Start */
+
+    .accounts {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+    }
+
+    .account-list {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        overflow-y: scroll;
+        border-radius: 10px;
+        
+
+        color:  #fff;
+        background-color: rgba(38, 232, 185, 0.5);
+        width: 100%;
+        max-height: 35vh;
+        
+        
+    }
+
+    .accounts-box {
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+
+        padding: 1rem;
+        margin: 1rem;
+
+        border: 2px solid rgb(32, 240, 59);
+        border-radius: 10px;
+        background-color: #38bdd2;
+        min-height: min-content;
+    }
+
+    #account-edit-buttons {
+        width: 75%;
+
+    }
+
+    #account-edit-button button {
+        margin-top: 1rem;
+    }
+
+    .merchant-profile-view {
+        padding: .5rem;
+        background-color: #38bdd2;
+        border: 2px solid #fff;
+        color: #fff;
+        width: 100%;
+        min-height: 140px;
+        margin: 0 -10px;
+        max-height: 800px;
+    }
+
+    .account-element {
+        width: 100%;
+        height: 15vh;
+        max-width: 500px;
+        min-width: 200px;
+        max-height: 150px;
+        min-height: 75px;
+        align-items: center;
+
+        margin: .5rem;
+        padding: .5rem;
+
+        border-width: 4px!important;
+
+    }
+
+    .new-account-form {
+        color:  black;
+        font-size: 1.25rem!important;
+    }
+
+    .new-account-form textarea {
+        max-height: 100px;
+    }
+
+    #new-account-form text {
+        margin-top: .5rem;
+        margin-bottom: .5rem;
+        
+    }
+
+    #new-account-form button {
+        font-size: 1.25rem!important;
+    }
+
+    .text-align-center {
+        text-align: center!important;
+    }
+
+/* Merchant CSS End */
+
+/* Tokens CSS Start */
+
+    .staking-table {
+        width: 90%;
+        min-height: 10vh;
+        margin: 0 auto;
+    }
+
+    .staking-box {
+        margin: auto;
+        display: flex;
+        width: 100%;
+        justify-content: space-evenly;
+        padding: 1rem;
+    }
+
+    .staking-box table {
+        margin-bottom: 0!important;
+    }
+
+    .token-box {
+    
+        min-width: 15vw;
+        max-width: 20vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+
+        border: 2px solid #fff;
+        border-radius: 10px;
+        background-color: rgba(47, 227, 242, 0.9);
+        min-height: 40vh;
+        margin: auto 0;
+        
+    }
+
+    .token-box input {
+        margin: 1rem 0;
+
+    }
+
+/* Tokens CSS End */
+
+
+
+
+
+
+
+
+
+
+
+

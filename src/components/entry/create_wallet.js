@@ -175,7 +175,7 @@ export default class CreateWallet extends React.Component {
 
     render() {
         return (
-            <Container fluid className="height100 d-flex flex-column justify-content-center safex-blue">
+            <Container  className="height100 d-flex flex-column justify-content-center ">
                 {this.state.wallet_made ?
                     (<div>
                         <WalletHome
@@ -185,7 +185,8 @@ export default class CreateWallet extends React.Component {
                             password={this.state.password}
                         />
                     </div>) :
-                    (<Container fluid className="font-size-small b-r25 grey-back d-flex flex-column safex-blue white-text" >
+                    (<Container  className="font-size-small b-r25 grey-back d-flex flex-column  white-text" >
+                    <div className="auto_margin_50 d-flex flex-column">
                         <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
 
                         <Row className="align-items-center mb-5 justify-content-center">
@@ -198,8 +199,9 @@ export default class CreateWallet extends React.Component {
                             <p>
                                 This path creates a new set of keys and a Safex Wallet.
                             </p>
-                            <p className="border border-danger b-r25">
-                                If you are participating in the testnet, tick this box
+<<<<<<< HEAD
+                            <p >
+                                Testnet
                                 <input
                                     name="isTestnet"
                                     type="checkbox"
@@ -209,12 +211,17 @@ export default class CreateWallet extends React.Component {
                                 />
                             </p>
 
+=======
+                    <p>
+                        THIS WALLET IS STAGENET V1 THIS IS NOT A REGULAR SAFEX WALLET USE ONLY FOR TESTING ONLY JULY 13, 2020
+                    </p>
+>>>>>>> 53bf3968c6641875313e8c979b7391b4cc21da5b
 
 
                         {this.state.new_path.length > 0 ?
                             (<div></div>) :
                             (
-                                    <div className="mt-2 border border-warning  b-r25">
+                                    <div className="mt-2 border   b-r25">
                                         <p>
                                             Set the path where to save your new wallet file
                                         </p>
@@ -228,7 +235,7 @@ export default class CreateWallet extends React.Component {
 
                         {this.state.new_path.length > 0 && this.state.daemon_host.length < 1 ?
                             (
-                                    <Col className="mb-2 mt-2 border border-warning b-r25">
+                                    <Col className="mb-2 mt-2 border  b-r25">
                                         <Form  id="set_daemon" className="auto_margin_50" onSubmit={this.set_daemon_state}>
                                             <Form.Control className="mt-2 mb-2"  name="daemon_host" defaultValue="stagenetrpc.safex.org"
                                                           placedholder="set the ip address of the safex blockchain"/>
@@ -240,7 +247,7 @@ export default class CreateWallet extends React.Component {
                                     </Col>
                                ) :
                             (
-                                <Col className="d-flex flex-column mb-2 mt-2 border border-warning b-r25">
+                                <Col className="d-flex flex-column mb-2 mt-2 border  b-r25">
                                     <p className="mt-2 mb-2">
                                         You will be connected
                                         to <b>{this.state.daemon_host}:{this.state.daemon_port}</b> for
@@ -261,7 +268,7 @@ export default class CreateWallet extends React.Component {
                         this.state.password.length < 1 ?
 
 
-                            (<Col className="mb-2 mt-2 border border-warning b-r25 ">
+                            (<Col className="mb-2 mt-2 border  b-r25 ">
                                 <Form id="set_password" className="auto_margin_50" onSubmit={this.set_password}>
                                     <Form.Control name="password" className="mt-2 mb-2" type="password"
                                                     placedholder="Set the ip address of the Safex blockchain"/>
@@ -274,7 +281,7 @@ export default class CreateWallet extends React.Component {
 
                             ) :
                             (
-                                <Col className="d-flex flex-column mb-5 border border-warning b-r25">
+                                <Col className="d-flex flex-column mb-5 border  b-r25">
                                     <p className="mt-2 mb-2">
                                         Your chosen password is: {[...Array(this.state.password.length)].map(() =>
                                         <span>♦</span>)}
@@ -293,7 +300,7 @@ export default class CreateWallet extends React.Component {
                         this.state.daemon_host.length > 0 &&
                         this.state.password.length > 0 ?
                             (   <Col className="mt-5">
-                                    <Col className="p-2 justify-content-between align-items-baseline border border-warning b-r25">
+                                    <Col className="p-2 justify-content-between align-items-baseline border  b-r25">
                                         <p>
                                             This file will be saved to: <b>{this.state.new_path}</b>
                                         </p>
@@ -314,6 +321,7 @@ export default class CreateWallet extends React.Component {
                             </div>)
                         }
                         </Col>
+                    </div>
                     </Container>)
                 }
             </Container>

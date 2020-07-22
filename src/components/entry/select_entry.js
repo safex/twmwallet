@@ -65,26 +65,26 @@ export default class SelectEntry extends React.Component {
 
     restore_keys = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/recover_keys'});
+        this.props.history.push({pathname: '/'});
     };
 
     seed_phrase = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/recover_seed'});
+        this.props.history.push({pathname: '/'});
     };
 
     restore_legacy = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/legacy_password', state: {legacy_wallet: this.state.legacy_wallet}});
+        this.props.history.push({pathname: '/', state: {legacy_wallet: this.state.legacy_wallet}});
     };
 
     render() {
         return (
-            <div className="width100 height100 safex-blue d-flex flex-column text-center">
+            <div className="width100 height100 d-flex flex-column text-center">
                 
                 <Container className="height100 flex-column p-5 d-flex">
                     <Row className="row justify-content-md-center justify-content-center p-3">
-                        <Image className="entry_image align-content-center mb-5" src={require("./../../img/safex-logo.png")}/>
+                        <Image className="entry-image align-content-center mb-5" src={require("./../../img/safex-logo.png")}/>
                     </Row>
                     
                     <Row className="row justify-content-md-center justify-content-center p-3">

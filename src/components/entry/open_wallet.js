@@ -186,7 +186,7 @@ export default class OpenWallet extends React.Component {
 
     render() {
         return (
-            <Container fluid className="height100 d-flex flex-column justify-content-center safex-blue">
+            <Container fluid className="height100 d-flex flex-column justify-content-center ">
                 {this.state.wallet_made ?
                     (<Container fluid className="height100 justify-content-between">
                         <WalletHome
@@ -196,7 +196,23 @@ export default class OpenWallet extends React.Component {
                             password={this.state.password}
                         />
                     </Container>) :
-                    (<Container fluid className="font-size-small b-r25 grey-back d-flex flex-column safex-blue white-text" >
+<<<<<<< HEAD
+                    (<Container  className="font-size-small b-r25 grey-back d-flex flex-column white-text" >
+                    
+                    <div className="auto_margin_50 d-flex flex-column">    
+                        <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
+
+                        <Row className="align-items-center mb-5 justify-content-center">
+                            <h1>Open Wallet</h1>
+                        </Row>
+
+                            <Col sm={8} className="d-flex justify-content-center align-self-center flex-column text-center" >
+                                <p>
+                                    Open an existing Safex wallet by selecting the .keys file and
+                                    entering your password.
+                                </p>
+=======
+                    (<Container fluid className="font-size-small b-r25 grey-back d-flex flex-column white-text" >
                     <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
 
                     <Row className="align-items-center mb-5 justify-content-center">
@@ -208,100 +224,109 @@ export default class OpenWallet extends React.Component {
                                 Open an existing Safex wallet by selecting the .keys file and
                                 entering your password.
                             </p>
+                            <p>
+                                THIS WALLET IS STAGENET V1 THIS IS NOT A REGULAR SAFEX WALLET USE ONLY FOR TESTING ONLY JULY 13, 2020
+                            </p>
+>>>>>>> 53bf3968c6641875313e8c979b7391b4cc21da5b
 
-                            <div className="mt-4">
-                                <p className="border border-danger b-r25">
-                                    If you are participating in the testnet, tick this box
-                                    <input
-                                        name="isTestnet"
-                                        type="checkbox"
-                                        checked={this.state.testnet}
-                                        onChange={this.set_to_testnet}
-                                        className="ml-2"
-                                    />
-                                </p>
-                            </div>
-
-                            {this.state.new_path.length > 0 ?
-                                (<Col className="mb-2 mt-2 border border-warning b-r25">
-                                    <p className="mt-2">
-                                        Selected Wallet File: <b>{this.state.new_path}</b>
+                                <div className="mt-4">
+                                    <p >
+                                        Testnet
+                                        <input
+                                            name="isTestnet"
+                                            type="checkbox"
+                                            checked={this.state.testnet}
+                                            onChange={this.set_to_testnet}
+                                            className="ml-2"
+                                        />
                                     </p>
-                                    <Button className="mt-2 mb-2" onClick={this.change_path}>
-                                        Change File
-                                    </Button>
+                                </div>
 
+                                {this.state.new_path.length > 0 ?
+                                    (<Col className="mb-2 mt-2 border  b-r25">
+                                        <p className="mt-2">
+                                            Selected Wallet File: <b>{this.state.new_path}</b>
+                                        </p>
+                                        <Button className="mt-2 mb-2" onClick={this.change_path}>
+                                            Change File
+                                        </Button>
+
+                                    </Col>) :
+                                    (<div>
+
+                                        <Form id="set_path" onSubmit={this.set_path}>
+                                            <Button className="mt-5 mb-5" type="submit" variant="primary" size="lg" block>
+                                                Select Wallet File
+                                            </Button>
+                                        </Form>
+                                    </div>)
+                                }
+
+                            </Col>
+
+                            {this.state.new_path.length > 0 &&
+                            this.state.daemon_host.length < 1 ?
+                                (
+                                    <Col sm={8} className="d-flex justify-content-center align-self-center flex-column ">
+                                        <div>
+                                            <p>
+                                                This is the URL used to connect to the Safex blockchain.
+                                                You can use the default provided by the Safex Foundation
+                                                or replace it with your own full node.
+                                            </p>
+                                            <ul className="mb-4">
+                                                <li>The default self hosted wallet setup would be:</li>
+                                                <li className="mt-4">HOST: <b>127.0.0.1</b></li>
+                                                <li className="mt-1">PORT: <b>17402</b></li>
+                                                <li className="mt-2">The default is rpc.safex.org</li>
+
+                                            </ul>
+                                            <Form id="set_daemon" onSubmit={this.set_daemon_state}>
+                                                <b>Safexd Host</b> <Form.Control className="mb-4" name="daemon_host" defaultValue="stagenetrpc.safex.org"
+                                                                        placedholder="set the ip address of the safex blockchain"/>
+                                                <b>Safexd Port</b> <Form.Control  name="daemon_port" defaultValue="30393"
+                                                                        placedholder="set the port of the safex blockchain"/>
+                                                <Button className="mt-5 mb-5" type="submit" variant="primary" size="lg" block>Set Connection</Button>
+                                            </Form>
+                                        </div>
+                                    </Col>
+                                ) :
+                                (<div>
+                                </div>)
+
+                            }
+
+                            {this.state.new_path.length > 0 &&
+                            this.state.daemon_host.length > 0 &&
+                            this.state.password.length < 1 ?
+
+                                (<Col className="mt-2">
+                                    <Form id="set_password" className="auto_margin_50" onSubmit={this.open_wallet}>
+                                        Enter Your Password: <Form.Control name="password" type="password"
+                                                        placedholder="enter your password and open your wallet"/>
+                                        <Button className="mt-2 mb-5" type="submit" variant="primary" size="lg" block>
+                                            Open Wallet
+                                        </Button>
+                                    </Form>
                                 </Col>) :
                                 (<div>
-
-                                    <Form id="set_path" onSubmit={this.set_path}>
-                                        <Button className="mt-5 mb-5" type="submit" variant="primary" size="lg" block>Select Wallet File</Button>
-                                    </Form>
                                 </div>)
                             }
 
-                        </Col>
-
-                        {this.state.new_path.length > 0 &&
-                        this.state.daemon_host.length < 1 ?
-                            (
-                                <Col sm={8} className="d-flex justify-content-center align-self-center flex-column ">
-                                    <div>
-                                        <p>
-                                            This is the URL used to connect to the Safex blockchain.
-                                            You can use the default provided by the Safex Foundation
-                                            or replace it with your own full node.
-                                        </p>
-                                        <ul className="mb-4">
-                                            <li>The default self hosted wallet setup would be:</li>
-                                            <li className="mt-4">HOST: <b>127.0.0.1</b></li>
-                                            <li className="mt-1">PORT: <b>17402</b></li>
-                                            <li className="mt-2">The default is rpc.safex.org</li>
-
-                                        </ul>
-                                        <Form id="set_daemon" onSubmit={this.set_daemon_state}>
-                                            <b>Safexd Host</b> <Form.Control className="mb-4" name="daemon_host" defaultValue="stagenetrpc.safex.org"
-                                                                      placedholder="set the ip address of the safex blockchain"/>
-                                            <b>Safexd Port</b> <Form.Control  name="daemon_port" defaultValue="30393"
-                                                                      placedholder="set the port of the safex blockchain"/>
-                                            <Button className="mt-5 mb-5" type="submit" variant="primary" size="lg" block>Set Connection</Button>
-                                        </Form>
-                                    </div>
-                                </Col>
-                            ) :
-                            (<div>
-                            </div>)
-
-                        }
-
-                        {this.state.new_path.length > 0 &&
-                        this.state.daemon_host.length > 0 &&
-                        this.state.password.length < 1 ?
-
-                            (<Col className="mt-2">
-                                <Form id="set_password" className="auto_margin_50" onSubmit={this.open_wallet}>
-                                    Enter Your Password: <Form.Control name="password" type="password"
-                                                    placedholder="enter your password and open your wallet"/>
-                                    <Button className="mt-2 mb-5" type="submit" variant="primary" size="lg" block>Open Wallet</Button>
-                                </Form>
-                            </Col>) :
-                            (<div>
-                            </div>)
-                        }
-
-                        {this.state.new_path.length > 0 &&
-                        this.state.daemon_host.length > 0 &&
-                        this.state.password.length > 0 ?
-                            (<div>
-                                <Row className="justify-content-md-center">
-                                    <Col sm={6}>
-                                        <p>Opening your wallet...</p>
-                                    </Col>
-                                </Row>
-                            </div>) :
-                            (<div>
-                            </div>)
-                        }
+                            {this.state.new_path.length > 0 &&
+                            this.state.daemon_host.length > 0 &&
+                            this.state.password.length > 0 ?
+                                (<div>
+                                    <Row className="justify-content-md-center">
+                                        <Col sm={6}>
+                                            <p>Opening your wallet...</p>
+                                        </Col>
+                                    </Row>
+                                </div>) :
+                                (<div>
+                                </div>)
+                            }
+                        </div>
                     </Container>)}
             </Container>);
     }
