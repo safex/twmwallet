@@ -80,7 +80,7 @@ export default class SelectEntry extends React.Component {
 
     render() {
         return (
-            <div className="width100 height100 safex-blue d-flex flex-column text-center">
+            <div className="width100 height100 d-flex flex-column text-center">
                 
                 <Container className="height100 flex-column p-5 d-flex">
                     <Row className="row justify-content-md-center justify-content-center p-3">
