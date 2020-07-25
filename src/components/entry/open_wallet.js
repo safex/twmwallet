@@ -196,7 +196,6 @@ export default class OpenWallet extends React.Component {
                             password={this.state.password}
                         />
                     </Container>) :
-<<<<<<< HEAD
                     (<Container  className="font-size-small b-r25 grey-back d-flex flex-column white-text" >
                     
                     <div className="auto_margin_50 d-flex flex-column">    
@@ -211,23 +210,6 @@ export default class OpenWallet extends React.Component {
                                     Open an existing Safex wallet by selecting the .keys file and
                                     entering your password.
                                 </p>
-=======
-                    (<Container fluid className="font-size-small b-r25 grey-back d-flex flex-column white-text" >
-                    <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
-
-                    <Row className="align-items-center mb-5 justify-content-center">
-                        <h1>Open Wallet</h1>
-                    </Row>
-
-                        <Col sm={8} className="d-flex justify-content-center align-self-center flex-column text-center" >
-                            <p>
-                                Open an existing Safex wallet by selecting the .keys file and
-                                entering your password.
-                            </p>
-                            <p>
-                                THIS WALLET IS STAGENET V1 THIS IS NOT A REGULAR SAFEX WALLET USE ONLY FOR TESTING ONLY JULY 13, 2020
-                            </p>
->>>>>>> 53bf3968c6641875313e8c979b7391b4cc21da5b
 
                                 <div className="mt-4">
                                     <p >
