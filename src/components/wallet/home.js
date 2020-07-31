@@ -1365,44 +1365,7 @@ class WalletHome extends React.Component {
                     });
                     return (
                         <div className="overflow-y">
-                            <Modal className="new-account-form" animation={false}
-                                   show={this.state.show_purchase_form}
-                                   onHide={this.handleClosePurchaseForm}>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>
-                                        Purchase {this.state.show_purchase_offer.title}
-                                    </Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body>
 
-                                    <Form id="purchase_item"
-                                          onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
-                                        <ul>
-
-                                            <li>{this.state.show_purchase_offer.title}</li>
-                                            <li>{this.state.show_purchase_offer.price / 10000000000}</li>
-                                            <li>{this.state.show_purchase_offer.seller}</li>
-                                            <li>{this.to_ellipsis(this.state.show_purchase_offer.offerID)}</li>
-                                        </ul>
-
-                                        {this.state.show_purchase_offer.quantity} available <Form.Control
-                                        className="light-blue-back"
-                                        id="quantity"
-                                        name="quantity"/>
-                                        Send Message <Form.Control name="message"/>
-                                        Mixins <Form.Control name="mixins" value="1"/>
-
-
-                                        <Button size="lg" className="mt-2" type="submit" variant="success">Confirm Payment</Button>
-                                    </Form>
-                                </Modal.Body>
-                                <Modal.Footer className="align-self-start">
-
-                                    <Button size="lg" variant="danger" onClick={this.handleClosePurchaseForm}>
-                                        Close
-                                    </Button>
-                                </Modal.Footer>
-                            </Modal>
                             <Row>
                                 <Col className=" white-text overflow-y" md={12}>
                                     <div
@@ -2152,7 +2115,44 @@ class WalletHome extends React.Component {
                     id="header"
                     className="no-gutters my-5 p-2 border border-light b-r10 opaque-black"
                 >
+                    <Modal className="new-account-form" animation={false}
+                           show={this.state.show_purchase_form}
+                           onHide={this.handleClosePurchaseForm}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>
+                                Purchase {this.state.show_purchase_offer.title}
+                            </Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
 
+                            <Form id="purchase_item"
+                                  onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
+                                <ul>
+
+                                    <li>{this.state.show_purchase_offer.title}</li>
+                                    <li>{this.state.show_purchase_offer.price / 10000000000}</li>
+                                    <li>{this.state.show_purchase_offer.seller}</li>
+                                    <li>{this.to_ellipsis(this.state.show_purchase_offer.offerID)}</li>
+                                </ul>
+
+                                {this.state.show_purchase_offer.quantity} available <Form.Control
+                                className="light-blue-back"
+                                id="quantity"
+                                name="quantity"/>
+                                Send Message <Form.Control name="message"/>
+                                Mixins <Form.Control name="mixins" value="1"/>
+
+
+                                <Button size="lg" className="mt-2" type="submit" variant="success">Confirm Payment</Button>
+                            </Form>
+                        </Modal.Body>
+                        <Modal.Footer className="align-self-start">
+
+                            <Button size="lg" variant="danger" onClick={this.handleClosePurchaseForm}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
                     <Row className="justify-content-between align-items-center">
 
                         <Col sm={2} className="p-1 align-self-center b-r10 light-blue-back">
