@@ -13,17 +13,14 @@ export async function create_wallet(path, password, restore_height, network, dae
     });
 };
 
-export async function open_wallet(path, password, restore_height, network, daemon) {
-    return safex.openWallet({
+export async function open_wallet_util(path, password, restore_height, network, daemon, callback) {
+    safex.openWallet({
         path: path,
         password: password,
         network: network,
         restoreHeight: restore_height,
         daemonAddress: daemon,
-    }).then((wallet) => {
-        console.log(`opened the wallet for address ${wallet.address()}`);
-        return wallet;
-    });
+    }, callback);
 };
 
 export async function recover_from_keys(path, password, restore_height, network, daemon, address, viewkey, spendkey) {

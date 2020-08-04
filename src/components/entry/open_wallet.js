@@ -1,6 +1,6 @@
 import React from 'react';
 import {Row, Col, OverlayTrigger, Container, Button, Form} from 'react-bootstrap';
-import {open_wallet} from '../../utils/wallet_creation';
+import {open_wallet_util} from '../../utils/wallet_creation';
 import {FaBackward} from 'react-icons/fa';
 import WalletHome from '../wallet/home';
 import {open_twm_file, save_twm_file} from "../../utils/twm_actions";
@@ -8,6 +8,8 @@ import {open_twm_file, save_twm_file} from "../../utils/twm_actions";
 const crypto = window.require('crypto');
 
 let {dialog} = window.require("electron").remote;
+
+let ipath = '';
 
 export default class OpenWallet extends React.Component {
     constructor(props) {
@@ -54,33 +56,8 @@ export default class OpenWallet extends React.Component {
         console.log(e.target.daemon_host.value);
     };
 
-    open_wallet = async (e) => {
-        e.preventDefault();
-
-        let the_password = e.target.password.value;
-        let ipath = '';
-
-        if (this.state.new_path.includes('.keys')) {
-            ipath = this.state.new_path.substring(0, this.state.new_path.length - 5);
-        } else if (this.state.new_path.includes('.safex_account_keys')) {
-            ipath = this.state.new_path.substring(0, this.state.new_path.length - 19);
-        } else if (this.state.new_path.includes('.address.txt')) {
-            ipath = this.state.new_path.substring(0, this.state.new_path.length - 12);
-        } else if (this.state.new_path.includes('.twm')) {
-            ipath = this.state.new_path.substring(0, this.state.new_path.length - 4);
-        } else {
-            ipath = this.state.new_path;
-        }
-
-        //now check if you can load the .twm file if not you have to make it
+    open_wallet_result = async(err, wallet) => {
         try {
-            let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
-            let wallet = await open_wallet(ipath,
-                e.target.password.value,
-                0,
-                this.state.network,
-                daemon_string);
-            console.log(wallet);
             localStorage.setItem('wallet', JSON.stringify(wallet));
 
             try {
@@ -155,13 +132,49 @@ export default class OpenWallet extends React.Component {
                 }
             }
 
-            this.setState({wallet_made: true, wallet: wallet, password: the_password});
+            this.setState({wallet_made: true, wallet: wallet, password: this.state.password});
         } catch (err) {
             console.error(err);
             console.error("error on initial recovery");
             alert(err);
         }
     };
+
+
+    open_wallet = async (e) => {
+        e.preventDefault();
+
+        let the_password = e.target.password.value;
+        this.setState({password: the_password});
+
+        if (this.state.new_path.includes('.keys')) {
+            ipath = this.state.new_path.substring(0, this.state.new_path.length - 5);
+        } else if (this.state.new_path.includes('.safex_account_keys')) {
+            ipath = this.state.new_path.substring(0, this.state.new_path.length - 19);
+        } else if (this.state.new_path.includes('.address.txt')) {
+            ipath = this.state.new_path.substring(0, this.state.new_path.length - 12);
+        } else if (this.state.new_path.includes('.twm')) {
+            ipath = this.state.new_path.substring(0, this.state.new_path.length - 4);
+        } else {
+            ipath = this.state.new_path;
+        }
+
+        //now check if you can load the .twm file if not you have to make it
+
+
+        let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
+
+        open_wallet_util(ipath,
+            e.target.password.value,
+            0,
+            this.state.network,
+            daemon_string, this.open_wallet_result)
+
+
+    };
+
+
+
 
     set_to_testnet = (e) => {
         e.preventDefault();
