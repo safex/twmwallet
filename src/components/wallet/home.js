@@ -21,7 +21,7 @@ import {
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
 
 // Icon Imports
-import {FaCogs, FaSearch} from 'react-icons/fa'
+import {FaCogs, FaSearch, FaInfoCircle} from 'react-icons/fa'
 import {GiExitDoor} from 'react-icons/gi'
 import {GrCubes} from 'react-icons/gr'
 import {IconContext} from 'react-icons'
@@ -69,7 +69,8 @@ class WalletHome extends React.Component {
             blockchain_current_interest: {},
             twm_file: {},
             show_purchase_offer: {title: '', quantity: 0, offerID: '', seller: ''},
-            show_edit_offer: {}
+            show_edit_offer: {},
+            new_account_image: ""
         };
     }
 
@@ -393,7 +394,7 @@ class WalletHome extends React.Component {
                         mixin: mixins
                     }).then((tx) => {
                         console.log(tx);
-                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${tx.fee() / 10000000000} SFX Safex Cash`);
+                        let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${tx.fee() / 10000000000} SFX Safex Cash`);
                         let fee = tx.fee();
                         let txid = tx.transactionsIds();
                         if (confirmed_fee) {
@@ -447,28 +448,32 @@ class WalletHome extends React.Component {
 
                                 console.log(commit);
                                 console.log("committed transaction");
-                                alert(`transaction successfully submitted 
-                        transaction id: ${txid}
-                        tokens locked for 500 blocks: 5000 SFT
-                        fee: ${fee / 10000000000}`);
+                                copy(`https://stagenet1.safex.org/search?value=${txid}`)
+                                alert(`Transaction successfully submitted. 
+                                    Transaction ID: ${txid}
+                                    5000 SFT will be locked for 500 blocks.
+                                    Fee: ${fee / 10000000000} SFX.
+                                    A link to this transaction on the blockchain has been copied to the clipboard.`);
+                                
                                 localStorage.setItem('twm_file', twm_file);
 
-                                this.setState({twm_file: twm_file});
+                                this.setState({twm_file: twm_file, show_new_account_form: false, new_account_image: ""});
+                                
 
                             }).catch((err) => {
                                 console.error(err);
                                 console.error(`error at the committing of the account registration transaction`);
-                                alert(`there was an error at committing the transaction to the blockchain`);
+                                alert(`There was an error at committing the transaction to the blockchain`);
                             })
                         } else {
-                            alert(`your transaction was cancelled, no account registration was completed`);
+                            alert(`Your transaction was cancelled, no account registration was completed.`);
                         }
                     }).catch((err) => {
                         console.error(err);
-                        alert(`error when committing the transaction: likely has not gone through`)
+                        alert(`Error when committing the transaction. It is likely that has not gone through.`)
                     })
                 } else {
-                    alert(`not enough tokens`);
+                    alert(`Not enough tokens`);
                 }
 
             } catch (err) {
@@ -476,7 +481,7 @@ class WalletHome extends React.Component {
                 console.error("error at the register account function");
             }
         } else {
-            alert(`please wait until the wallet has fully loaded before performing registration actions`)
+            alert(`Please wait until the wallet has fully loaded before performing registration actions`)
         }
     };
 
@@ -492,7 +497,7 @@ class WalletHome extends React.Component {
                 if (confirmed) {
                     try {
                         let token_txn = await send_tokens(wallet, e.target.destination.value, e.target.amount.value, mixins);
-                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${token_txn.fee() / 10000000000} SFX Safex Cash`);
+                        let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${token_txn.fee() / 10000000000} SFX Safex Cash`);
                         let fee = token_txn.fee();
                         let txid = token_txn.transactionsIds();
                         let amount = e.target.amount.value;
@@ -542,7 +547,7 @@ class WalletHome extends React.Component {
                     try {
                         let cash_txn = await send_cash(wallet, e.target.destination.value, e.target.amount.value, mixins);
                         console.log(cash_txn);
-                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${cash_txn.fee() / 10000000000} SFX Safex Cash`);
+                        let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${cash_txn.fee() / 10000000000} SFX Safex Cash`);
                         let fee = cash_txn.fee();
                         let txid = cash_txn.transactionsIds();
                         let amount = e.target.amount.value;
@@ -579,6 +584,10 @@ class WalletHome extends React.Component {
             console.error(`error at the cash transaction`);
         }
     };
+
+    handleChange = (event) => {
+        this.setState({[event.target.name]: event.target.value});
+    }
 
     //view shifting
     go_home = () => {
@@ -723,6 +732,7 @@ class WalletHome extends React.Component {
     //close modal of Purchase Form
     handleClosePurchaseForm = () => {
         this.setState({show_purchase_form: false});
+        
     };
 
     //show modal of Purchase Form
@@ -800,7 +810,7 @@ class WalletHome extends React.Component {
                 mixin: mixins
             }).then((tx) => {
                 console.log(tx);
-                let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${tx.fee() / 10000000000} SFX Safex Cash`);
+                let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${tx.fee() / 10000000000} SFX Safex Cash`);
                 let fee = tx.fee();
                 let txid = tx.transactionsIds();
                 if (confirmed_fee) {
@@ -841,7 +851,7 @@ class WalletHome extends React.Component {
                 if (confirmed) {
                     try {
                         let stake_txn = await stake_tokens(wallet, e.target.amount.value, mixins);
-                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${stake_txn.fee() / 10000000000} SFX Safex Cash`);
+                        let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${stake_txn.fee() / 10000000000} SFX Safex Cash`);
                         let fee = stake_txn.fee();
                         let txid = stake_txn.transactionsIds();
                         let amount = e.target.amount.value;
@@ -889,7 +899,7 @@ class WalletHome extends React.Component {
                 if (confirmed) {
                     try {
                         let unstake_txn = await unstake_tokens(wallet, e.target.amount.value, mixins);
-                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${unstake_txn.fee() / 10000000000} SFX Safex Cash`);
+                        let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${unstake_txn.fee() / 10000000000} SFX Safex Cash`);
                         let fee = unstake_txn.fee();
                         let txid = unstake_txn.transactionsIds();
                         let amount = e.target.amount.value;
@@ -974,10 +984,10 @@ class WalletHome extends React.Component {
         }
     };
 
-    to_ellipsis = (text) => {
+    to_ellipsis = (text, firstHalf, secondHalf) => {
         const text_to_ellipse = text
 
-        const ellipse = `${text_to_ellipse.substring(0, 10)}.....${text_to_ellipse.substring(text_to_ellipse.length - 10, text_to_ellipse.length)}`
+        const ellipse = `${text_to_ellipse.substring(0, firstHalf)}.....${text_to_ellipse.substring(text_to_ellipse.length - secondHalf, text_to_ellipse.length)}`
 
         return (
             ellipse
@@ -1018,7 +1028,7 @@ class WalletHome extends React.Component {
                 if (mixins >= 0) {
 
                     let amount = e.target.quantity.value;
-                    let confirmed = window.confirm(`Are you sure you want to purchase ${e.target.quantity.value} X ${listing.title} for a total of ${total_cost}SFX?`);
+                    let confirmed = window.confirm(`Are you sure you want to purchase ${e.target.quantity.value} X ${listing.title} for a total of ${total_cost} SFX?`);
                     console.log(confirmed);
                     if (confirmed) {
                         try {
@@ -1039,6 +1049,7 @@ class WalletHome extends React.Component {
                                     console.log(committed_txn);
                                     console.log(purchase_txn);
                                     copy(`https://stagenet1.safex.org/search?value=${txid}`)
+                                    this.setState({show_purchase_form: false})
                                     alert(`
                                         Purchase transaction committed.
                                         Transaction ID: ${txid}
@@ -1137,7 +1148,7 @@ class WalletHome extends React.Component {
                         active,
                         mixins
                     );
-                    let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${edit_txn.fee() / 10000000000} SFX Safex Cash`);
+                    let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${edit_txn.fee() / 10000000000} SFX Safex Cash`);
                     let fee = edit_txn.fee();
                     let txid = edit_txn.transactionsIds();
                     if (confirmed_fee) {
@@ -1198,14 +1209,48 @@ class WalletHome extends React.Component {
                                     <hr class="border border-light w-100"></hr>
 
                                     <Form id="send_cash" onSubmit={this.cash_send}>
-                                        Destination Address <Form.Control name="destination"
-                                                                          defaultValue="Safex5..."
-                                                                          placedholder="the destination address"/>
-                                        Amount (SFX)<Form.Control name="amount" defaultValue="0"
+                                        Destination Address 
+                                        <Form.Control name="destination"
+                                            defaultValue="Safex5..."
+                                            placedholder="the destination address"/>
+
+                                        Amount (SFX)
+                                        <Form.Control name="amount" defaultValue="0"
                                                                   placedholder="the amount to send"/>
-                                     {/*<select multiple={true} value={['1','2','3','4','5','6','7']}/>*/}
-                                        Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
-                                                                      placedholder="choose the number of mixins"/>
+                                        <Form.Group>
+                                            <Form.Label>
+                                                Mixins
+                                                <IconContext.Provider className="ml-5"  value={{color: 'white', size: '20px'}}>
+                                                    <FaInfoCircle 
+                                                    data-tip data-for='apiInfo' 
+                                                    className="blockchain-icon ml-8 white-text"/>
+                                                    
+                                                    <ReactTooltip className="ml-5" id='apiInfo' type='info' effect='solid'>
+                                                        <span>
+                                                            Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                            They are combined with yours for private transactions.<br/>
+                                                            Changing this from the default could hurt your privacy.<br/>
+                                                        </span>
+                                                    </ReactTooltip>
+                                                </IconContext.Provider>
+                                            </Form.Label>
+                                            
+                                            <Form.Control 
+                                                name="mixins" 
+                                                as="select"
+                                                defaultValue="7"
+                                            >
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                                <option>5</option>
+                                                <option>6</option>
+                                                <option>7</option>
+                                            </Form.Control>
+
+                                        </Form.Group>
+
                                         <Button className="mt-2 safex-cash-green" type="submit" size="lg" block>
                                             Send Safex
                                         </Button>
@@ -1229,13 +1274,14 @@ class WalletHome extends React.Component {
                     );
                 }
                 case "market":
+                    
                     var twm_listings_table = this.state.twm_offers.map((listing, key) => {
                         console.log(key);
                         try {
                             return <tr className="white-text" key={key}>
                                 <td>{listing.title}</td>
-                                <td>{listing.quantity}</td>
                                 <td>{listing.price / 10000000000}</td>
+                                <td>{listing.quantity}</td>
                                 <td>{listing.seller}</td>
                                 <td>{listing.offerID}</td>
                             </tr>
@@ -1261,10 +1307,12 @@ class WalletHome extends React.Component {
                                 data.country = '';
                                 data.message_type = '';
                                 data.physical = '';
+                                data.twm_version = '';
                                 try {
                                     let parsed_data = JSON.parse(listing.description);
                                     console.log(parsed_data);
                                     if (parsed_data.twm_version === 1) {
+                                        data.twm_version = 1
                                         if (parsed_data.hasOwnProperty('main_image')) {
                                             data.main_image = parsed_data.main_image;
                                         }
@@ -1296,23 +1344,34 @@ class WalletHome extends React.Component {
 
                         try {
                             return <tr key={key}>
-                                <td data-tip data-for={`offerTitle${key}`}>
-                                    {listing.title}
+                                <td 
+                                    onClick={() => this.handleShowPurchaseForm(listing)}
+                                    className="title-row" data-tip data-for={`offerTitle${key}`}
+                                >
+                                    <h4>{listing.title}</h4>
                                     <ReactTooltip className="offer-tooltip" id={`offerTitle${key}`} type='light' effect='float'>
                                         
-                                        {data.main_image ? 
+                                        {data.twm_version === 1 ? 
                                             <div className="d-flex flex-row justify-content-around p-3">
-                                                <Image className="border border-dark" src={data.main_image}></Image>
-                                                
-                                                <div className="d-flex flex-column justify-content-center"> 
+                                                <div className="d-flex flex-column justify-content-center">
+                                                    <Image className="border border-dark" src={data.main_image}></Image>
+                                                    
+                                                </div>
+
+                                                <div className="d-flex p-3 flex-column justify-content-center"> 
                                                     <h3>{listing.title}</h3>
+
                                                     <hr class="border border-dark w-100"></hr>
+
                                                     <ul>
-                                                        <li>Price: {listing.price} SFX</li>
+                                                        <li>Price: {listing.price  / 10000000000} SFX</li>
                                                         <li>Seller: {listing.seller}</li>
                                                     </ul>  
-                                                    <hr class="border border-primary w-100"></hr>  
-                                                    <p>{data.description}</p>
+
+                                                    <hr class="border border-dark w-100"></hr>
+
+                                                    <p>{this.to_ellipsis(data.description, 500, 0)}</p>
+                                                    
                                                 </div>
                                                 
                                             </div>
@@ -1322,26 +1381,26 @@ class WalletHome extends React.Component {
                                                 <h3>{listing.title}</h3>
                                             </div>
                                         }    
-                                            <hr class="border border-dark w-100"></hr>  
+                                            <hr class="border border-primary w-100"></hr>  
                                             <p className="my-3">{listing.offerID}</p>
                                     </ReactTooltip>
 
                                 </td>
-                                <td>{listing.quantity}</td>
-                                <td>{listing.price / 10000000000}</td>
-                                <td>{listing.seller}</td>
-                                <td data-tip data-for={`offerID${key}`}>
-                                    {this.to_ellipsis(listing.offerID)}
+                                <td className="quantity-row">{listing.price / 10000000000}</td>
+                                <td className="quantity-row">{listing.quantity}</td>
+                                <td className="quantity-row">{listing.seller}</td>
+                                <td className="title-row" data-tip data-for={`offerID${key}`}>
+                                    {this.to_ellipsis(listing.offerID, 10, 10)}
                                     <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
                                         <span>{listing.offerID}</span>
                                     </ReactTooltip>
                                 </td>
-                                <td><select className="light-blue-back" id="quantity">
+                                <td className="quantity-row"><select className="light-blue-back" id="quantity">
                                     <option value="1">1</option>
                                 </select></td>
-                                <td>
+                                <td className="quantity-row">
                                    
-                                        <Button size="lg" variant="success"
+                                        <Button size="lg" variant="success" 
                                                 onClick={() => this.handleShowPurchaseForm(listing)}>
                                             BUY
                                         </Button>
@@ -1363,7 +1422,7 @@ class WalletHome extends React.Component {
                                                         <li>{this.state.show_purchase_offer.title}</li>
                                                         <li>{this.state.show_purchase_offer.price / 10000000000}</li>
                                                         <li>{this.state.show_purchase_offer.seller}</li>
-                                                        <li>{this.to_ellipsis(this.state.show_purchase_offer.offerID)}</li>
+                                                        <li>{this.to_ellipsis(this.state.show_purchase_offer.offerID,0,0)}</li>
                                                     </ul>
 
                                                     {this.state.show_purchase_offer.quantity} available <Form.Control
@@ -1371,8 +1430,35 @@ class WalletHome extends React.Component {
                                                     id="quantity"
                                                     name="quantity"/>
                                                     Send Message <Form.Control name="message"/>
-                                                    Mixins <Form.Control name="mixins" value="1"/>
-
+                                                    <Form.Group>
+                                                        <Form.Label>
+                                                            Mixins
+                                                            <IconContext.Provider  value={{color: 'black', size: '20px'}}>
+                                                                <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon mx-4"/>
+                                                                
+                                                                <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                                    <span>
+                                                                        Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                        They are combined with yours for private transactions.<br/>
+                                                                        Changing this from the default could hurt your privacy.<br/>
+                                                                    </span>
+                                                                </ReactTooltip>
+                                                            </IconContext.Provider>
+                                                        </Form.Label>
+                                                        <Form.Control 
+                                                            name="mixins" 
+                                                            as="select"
+                                                            defaultValue="7"
+                                                        >
+                                                            <option>1</option>
+                                                            <option>2</option>
+                                                            <option>3</option>
+                                                            <option>4</option>
+                                                            <option>5</option>
+                                                            <option>6</option>
+                                                            <option>7</option>
+                                                        </Form.Control>
+                                                    </Form.Group>
 
                                                     <Button size="lg" className="mt-2" type="submit" variant="success">Confirm Payment</Button>
                                                 </Form>
@@ -1386,7 +1472,7 @@ class WalletHome extends React.Component {
                                         </Modal>
                                     
                                 </td>
-                                <td>
+                                <td className="quantity-row">
                                     <Button size="lg" variant="info">CONTACT</Button>
                                 </td>
                             </tr>
@@ -1402,34 +1488,191 @@ class WalletHome extends React.Component {
                     });
                     return (
                         <div className="overflow-y">
+                            <Container 
+                                fluid
+                                id="header"
+                                className="no-gutters mt-5 p-2 border border-light b-r10 black-back h-25 sticky"
+                                style={{height: "200px"}}
+                            >
+
+                        <Row className="justify-content-between align-items-center">
+
+                            <Col sm={2} className="p-1 align-self-center b-r10 light-blue-back">
+
+                                <div className="d-flex flex-row justify-content-center align-items-end">
+                                    <IconContext.Provider value={{color: 'white', size: '20px'}}>
+                                        <div className="white-text">
+                                            <GrCubes className="blockchain-icon m-1 white-text"/>
+                                        </div>
+                                    </IconContext.Provider>
+                                    <p className="mb-2"><b>{this.state.blockchain_height.toLocaleString()}</b></p>
+                                </div>
+
+                                {this.state.wallet_height < this.state.blockchain_height ?
+                                    (<p className="mb-2">
+                                        {this.state.wallet_height} / {this.state.blockchain_height}
+                                    </p>) : ''}
+                                <p className="mb-2 text-align-center">{this.state.connection_status}</p>
+
+                            </Col>
+
+                            {/*<div className="menu-logo">
+                                <Image className=" align-content-center"
+                                    src={require("./../../img/sails-logo.png")}/>
+                                </div>*/}
+
+                            <Col sm={6} className="menu">
+                                <ul className="menu__list">
+                                    <li className={this.state.interface_view === 'home'  ? "menu-link-active" : "menu__list-item"} >
+                                        <a className="menu__link" href="javascript:void(0)" 
+                                        onClick={this.go_home}>Home</a>
+                                    </li>
+                                    <li className={this.state.interface_view === 'market' ? "menu__list-item menu-link-active" : "menu__list-item"}>
+                                        <a className="menu__link" href="javascript:void(0)"
+                                        onClick={this.show_market}>Market</a>
+                                    </li>
+                                    <li className={this.state.interface_view === 'merchant' ? "menu__list-item menu-link-active" : "menu__list-item"}>
+                                        <a className="menu__link" href="javascript:void(0)"
+                                        onClick={this.show_merchant}>Merchant</a>
+                                    </li>
+                                    <li className={this.state.interface_view === 'tokens' ? "menu__list-item menu-link-active" : "menu__list-item"}>
+                                        <a className="menu__link" href="javascript:void(0)"
+                                        onClick={this.show_tokens}>Tokens</a>
+                                    </li>
+
+
+                                </ul>
+
+                            </Col>
+                            <div className="d-flex flex-column">
+                                <a className="menu__link" href="javascript:void(0)"
+                                onClick={this.show_settings}><FaCogs size={20} className="m-3"/></a>
+
+
+                                <a className="menu__link" href="javascript:void(0)"
+                                onClick={this.logout}><GiExitDoor className="m-3"/></a>
+                            </div>
+                        </Row>
+
+
+                        <Row
+                            className="no-gutters p-2 justify-content-between align-items-center b-r10 white-text">
+                            <Col id="balances" sm={3}>
+                                <li>
+                                    SFX: {this.state.cash.toLocaleString()} {this.state.pending_cash > 0 ? `(${this.state.pending_cash.toLocaleString()} SFX Pending)` : ''}
+                                </li>
+                                <li className="">
+                                    SFT: {this.state.tokens.toLocaleString()} {this.state.pending_tokens > 0 ? `(${this.state.pending_tokens.toLocaleString()} SFT Pending)` : ''}
+                                </li>
+                            </Col>
+                            <Col className="text-align-center" sm={8}>
+                                <p>SFX + SFT Public Address:<br/>
+                                    <br/>
+                                    <b>{this.state.address}</b>                            
+                                </p>
+                                <Row className="justify-content-center">
+                                    
+                                    <div id="header-buttons" className="d-flex flex-row" sm={1}>
+
+                                    {this.state.synced === false ? (
+                                        <Button variant="warning" onClick={this.check}>
+                                            Check
+                                        </Button>) : ''}
+
+                                        <Button variant="danger" onClick={this.rescan}>
+                                            Hard Rescan
+                                        </Button>
+
+                                        <Button variant="primary" onClick={this.handleShow}>
+                                            Show Keys
+                                        </Button>
+
+                                        <Modal 
+                                            className="width100 black-text" 
+                                            animation={false}
+                                            show={this.state.show_keys}
+                                            onHide={this.handleClose}
+                                        >
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>Your Private Keys</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                <ul>
+                                                    <li>
+                                                        <b>Address:</b> <br/> {this.props.wallet.address()}
+                                                    </li>
+                                                    <li>
+                                                        <b>Secret Spend Key:</b>
+                                                        <br/> {this.props.wallet.secretSpendKey()}
+                                                    </li>
+                                                    <li>
+                                                        <b>Secret View Key:</b>
+                                                        <br/> {this.props.wallet.secretViewKey()}
+                                                    </li>
+                                                    <li>
+                                                        <b>Mnemonic Seed:</b>
+                                                        <br/> {this.props.wallet.seed().toUpperCase()}
+                                                    </li>
+                                                </ul>
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={this.handleClose}>
+                                                    Close
+                                                </Button>
+                                            </Modal.Footer>
+                                        </Modal>
+                                        <Button className="ml-3" onClick={this.copyAddressToClipboard}>
+                                            Copy Address
+                                        </Button>
+                                    </div>
+                                </Row>
+                            </Col>
+                            
+                        </Row>
+                    </Container>
                             <Row>
-                                <Col className=" white-text overflow-y" md={12}>
+                                <Col className="market-table white-text overflow-y" md={12}>
                                     <div
-                                        className="search-box d-flex flex-column align-items-center border border-white light-blue-back">
+                                        className="
+                                        search-box d-flex flex-column
+                                        align-items-center border
+                                        border-white safex-blue
+                                        "
+                                    >
 
                                         <div class="row width100 border-bottom border-white" id="search">
-                                            <form className="width100 no-gutters p-2" id="search-form" action=""
+                                            <form className="width100 no-gutters p-2 d-flex justify-content-center" id="search-form" action=""
                                                   method="" enctype="multipart/form-data">
-                                                <div class="form-group col-sm-9">
+                                                <div class="form-group col-sm-9 mr-5">
                                                     <input class="form-control" type="text"
                                                            placeholder="eg. api.theworldmarketplace.com"/>
                                                 </div>
-                                                <div class="form-group col-sm-3">
-                                                    <button type="submit" class="btn btn-block btn-primary">
+                                                <div class="form-group col-sm-2">
+                                                    <button class="btn btn-primary mx-3">
                                                         Set Market API 
                                                     </button>
+                                                    <IconContext.Provider  value={{color: 'white', size: '20px'}}>
+                                                        
+                                                            <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon mx-4 white-text"/>
+                                                        
+                                                        <ReactTooltip id='apiInfo' type='light' effect='solid'>
+                                                            <span>This is info about setting a market API. Lorem Ipsum.</span>
+                                                        </ReactTooltip>
+                                                    </IconContext.Provider>
+                                                    
+                                                    
                                                 </div>
                                             </form>
                                         </div>
                                         <div class="row" id="search">
                                             <form className="no-gutters p-2" id="search-form" action=""
-                                                  method="POST"
+                                                  
                                                   enctype="multipart/form-data">
                                                 <div class="form-group col-sm-9">
                                                     <input class="form-control" type="text" placeholder="Search"/>
                                                 </div>
                                                 <div class="form-group col-sm-3">
-                                                    <button type="submit" class="btn btn-block btn-primary">Search
+                                                    <button onClick={() => (alert("We are wokring on getting this feature up and running as soon as possible. Please be patient!"))} class="btn btn-block btn-primary">Search
                                                     </button>
                                                 </div>
                                             </form>
@@ -1485,6 +1728,18 @@ class WalletHome extends React.Component {
                                                 </div>
                                             </form>
                                         </div>
+                                        <thead className="opaque-black text-align-center">
+
+                                        <tr>
+                                            <th className="title-row">Title</th>
+                                            <th className="quantity-row">Price (SFX)</th>
+                                            <th className="quantity-row">Quantity</th>
+                                            <th className="quantity-row">Seller</th>
+                                            <th className="title-row">Offer ID</th>
+                                            <th className="actions-row">Actions</th>
+                                            
+                                        </tr>
+                                        </thead>
 
                                     </div>
 
@@ -1493,8 +1748,8 @@ class WalletHome extends React.Component {
                                             <thead>
                                             <tr>
                                                 <th>Title</th>
-                                                <th>Quantity</th>
                                                 <th>Price (SFX)</th>
+                                                <th>Quantity</th>
                                                 <th>Seller</th>
                                                 <th>Offer ID</th>
                                             </tr>
@@ -1505,18 +1760,7 @@ class WalletHome extends React.Component {
                                         </Table>) : (<div></div>)}
 
                                     <Table>
-                                        <thead>
-                                        <tr>
-                                            <th>Title</th>
-                                            <th>Quantity</th>
-                                            <th>Price (SFX)</th>
-                                            <th>Seller</th>
-                                            <th>Offer ID</th>
-                                            <th>Actions</th>
-                                            <th></th>
-                                            <th></th>
-                                        </tr>
-                                        </thead>
+                                        
 
                                         <tbody>
                                         {non_listings_table}
@@ -1533,8 +1777,8 @@ class WalletHome extends React.Component {
                             if (listing.seller === this.state.selected_user.username) {
                                 return <tr key={key}>
                                     <td>{listing.title}</td>
-                                    <td>{listing.quantity}</td>
                                     <td>{listing.price / 10000000000}</td>
+                                    <td>{listing.quantity}</td>
                                     <td>{listing.seller}</td>
                                     <td>{listing.offerID}</td>
                                 </tr>
@@ -1593,61 +1837,94 @@ class WalletHome extends React.Component {
                                     console.error(err);
                                 }
                                 return <tr key={key}>
-                                    <td>{listing.title}</td>
-                                    <td>{listing.quantity}</td>
-                                    <td>{listing.price / 10000000000}</td>
-                                    <td>{listing.seller}</td>
-                                    <td>{this.to_ellipsis(listing.offerID)}</td>
-
-                                    <td>
-                                    <Col className="align-self-center" md={2}>
-                                            <Button size="lg" variant="success"
-                                                    onClick={() => this.handleShowEditOfferForm(listing)}>
-                                                EDIT
+                                    <td className="title-row text-align-center"><h4>{listing.title}</h4></td>
+                                    <td className="quantity-row text-align-center">{listing.price / 10000000000}</td>
+                                    <td className="quantity-row text-align-center">{listing.quantity}</td>
+                                    <td className="quantity-row text-align-center">{listing.seller}</td>
+                                    <td className="actions-row text-align-center">{listing.offerID}</td>
+                                    <td className="title-row text-align-center">
+                                        <Col className="align-self-center" md={2}>
+                                            <Button 
+                                                size="lg" 
+                                                variant="success"
+                                                onClick={() => this.handleShowEditOfferForm()}>
+                                            EDIT
                                             </Button>
-                                            <Modal className="new-account-form" animation={false}
-                                                   show={this.state.show_edit_offer_form}
-                                                   onHide={this.handleCloseEditOfferForm}>
+                                            
+                                            <Modal 
+                                                className="new-account-form" 
+                                                animation={false}
+                                                show={this.state.show_edit_offer_form}
+                                                onHide={this.handleCloseEditOfferForm}
+                                            >
                                                 <Modal.Header closeButton>
                                                     <Modal.Title>Edit Offer {this.state.show_edit_offer.title}</Modal.Title>
                                                 </Modal.Header>
+                                                
                                                 <Modal.Body>
-
                                                     <Form id="edit_offer"
-                                                          onSubmit={(e) => this.make_edit_offer(e, this.state.show_edit_offer)}>
+                                                        onSubmit={(e) => this.make_edit_offer(e, this.state.show_edit_offer)}>
 
                                                         Offer ID <Form.Control name="offerid"
-                                                                               value={this.state.show_edit_offer.offerID}/>
+                                                                            value={this.state.show_edit_offer.offerID}/>
                                                         Username <Form.Control name="username"
-                                                                               value={this.state.show_edit_offer.seller}/>
+                                                                            value={this.state.show_edit_offer.seller}/>
                                                         Image URL <Form.Control name="main_image"
-                                                                                          defaultValue={data.main_image}/>
+                                                                                        defaultValue={data.main_image}/>
                                                         Title <Form.Control name="title"
                                                                             defaultValue={this.state.show_edit_offer.title}/>
-                                                        Description <Form.Control maxLength="200" as="textarea"
-                                                                                  name="description"
-                                                                                  defaultValue={data.description}/>
+                                                        Description <Form.Control maxLength="2000" as="textarea"
+                                                                                name="description"
+                                                                                defaultValue={data.description}/>
                                                         Price (SFX) <Form.Control name="price"
                                                                                 defaultValue={this.state.show_edit_offer.price / 10000000000}/>
                                                         Available Quantity <Form.Control name="quantity"
-                                                                                         defaultValue={this.state.show_edit_offer.quantity}/>
+                                                                                        defaultValue={this.state.show_edit_offer.quantity}/>
                                                         SKU <Form.Control name="sku" 
-                                                                          defaultValue={data.sku}/>
+                                                                        defaultValue={data.sku}/>
                                                         Barcode (ISBN, UPC, GTIN, etc) <Form.Control name="barcode" 
-                                                                                                     defaultValue={data.barcode}/>
+                                                                                                    defaultValue={data.barcode}/>
 
                                                         Message Type <Form.Control name="message_type"
-                                                                                   defaultValue={data.message_type}/>
+                                                                                defaultValue={data.message_type}/>
                                                         Weight <Form.Control name="weight" defaultValue={data.weight}/>
                                                         Physical Item? <Form.Control name="physical"
-                                                                                     defaultValue={data.physical}/>
+                                                                                    defaultValue={data.physical}/>
                                                         Country of Origin <Form.Control name="country"
                                                                                         defaultValue={data.country}
                                                                                         placedholder="your location"/>
                                                         Set Active <Form.Control name="active"
-                                                                                 defaultValue={this.state.show_edit_offer.active}/>
-                                                        Mixins <Form.Control name="mixins" defaultValue="7"
-                                                                             placedholder="your location"/>
+                                                                                defaultValue={this.state.show_edit_offer.active}/>
+                                                        <Form.Group>
+                                                            <Form.Label>
+                                                                Mixins
+                                                                <IconContext.Provider  value={{color: 'white', size: '20px'}}>
+                                                                    <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon mx-4 white-text"/>
+                                                                    
+                                                                    <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                                        <span>
+                                                                            Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                            They are combined with yours for private transactions.<br/>
+                                                                            Changing this from the default could hurt your privacy.<br/>
+                                                                        </span>
+                                                                    </ReactTooltip>
+                                                                </IconContext.Provider>
+                                                            </Form.Label>
+                                                        
+                                                            <Form.Control 
+                                                                name="mixins" 
+                                                                as="select"
+                                                                defaultValue="7"
+                                                            >
+                                                                <option>1</option>
+                                                                <option>2</option>
+                                                                <option>3</option>
+                                                                <option>4</option>
+                                                                <option>5</option>
+                                                                <option>6</option>
+                                                                <option>7</option>
+                                                            </Form.Control>
+                                                        </Form.Group>
 
                                                         <Button block size="lg" type="submit" variant="success">Submit Edit</Button>
                                                     </Form>
@@ -1757,7 +2034,7 @@ class WalletHome extends React.Component {
                                         </Col>
                                         {selected !== void (0) ? (
                                             <Col md={3}
-                                                 className="no-gutters d-flex flex-column align-items-center merchant-profile-view text-align-center"
+                                                 className="no-gutters d-flex flex-column align-items-center b-r10 merchant-profile-view text-align-center"
                                             >
                                                 <Row>
                                                     <ul>
@@ -1790,42 +2067,168 @@ class WalletHome extends React.Component {
                                                 New Account
                                             </Button>
 
-                                            <Modal className="new-account-form" animation={false}
-                                                   show={this.state.show_new_account_form}
-                                                   onHide={this.handleCloseNewAccountForm}>
+                                            <Modal 
+                                                animation={false}
+                                                show={this.state.show_new_account_form}
+                                                onHide={this.handleCloseNewAccountForm}
+                                            >
                                                 <Modal.Header closeButton>
                                                     <Modal.Title>Create New Account</Modal.Title>
                                                 </Modal.Header>
+                                                
                                                 <Modal.Body>
                                                     <Form id="create_account" onSubmit={this.register_account}>
-                                                        Username <Form.Control name="username"
-                                                                               placedholder="enter your desired username"/>
-                                                        Avatar URL <Form.Control name="avatar"
-                                                                                 placedholder="enter the url of your avatar"/>
-                                                        Twitter Link <Form.Control name="twitter"
-                                                                                   defaultValue="twitter.com"
-                                                                                   placedholder="enter the link to your twitter handle"/>
-                                                        Facebook Link <Form.Control name="facebook"
-                                                                                    defaultValue="facebook.com"
-                                                                                    placedholder="enter the to of your facebook page"/>
-                                                        LinkedIn Link <Form.Control name="linkedin"
-                                                                                    defaultValue="linkedin.com"
-                                                                                    placedholder="enter the link to your linkedin handle"/>
-                                                        Biography <Form.Control maxLength="200" as="textarea"
-                                                                                name="biography"
-                                                                                placedholder="type up your biography"/>
-                                                        Website <Form.Control name="website" defaultValue="safex.org"
-                                                                              placedholder="if you have your own website: paste your link here"/>
-                                                        Location <Form.Control name="location" defaultValue="Earth"
-                                                                               placedholder="your location"/>
-                                                        Email <Form.Control name="email"
-                                                                            defaultValue="xyz@example.com"
-                                                                            placedholder="your location"/>
-                                                        Mixins <Form.Control name="mixins" defaultValue="7"
-                                                                             placedholder="your location"/>
+                                                        <Form.Row>
+                                                            <Col md="8">
+                                                                <Form.Group as={Col}>
+                                                                    <Form.Label>Username</Form.Label>
+                                                                    <Form.Control name="username" placedholder="enter your desired username"/>
+                                                                </Form.Group>
+                                                                
+                                                                <Form.Group as={Col}>
+                                                                    <Form.Label>Avatar URL</Form.Label>
+                                                                    <Form.Control 
+                                                                        onChange={this.handleChange}
+                                                                        value={this.state.new_account_image} 
+                                                                        name="new_account_image" 
+                                                                        placedholder="enter the url of your avatar"
+                                                                    />
+                                                                </Form.Group>
+                                                            </Col>
 
-                                                        <Button block size="lg" variant="success" type="submit">Create
-                                                            Account</Button>
+                                                            <Col md="4">
+                                                                <Image 
+                                                                    className="border border-white grey-back" 
+                                                                    width={150} 
+                                                                    height={150} 
+                                                                    src={this.state.new_account_image}
+                                                                    roundedCircle
+                                                                />
+                                                            </Col>
+                                                        </Form.Row>
+
+                                                        <Form.Row>
+                                                            <Col>
+                                                                <Form.Group as={Col}>
+                                                                    <Form.Label>Biography</Form.Label>
+                                                                    <Form.Control 
+                                                                        maxLength="500" 
+                                                                        as="textarea" 
+                                                                        name="biography"
+                                                                        placedholder="type up your biography"
+                                                                        style={{maxHeight: 150}}
+                                                                    />
+                                                                </Form.Group>
+                                                                
+                                                                
+                                                                    <Form.Group as={Col}>
+                                                                        <Form.Label>Location</Form.Label>
+                                                                        <Form.Control 
+                                                                            name="location" 
+                                                                            defaultValue="Earth"
+                                                                            placedholder="your location"
+                                                                        />
+                                                                    </Form.Group> 
+                                                                    
+                                                                    <Form.Group as={Col}>
+
+                                                                        <Form.Label>Email</Form.Label>
+                                                                        <Form.Control 
+                                                                            name="email"
+                                                                            defaultValue="xyz@example.com"
+                                                                            placedholder="your location"
+                                                                        />
+                                                                    </Form.Group>
+
+                                                                <Form.Group>
+                                                                    <Form.Group  md="6" as={Col}>
+                                                                        <Form.Label>Twitter Link</Form.Label>
+                                                                        <Form.Control 
+                                                                            name="twitter"
+                                                                            defaultValue="twitter.com"
+                                                                            placedholder="enter the link to your twitter handle"
+                                                                        />
+                                                                
+                                                                    </Form.Group>
+                                                                
+                                                                    <Form.Group  md="6" as={Col}>
+                                                                        <Form.Label>Facebook Link</Form.Label>
+                                                                        <Form.Control 
+                                                                            name="facebook"
+                                                                            defaultValue="facebook.com"
+                                                                            placedholder="enter the to of your facebook page"
+                                                                        />
+
+                                                                    </Form.Group>
+                                                                
+                                                                    <Form.Group md="6" as={Col}>
+                                                                        <Form.Label>LinkedIn Link</Form.Label>
+                                                                        <Form.Control 
+                                                                            name="linkedin"
+                                                                            defaultValue="linkedin.com"
+                                                                            placedholder="enter the link to your linkedin handle"
+                                                                        />
+                                                                    </Form.Group>
+                                                                
+                                                                    <Form.Group md="6" as={Col}>
+
+                                                                        <Form.Label>Website</Form.Label>
+                                                                        <Form.Control 
+                                                                            name="website" 
+                                                                            defaultValue="safex.org"
+                                                                            placedholder="if you have your own website: paste your link here"
+                                                                        />
+                                                                    </Form.Group>
+
+                                                                </Form.Group>
+                                                               
+
+                                                                <Form.Group as={Col}>
+
+                                                                    <Form.Label>Mixins</Form.Label>
+                                                                    <IconContext.Provider  value={{color: 'white', size: '20px'}}>
+                                                                        <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon mx-4 white-text"/>
+                                                                        
+                                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                                            <span>
+                                                                                Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                                They are combined with yours for private transactions.<br/>
+                                                                                Changing this from the default could hurt your privacy.<br/>
+                                                                            </span>
+                                                                        </ReactTooltip>
+                                                                    </IconContext.Provider>
+                                                                
+                                                            
+                                                                    <Form.Control 
+                                                                        name="mixins" 
+                                                                        as="select"
+                                                                        defaultValue="7"
+                                                                    >
+                                                                        <option>1</option>
+                                                                        <option>2</option>
+                                                                        <option>3</option>
+                                                                        <option>4</option>
+                                                                        <option>5</option>
+                                                                        <option>6</option>
+                                                                        <option>7</option>
+                                                                    </Form.Control>
+                                                                    
+                                                                </Form.Group>
+                                                            </Col>
+
+                                                            
+                                                        </Form.Row>
+                                                   
+                                                        <Button 
+                                                            block 
+                                                            size="lg" 
+                                                            variant="success" 
+                                                            type="submit"
+                                                            className="my-5"
+                                                        >
+                                                            
+                                                        Create Account
+                                                        </Button>
                                                     </Form>
                                                 </Modal.Body>
                                                 <Modal.Footer className="align-self-start">
@@ -1838,15 +2241,20 @@ class WalletHome extends React.Component {
                                         </Col>
                                     </Row>
 
-                                    <Col lg className="merchant_product_view no-gutters mt-5">
+                                    <Col lg className="merchant-product-view b-r10 px-3 pb-5 opaque-black no-gutters mt-5">
                                         {selected !== void (0) ? (
-                                            <Row className="p-2 justify-content-center">
-                                                <Button size="lg" variant="success"
+                                            <div className="pt-5 align-items-center sticky safex-cash-green d-flex flex-column">
+                                                <div>
+                                                    <Button 
+                                                        className="mb-5" 
+                                                        size="lg" 
+                                                        variant="success"
                                                         onClick={this.handleShowNewOfferForm}>
                                                     New Offer
-                                                </Button>
+                                                    </Button>
+                                                </div>
 
-                                                <Modal className="new-account-form" animation={false}
+                                                <Modal animation={false}
                                                        show={this.state.show_new_offer_form}
                                                        onHide={this.handleCloseNewOfferForm}>
                                                     <Modal.Header closeButton>
@@ -1855,26 +2263,108 @@ class WalletHome extends React.Component {
                                                     <Modal.Body>
 
                                                         <Form id="list_new_offer" onSubmit={this.list_new_offer}>
-                                                            Username <Form.Control name="username"
-                                                                                   value={selected.username}/>
-                                                            Image URL <Form.Control name="main_image"/>
-                                                            Title <Form.Control name="title"/>
-                                                            Description <Form.Control maxLength="200" as="textarea"
-                                                                                      name="description"/>
-                                                            Price (SFX) <Form.Control name="price"/>
-                                                            Available Quantity <Form.Control name="quantity"/>
-                                                            SKU <Form.Control name="sku"/>
-                                                            Barcode (ISBN, UPC, GTIN, etc) <Form.Control
-                                                            name="barcode"/>
+                                                            <Form.Group controlId="formBasicEmail">
+                                                                <Form.Label>Username</Form.Label>
+                                                                
+                                                                <Form.Control name="username" value={selected.username}/>
+                                                            </Form.Group>
 
-                                                            Message Type <Form.Control name="message_type"/>
-                                                            Weight <Form.Control name="weight"/>
-                                                            Physical Item? <Form.Control name="physical" value="true"/>
-                                                            Country of Origin <Form.Control name="country"
-                                                                                            defaultValue="Earth"
-                                                                                            placedholder="your location"/>
-                                                            Mixins <Form.Control name="mixins" defaultValue="7"
-                                                                                 placedholder="your location"/>
+                                                            <Form.Group controlId="formBasicEmail">
+                                                                <Form.Label>Title</Form.Label>
+                                                                
+                                                                <Form.Control name="title"/>
+                                                            </Form.Group>
+
+                                                            <Form.Group controlId="formBasicEmail">
+                                                                <Form.Label>Image URL</Form.Label>
+                                                                
+                                                                <Form.Control name="main_image"/>
+                                                            </Form.Group>
+
+                                                            <Form.Group controlId="formBasicEmail">
+                                                                <Form.Label>Description</Form.Label>
+                                                                
+                                                                <Form.Control maxLength="2000" as="textarea" name="description"/>
+                                                            </Form.Group>
+
+                                                            <Form.Group controlId="formBasicEmail">
+                                                                <Form.Label>Price (SFX)</Form.Label>
+                                                                
+                                                                <Form.Control name="price"/>
+                                                            </Form.Group>
+
+                                                            <Form.Group controlId="formBasicEmail">
+                                                                <Form.Label>Available Quantity</Form.Label>
+                                                                
+                                                                <Form.Control name="quantity"/>
+                                                            </Form.Group>
+
+                                                            <Form.Group controlId="formBasicEmail">
+                                                                <Form.Label>SKU</Form.Label>
+                                                                
+                                                                <Form.Control name="sku"/>
+                                                            </Form.Group>
+                                                            
+                                                            <Form.Group controlId="formBasicEmail">
+                                                                <Form.Label>Barcode (ISBN, UPC, GTIN, etc)</Form.Label>
+                                                                
+                                                                <Form.Control name="barcode"/>
+                                                            </Form.Group>
+
+                                                            <Form.Group controlId="formBasicEmail">
+                                                                <Form.Label>Message Type </Form.Label>
+                                                                
+                                                                <Form.Control name="message_type"/>
+                                                            </Form.Group>
+
+                                                            <Form.Group controlId="formBasicEmail">
+                                                                <Form.Label>Weight</Form.Label>
+                                                                
+                                                                <Form.Control name="weight"/>
+                                                            </Form.Group>
+
+                                                            <Form.Group controlId="formBasicEmail">
+                                                                <Form.Label>Physical Item?</Form.Label>
+                                                                
+                                                                <Form.Control name="physical" value="true"/>
+                                                            </Form.Group>
+
+                                                            <Form.Group controlId="formBasicEmail">
+                                                                <Form.Label>Country of Origin</Form.Label>
+                                                                
+                                                                <Form.Control name="country" defaultValue="Earth" placedholder="your location"/>
+                                                            </Form.Group>
+                                                             
+                                                            <Form.Group>
+                                                                <Form.Label>
+                                                                    Mixins
+                                                                    <IconContext.Provider  value={{color: 'white', size: '20px'}}>
+                                                                        <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon mx-4 white-text"/>
+                                                                        
+                                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                                            <span>
+                                                                                Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                                They are combined with yours for private transactions.<br/>
+                                                                                Changing this from the default could hurt your privacy.<br/>
+                                                                            </span>
+                                                                        </ReactTooltip>
+                                                                    </IconContext.Provider>
+                                                                </Form.Label>
+                                                                
+                                                                <Form.Control 
+                                                                    name="mixins" 
+                                                                    as="select"
+                                                                    defaultValue="7"
+                                                                >
+                                                                    <option>1</option>
+                                                                    <option>2</option>
+                                                                    <option>3</option>
+                                                                    <option>4</option>
+                                                                    <option>5</option>
+                                                                    <option>6</option>
+                                                                    <option>7</option>
+                                                                </Form.Control>
+                                                            </Form.Group>
                                                             <Button block size="lg" variant="success" type="submit">
                                                                 List Offer
                                                             </Button>
@@ -1886,16 +2376,28 @@ class WalletHome extends React.Component {
                                                         </Button>
                                                     </Modal.Footer>
                                                 </Modal>
-                                            </Row>) : ''}
+                                                <thead className="w-100 opaque-black text-align-center">
 
-                                        <Row>
+                                                    <tr>
+                                                        <th className="title-row">Title</th>
+                                                        <th className="quantity-row">Price (SFX)</th>
+                                                        <th className="quantity-row">Quantity</th>
+                                                        <th className="quantity-row">Seller</th>
+                                                        <th className="actions-row">Offer ID</th>
+                                                        <th className="title-row">Actions</th>
+                                                        
+                                                    </tr>
+                                                </thead>
+                                            </div>) : ''}
+
+                                        <Row className="no-gutters">
                                             {this.state.twm_offers.length > 1 ? (
                                                     <Table color="white" className="white-text border border-white b-r10">
                                                         <thead>
                                                         <tr>
                                                             <th>Title</th>
-                                                            <th>Quantity</th>
                                                             <th>Price (SFX)</th>
+                                                            <th>Quantity</th>
                                                             <th>Seller</th>
                                                             <th>Offer ID</th>
                                                         </tr>
@@ -1908,14 +2410,7 @@ class WalletHome extends React.Component {
 
                                             <Table>
                                                 <thead>
-                                                <tr>
-                                                    <th>Title</th>
-                                                    <th>Quantity</th>
-                                                    <th>Price (SFX)</th>
-                                                    <th>Seller</th>
-                                                    <th>Offer ID</th>
-                                                    <th>Actions</th>
-                                                </tr>
+                                              
                                                 </thead>
                                                 <tbody>
                                                     {non_listings_table}
@@ -1928,7 +2423,7 @@ class WalletHome extends React.Component {
                     } catch (err) {
                         console.log(err);
                         alert(err);
-                        return (<div><p>error loading</p></div>);
+                        return (<div><p>Error loading</p></div>);
                     }
                 }
                 case "tokens": {
@@ -1982,8 +2477,35 @@ class WalletHome extends React.Component {
                                                                         placedholder="the destination address"/>
                                         Amount (SFT)<Form.Control name="amount" defaultValue="0"
                                                                 placedholder="the amount to send"/>
-                                        Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
-                                                                    placedholder="choose the number of mixins"/>
+                                        <Form.Group>
+                                            <Form.Label>
+                                                Mixins
+                                                <IconContext.Provider  value={{color: 'white', size: '20px'}}>
+                                                    <FaInfoCircle data-tip data-for='mixinTokenSendInfo' className="blockchain-icon ml-8 white-text"/>
+                                                    
+                                                    <ReactTooltip id='mixinTokenSendInfo' type='info' effect='solid'>
+                                                        <span>
+                                                            Mixins are transactions that have also been sent on the Safex blockchain.<br/> 
+                                                            They are combined with yours for private transactions.<br/>
+                                                            Changing this from the default could hurt your privacy.<br/>
+                                                        </span><br/>
+                                                    </ReactTooltip>
+                                                </IconContext.Provider>
+                                            </Form.Label>
+                                            <Form.Control 
+                                                name="mixins" 
+                                                as="select"
+                                                defaultValue="7"
+                                            >
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                                <option>5</option>
+                                                <option>6</option>
+                                                <option>7</option>
+                                            </Form.Control>
+                                        </Form.Group>
                                         <Button className="mt-2" type="submit" variant="warning" size="lg" block>
                                             Send Tokens
                                         </Button>
@@ -1994,7 +2516,7 @@ class WalletHome extends React.Component {
 
                                 <Col sm={8} className="no-gutters pt-3 b-r10 opaque-black">
                                     
-                                    <div className="staking-table mt-2 search-box border border-white grey-back">
+                                    <div className="staking-table mt-2 border rounded border-white grey-back">
                                         <h2 className="text-center "> Stakes </h2>
 
                                         <Table color="white"
@@ -2023,8 +2545,35 @@ class WalletHome extends React.Component {
                                         <Form id="stake_tokens" onSubmit={this.make_token_stake}>
                                             Amount (SFT)<Form.Control name="amount" defaultValue="0"
                                                                     placedholder="The amount to stake"/>
-                                            Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
-                                                                        placedholder="Choose the number of mixins"/>
+                                            <Form.Group>
+                                                <Form.Label>
+                                                    Mixins
+                                                    <IconContext.Provider  value={{color: 'white', size: '20px'}}>
+                                                        <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon ml-8 white-text"/>
+                                                        
+                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                            <span>
+                                                                Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                They are combined with yours for private transactions. <br/>
+                                                                Changing this from the default could hurt your privacy. <br/>
+                                                            </span>
+                                                        </ReactTooltip>
+                                                    </IconContext.Provider>
+                                                </Form.Label>
+                                                <Form.Control 
+                                                name="mixins" 
+                                                as="select"
+                                                defaultValue="7"
+                                                >
+                                                    <option>1</option>
+                                                    <option>2</option>
+                                                    <option>3</option>
+                                                    <option>4</option>
+                                                    <option>5</option>
+                                                    <option>6</option>
+                                                    <option>7</option>
+                                                </Form.Control>
+                                            </Form.Group>
                                             <Button className="mt-2" type="submit" variant="warning" size="lg" block>
                                                 Stake Tokens
                                             </Button>
@@ -2117,8 +2666,35 @@ class WalletHome extends React.Component {
                                             Amount (SFT) (MAX: {unlocked_tokens.toLocaleString()})<Form.Control name="amount"
                                                                                             defaultValue="0"
                                                                                             placedholder="the amount to send"/>
-                                            Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
-                                                                        placedholder="choose the number of mixins"/>
+                                            <Form.Group>
+                                                <Form.Label>
+                                                    Mixins
+                                                    <IconContext.Provider  value={{color: 'white', size: '20px'}}>
+                                                        <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon ml-8 white-text"/>
+                                                        
+                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                            <span>
+                                                                Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                They are combined with yours for private transactions. <br/>
+                                                                Changing this from the default could hurt your privacy. <br/>
+                                                            </span>
+                                                        </ReactTooltip>
+                                                    </IconContext.Provider>
+                                                </Form.Label>
+                                                <Form.Control 
+                                                name="mixins" 
+                                                as="select"
+                                                defaultValue="7"
+                                                >
+                                                    <option>1</option>
+                                                    <option>2</option>
+                                                    <option>3</option>
+                                                    <option>4</option>
+                                                    <option>5</option>
+                                                    <option>6</option>
+                                                    <option>7</option>
+                                                </Form.Control>
+                                            </Form.Group>
                                             <Button className="mt-2" type="submit" variant="danger" size="lg" block>
                                                 Unstake and Collect
                                             </Button>
@@ -2146,147 +2722,152 @@ class WalletHome extends React.Component {
 
         return (
             <Container className="height100 justify-content-between whtie-text" fluid>
-                <Container 
-                    fluid
-                    id="header"
-                    className="no-gutters my-5 p-2 border border-light b-r10 opaque-black"
-                >
+                {this.state.interface_view === "market" ? "" :
+                    <Container 
+                        fluid
+                        id="header"
+                        className="no-gutters my-5 p-2 border border-light b-r10 opaque-black"
+                    >
 
-                    <Row className="justify-content-between align-items-center">
+                        <Row className="justify-content-between align-items-center">
 
-                        <Col sm={2} className="p-1 align-self-center b-r10 light-blue-back">
+                            <Col sm={2} className="p-1 align-self-center b-r10 white-text light-blue-back">
 
-                            <div className="d-flex flex-row justify-content-center align-items-end">
-                                <IconContext.Provider value={{color: 'white', size: '20px'}}>
-                                    <div className="white-text">
-                                        <GrCubes className="blockchain-icon m-1 white-text"/>
-                                    </div>
-                                </IconContext.Provider>
-                                <p className="mb-2"><b>{this.state.blockchain_height.toLocaleString()}</b></p>
-                            </div>
-
-                            {this.state.wallet_height < this.state.blockchain_height ?
-                                (<p className="mb-2">
-                                    {this.state.wallet_height} / {this.state.blockchain_height}
-                                </p>) : ''}
-                            <p className="mb-2 text-align-center">{this.state.connection_status}</p>
-
-                        </Col>
-
-                        {/*<div className="menu-logo">
-                            <Image className=" align-content-center"
-                                   src={require("./../../img/sails-logo.png")}/>
-                            </div>*/}
-
-                        <Col sm={6} className="menu">
-                            <ul className="menu__list">
-                                <li className={this.state.interface_view === 'home'  ? "menu-link-active" : "menu__list-item"} >
-                                    <a className="menu__link" href="javascript:void(0)" 
-                                       onClick={this.go_home}>Home</a>
-                                </li>
-                                <li className={this.state.interface_view === 'market' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                    <a className="menu__link" href="javascript:void(0)"
-                                       onClick={this.show_market}>Market</a>
-                                </li>
-                                <li className={this.state.interface_view === 'merchant' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                    <a className="menu__link" href="javascript:void(0)"
-                                       onClick={this.show_merchant}>Merchant</a>
-                                </li>
-                                <li className={this.state.interface_view === 'tokens' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                    <a className="menu__link" href="javascript:void(0)"
-                                       onClick={this.show_tokens}>Tokens</a>
-                                </li>
-
-
-                            </ul>
-
-                        </Col>
-                        <div className="d-flex flex-column">
-                            <a className="menu__link" href="javascript:void(0)"
-                               onClick={this.show_settings}><FaCogs size={20} className="m-3"/></a>
-
-
-                            <a className="menu__link" href="javascript:void(0)"
-                               onClick={this.logout}><GiExitDoor className="m-3"/></a>
-                        </div>
-                    </Row>
-
-
-                    <Row
-                        className="no-gutters p-2 justify-content-between align-items-center b-r10 white-text">
-                        <Col id="balances" sm={3}>
-                            <li>
-                                SFX: {this.state.cash.toLocaleString()} {this.state.pending_cash > 0 ? `(${this.state.pending_cash.toLocaleString()} SFX Pending)` : ''}
-                            </li>
-                            <li className="">
-                                SFT: {this.state.tokens.toLocaleString()} {this.state.pending_tokens > 0 ? `(${this.state.pending_tokens.toLocaleString()} SFT Pending)` : ''}
-                            </li>
-                        </Col>
-                        <Col className="text-align-center" sm={8}>
-                            <p>SFX + SFT Public Address:<br/>
-                                <br/>
-                                <b>{this.state.address}</b>                            
-                            </p>
-                            <Row className="justify-content-center">
-                                
-                                <div id="header-buttons" className="d-flex flex-row" sm={1}>
-
-                                {this.state.synced === false ? (
-                                    <Button variant="warning" onClick={this.check}>
-                                        Check
-                                    </Button>) : ''}
-
-                                    <Button variant="danger" onClick={this.rescan}>
-                                        Hard Rescan
-                                    </Button>
-
-                                    <Button variant="primary" onClick={this.handleShow}>
-                                        Show Keys
-                                    </Button>
-
-                                    <Modal 
-                                        className="width100 black-text" 
-                                        animation={false}
-                                        show={this.state.show_keys}
-                                        onHide={this.handleClose}
-                                    >
-                                        <Modal.Header closeButton>
-                                            <Modal.Title>Your Private Keys</Modal.Title>
-                                        </Modal.Header>
-                                        <Modal.Body>
-                                            <ul>
-                                                <li>
-                                                    <b>Address:</b> <br/> {this.props.wallet.address()}
-                                                </li>
-                                                <li>
-                                                    <b>Secret Spend Key:</b>
-                                                    <br/> {this.props.wallet.secretSpendKey()}
-                                                </li>
-                                                <li>
-                                                    <b>Secret View Key:</b>
-                                                    <br/> {this.props.wallet.secretViewKey()}
-                                                </li>
-                                                <li>
-                                                    <b>Mnemonic Seed:</b>
-                                                    <br/> {this.props.wallet.seed().toUpperCase()}
-                                                </li>
-                                            </ul>
-                                        </Modal.Body>
-                                        <Modal.Footer>
-                                            <Button variant="secondary" onClick={this.handleClose}>
-                                                Close
-                                            </Button>
-                                        </Modal.Footer>
-                                    </Modal>
-                                    <Button className="ml-3" onClick={this.copyAddressToClipboard}>
-                                        Copy Address
-                                    </Button>
+                                <div className="d-flex flex-row justify-content-center align-items-end">
+                                    <IconContext.Provider value={{color: 'white', size: '20px'}}>
+                                        <div className="white-text">
+                                            <GrCubes className="blockchain-icon m-1 white-text"/>
+                                        </div>
+                                    </IconContext.Provider>
+                                    <p className="mb-2"><b>{this.state.blockchain_height.toLocaleString()}</b></p>
                                 </div>
-                            </Row>
-                        </Col>
-                        
-                    </Row>
-                </Container>
+
+                                {this.state.wallet_height < this.state.blockchain_height ?
+                                    (<p className="mb-2">
+                                        {this.state.wallet_height} / {this.state.blockchain_height}
+                                    </p>) : ''}
+                                <p className="mb-2 text-align-center">{this.state.connection_status}</p>
+
+                            </Col>
+
+                            {/*<div className="menu-logo">
+                                <Image className=" align-content-center"
+                                    src={require("./../../img/sails-logo.png")}/>
+                                </div>*/}
+
+                            <Col sm={6} className="menu">
+                                <ul className="menu__list">
+                                    <li className={this.state.interface_view === 'home'  ? "menu-link-active" : "menu__list-item"} >
+                                        <a className="menu__link" href="javascript:void(0)" 
+                                        onClick={this.go_home}>Home</a>
+                                    </li>
+                                    <li className={this.state.interface_view === 'market' ? "menu__list-item menu-link-active" : "menu__list-item"}>
+                                        <a className="menu__link" href="javascript:void(0)"
+                                        onClick={this.show_market}>Market</a>
+                                    </li>
+                                    <li className={this.state.interface_view === 'merchant' ? "menu__list-item menu-link-active" : "menu__list-item"}>
+                                        <a className="menu__link" href="javascript:void(0)"
+                                        onClick={this.show_merchant}>Merchant</a>
+                                    </li>
+                                    <li className={this.state.interface_view === 'tokens' ? "menu__list-item menu-link-active" : "menu__list-item"}>
+                                        <a className="menu__link" href="javascript:void(0)"
+                                        onClick={this.show_tokens}>Tokens</a>
+                                    </li>
+
+
+                                </ul>
+
+                            </Col>
+                            <div className="d-flex flex-column">
+                                <a className="menu__link" href="javascript:void(0)"
+                                onClick={this.show_settings}><FaCogs size={20} className="m-3"/></a>
+
+
+                                <a className="menu__link" href="javascript:void(0)"
+                                onClick={this.logout}><GiExitDoor className="m-3"/></a>
+                            </div>
+                        </Row>
+
+
+                        <Row
+                            className="no-gutters p-2 justify-content-between align-items-center b-r10 white-text">
+                            <Col id="balances" sm={3}>
+                                <li>
+                                    SFX: {this.state.cash.toLocaleString()} {this.state.pending_cash > 0 ? `(${this.state.pending_cash.toLocaleString()} SFX Pending)` : ''}
+                                </li>
+                                <li className="">
+                                    SFT: {this.state.tokens.toLocaleString()} {this.state.pending_tokens > 0 ? `(${this.state.pending_tokens.toLocaleString()} SFT Pending)` : ''}
+                                </li>
+                            </Col>
+                            <Col className="text-align-center" sm={8}>
+                                <p>SFX + SFT Public Address:<br/>
+                                    <br/>
+                                    <b>{this.state.address}</b>                            
+                                </p>
+                                <Row className="justify-content-center">
+                                    
+                                    <div id="header-buttons" className="d-flex flex-row" sm={1}>
+
+                                    {this.state.synced === false ? (
+                                        <Button variant="warning" onClick={this.check}>
+                                            Check
+                                        </Button>) : ''}
+
+                                        <Button variant="danger" onClick={this.rescan}>
+                                            Hard Rescan
+                                        </Button>
+
+                                        <Button variant="primary" onClick={this.handleShow}>
+                                            Show Keys
+                                        </Button>
+
+                                        <Modal 
+                                            className="width100 black-text" 
+                                            animation={false}
+                                            show={this.state.show_keys}
+                                            onHide={this.handleClose}
+                                        >
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>Your Private Keys</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                <ul>
+                                                    <li>
+                                                        <b>Address:</b> <br/> {this.props.wallet.address()}
+                                                    </li>
+                                                    <li>
+                                                        <b>Secret Spend Key:</b>
+                                                        <br/> {this.props.wallet.secretSpendKey()}
+                                                    </li>
+                                                    <li>
+                                                        <b>Secret View Key:</b>
+                                                        <br/> {this.props.wallet.secretViewKey()}
+                                                    </li>
+                                                    <li>
+                                                        <b>Mnemonic Seed:</b>
+                                                        <br/> {this.props.wallet.seed().toUpperCase()}
+                                                    </li>
+                                                </ul>
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={this.handleClose}>
+                                                    Close
+                                                </Button>
+                                            </Modal.Footer>
+                                        </Modal>
+                                        <Button className="ml-3" onClick={this.copyAddressToClipboard}>
+                                            Copy Address
+                                        </Button>
+                                    </div>
+                                </Row>
+                            </Col>
+                            
+                        </Row>
+                    </Container>
+                }
+                 
+                    
+                
 
                 {twmwallet()}
 

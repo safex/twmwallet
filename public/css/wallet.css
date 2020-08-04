@@ -108,6 +108,7 @@
         border: 2px solid #fff;
         border-radius: 10px;
         background-color: rgba(38, 232, 185, 0.5);
+        color: white;
         min-height: 25vh;
         margin: auto 0;
         
@@ -137,10 +138,13 @@
 
 /* Market CSS Start */
 
+    
+
     .search-box {
         position: -webkit-sticky;
         position: sticky;
-        top: 0;
+        top: 200px;
+        z-index: 1;
 
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
@@ -152,6 +156,28 @@
         max-height: 500px!important;
     }
 
+    .market-table tbody tr td {
+        text-align: center;
+    }
+
+    .quantity-row {
+        width: 10vw!important;
+        padding-left: 0!important;
+        padding-right: 0!important;
+    }
+
+    .title-row {
+        width: 20vw!important;
+        padding-left: 0!important;
+        padding-right: 0!important;
+    }
+
+    .actions-row {
+        width: 30vw!important;
+        padding-left: 0!important;
+        padding-right: 0!important;
+    }
+
     .offer-tooltip {
         display: flex;
         flex-direction: column;
@@ -159,7 +185,7 @@
         justify-content: center;
         text-align: center;
         width: 80vh;
-        height: 40vh;
+        height: 60vh;
         min-width: 200px;
         max-width: 500px;
         min-height: 100px;
@@ -170,6 +196,15 @@
        
         height: 30vh;
         
+    }
+
+    .offer-tooltip p {
+        word-break: break-word;
+    }
+
+
+    .offer .offer-image {
+        width: 400px;
     }
 
 /* Market CSS End */
@@ -218,7 +253,7 @@
 
     }
 
-    #account-edit-button button {
+    #account-edit-buttons button {
         margin-top: 1rem;
     }
 
@@ -233,6 +268,18 @@
         max-height: 800px;
     }
 
+    .merchant-product-view {
+    
+        background-color: #38bdd2;
+        
+        color: #fff;
+        width: 100%;
+        min-height: 20vh;
+       
+        max-height: 60vh;
+        overflow-y: scroll;
+    }
+    
     .account-element {
         width: 100%;
         height: 15vh;
@@ -252,7 +299,19 @@
     .new-account-form {
         color:  black;
         font-size: 1.25rem!important;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        
+        width: 80vh;
+        height: 60vh;
+        min-width: 200px;
+        max-width: 80vw;
+        min-height: 100px;
+        max-height: 80vh;
     }
+    
 
     .new-account-form textarea {
         max-height: 100px;
