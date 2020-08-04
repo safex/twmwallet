@@ -1457,7 +1457,7 @@ class WalletHome extends React.Component {
                                                             <option>5</option>
                                                             <option>6</option>
                                                             <option>7</option>
-                                                        </Form.Control>
+                                                            </Form.Control>
                                                     </Form.Group>
 
                                                     <Button size="lg" className="mt-2" type="submit" variant="success">Confirm Payment</Button>
@@ -1630,6 +1630,7 @@ class WalletHome extends React.Component {
                             
                         </Row>
                     </Container>
+
                             <Row>
                                 <Col className="market-table white-text overflow-y" md={12}>
                                     <div

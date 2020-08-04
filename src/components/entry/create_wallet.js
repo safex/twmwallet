@@ -202,6 +202,16 @@ export default class CreateWallet extends React.Component {
                     <p>
                         THIS WALLET IS STAGENET V1 THIS IS NOT A REGULAR SAFEX WALLET USE ONLY FOR TESTING ONLY JULY 13, 2020
                     </p>
+                            <p >
+                                Testnet
+                                <input
+                                    name="isTestnet"
+                                    type="checkbox"
+                                    checked={this.state.testnet}
+                                    onChange={this.set_to_testnet}
+                                    className="ml-2"
+                                />
+                            </p>
 
 
                         {this.state.new_path.length > 0 ?
