@@ -169,8 +169,6 @@ export default class OpenWallet extends React.Component {
             0,
             this.state.network,
             daemon_string, this.open_wallet_result)
-
-
     };
 
 

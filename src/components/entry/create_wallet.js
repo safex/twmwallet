@@ -1,7 +1,7 @@
 import React from 'react';
 import {Row, Col, Container, Button, Form} from 'react-bootstrap';
 import path from 'path';
-import {create_wallet} from '../../utils/wallet_creation';
+import {create_wallet_util} from '../../utils/wallet_creation';
 import { FaBackward } from 'react-icons/fa'
 
 import WalletHome from "../wallet/home";
@@ -77,11 +77,9 @@ export default class CreateWallet extends React.Component {
         this.setState({password: ''});
     };
 
-    make_wallet = async (e) => {
-        e.preventDefault();
+
+    make_wallet_result = async(err, wallet) => {
         try {
-            let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
-            let wallet = await create_wallet(this.state.new_path, this.state.password, 0, this.state.network, daemon_string);
             console.log(wallet);
             wallet.setSeedLanguage("English");
             try {
@@ -141,6 +139,18 @@ export default class CreateWallet extends React.Component {
                 console.error(`error at initial save of the twm file`);
             }
             this.setState({wallet_made: true, wallet: wallet});
+        } catch(err) {
+            console.error(err);
+            console.error(`error at open_wallet_result`);
+        }
+
+    };
+    make_wallet = async (e) => {
+        e.preventDefault();
+        try {
+            let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
+            create_wallet_util(this.state.new_path, this.state.password, 0, this.state.network, daemon_string, this.make_wallet_result);
+
         } catch (err) {
             console.error(err);
             console.error("error on initial recovery");
