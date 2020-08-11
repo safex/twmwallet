@@ -226,7 +226,9 @@ class WalletHome extends React.Component {
             console.error(err);
             console.error(`error at getting the staked tokens from the blockchain`);
         }
+        console.log("got to the 229");
         try {
+            console.log("got tot he 231");
             m_wallet.store().then(() => {
                 console.log("wallet stored refresh");
 

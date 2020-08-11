@@ -56,87 +56,90 @@ export default class OpenWallet extends React.Component {
         console.log(e.target.daemon_host.value);
     };
 
-    open_wallet_result = async(err, wallet) => {
-        try {
-            localStorage.setItem('wallet', JSON.stringify(wallet));
+    open_wallet_result = async(error, wallet) => {
+        if (error) {
 
+        } else {
             try {
+                localStorage.setItem('wallet', JSON.stringify(wallet));
 
-                console.log(`the path ${ipath}`);
-                let twm_file = await open_twm_file(ipath + '.twm', this.state.password);
-                if (twm_file.success) {
-                    //parse the json and pack it into the local storage for usages
-                    console.log(`success`);
-                    console.log(twm_file);
-                    localStorage.setItem('twm_file', JSON.stringify(twm_file.contents));
-                } else {
-                    console.log(`error`);
-                    console.log(twm_file);
-                    throw `error`;
-                }
-
-            } catch (err) {
-                console.error(err);
                 try {
 
-                    let twm_obj = {};
-
-                    twm_obj.version = 1;
-                    twm_obj.api = {};
-                    twm_obj.api.urls = {};/*
-                    twm_obj.api.urls.theworldmarketplace = {};
-                    twm_obj.api.urls.theworldmarketplace.url = 'api.theworldmarketplace.com';*/
-                    twm_obj.accounts = {};
-                    twm_obj.settings = {};
-
-                    //for each account make one, and within an account you have urls and keys  the top lvel api urls is for top level non account actions
-                    var accs = wallet.getSafexAccounts();
-                    for (const acc of accs) {
-                        console.log(acc);
-                        twm_obj.accounts[acc.username] = {};
-                        twm_obj.accounts[acc.username].username = acc.username;
-                        twm_obj.accounts[acc.username].data = acc.data;
-                        twm_obj.accounts[acc.username].safex_public_key = acc.publicKey;
-                        twm_obj.accounts[acc.username].safex_private_key = acc.privateKey;
-                        twm_obj.accounts[acc.username].urls = {};
-                        /*
-                                                twm_obj.accounts[acc.username].urls.theworldmarketplace = {};
-                                                twm_obj.accounts[acc.username].urls.theworldmarketplace.url = 'api.theworldmarketplace.com';
-                        */
-                    }
-
-                    const algorithm = 'aes-256-ctr';
-                    const cipher = crypto.createCipher(algorithm, this.state.password);
-                    let crypted = cipher.update(JSON.stringify(twm_obj), 'utf8', 'hex');
-                    crypted += cipher.final('hex');
-
-                    const hash1 = crypto.createHash('sha256');
-                    hash1.update(JSON.stringify(twm_obj));
-                    console.log(`password ${this.state.password}`);
-                    console.log(JSON.stringify(twm_obj));
-
-                    let twm_save = await save_twm_file(ipath + '.twm', crypted, this.state.password, hash1.digest('hex'));
-
-                    try {
-                        let twm_file = await open_twm_file(ipath + '.twm', this.state.password);
+                    console.log(`the path ${ipath}`);
+                    let twm_file = await open_twm_file(ipath + '.twm', this.state.password);
+                    if (twm_file.success) {
+                        //parse the json and pack it into the local storage for usages
+                        console.log(`success`);
                         console.log(twm_file);
                         localStorage.setItem('twm_file', JSON.stringify(twm_file.contents));
-                    } catch (err) {
-                        console.error(err);
-                        console.error(`error opening twm file after save to verify`);
+                    } else {
+                        console.log(`error`);
+                        console.log(twm_file);
+                        throw `error`;
                     }
-                    console.log(twm_save);
+
                 } catch (err) {
                     console.error(err);
-                    console.error(`error at initial save of the twm file`);
-                }
-            }
+                    try {
 
-            this.setState({wallet_made: true, wallet: wallet, password: this.state.password});
-        } catch (err) {
-            console.error(err);
-            console.error("error on initial recovery");
-            alert(err);
+                        let twm_obj = {};
+
+                        twm_obj.version = 1;
+                        twm_obj.api = {};
+                        twm_obj.api.urls = {};/*
+                    twm_obj.api.urls.theworldmarketplace = {};
+                    twm_obj.api.urls.theworldmarketplace.url = 'api.theworldmarketplace.com';*/
+                        twm_obj.accounts = {};
+                        twm_obj.settings = {};
+
+                        //for each account make one, and within an account you have urls and keys  the top lvel api urls is for top level non account actions
+                        var accs = wallet.getSafexAccounts();
+                        for (const acc of accs) {
+                            console.log(acc);
+                            twm_obj.accounts[acc.username] = {};
+                            twm_obj.accounts[acc.username].username = acc.username;
+                            twm_obj.accounts[acc.username].data = acc.data;
+                            twm_obj.accounts[acc.username].safex_public_key = acc.publicKey;
+                            twm_obj.accounts[acc.username].safex_private_key = acc.privateKey;
+                            twm_obj.accounts[acc.username].urls = {};
+                            /*
+                                                    twm_obj.accounts[acc.username].urls.theworldmarketplace = {};
+                                                    twm_obj.accounts[acc.username].urls.theworldmarketplace.url = 'api.theworldmarketplace.com';
+                            */
+                        }
+
+                        const algorithm = 'aes-256-ctr';
+                        const cipher = crypto.createCipher(algorithm, this.state.password);
+                        let crypted = cipher.update(JSON.stringify(twm_obj), 'utf8', 'hex');
+                        crypted += cipher.final('hex');
+
+                        const hash1 = crypto.createHash('sha256');
+                        hash1.update(JSON.stringify(twm_obj));
+                        console.log(`password ${this.state.password}`);
+                        console.log(JSON.stringify(twm_obj));
+
+                        let twm_save = await save_twm_file(ipath + '.twm', crypted, this.state.password, hash1.digest('hex'));
+
+                        try {
+                            let twm_file = await open_twm_file(ipath + '.twm', this.state.password);
+                            console.log(twm_file);
+                            localStorage.setItem('twm_file', JSON.stringify(twm_file.contents));
+                        } catch (err) {
+                            console.error(err);
+                            console.error(`error opening twm file after save to verify`);
+                        }
+                        console.log(twm_save);
+                    } catch (err) {
+                        console.error(err);
+                        console.error(`error at initial save of the twm file`);
+                    }
+                }
+                this.setState({wallet_made: true, wallet: wallet, password: this.state.password});
+            } catch (err) {
+                console.error(err);
+                console.error("error on initial recovery");
+                alert(err);
+            }
         }
     };
 

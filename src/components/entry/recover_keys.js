@@ -1,6 +1,6 @@
 import React from 'react';
 import {Row, Col, Container, Button, Form} from 'react-bootstrap';
-import {recover_from_keys} from '../../utils/wallet_creation';
+import {recover_from_keys_util} from '../../utils/wallet_creation';
 import {FaBackward} from 'react-icons/fa'
 
 import WalletHome from "../wallet/home";
@@ -77,11 +77,19 @@ export default class RecoverKeys extends React.Component {
         this.setState({password: ''});
     };
 
+    make_wallet_result = async(error, wallet) => {
+        if (error) {
+
+        } else {
+            this.setState({wallet_made: true, wallet: wallet});
+        }
+    };
+
     make_wallet = async (e) => {
         e.preventDefault();
         try {
             let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
-            let wallet = await recover_from_keys(
+            recover_from_keys_util(
                 this.state.new_path,
                 this.state.password,
                 0,
@@ -89,9 +97,7 @@ export default class RecoverKeys extends React.Component {
                 daemon_string,
                 this.state.public_address,
                 this.state.viewkey,
-                this.state.spendkey);
-            console.log(wallet);
-            this.setState({wallet_made: true, wallet: wallet});
+                this.state.spendkey, this.make_wallet_result);
         } catch (err) {
             console.error(err);
             console.error("error on initial recovery");

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Row, Col, Container, Button, Form} from 'react-bootstrap';
-import {recover_from_seed} from '../../utils/wallet_creation';
+import {recover_from_seed_util} from '../../utils/wallet_creation';
 
 import {FaBackward} from 'react-icons/fa'
 
@@ -77,18 +77,24 @@ export default class RecoverSeed extends React.Component {
         this.setState({password: ''});
     };
 
+    make_wallet_result = async(error, wallet) => {
+        if (error) {
+
+        } else {
+            this.setState({wallet_made: true, wallet: wallet});
+        }
+    };
+
     make_wallet = async (e) => {
         e.preventDefault();
         try {
             let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
-            let wallet = await recover_from_seed(this.state.new_path,
+            recover_from_seed_util(this.state.new_path,
                 this.state.password,
                 0,
                 this.state.network,
                 daemon_string,
-                this.state.seed);
-            console.log(wallet);
-            this.setState({wallet_made: true, wallet: wallet});
+                this.state.seed, this.make_wallet_result);
         } catch (err) {
             console.error(err);
             console.error("error on initial recovery");
