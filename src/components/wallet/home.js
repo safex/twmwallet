@@ -520,6 +520,7 @@ class WalletHome extends React.Component {
             let amount = this.state.token_txn_amount;
             if (confirmed_fee) {
                try {
+                   this.setState({token_txn_id: token_txn.transactionsIds()})
                     token_txn.commit(this.commit_txn_callback);
                 } catch (err) {
                     console.error(err);
@@ -536,11 +537,12 @@ class WalletHome extends React.Component {
     };
 
     commit_txn_callback = async (error, txn) => {
+        console.log(error);
         try {
             console.log(txn);
             console.log(txn);
             alert(`token transaction successfully submitted 
-                                        transaction id: ${txn}
+                                        transaction id: ${this.state.token_txn_id}
                                         amount: ${txn} SFT
                                         fee: ${txn / 10000000000} SFX`);
         } catch (err) {
