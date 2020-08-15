@@ -491,28 +491,9 @@ class WalletHome extends React.Component {
                 console.log(confirmed);
                 if (confirmed) {
                     try {
-                        let token_txn = await send_tokens(wallet, e.target.destination.value, e.target.amount.value, mixins);
-                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${token_txn.fee() / 10000000000} SFX Safex Cash`);
-                        let fee = token_txn.fee();
-                        let txid = token_txn.transactionsIds();
-                        let amount = e.target.amount.value;
-                        if (confirmed_fee) {
-                            try {
-                                let committed_txn = await commit_txn(token_txn);
-                                console.log(committed_txn);
-                                console.log(token_txn);
-                                alert(`token transaction successfully submitted 
-                                        transaction id: ${txid}
-                                        amount: ${amount} SFT
-                                        fee: ${fee / 10000000000} SFX`);
-                            } catch (err) {
-                                console.error(err);
-                                console.error(`error when trying to commit the token transaction to the blockchain`);
-                                alert(`error when trying to commit the token transaction to the blockchain`);
-                            }
-                        } else {
-                            console.log("token transaction cancelled");
-                        }
+                        this.setState({token_txn_amount: e.target.amount.value})
+                        send_tokens(wallet, e.target.destination.value, e.target.amount.value, mixins, this.token_send_first);
+
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the token transaction formation it was not commited`);
@@ -526,6 +507,46 @@ class WalletHome extends React.Component {
                 alert(`choose fewer mixins`);
             }
             console.error(`error at the token transaction`);
+        }
+    };
+
+    token_send_first = async (error, token_txn) => {
+        console.log(token_txn);
+        console.log(error);
+        try {
+            let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${token_txn.fee() / 10000000000} SFX Safex Cash`);
+            let fee = token_txn.fee();
+            let txid = token_txn.transactionsIds();
+            let amount = this.state.token_txn_amount;
+            if (confirmed_fee) {
+               try {
+                    token_txn.commit(this.commit_txn_callback);
+                } catch (err) {
+                    console.error(err);
+                    console.error(`error when trying to commit the token transaction to the blockchain`);
+                    alert(`error when trying to commit the token transaction to the blockchain`);
+                }
+            } else {
+                console.log(`token transaction cancelled`);
+            }
+        } catch (err) {
+            console.error(err);
+            console.error(`error at stepping into confirming the transaction`)
+        }
+    };
+
+    commit_txn_callback = async (error, txn) => {
+        try {
+            console.log(txn);
+            console.log(txn);
+            alert(`token transaction successfully submitted 
+                                        transaction id: ${txn}
+                                        amount: ${txn} SFT
+                                        fee: ${txn / 10000000000} SFX`);
+        } catch (err) {
+            console.error(err);
+            console.error(`error when trying to commit the token transaction to the blockchain`);
+            alert(`error when trying to commit the token transaction to the blockchain`);
         }
     };
 
@@ -1302,7 +1323,8 @@ class WalletHome extends React.Component {
 
                                             {data.main_image ?
                                                 <div className="d-flex flex-row justify-content-around p-3">
-                                                    <Image className="border border-dark" src={data.main_image}></Image>
+                                                    <Image className="border border-dark"
+                                                           src={data.main_image}></Image>
 
                                                     <div className="d-flex flex-column justify-content-center">
                                                         <h3>{listing.title}</h3>
@@ -1602,7 +1624,8 @@ class WalletHome extends React.Component {
 
                                                         Message Type <Form.Control name="message_type"
                                                                                    defaultValue={data.message_type}/>
-                                                        Weight <Form.Control name="weight" defaultValue={data.weight}/>
+                                                        Weight <Form.Control name="weight"
+                                                                             defaultValue={data.weight}/>
                                                         Physical Item? <Form.Control name="physical"
                                                                                      defaultValue={data.physical}/>
                                                         Country of Origin <Form.Control name="country"
@@ -1780,7 +1803,8 @@ class WalletHome extends React.Component {
                                                         Biography <Form.Control maxLength="200" as="textarea"
                                                                                 name="biography"
                                                                                 placedholder="type up your biography"/>
-                                                        Website <Form.Control name="website" defaultValue="safex.org"
+                                                        Website <Form.Control name="website"
+                                                                              defaultValue="safex.org"
                                                                               placedholder="if you have your own website: paste your link here"/>
                                                         Location <Form.Control name="location" defaultValue="Earth"
                                                                                placedholder="your location"/>
@@ -1796,7 +1820,8 @@ class WalletHome extends React.Component {
                                                 </Modal.Body>
                                                 <Modal.Footer className="align-self-start">
 
-                                                    <Button variant="danger" onClick={this.handleCloseNewAccountForm}>
+                                                    <Button variant="danger"
+                                                            onClick={this.handleCloseNewAccountForm}>
                                                         Close
                                                     </Button>
                                                 </Modal.Footer>
@@ -1835,7 +1860,8 @@ class WalletHome extends React.Component {
 
                                                             Message Type <Form.Control name="message_type"/>
                                                             Weight <Form.Control name="weight"/>
-                                                            Physical Item? <Form.Control name="physical" value="true"/>
+                                                            Physical Item? <Form.Control name="physical"
+                                                                                         value="true"/>
                                                             Country of Origin <Form.Control name="country"
                                                                                             defaultValue="Earth"
                                                                                             placedholder="your location"/>
@@ -1857,7 +1883,8 @@ class WalletHome extends React.Component {
 
                                         <Row>
                                             {this.state.twm_offers.length > 1 ? (
-                                                    <Table color="white" className="white-text border border-white b-r10">
+                                                    <Table color="white"
+                                                           className="white-text border border-white b-r10">
                                                         <thead>
                                                         <tr>
                                                             <th>Title</th>
@@ -1916,7 +1943,8 @@ class WalletHome extends React.Component {
                         console.error(`error at the interval loading of stacking`);
                     }
                     return (
-                        <div className="wallet no-gutters flex-column border-bottom border-white b-r10 oflow-y-scroll">
+                        <div
+                            className="wallet no-gutters flex-column border-bottom border-white b-r10 oflow-y-scroll">
 
                             <h1 className="text-center m-2"> Token Management </h1>
 
@@ -2073,7 +2101,8 @@ class WalletHome extends React.Component {
                                                 <tfoot>
                                                 <tr>
                                                     <td>
-                                                        <li>Block Interval {interval[0] * 10} : {interest[0]} SFX per
+                                                        <li>Block Interval {interval[0] * 10} : {interest[0]} SFX
+                                                            per
                                                             token
                                                         </li>
                                                     </td>
@@ -2098,7 +2127,8 @@ class WalletHome extends React.Component {
                                                 placedholder="the amount to send"/>
                                                 Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
                                                                               placedholder="choose the number of mixins"/>
-                                                <Button className="mt-2" type="submit" variant="danger" size="lg" block>
+                                                <Button className="mt-2" type="submit" variant="danger" size="lg"
+                                                        block>
                                                     Unstake and Collect
                                                 </Button>
                                             </Form>

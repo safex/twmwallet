@@ -1,7 +1,7 @@
 const safex = window.require("safex-nodejs-libwallet");
 
 export async function create_wallet_util(path, password, restore_height, network, daemon, callback) {
-    return safex.createWallet({
+    safex.createWallet({
         path: path,
         password: password,
         network: network,
