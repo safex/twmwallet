@@ -20,10 +20,11 @@ export async function send_tokens(wallet, address, amount, mixin, callback) {
 
 export async function send_cash(wallet, address, amount, mixin, callback) {
     let mixi = mixin >= 0 ? mixin : 6;
+    let amount2 = amount * 10000000000;
     try {
         wallet.createTransaction({
             address: address,
-            amount: amount * 10000000000,
+            amount: amount2.toString(),
             mixin: mixi
         }, callback)
     } catch(err) {
