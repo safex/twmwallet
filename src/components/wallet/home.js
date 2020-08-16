@@ -572,7 +572,7 @@ class WalletHome extends React.Component {
                             cash_txn_amount: e.target.amount.value,
                             cash_txn_destination: e.target.destination.value.trim()
                         });
-                        send_cash(wallet, e.target.destination.value, e.target.amount.value.trim(), mixins, this.cash_send_first);
+                        send_cash(wallet, e.target.destination.value.trim(), e.target.amount.value, mixins, this.cash_send_first);
 
 
                     } catch (err) {
@@ -593,13 +593,15 @@ class WalletHome extends React.Component {
 
     cash_send_first = async (error, cash_txn) => {
         if (error) {
-
+            console.error(error);
+            console.error(`error at the cash send transaction`);
+            alert(`error at the the cash send transaction`);
+            alert(error);
         } else {
             let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${cash_txn.fee() / 10000000000} SFX Safex Cash 
             sending ${this.state.cash_txn_amount} SFX to ${this.state.cash_txn_destination}`);
             let fee = cash_txn.fee();
             let txid = cash_txn.transactionsIds();
-            let amount = e.target.amount.value;
             if (confirmed_fee) {
                 try {
                     this.setState({cash_txn_fee: fee, cash_txn_id: txid});
@@ -618,10 +620,11 @@ class WalletHome extends React.Component {
 
     commit_cash_txn_callback = async (error, txn) => {
         if (error) {
-
+            console.error(error);
+            console.error(`error at committing the cash transaction`);
+            alert(`error at the cash transaction`);
+            alert(error);
         } else {
-            console.log(committed_txn);
-            console.log(cash_txn);
             alert(`cash transaction successfully submitted 
                                         transaction id: ${this.state.cash_txn_id}
                                         amount: ${this.state.cash_txn_amount}
