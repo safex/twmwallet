@@ -516,27 +516,34 @@ class WalletHome extends React.Component {
     token_send_first = async (error, token_txn) => {
         console.log(token_txn);
         console.log(error);
-        try {
-            let confirmed_fee = window.confirm(`the fee to send this token transaction will be:  ${token_txn.fee() / 10000000000} SFX Safex Cash
+        if (error) {
+            console.error(error);
+            console.error(`error at the token transaction send`);
+            alert(`error at the token transaction send`);
+            alert(error);
+        } else {
+            try {
+                let confirmed_fee = window.confirm(`the fee to send this token transaction will be:  ${token_txn.fee() / 10000000000} SFX Safex Cash
              sending ${this.state.token_txn_amount} SFT to ${this.state.token_txn_destination}`);
-            let fee = token_txn.fee();
-            let txid = token_txn.transactionsIds();
-            let amount = this.state.token_txn_amount;
-            if (confirmed_fee) {
-                try {
-                    this.setState({token_txn_id: txid, token_txn_fee: fee});
-                    token_txn.commit(this.commit_token_txn_callback);
-                } catch (err) {
-                    console.error(err);
-                    console.error(`error when trying to commit the token transaction to the blockchain`);
-                    alert(`error when trying to commit the token transaction to the blockchain`);
+                let fee = token_txn.fee();
+                let txid = token_txn.transactionsIds();
+                let amount = this.state.token_txn_amount;
+                if (confirmed_fee) {
+                    try {
+                        this.setState({token_txn_id: txid, token_txn_fee: fee});
+                        token_txn.commit(this.commit_token_txn_callback);
+                    } catch (err) {
+                        console.error(err);
+                        console.error(`error when trying to commit the token transaction to the blockchain`);
+                        alert(`error when trying to commit the token transaction to the blockchain`);
+                    }
+                } else {
+                    console.log(`token transaction cancelled`);
                 }
-            } else {
-                console.log(`token transaction cancelled`);
+            } catch (err) {
+                console.error(err);
+                console.error(`error at stepping into confirming the transaction`)
             }
-        } catch (err) {
-            console.error(err);
-            console.error(`error at stepping into confirming the transaction`)
         }
     };
 
