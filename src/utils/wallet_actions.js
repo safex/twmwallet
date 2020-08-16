@@ -18,16 +18,18 @@ export async function send_tokens(wallet, address, amount, mixin, callback) {
     }
 }
 
-export async function send_cash(wallet, address, amount, mixin) {
+export async function send_cash(wallet, address, amount, mixin, callback) {
     let mixi = mixin >= 0 ? mixin : 6;
-    return wallet.createTransaction({
-        address: address,
-        amount: amount * 10000000000,
-        mixin: mixi
-    }).then((tx) => {
-        console.log("cash transaction created: " + tx.transactionsIds());
-        return tx;
-    });
+    try {
+        wallet.createTransaction({
+            address: address,
+            amount: amount * 10000000000,
+            mixin: mixi
+        }, callback)
+    } catch(err) {
+        console.error(err);
+        console.error(`error at cash transaction`)
+    }
 }
 
 export async function stake_tokens(wallet, amount, mixin) {

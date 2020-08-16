@@ -491,8 +491,11 @@ class WalletHome extends React.Component {
                 console.log(confirmed);
                 if (confirmed) {
                     try {
-                        this.setState({token_txn_amount: e.target.amount.value})
-                        send_tokens(wallet, e.target.destination.value, e.target.amount.value, mixins, this.token_send_first);
+                        this.setState({
+                            token_txn_amount: e.target.amount.value,
+                            token_txn_destination: e.target.destination.value.trim()
+                        });
+                        send_tokens(wallet, e.target.destination.value.trim(), e.target.amount.value, mixins, this.token_send_first);
 
                     } catch (err) {
                         console.error(err);
@@ -514,14 +517,15 @@ class WalletHome extends React.Component {
         console.log(token_txn);
         console.log(error);
         try {
-            let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${token_txn.fee() / 10000000000} SFX Safex Cash`);
+            let confirmed_fee = window.confirm(`the fee to send this token transaction will be:  ${token_txn.fee() / 10000000000} SFX Safex Cash
+             sending ${this.state.token_txn_amount} SFT to ${this.state.token_txn_destination}`);
             let fee = token_txn.fee();
             let txid = token_txn.transactionsIds();
             let amount = this.state.token_txn_amount;
             if (confirmed_fee) {
-               try {
-                   this.setState({token_txn_id: token_txn.transactionsIds()})
-                    token_txn.commit(this.commit_txn_callback);
+                try {
+                    this.setState({token_txn_id: txid, token_txn_fee: fee});
+                    token_txn.commit(this.commit_token_txn_callback);
                 } catch (err) {
                     console.error(err);
                     console.error(`error when trying to commit the token transaction to the blockchain`);
@@ -536,19 +540,20 @@ class WalletHome extends React.Component {
         }
     };
 
-    commit_txn_callback = async (error, txn) => {
+    commit_token_txn_callback = async (error, txn) => {
         console.log(error);
-        try {
+        if (error) {
+            console.error(`error when trying to commit the token transaction to the blockchain`);
+            alert(`error when trying to commit the token transaction to the blockchain`);
+            console.error(error);
+            alert(error);
+        } else {
             console.log(txn);
             console.log(txn);
             alert(`token transaction successfully submitted 
                                         transaction id: ${this.state.token_txn_id}
-                                        amount: ${txn} SFT
-                                        fee: ${txn / 10000000000} SFX`);
-        } catch (err) {
-            console.error(err);
-            console.error(`error when trying to commit the token transaction to the blockchain`);
-            alert(`error when trying to commit the token transaction to the blockchain`);
+                                        amount: ${this.state.token_txn_amount} SFT
+                                        fee: ${this.state.token_txn_fee / 10000000000} SFX`);
         }
     };
 
@@ -563,30 +568,13 @@ class WalletHome extends React.Component {
                 console.log(confirmed);
                 if (confirmed) {
                     try {
-                        let cash_txn = await send_cash(wallet, e.target.destination.value, e.target.amount.value, mixins);
-                        console.log(cash_txn);
-                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${cash_txn.fee() / 10000000000} SFX Safex Cash`);
-                        let fee = cash_txn.fee();
-                        let txid = cash_txn.transactionsIds();
-                        let amount = e.target.amount.value;
-                        if (confirmed_fee) {
-                            try {
+                        this.setState({
+                            cash_txn_amount: e.target.amount.value,
+                            cash_txn_destination: e.target.destination.value.trim()
+                        });
+                        send_cash(wallet, e.target.destination.value, e.target.amount.value.trim(), mixins, this.cash_send_first);
 
-                                let committed_txn = await commit_txn(cash_txn);
-                                console.log(committed_txn);
-                                console.log(cash_txn);
-                                alert(`cash transaction successfully submitted 
-                                        transaction id: ${txid}
-                                        amount: ${amount}
-                                        fee: ${fee / 10000000000}`);
-                            } catch (err) {
-                                console.error(err);
-                                console.error(`error at commiting the cash transaction to the blockchain network`);
-                                alert(`error at commiting the cash transaction to the blockchain network`);
-                            }
-                        } else {
-                            alert(`the cash transaction was cancelled`)
-                        }
+
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the cash transaction formation it was not commited`);
@@ -600,6 +588,44 @@ class WalletHome extends React.Component {
                 alert(`choose fewer mixins`);
             }
             console.error(`error at the cash transaction`);
+        }
+    };
+
+    cash_send_first = async (error, cash_txn) => {
+        if (error) {
+
+        } else {
+            let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${cash_txn.fee() / 10000000000} SFX Safex Cash 
+            sending ${this.state.cash_txn_amount} SFX to ${this.state.cash_txn_destination}`);
+            let fee = cash_txn.fee();
+            let txid = cash_txn.transactionsIds();
+            let amount = e.target.amount.value;
+            if (confirmed_fee) {
+                try {
+                    this.setState({cash_txn_fee: fee, cash_txn_id: txid});
+                    cash_txn.commit(this.commit_cash_txn_callback);
+
+                } catch (err) {
+                    console.error(err);
+                    console.error(`error at commiting the cash transaction to the blockchain network`);
+                    alert(`error at commiting the cash transaction to the blockchain network`);
+                }
+            } else {
+                alert(`the cash transaction was cancelled`)
+            }
+        }
+    };
+
+    commit_cash_txn_callback = async (error, txn) => {
+        if (error) {
+
+        } else {
+            console.log(committed_txn);
+            console.log(cash_txn);
+            alert(`cash transaction successfully submitted 
+                                        transaction id: ${this.state.cash_txn_id}
+                                        amount: ${this.state.cash_txn_amount}
+                                        fee: ${this.state.cash_txn_fee / 10000000000}`);
         }
     };
 
