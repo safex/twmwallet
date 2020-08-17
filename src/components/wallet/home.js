@@ -15,7 +15,8 @@ import {
     unstake_tokens,
     commit_txn,
     purchase_offer,
-    edit_offer
+    edit_offer,
+    create_offer
 } from "../../utils/wallet_actions";
 
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
@@ -848,45 +849,56 @@ class WalletHome extends React.Component {
 
         try {
             let mixins = e.target.mixins.value - 1;
-            let new_offer_transaction = wallet.createAdvancedTransaction({
-                tx_type: '8',
-                safex_username: e.target.username.value,
-                safex_offer_title: e.target.title.value,
-                safex_offer_price: e.target.price.value * 10000000000,
-                safex_offer_quantity: e.target.quantity.value,
-                safex_offer_description: JSON.stringify(o_obj),
-                safex_offer_price_peg_used: 0,
-                mixin: mixins
-            }).then((tx) => {
-                console.log(tx);
-                let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${tx.fee() / 10000000000} SFX Safex Cash`);
-                let fee = tx.fee();
-                let txid = tx.transactionsIds();
-                if (confirmed_fee) {
-                    tx.commit().then(async (commit) => {
-                        console.log(commit);
-                        console.log("committed transaction");
-                        alert(`transaction successfully submitted 
-                        transaction id: ${txid}
-                        fee: ${fee / 10000000000}`);
-
-                    }).catch((err) => {
-                        console.error(err);
-                        console.error(`error at the committing of the account registration transaction`);
-                        alert(`there was an error at committing the transaction to the blockchain`);
-                    })
-                } else {
-                    alert(`your transaction was cancelled, no account registration was completed`);
-                }
-
-            }).catch((err) => {
-                console.error(err);
-                alert(`error when committing the transaction: likely has not gone through`)
-            })
+            this.setState({create_offer_txn_title: e.target.title.value});
+            create_offer(
+                e.target.username.value,
+                e.target.title.value,
+                e.target.price.value * 10000000000,
+                e.target.quantity.value,
+                JSON.stringify(o_obj),
+                mixins, this.create_offer_first_callback);
         } catch (err) {
             console.error(err);
             console.error("error at listing the offer");
         }
+    };
+
+    create_offer_first_callback = async (error, create_offer_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at first callback create new offer transaction`);
+            alert(`error at first call back create new offer transaction`);
+            alert(error);
+        } else {
+            console.log(create_offer_txn);
+            let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${create_offer_txn.fee() / 10000000000} SFX Safex Cash
+            to list ${this.state.create_offer_txn_title} clicking OK will confirm this transaction`);
+            let fee = create_offer_txn.fee();
+            let txid = create_offer_txn.transactionsIds();
+            if (confirmed_fee) {
+                this.setState({create_offer_txn_fee: fee, create_offer_txn_id: txid});
+                create_offer_txn.commit(this.create_offer_commit_callback)
+            } else {
+                alert(`your transaction was cancelled, the listing for ${this.state.create_offer_txn_title} was cancelled`);
+                this.setState({create_offer_txn_title: '', create_offer_txn_id: '', create_offer_txn_fee: 0})
+            }
+        }
+    };
+
+    create_offer_commit_callback = async(error, txn) => {
+        if (error) {
+            this.setState({create_offer_txn_title: '', create_offer_txn_id: '', create_offer_txn_fee: 0})
+            console.error(error);
+            console.error(`error at commit callback create new offer transaction`);
+            alert(`error at commit call back create new offer transaction`);
+            alert(error);
+        } else {
+            console.log("committed create offer transaction");
+            alert(`transaction successfully submitted listing ${this.state.create_offer_txn_title}
+                        transaction id: ${this.state.create_offer_txn_id}
+                        fee: ${this.state.create_offer_txn_fee / 10000000000}`);
+        }
+
     };
 
     make_token_stake = async (e) => {
