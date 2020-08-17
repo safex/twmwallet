@@ -48,7 +48,7 @@ export async function create_offer(wallet, username, title, price, quantity, des
     let mixi = mixin >= 0 ? mixin : 6;
     console.log(mixin);
     let price2 = price * 10000000000;
-    return wallet.createAdvancedTransaction({
+    wallet.createAdvancedTransaction({
         tx_type: '8',
         safex_username: username,
         safex_offer_title: title,

@@ -850,10 +850,10 @@ class WalletHome extends React.Component {
         try {
             let mixins = e.target.mixins.value - 1;
             this.setState({create_offer_txn_title: e.target.title.value});
-            create_offer(
+            create_offer(wallet,
                 e.target.username.value,
                 e.target.title.value,
-                e.target.price.value * 10000000000,
+                e.target.price.value,
                 e.target.quantity.value,
                 JSON.stringify(o_obj),
                 mixins, this.create_offer_first_callback);
