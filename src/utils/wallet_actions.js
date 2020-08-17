@@ -98,6 +98,15 @@ export async function edit_account(wallet, username, data, mixin, callback) {
     }, callback);
 }
 
+export async function create_account(wallet, username, mixin, callback) {
+    let mixi = mixin >= 0 ? mixin : 6;
+    wallet.createAdvancedTransaction({
+        tx_type: '6', //create account transaction
+        safex_username: username,
+        mixin: mixins
+    }, callback);
+}
+
 export async function create_price_oracle(wallet, title, creator, description, currency, rate, mixin, callback) {
     let mixi = mixin >= 0 ? mixin : 6;
     wallet.createAdvancedTransaction({
