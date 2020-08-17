@@ -885,7 +885,7 @@ class WalletHome extends React.Component {
         }
     };
 
-    create_offer_commit_callback = async(error, txn) => {
+    create_offer_commit_callback = async (error, txn) => {
         if (error) {
             this.setState({create_offer_txn_title: '', create_offer_txn_id: '', create_offer_txn_fee: 0})
             console.error(error);
@@ -911,28 +911,9 @@ class WalletHome extends React.Component {
                 console.log(confirmed);
                 if (confirmed) {
                     try {
-                        let stake_txn = await stake_tokens(wallet, e.target.amount.value, mixins);
-                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${stake_txn.fee() / 10000000000} SFX Safex Cash`);
-                        let fee = stake_txn.fee();
-                        let txid = stake_txn.transactionsIds();
-                        let amount = e.target.amount.value;
-                        if (confirmed_fee) {
-                            try {
-                                let committed_txn = await commit_txn(stake_txn);
-                                console.log(committed_txn);
-                                console.log(stake_txn);
-                                alert(`token staking transaction successfully submitted 
-                                        transaction id: ${txid}
-                                        amount: ${amount} SFT
-                                        fee: ${fee / 10000000000} SFX`);
-                            } catch (err) {
-                                console.error(err);
-                                console.error(`error when trying to commit the token staking transaction to the blockchain`);
-                                alert(`error when trying to commit the token staking transaction to the blockchain`);
-                            }
-                        } else {
-                            console.log("token staking transaction cancelled");
-                        }
+                        this.setState({stake_txn_amount: e.target.amount.value});
+                        stake_tokens(wallet, e.target.amount.value, mixins, this.stake_first_callback);
+
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the token staking transaction formation it was not commited`);
@@ -949,6 +930,41 @@ class WalletHome extends React.Component {
         }
     };
 
+    stake_first_callback = async (error, stake_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at first call back stake token txn`);
+            alert(`error at the first call back stake token txn`);
+            alert(error);
+        } else {
+            let confirmed_fee = window.confirm(`the network fee to stake ${this.state.stake_txn_amount} SFT will be:  ${stake_txn.fee() / 10000000000} SFX Safex Cash`);
+            let fee = stake_txn.fee();
+            let txid = stake_txn.transactionsIds();
+            this.setState({stake_txn_id: txid, stake_txn_fee: fee});
+            if (confirmed_fee) {
+                stake_txn.commit(this.stake_commit_callback);
+            } else {
+                console.log("token staking transaction cancelled");
+            }
+        }
+    };
+
+    stake_commit_callback = async (error, txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at committing the stake token transaction`);
+            alert(`error at committing the stake token transaction`);
+            alert(error);
+        } else {
+            alert(`token staking transaction successfully submitted 
+                                        transaction id: ${this.state.stake_txn_id}
+                                        staking ${this.state.stake_txn_amount} SFT
+                                        fee: ${this.state.stake_txn_fee / 10000000000} SFX`);
+
+            this.setState({stake_txn_id: '', stake_txn_fee: 0, stake_txn_amount: 0});
+        }
+    };
+
     make_token_unstake = async (e) => {
         e.preventDefault();
         e.persist();
@@ -959,28 +975,9 @@ class WalletHome extends React.Component {
                 console.log(confirmed);
                 if (confirmed) {
                     try {
-                        let unstake_txn = await unstake_tokens(wallet, e.target.amount.value, mixins);
-                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${unstake_txn.fee() / 10000000000} SFX Safex Cash`);
-                        let fee = unstake_txn.fee();
-                        let txid = unstake_txn.transactionsIds();
-                        let amount = e.target.amount.value;
-                        if (confirmed_fee) {
-                            try {
-                                let committed_txn = await commit_txn(unstake_txn);
-                                console.log(committed_txn);
-                                console.log(unstake_txn);
-                                alert(`token unstake transaction committed  
-                                        transaction id: ${txid}
-                                        amount: ${amount} SFT
-                                        fee: ${fee / 10000000000} SFX`);
-                            } catch (err) {
-                                console.error(err);
-                                console.error(`error when trying to commit the token unstaking transaction to the blockchain`);
-                                alert(`error when trying to commit the token unstaking transaction to the blockchain`);
-                            }
-                        } else {
-                            console.log("token staking transaction cancelled");
-                        }
+                        this.setState({unstake_txn_amount: e.target.amount.value});
+                        unstake_tokens(wallet, e.target.amount.value, mixins, this.unstake_first_callback);
+
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the token unstaking transaction formation it was not commited`);
@@ -994,6 +991,47 @@ class WalletHome extends React.Component {
                 alert(`choose fewer mixins`);
             }
             console.error(`error at the token unstake transaction`);
+        }
+    };
+
+    unstake_first_callback = async (error, unstake_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the unstake first callback`);
+            alert(`error at the unstake first callback`);
+            alert(error);
+        } else {
+            let confirmed_fee = window.confirm(`the network fee to unstake ${this.state.unstake_txn_amount} SFT will be:  ${unstake_txn.fee() / 10000000000} SFX Safex Cash`);
+            let fee = unstake_txn.fee();
+            let txid = unstake_txn.transactionsIds();
+            if (confirmed_fee) {
+                try {
+                    this.setState({unstake_txn_id: txid, unstake_txn_fee: fee});
+                    unstake_txn.commit(this.unstake_commit_callback);
+
+
+                } catch (err) {
+                    console.error(err);
+                    console.error(`error when trying to commit the token unstaking transaction to the blockchain`);
+                    alert(`error when trying to commit the token unstaking transaction to the blockchain`);
+                }
+            } else {
+                console.log("token staking transaction cancelled");
+            }
+        }
+    };
+
+    unstake_commit_callback = async (error, txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the unstake commit callback`);
+            alert(`error at the unstake commit callback`);
+            alert(error);
+        } else {
+            alert(`token unstake transaction committed  
+                                        transaction id: ${this.state.unstake_txn_id}
+                                        amount: ${this.state.unstake_txn_amount} SFT
+                                        fee: ${this.state.unstake_txn_fee / 10000000000} SFX`);
         }
     };
 
@@ -1093,40 +1131,21 @@ class WalletHome extends React.Component {
                     console.log(confirmed);
                     if (confirmed) {
                         try {
-                            let purchase_txn = await purchase_offer(
+                            this.setState({
+                                purchase_txn_quantity: e.target.quantity.value,
+                                purchase_txn_title: listing.title,
+                                purchase_txn_offerid: listing.offerID,
+                                purchase_txn_price: listing.price / 10000000000,
+                                purchase_txn_total_cost: total_cost
+                            });
+                            purchase_offer(
                                 wallet,
                                 total_cost,
                                 listing.offerID,
                                 e.target.quantity.value,
-                                mixins
+                                mixins, this.purchase_first_callback
                             );
-                            let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${purchase_txn.fee() / 10000000000}SFX`);
-                            let fee = purchase_txn.fee();
-                            let txid = purchase_txn.transactionsIds();
-                            console.log(purchase_txn);
-                            if (confirmed_fee) {
-                                try {
-                                    let committed_txn = await commit_txn(purchase_txn);
-                                    console.log(committed_txn);
-                                    console.log(purchase_txn);
-                                    copy(`https://stagenet1.safex.org/search?value=${txid}`)
-                                    alert(`
-                                        Purchase transaction committed.
-                                        Transaction ID: ${txid}
-                                        amount: ${amount} X ${listing.title}
-                                        Price: ${total_cost} SFX
-                                        Fee: ${fee / 10000000000} SFX
-                                        A link to this transaction on the Safex Block Explorer has been copied to your clipboard 
-                                        https://stagenet1.safex.org/search?value=${txid} 
-                                        `);
-                                } catch (err) {
-                                    console.error(err);
-                                    console.error(`error when trying to commit the purchase transaction to the blockchain`);
-                                    alert(`error when trying to commit the purchase transaction to the blockchain`);
-                                }
-                            } else {
-                                console.log("purchase transaction cancelled");
-                            }
+
                         } catch (err) {
                             console.error(err);
                             console.error(`error at the purchase transaction formation it was not commited`);
@@ -1141,6 +1160,54 @@ class WalletHome extends React.Component {
                 }
                 console.error(`Error at the purchase transaction`);
             }
+        }
+    };
+
+    purchase_first_callback = async (error, purchase_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the first call back purchase txn`);
+            alert(`error at the first call back purchase txn`);
+            alert(error);
+        } else {
+            let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${purchase_txn.fee() / 10000000000}SFX`);
+            let fee = purchase_txn.fee();
+            let txid = purchase_txn.transactionsIds();
+            if (confirmed_fee) {
+                try {
+                    this.setState({purchase_txn_id: txid, purchase_txn_fee: fee});
+                    purchase_txn.commit(this.purchase_commit_callback);
+
+                } catch (err) {
+                    console.error(err);
+                    console.error(`error when trying to commit the purchase transaction to the blockchain`);
+                    alert(`error when trying to commit the purchase transaction to the blockchain`);
+                }
+            } else {
+                console.log("purchase transaction cancelled");
+            }
+        }
+    };
+
+    purchase_commit_callback = async (error, txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the purchase commit callback`);
+            alert(`error at the purchase commit callback`);
+            alert(error);
+        } else {
+            console.log(committed_txn);
+            console.log(purchase_txn);
+            copy(`https://stagenet1.safex.org/search?value=${txid}`)
+            alert(`
+                                        Purchase transaction committed.
+                                        Transaction ID: ${this.state.purchase_txn_id}
+                                        amount: ${this.state.purchase_txn_quantity} X ${this.state.purchase_txn_title}
+                                        Price: ${this.state.purchase_txn_price} SFX
+                                        Network Fee: ${this.state.purchase_txn_fee / 10000000000} SFX
+                                        A link to this transaction on the Safex Block Explorer has been copied to your clipboard 
+                                        https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id} 
+                                        `);
         }
     };
 
