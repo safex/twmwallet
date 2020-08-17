@@ -63,10 +63,11 @@ export async function unstake_tokens(wallet, amount, mixin, callback) {
 export async function purchase_offer(wallet, cost, offer_id, quantity, mixin, callback) {
     let mixi = mixin >= 0 ? mixin : 6;
     console.log(mixin);
+    let amount2 = cost * 10000000000;
     wallet.createAdvancedTransaction({
         tx_type: '5', //purchase offer transaction
         address: wallet.address(),
-        amount: cost * 10000000000,
+        amount: amount2.toString(),
         safex_offer_id: offer_id,
         safex_purchase_quantity: quantity,
         mixin: mixi
@@ -75,12 +76,13 @@ export async function purchase_offer(wallet, cost, offer_id, quantity, mixin, ca
 
 export async function edit_offer(wallet, offerid, username, offer_title, offer_price, offer_quantity, offer_description, active, mixin, callback) {
     let mixi = mixin >= 0 ? mixin : 6;
+    let price2 = offer_price * 10000000000;
     wallet.createAdvancedTransaction({
         tx_type: '9', //edit offer transaction
         safex_offer_id: offerid,
         safex_username: username,
         safex_offer_title: offer_title,
-        safex_offer_price: offer_price * 10000000000,
+        safex_offer_price: price2.toString(),
         safex_offer_quantity: offer_quantity,
         safex_offer_description: offer_description,
         safex_offer_active: active,
@@ -103,7 +105,7 @@ export async function create_account(wallet, username, mixin, callback) {
     wallet.createAdvancedTransaction({
         tx_type: '6', //create account transaction
         safex_username: username,
-        mixin: mixins
+        mixin: mixi
     }, callback);
 }
 

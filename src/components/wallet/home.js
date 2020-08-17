@@ -414,7 +414,6 @@ class WalletHome extends React.Component {
             alert(`error at the register first callback`);
             alert(error);
         } else {
-            console.log(tx);
             let confirmed_fee = window.confirm(`the network fee to register this account ${this.state.create_account_txn_account.username} will be:  ${register_txn.fee() / 10000000000} SFX Safex Cash`);
             let fee = register_txn.fee();
             let txid = register_txn.transactionsIds();
@@ -439,6 +438,7 @@ class WalletHome extends React.Component {
             let twm_file = this.state.twm_file;
             console.log(twm_file.accounts);
             console.log(`before`);
+            let this_account = this.state.create_account_txn_account;
 
             twm_file.accounts[this_account.username] = {};
             twm_file.accounts[this_account.username].username = this.state.create_account_txn_account.username;
@@ -476,7 +476,7 @@ class WalletHome extends React.Component {
 
                     alert(`transaction successfully submitted 
                         transaction id: ${this.state.create_account_txn_id}
-                        tokens locked for 1000 blocks: 300 SFT
+                        tokens locked for 300 blocks: 100 SFT
                         fee: ${this.state.create_account_txn_fee / 10000000000}`);
                     localStorage.setItem('twm_file', twm_file);
 
@@ -984,6 +984,7 @@ class WalletHome extends React.Component {
             let txid = stake_txn.transactionsIds();
             this.setState({stake_txn_id: txid, stake_txn_fee: fee});
             if (confirmed_fee) {
+                console.log(stake_txn);
                 stake_txn.commit(this.stake_commit_callback);
             } else {
                 console.log("token staking transaction cancelled");
@@ -1239,9 +1240,7 @@ class WalletHome extends React.Component {
             alert(`error at the purchase commit callback`);
             alert(error);
         } else {
-            console.log(committed_txn);
-            console.log(purchase_txn);
-            copy(`https://stagenet1.safex.org/search?value=${txid}`)
+            copy(`https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`)
             alert(`
                                         Purchase transaction committed.
                                         Transaction ID: ${this.state.purchase_txn_id}
@@ -1270,28 +1269,28 @@ class WalletHome extends React.Component {
         let o_obj = {};
         o_obj.twm_version = 1;
 
-        if (vees.description.value.length > 0) {
+        if (va.description.value.length > 0) {
             o_obj.description = va.description.value;
         }
-        if (vees.main_image.value.length > 0) {
+        if (va.main_image.value.length > 0) {
             o_obj.main_image = va.main_image.value;
         }
-        if (vees.sku.value.length > 0) {
+        if (va.sku.value.length > 0) {
             o_obj.sku = va.sku.value;
         }
-        if (vees.barcode.value.length > 0) {
+        if (va.barcode.value.length > 0) {
             o_obj.barcode = va.barcode.value;
         }
-        if (vees.weight.value.length > 0) {
+        if (va.weight.value.length > 0) {
             o_obj.weight = va.weight.value;
         }
-        if (vees.country.value.length > 0) {
+        if (va.country.value.length > 0) {
             o_obj.country = va.country.value;
         }
-        if (vees.message_type.value.length > 0) {
+        if (va.message_type.value.length > 0) {
             o_obj.message_type = va.message_type.value;
         }
-        if (vees.physical.value.length > 0) {
+        if (va.physical.value.length > 0) {
             o_obj.physical = va.physical.value;
         }
         let active = 0;
@@ -1307,11 +1306,11 @@ class WalletHome extends React.Component {
                     this.setState({edit_offer_txn_offerid: va.offerid.value, edit_offer_txn_title: va.title.value});
                     let edit_txn = await edit_offer(
                         wallet,
-                        vees.offerid.value,
-                        vees.username.value,
-                        vees.title.value,
-                        vees.price.value,
-                        vees.quantity.value,
+                        va.offerid.value,
+                        va.username.value,
+                        va.title.value,
+                        va.price.value,
+                        va.quantity.value,
                         JSON.stringify(o_obj),
                         active,
                         mixins,
@@ -1341,7 +1340,7 @@ class WalletHome extends React.Component {
                     edit_offer_txn.commit(this.edit_offer_commit_callback);
                 } catch (err) {
                     console.error(err);
-                    console.error(`error at committing the edit offer transaction for ${vees.offerid.value}`);
+                    console.error(`error at committing the edit offer transaction for ${this.state.edit_offer_txn_offerid}`);
                 }
             } else {
                 alert(`your transaction was cancelled, no edit for the offer was completed`);
@@ -1958,38 +1957,23 @@ class WalletHome extends React.Component {
                                                            onHide={this.handleCloseEditAccountForm}>
                                                         <Modal.Header closeButton>
                                                             <Modal.Title>Edit
-                                                                Offer {this.state.show_edit_account.title}</Modal.Title>
+                                                                Account {selected.username}</Modal.Title>
                                                         </Modal.Header>
                                                         <Modal.Body>
 
                                                             <Form id="edit_account"
-                                                                  onSubmit={(e) => this.edit_account_top(e, this.state.show_edit_account)}>
-                                                                Username <Form.Control name="username"
-                                                                                       defaultValue={this.state.show_edit_account.username}/>
-                                                                Avatar URL <Form.Control name="avatar"
-                                                                                         defaultValue={}/>
-                                                                Twitter Link <Form.Control name="twitter"
-                                                                                           defaultValue={}
-                                                                                           placedholder="enter the link to your twitter handle"/>
-                                                                Facebook Link <Form.Control name="facebook"
-                                                                                            defaultValue={}
-                                                                                            placedholder="enter the to of your facebook page"/>
-                                                                LinkedIn Link <Form.Control name="linkedin"
-                                                                                            defaultValue={}
-                                                                                            placedholder="enter the link to your linkedin handle"/>
-                                                                Biography <Form.Control maxLength="200" as="textarea"
-                                                                                        name="biography"
-                                                                                        placedholder="type up your biography"/>
-                                                                Website <Form.Control name="website"
-                                                                                      defaultValue={}
-                                                                                      placedholder="if you have your own website: paste your link here"/>
-                                                                Location <Form.Control name="location" defaultValue={}
-                                                                                       placedholder="your location"/>
-                                                                Email <Form.Control name="email"
-                                                                                    defaultValue={}
-                                                                                    placedholder="your location"/>
-                                                                Mixins <Form.Control name="mixins" defaultValue="7"/>
+                                                                  onSubmit={(e) => this.edit_account_top(e)}>
 
+                                                                Username <Form.Control name="username" defaultValue={selected.username} />
+                                                                Avatar URL <Form.Control name="avatar" defaultValue={data.avatar} />
+                                                                Twitter Link <Form.Control name="twitter" defaultValue={data.twitter ? data.twitter : ''} />
+                                                                Facebook Link <Form.Control name="facebook" defaultValue={data.facebook ? data.facebook : ''} />
+                                                                LinkedIn Link <Form.Control name="linkedin" defaultValue={data.linkedin ? data.linkedin : ''} />
+                                                                Biography <Form.Control maxLength="200" as="textarea" name="biography" defaulValue={data.biography ? data.biography : ''} />
+                                                                Website <Form.Control name="website" defaultValue={data.website ? data.website : ''} />
+                                                                Location <Form.Control name="location" defaultValue={data.location ? data.location : ''} />
+                                                                Email <Form.Control name="email" defaultValue={data.email ? data.email : ''} />
+                                                                Mixins <Form.Control name="mixins" defaultValue="7" />
 
                                                                 <Button block size="lg" type="submit" variant="success">Submit
                                                                     Edit</Button>
