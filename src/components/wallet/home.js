@@ -16,7 +16,8 @@ import {
     purchase_offer,
     edit_offer,
     create_offer,
-    create_account
+    create_account,
+    edit_account
 } from "../../utils/wallet_actions";
 
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
@@ -65,6 +66,7 @@ class WalletHome extends React.Component {
             show_new_account_form: false,
             show_purchase_form: false,
             show_edit_offer_form: false,
+            show_edit_account_form: false,
             blockchain_tokens_staked: 0,
             blockchain_interest_history: [],
             blockchain_current_interest: {},
@@ -496,6 +498,21 @@ class WalletHome extends React.Component {
         }
     };
 
+
+    edit_account_top = async (e) => {
+        e.preventDefault();
+
+    };
+
+    edit_account_first_callback = async(error, edit_account_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at edit account first callback`);
+        }  else {
+
+        }
+    };
+
     //basic send transactions
     token_send = async (e) => {
         e.preventDefault();
@@ -808,6 +825,16 @@ class WalletHome extends React.Component {
     //show modal of new account
     handleShowNewAccountForm = () => {
         this.setState({show_new_account_form: true});
+    };
+
+    //show modal of Edit Account Form
+    handleShowEditAccountForm = (account) => {
+        this.setState({show_edit_account_form: true, show_edit_account: account});
+    };
+
+    //close modal of Edit Account Form
+    handleCloseEditAccountForm = () => {
+        this.setState({show_edit_account_form: false});
     };
 
     //show modal of Edit Offer Form
@@ -1922,7 +1949,59 @@ class WalletHome extends React.Component {
                                                     </ul>
                                                 </Row>
                                                 <Col id="account-edit-buttons" className=" d-flex flex-column">
-                                                    <Button>Edit</Button>
+                                                    <Button size="lg" variant="success"
+                                                            onClick={() => this.handleShowEditAccountForm(selected)}>
+                                                        EDIT
+                                                    </Button>
+                                                    <Modal className="new-account-form" animation={false}
+                                                           show={this.state.show_edit_account_form}
+                                                           onHide={this.handleCloseEditAccountForm}>
+                                                        <Modal.Header closeButton>
+                                                            <Modal.Title>Edit
+                                                                Offer {this.state.show_edit_account.title}</Modal.Title>
+                                                        </Modal.Header>
+                                                        <Modal.Body>
+
+                                                            <Form id="edit_account"
+                                                                  onSubmit={(e) => this.edit_account_top(e, this.state.show_edit_account)}>
+                                                                Username <Form.Control name="username"
+                                                                                       defaultValue={this.state.show_edit_account.username}/>
+                                                                Avatar URL <Form.Control name="avatar"
+                                                                                         defaultValue={}/>
+                                                                Twitter Link <Form.Control name="twitter"
+                                                                                           defaultValue={}
+                                                                                           placedholder="enter the link to your twitter handle"/>
+                                                                Facebook Link <Form.Control name="facebook"
+                                                                                            defaultValue={}
+                                                                                            placedholder="enter the to of your facebook page"/>
+                                                                LinkedIn Link <Form.Control name="linkedin"
+                                                                                            defaultValue={}
+                                                                                            placedholder="enter the link to your linkedin handle"/>
+                                                                Biography <Form.Control maxLength="200" as="textarea"
+                                                                                        name="biography"
+                                                                                        placedholder="type up your biography"/>
+                                                                Website <Form.Control name="website"
+                                                                                      defaultValue={}
+                                                                                      placedholder="if you have your own website: paste your link here"/>
+                                                                Location <Form.Control name="location" defaultValue={}
+                                                                                       placedholder="your location"/>
+                                                                Email <Form.Control name="email"
+                                                                                    defaultValue={}
+                                                                                    placedholder="your location"/>
+                                                                Mixins <Form.Control name="mixins" defaultValue="7"/>
+
+
+                                                                <Button block size="lg" type="submit" variant="success">Submit
+                                                                    Edit</Button>
+                                                            </Form>
+                                                        </Modal.Body>
+                                                        <Modal.Footer className="align-self-start">
+                                                            <Button size="lg" variant="danger"
+                                                                    onClick={this.handleCloseEditAccountForm}>
+                                                                Close
+                                                            </Button>
+                                                        </Modal.Footer>
+                                                    </Modal>
                                                     <Button onClick={() => this.register_twmapi(selected)}>
                                                         Register API
                                                     </Button>
