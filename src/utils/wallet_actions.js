@@ -136,11 +136,3 @@ export async function update_price_oracle(wallet, title, creator, description, c
         mixin: mixi
     }, callback);
 }
-
-export async function commit_txn(txn) {
-    return txn.commit().then((commit) => {
-        console.log(`commit ${commit}`);
-        console.log(commit);
-        return txn;
-    });
-}
