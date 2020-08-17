@@ -33,20 +33,34 @@ export async function send_cash(wallet, address, amount, mixin, callback) {
     }
 }
 
-export async function stake_tokens(wallet, amount, mixin) {
+export async function stake_tokens(wallet, amount, mixin, callback) {
     let mixi = mixin >= 0 ? mixin : 6;
+    let amount2 = amount * 10000000000;
     return wallet.createAdvancedTransaction({
         tx_type: '3',
         address: wallet.address(),
-        amount: amount * 10000000000,
+        amount: amount2.toString(),
         mixin: mixi
-    }).then((tx) => {
-        console.log(`stake tokens transaction created: ${tx.transactionsIds()}`);
-        return tx;
-    });
+    }, callback)
 }
 
-export async function unstake_tokens(wallet, amount, mixin) {
+export async function create_offer(wallet, username, title, price, quantity, description, mixin, callback) {
+    let mixi = mixin >= 0 ? mixin : 6;
+    console.log(mixin);
+    let price2 = price * 10000000000;
+    return wallet.createAdvancedTransaction({
+        tx_type: '8',
+        safex_username: username,
+        safex_offer_title: title,
+        safex_offer_price: price2.toString(),
+        safex_offer_quantity: quantity,
+        safex_offer_description: description,
+        safex_offer_price_peg_used: 0,
+        mixin: mixi
+    }, callback)
+}
+
+export async function unstake_tokens(wallet, amount, mixin, callback) {
     let mixi = mixin >= 0 ? mixin : 6;
     return wallet.createAdvancedTransaction({
         tx_type: '4',
@@ -59,7 +73,7 @@ export async function unstake_tokens(wallet, amount, mixin) {
     });
 }
 
-export async function purchase_offer(wallet, cost, offer_id, quantity, mixin) {
+export async function purchase_offer(wallet, cost, offer_id, quantity, mixin, callback) {
     let mixi = mixin >= 0 ? mixin : 6;
     console.log(mixin);
     return wallet.createAdvancedTransaction({
