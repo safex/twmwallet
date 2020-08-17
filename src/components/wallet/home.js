@@ -1143,7 +1143,8 @@ class WalletHome extends React.Component {
                                 total_cost,
                                 listing.offerID,
                                 e.target.quantity.value,
-                                mixins, this.purchase_first_callback
+                                mixins,
+                                this.purchase_first_callback
                             );
 
                         } catch (err) {
@@ -1220,50 +1221,48 @@ class WalletHome extends React.Component {
         e.preventDefault();
         e.persist();
         console.log(`let's list the offer it`);
-        let vees = e.target;
+        let va = e.target;
 
-        console.log(vees.offerid.value);
+        console.log(va.offerid.value);
 
         let o_obj = {};
         o_obj.twm_version = 1;
 
         if (vees.description.value.length > 0) {
-            o_obj.description = vees.description.value;
+            o_obj.description = va.description.value;
         }
         if (vees.main_image.value.length > 0) {
-            o_obj.main_image = vees.main_image.value;
+            o_obj.main_image = va.main_image.value;
         }
         if (vees.sku.value.length > 0) {
-            o_obj.sku = vees.sku.value;
+            o_obj.sku = va.sku.value;
         }
         if (vees.barcode.value.length > 0) {
-            o_obj.barcode = vees.barcode.value;
+            o_obj.barcode = va.barcode.value;
         }
         if (vees.weight.value.length > 0) {
-            o_obj.weight = vees.weight.value;
+            o_obj.weight = va.weight.value;
         }
         if (vees.country.value.length > 0) {
-            o_obj.country = vees.country.value;
+            o_obj.country = va.country.value;
         }
         if (vees.message_type.value.length > 0) {
-            o_obj.message_type = vees.message_type.value;
+            o_obj.message_type = va.message_type.value;
         }
         if (vees.physical.value.length > 0) {
-            o_obj.physical = vees.physical.value;
+            o_obj.physical = va.physical.value;
         }
         let active = 0;
-        if (vees.active.value === 'True' || vees.active.value === 'true') {
+        if (va.active.value === 'True' || va.active.value === 'true') {
             active = 1;
         }
         try {
-            let mixins = vees.mixins.value - 1;
+            let mixins = va.mixins.value - 1;
             if (mixins >= 0) {
-                let confirmed = window.confirm(`are you sure you want to edit ${vees.title.value} offer id:  ${vees.offerid.value}?`);
+                let confirmed = window.confirm(`are you sure you want to edit ${va.title.value} offer id:  ${va.offerid.value}?`);
                 console.log(confirmed);
-                console.log(vees.offerid.value);
-                console.log(vees.username.value);
-                console.log(vees.offerid.value);
                 if (confirmed) {
+                    this.setState({edit_offer_txn_offerid: va.offerid.value, edit_offer_txn_title: va.title.value});
                     let edit_txn = await edit_offer(
                         wallet,
                         vees.offerid.value,
@@ -1273,33 +1272,56 @@ class WalletHome extends React.Component {
                         vees.quantity.value,
                         JSON.stringify(o_obj),
                         active,
-                        mixins
+                        mixins,
+                        this.edit_offer_first_callback
                     );
-                    let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${edit_txn.fee() / 10000000000} SFX Safex Cash`);
-                    let fee = edit_txn.fee();
-                    let txid = edit_txn.transactionsIds();
-                    if (confirmed_fee) {
-                        try {
-                            let committed_edit_txn = await commit_txn(edit_txn);
-                            console.log(committed_edit_txn);
-                            console.log(edit_txn);
-                            alert(`edit offer committed 
-                                        transaction id: ${txid}
-                                        for offerid: ${vees.offerid.value}
-                                        titled: ${vees.title.value}
-                                        fee: ${fee / 10000000000} SFX`);
-                        } catch (err) {
-                            console.error(err);
-                            console.error(`error at committing the edit offer transaction for ${vees.offerid.value}`);
-                        }
-                    } else {
-                        alert(`your transaction was cancelled, no edit for the offer was completed`);
-                    }
+
                 }
             }
         } catch (err) {
             console.error(err);
             console.error(`error at creating the edit offer transaction`);
+        }
+    };
+
+    edit_offer_first_callback = async (error, edit_offer_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the edit offer first callback`);
+            alert(`error at the edit offer first callback`);
+            alert(error);
+        } else {
+            let confirmed_fee = window.confirm(`the network fee to edit the ${this.state.edit_offer_txn_title} will be:  ${edit_offer_txn.fee() / 10000000000} SFX Safex Cash`);
+            let fee = edit_offer_txn.fee();
+            let txid = edit_offer_txn.transactionsIds();
+            if (confirmed_fee) {
+                try {
+                    this.setState({edit_offer_txn_id: txid, edit_offer_txn_fee: fee});
+                    edit_offer_txn.commit(this.edit_offer_commit_callback);
+                } catch (err) {
+                    console.error(err);
+                    console.error(`error at committing the edit offer transaction for ${vees.offerid.value}`);
+                }
+            } else {
+                alert(`your transaction was cancelled, no edit for the offer was completed`);
+            }
+        }
+    };
+
+    edit_offer_commit_callback = async (error, txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the edit offer commit callback`);
+            alert(`error at the edit offer commit callback`);
+            alert(error);
+        } else {
+            alert(`edit offer committed 
+                                        transaction id: ${this.state.edit_offer_txn_id}
+                                        for offerid: ${this.state.edit_offer_txn_offerid}
+                                        titled: ${this.state.edit_offer_txn_title}
+                                        fee: ${this.state.edit_offer_txn_fee / 10000000000} SFX`);
+            this.setState({edit_offer_txn_id: '', edit_offer_txn_fee: 0, edit_offer_txn_title: '', edit_offer_txn_offerid: ''});
+
         }
     };
 
