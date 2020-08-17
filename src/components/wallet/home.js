@@ -13,10 +13,10 @@ import {
     send_tokens,
     stake_tokens,
     unstake_tokens,
-    commit_txn,
     purchase_offer,
     edit_offer,
-    create_offer
+    create_offer,
+    create_account
 } from "../../utils/wallet_actions";
 
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
@@ -329,7 +329,7 @@ class WalletHome extends React.Component {
 
     register_account = async (e) => {
         e.preventDefault();
-        if (this.state.tokens >= 5000 && this.state.first_refresh === true) {
+        if (this.state.tokens >= 300 && this.state.first_refresh === true) {
             try {
                 let vees = e.target;
 
@@ -384,92 +384,16 @@ class WalletHome extends React.Component {
                         }
                     }
 
+
                     console.log(`this_account`);
                     console.log(this_account);
                     console.log(`this_account`);
+                    this.setState({create_account_txn_account: this_account});
 
-                    let confirm_registration = wallet.createAdvancedTransaction({
-                        tx_type: '6',
-                        safex_username: e.target.username.value,
-                        mixin: mixins
-                    }).then((tx) => {
-                        console.log(tx);
-                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${tx.fee() / 10000000000} SFX Safex Cash`);
-                        let fee = tx.fee();
-                        let txid = tx.transactionsIds();
-                        if (confirmed_fee) {
-                            tx.commit().then(async (commit) => {
+                    create_account(wallet, e.target.username.value, mixins, this.create_account_first_callback);
 
-                                let twm_file = this.state.twm_file;
-                                console.log(twm_file.accounts);
-                                console.log(`before`);
-
-                                twm_file.accounts[this_account.username] = {};
-                                twm_file.accounts[this_account.username].username = this_account.username;
-                                twm_file.accounts[this_account.username].data = this_account.data;
-                                twm_file.accounts[this_account.username].safex_public_key = this_account.publicKey;
-                                twm_file.accounts[this_account.username].safex_private_key = this_account.privateKey;
-                                twm_file.accounts[this_account.username].urls = {};
-
-                                console.log(`before`);
-                                console.log(twm_file.accounts);
-                                console.log(`after`);
-
-                                try {
-                                    const algorithm = 'aes-256-ctr';
-                                    const cipher = crypto.createCipher(algorithm, this.state.password);
-                                    let crypted = cipher.update(JSON.stringify(twm_file), 'utf8', 'hex');
-                                    crypted += cipher.final('hex');
-
-                                    const hash1 = crypto.createHash('sha256');
-                                    hash1.update(JSON.stringify(twm_file));
-                                    console.log(`password ${this.state.password}`);
-                                    console.log(JSON.stringify(twm_file));
-
-                                    let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
-
-                                    try {
-
-                                        let open_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
-                                        console.log(open_twm_file);
-
-                                        localStorage.setItem('twm_file', JSON.stringify(open_twm_file.contents));
-                                    } catch (err) {
-                                        console.error(err);
-                                        console.error(`error opening twm file after save to verify`);
-                                    }
-                                    console.log(twm_save);
-
-                                } catch (err) {
-                                    console.error(err);
-                                    console.error(`error at initial save of the twm file`);
-                                }
-
-
-                                console.log(commit);
-                                console.log("committed transaction");
-                                alert(`transaction successfully submitted 
-                        transaction id: ${txid}
-                        tokens locked for 500 blocks: 5000 SFT
-                        fee: ${fee / 10000000000}`);
-                                localStorage.setItem('twm_file', twm_file);
-
-                                this.setState({twm_file: twm_file});
-
-                            }).catch((err) => {
-                                console.error(err);
-                                console.error(`error at the committing of the account registration transaction`);
-                                alert(`there was an error at committing the transaction to the blockchain`);
-                            })
-                        } else {
-                            alert(`your transaction was cancelled, no account registration was completed`);
-                        }
-                    }).catch((err) => {
-                        console.error(err);
-                        alert(`error when committing the transaction: likely has not gone through`)
-                    })
                 } else {
-                    alert(`not enough tokens`);
+                    alert(`not enough tokens, an issue making an account`);
                 }
 
             } catch (err) {
@@ -478,6 +402,97 @@ class WalletHome extends React.Component {
             }
         } else {
             alert(`please wait until the wallet has fully loaded before performing registration actions`)
+        }
+    };
+
+    create_account_first_callback = async (error, register_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the register first callback`);
+            alert(`error at the register first callback`);
+            alert(error);
+        } else {
+            console.log(tx);
+            let confirmed_fee = window.confirm(`the network fee to register this account ${this.state.create_account_txn_account.username} will be:  ${register_txn.fee() / 10000000000} SFX Safex Cash`);
+            let fee = register_txn.fee();
+            let txid = register_txn.transactionsIds();
+            if (confirmed_fee) {
+
+                this.setState({create_account_txn_id: txid, create_account_txn_fee: fee});
+                register_txn.commit(this.create_account_commit_callback);
+
+            } else {
+                alert(`your transaction was cancelled, no account registration was completed`);
+            }
+        }
+    };
+
+    create_account_commit_callback = async (error, txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the create account commit callback`);
+            alert(`error at the create account commit callback`);
+            alert(error);
+        } else {
+            let twm_file = this.state.twm_file;
+            console.log(twm_file.accounts);
+            console.log(`before`);
+
+            twm_file.accounts[this_account.username] = {};
+            twm_file.accounts[this_account.username].username = this.state.create_account_txn_account.username;
+            twm_file.accounts[this_account.username].data = this.state.create_account_txn_account.data;
+            twm_file.accounts[this_account.username].safex_public_key = this.state.create_account_txn_account.publicKey;
+            twm_file.accounts[this_account.username].safex_private_key = this.state.create_account_txn_account.privateKey;
+            twm_file.accounts[this_account.username].urls = {};
+
+            console.log(`before`);
+            console.log(twm_file.accounts);
+            console.log(`after`);
+
+            try {
+                const algorithm = 'aes-256-ctr';
+                const cipher = crypto.createCipher(algorithm, this.state.password);
+                let crypted = cipher.update(JSON.stringify(twm_file), 'utf8', 'hex');
+                crypted += cipher.final('hex');
+
+                const hash1 = crypto.createHash('sha256');
+                hash1.update(JSON.stringify(twm_file));
+                console.log(`password ${this.state.password}`);
+                console.log(JSON.stringify(twm_file));
+
+                let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
+
+                try {
+
+                    let open_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
+                    console.log(open_twm_file);
+
+                    localStorage.setItem('twm_file', JSON.stringify(open_twm_file.contents));
+
+                    console.log("committed transaction");
+
+
+                    alert(`transaction successfully submitted 
+                        transaction id: ${this.state.create_account_txn_id}
+                        tokens locked for 1000 blocks: 300 SFT
+                        fee: ${this.state.create_account_txn_fee / 10000000000}`);
+                    localStorage.setItem('twm_file', twm_file);
+
+                    this.setState({twm_file: twm_file});
+                } catch (err) {
+                    console.error(err);
+                    console.error(`error opening twm file after save to verify`);
+                    alert(`error at saving to the twm file during account creation verification stage`);
+                }
+                console.log(twm_save);
+
+            } catch (err) {
+                console.error(err);
+                console.error(`error at initial save of the twm file`);
+                alert(`error at saving to the twm file during account creation initialization stage`);
+            }
+
+
         }
     };
 
@@ -1275,7 +1290,6 @@ class WalletHome extends React.Component {
                         mixins,
                         this.edit_offer_first_callback
                     );
-
                 }
             }
         } catch (err) {
@@ -1320,7 +1334,12 @@ class WalletHome extends React.Component {
                                         for offerid: ${this.state.edit_offer_txn_offerid}
                                         titled: ${this.state.edit_offer_txn_title}
                                         fee: ${this.state.edit_offer_txn_fee / 10000000000} SFX`);
-            this.setState({edit_offer_txn_id: '', edit_offer_txn_fee: 0, edit_offer_txn_title: '', edit_offer_txn_offerid: ''});
+            this.setState({
+                edit_offer_txn_id: '',
+                edit_offer_txn_fee: 0,
+                edit_offer_txn_title: '',
+                edit_offer_txn_offerid: ''
+            });
 
         }
     };
