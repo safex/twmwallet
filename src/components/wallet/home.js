@@ -70,7 +70,7 @@ class WalletHome extends React.Component {
             twm_file: {},
             show_purchase_offer: {title: '', quantity: 0, offerID: '', seller: ''},
             show_edit_offer: {},
-            new_account_image: ""
+            new_account_image: require("./../../img/sails-logo.png")
         };
     }
 
@@ -457,7 +457,11 @@ class WalletHome extends React.Component {
                                 
                                 localStorage.setItem('twm_file', twm_file);
 
-                                this.setState({twm_file: twm_file, show_new_account_form: false, new_account_image: ""});
+                                this.setState({
+                                    twm_file: twm_file, 
+                                    show_new_account_form: false, 
+                                    new_account_image: require("./../../img/sails-logo.png")
+                                });
                                 
 
                             }).catch((err) => {
@@ -817,26 +821,29 @@ class WalletHome extends React.Component {
                     tx.commit().then(async (commit) => {
                         console.log(commit);
                         console.log("committed transaction");
-                        alert(`transaction successfully submitted 
-                        transaction id: ${txid}
-                        fee: ${fee / 10000000000}`);
+                        alert(`Transaction successfully submitted. 
+                        Transaction ID: ${txid}
+                        
+                        Fee: ${fee / 10000000000}`);
+
+                        this.setState({ show_new_offer_form: false })
 
                     }).catch((err) => {
                         console.error(err);
-                        console.error(`error at the committing of the account registration transaction`);
-                        alert(`there was an error at committing the transaction to the blockchain`);
+                        console.error(`Error at the committing of the account registration transaction.`);
+                        alert(`There was an error when committing the transaction to the blockchain.`);
                     })
                 } else {
-                    alert(`your transaction was cancelled, no account registration was completed`);
+                    alert(`Your transaction was cancelled. No account registration was completed.`);
                 }
 
             }).catch((err) => {
                 console.error(err);
-                alert(`error when committing the transaction: likely has not gone through`)
+                alert(`Error when committing the transaction. It is likely that it has not gone through.`)
             })
         } catch (err) {
             console.error(err);
-            console.error("error at listing the offer");
+            console.error("Error at listing the offer.");
         }
     };
 
