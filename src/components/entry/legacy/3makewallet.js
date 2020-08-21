@@ -2,7 +2,7 @@ import React from 'react';
 import {Row, Col, Container, Button} from 'react-bootstrap';
 import Form from "react-bootstrap/esm/Form";
 
-import {recover_from_keys} from "../../../utils/wallet_creation";
+import {recover_from_keys_util} from "../../../utils/wallet_creation";
 import WalletHome from "../../wallet/home";
 
 const safex = window.require("safex-nodejs-libwallet");
@@ -72,12 +72,20 @@ export default class ConvertLegacy extends React.Component {
         }
     };
 
+    make_wallet_result = async(error, wallet) => {
+        if (error) {
+
+        } else {
+            this.setState({wallet_made: true, wallet: wallet});
+        }
+    };
+
     make_wallet = async (e) => {
         e.preventDefault();
         try {
             let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
             try {
-                let wallet = await recover_from_keys(
+                recover_from_keys_util(
                     this.state.new_path,
                     this.state.password,
                     0,
@@ -85,10 +93,7 @@ export default class ConvertLegacy extends React.Component {
                     daemon_string,
                     this.state.safex_key.public_addr,
                     this.state.safex_key.view.sec,
-                    this.state.safex_key.spend.sec);
-
-                console.log(wallet);
-                this.setState({wallet_made: true, wallet: wallet});
+                    this.state.safex_key.spend.sec, this.make_wallet_result);
             } catch (e) {
                 console.error(e);
                 console.error("error on the packing the btc keys");

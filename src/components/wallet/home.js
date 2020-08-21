@@ -13,9 +13,11 @@ import {
     send_tokens,
     stake_tokens,
     unstake_tokens,
-    commit_txn,
     purchase_offer,
-    edit_offer
+    edit_offer,
+    create_offer,
+    create_account,
+    edit_account
 } from "../../utils/wallet_actions";
 
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
@@ -24,10 +26,17 @@ import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
 import {FaCogs, FaSearch, FaInfoCircle} from 'react-icons/fa'
 import {GiExitDoor} from 'react-icons/gi'
 import {GrCubes} from 'react-icons/gr'
+import {MdPeople, MdReceipt} from 'react-icons/md'
+import {TiMessages} from 'react-icons/ti'
 import {IconContext} from 'react-icons'
+
 
 import copy from "copy-to-clipboard"
 import ReactTooltip from "react-tooltip";
+
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
+
+import Loader from 'react-loader-spinner'
 
 import {open_twm_file, save_twm_file} from "../../utils/twm_actions";
 
@@ -64,13 +73,15 @@ class WalletHome extends React.Component {
             show_new_account_form: false,
             show_purchase_form: false,
             show_edit_offer_form: false,
+            show_edit_account_form: false,
             blockchain_tokens_staked: 0,
             blockchain_interest_history: [],
             blockchain_current_interest: {},
             twm_file: {},
             show_purchase_offer: {title: '', quantity: 0, offerID: '', seller: ''},
             show_edit_offer: {},
-            new_account_image: require("./../../img/sails-logo.png")
+            new_account_image: require('./../../img/sails-logo.png'),
+            merchantTabs: 'accounts'            
         };
     }
 
@@ -160,13 +171,13 @@ class WalletHome extends React.Component {
                     if (wallet.synchronized()) {
                         clearInterval(this.state.timer);
                     } else {
-                        this.check();
+                        //this.check();
                     }
                 }, 1000);
                 this.setState({timer: timer});
                 this.setState({synced: false});
             }
-            wallet.on('newBlock', function (height) {
+            wallet.on('newBlock', (height) => {
                 console.log("blockchain updated, height: " + height);
                 this.setState({
                     blockchain_height: height
@@ -184,7 +195,7 @@ class WalletHome extends React.Component {
 
             console.log(accs);
             console.log(`accounts`);
-            this.setState({usernames: accs, selected_user: {index: 0, username: accs[0].username}});
+            //this.setState({usernames: accs, selected_user: {index: 0, username: accs[0].username}});
         } catch (err) {
             console.error(err);
             console.log("errors on startup");
@@ -228,30 +239,30 @@ class WalletHome extends React.Component {
             console.error(`error at getting the staked tokens from the blockchain`);
         }
         try {
-            m_wallet.store().then(() => {
-                console.log("wallet stored refresh");
+            m_wallet.store((error, result) => {
+                if (error) {
+                    console.error(error);
+                } else {
+                    console.log("wallet stored refresh");
+                    var accs = wallet.getSafexAccounts();
 
-                var accs = wallet.getSafexAccounts();
-
-
-                this.setState({
-                    address: m_wallet.address(),
-                    pending_cash: normalize_8decimals(
-                        Math.abs(m_wallet.balance() - m_wallet.unlockedBalance())
-                    ),
-                    synced: m_wallet.synchronized() ? true : false,
-                    wallet_height: wallet.blockchainHeight(),
-                    blockchain_height: wallet.daemonBlockchainHeight(),
-                    cash: normalize_8decimals(m_wallet.unlockedBalance()),
-                    pending_tokens: normalize_8decimals(m_wallet.tokenBalance() - m_wallet.unlockedTokenBalance()),
-                    tokens: normalize_8decimals(m_wallet.unlockedTokenBalance()),
-                    first_refresh: true,
-                    usernames: accs
-                });
-            }).catch((err) => {
-                console.log("unable to store wallet refresh: " + err);
-                console.error(err);
+                    this.setState({
+                        address: m_wallet.address(),
+                        pending_cash: normalize_8decimals(
+                            Math.abs(m_wallet.balance() - m_wallet.unlockedBalance())
+                        ),
+                        synced: m_wallet.synchronized() ? true : false,
+                        wallet_height: wallet.blockchainHeight(),
+                        blockchain_height: wallet.daemonBlockchainHeight(),
+                        cash: normalize_8decimals(m_wallet.unlockedBalance()),
+                        pending_tokens: normalize_8decimals(m_wallet.tokenBalance() - m_wallet.unlockedTokenBalance()),
+                        tokens: normalize_8decimals(m_wallet.unlockedTokenBalance()),
+                        first_refresh: true,
+                        usernames: accs
+                    });
+                }
             });
+
         } catch (err) {
             console.error(err);
             console.error("error getting height");
@@ -329,7 +340,7 @@ class WalletHome extends React.Component {
 
     register_account = async (e) => {
         e.preventDefault();
-        if (this.state.tokens >= 5000 && this.state.first_refresh === true) {
+        if (this.state.tokens >= 300 && this.state.first_refresh === true) {
             try {
                 let vees = e.target;
 
@@ -384,100 +395,16 @@ class WalletHome extends React.Component {
                         }
                     }
 
+
                     console.log(`this_account`);
                     console.log(this_account);
                     console.log(`this_account`);
+                    this.setState({create_account_txn_account: this_account});
 
-                    let confirm_registration = wallet.createAdvancedTransaction({
-                        tx_type: '6',
-                        safex_username: e.target.username.value,
-                        mixin: mixins
-                    }).then((tx) => {
-                        console.log(tx);
-                        let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${tx.fee() / 10000000000} SFX Safex Cash`);
-                        let fee = tx.fee();
-                        let txid = tx.transactionsIds();
-                        if (confirmed_fee) {
-                            tx.commit().then(async (commit) => {
+                    create_account(wallet, e.target.username.value, mixins, this.create_account_first_callback);
 
-                                let twm_file = this.state.twm_file;
-                                console.log(twm_file.accounts);
-                                console.log(`before`);
-
-                                twm_file.accounts[this_account.username] = {};
-                                twm_file.accounts[this_account.username].username = this_account.username;
-                                twm_file.accounts[this_account.username].data = this_account.data;
-                                twm_file.accounts[this_account.username].safex_public_key = this_account.publicKey;
-                                twm_file.accounts[this_account.username].safex_private_key = this_account.privateKey;
-                                twm_file.accounts[this_account.username].urls = {};
-
-                                console.log(`before`);
-                                console.log(twm_file.accounts);
-                                console.log(`after`);
-
-                                try {
-                                    const algorithm = 'aes-256-ctr';
-                                    const cipher = crypto.createCipher(algorithm, this.state.password);
-                                    let crypted = cipher.update(JSON.stringify(twm_file), 'utf8', 'hex');
-                                    crypted += cipher.final('hex');
-
-                                    const hash1 = crypto.createHash('sha256');
-                                    hash1.update(JSON.stringify(twm_file));
-                                    console.log(`password ${this.state.password}`);
-                                    console.log(JSON.stringify(twm_file));
-
-                                    let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
-
-                                    try {
-
-                                        let open_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
-                                        console.log(open_twm_file);
-
-                                        localStorage.setItem('twm_file', JSON.stringify(open_twm_file.contents));
-                                    } catch (err) {
-                                        console.error(err);
-                                        console.error(`error opening twm file after save to verify`);
-                                    }
-                                    console.log(twm_save);
-
-                                } catch (err) {
-                                    console.error(err);
-                                    console.error(`error at initial save of the twm file`);
-                                }
-
-
-                                console.log(commit);
-                                console.log("committed transaction");
-                                copy(`https://stagenet1.safex.org/search?value=${txid}`)
-                                alert(`Transaction successfully submitted. 
-                                    Transaction ID: ${txid}
-                                    5000 SFT will be locked for 500 blocks.
-                                    Fee: ${fee / 10000000000} SFX.
-                                    A link to this transaction on the blockchain has been copied to the clipboard.`);
-                                
-                                localStorage.setItem('twm_file', twm_file);
-
-                                this.setState({
-                                    twm_file: twm_file, 
-                                    show_new_account_form: false, 
-                                    new_account_image: require("./../../img/sails-logo.png")
-                                });
-                                
-
-                            }).catch((err) => {
-                                console.error(err);
-                                console.error(`error at the committing of the account registration transaction`);
-                                alert(`There was an error at committing the transaction to the blockchain`);
-                            })
-                        } else {
-                            alert(`Your transaction was cancelled, no account registration was completed.`);
-                        }
-                    }).catch((err) => {
-                        console.error(err);
-                        alert(`Error when committing the transaction. It is likely that has not gone through.`)
-                    })
                 } else {
-                    alert(`Not enough tokens`);
+                    alert(`not enough tokens, an issue making an account`);
                 }
 
             } catch (err) {
@@ -485,9 +412,123 @@ class WalletHome extends React.Component {
                 console.error("error at the register account function");
             }
         } else {
-            alert(`Please wait until the wallet has fully loaded before performing registration actions`)
+            alert(`please wait until the wallet has fully loaded before performing registration actions`)
         }
     };
+
+    create_account_first_callback = async (error, register_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the register first callback`);
+            alert(`error at the register first callback`);
+            alert(error);
+        } else {
+            let confirmed_fee = window.confirm(`the network fee to register this account ${this.state.create_account_txn_account.username} will be:  ${register_txn.fee() / 10000000000} SFX Safex Cash`);
+            let fee = register_txn.fee();
+            let txid = register_txn.transactionsIds();
+            if (confirmed_fee) {
+
+                this.setState({create_account_txn_id: txid, create_account_txn_fee: fee});
+                register_txn.commit(this.create_account_commit_callback);
+
+            } else {
+                alert(`your transaction was cancelled, no account registration was completed`);
+            }
+        }
+    };
+
+    create_account_commit_callback = async (error, txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the create account commit callback`);
+            alert(`error at the create account commit callback`);
+            alert(error);
+        } else {
+            let twm_file = this.state.twm_file;
+            console.log(twm_file.accounts);
+            console.log(`before`);
+            let this_account = this.state.create_account_txn_account;
+
+            twm_file.accounts[this_account.username] = {};
+            twm_file.accounts[this_account.username].username = this.state.create_account_txn_account.username;
+            twm_file.accounts[this_account.username].data = this.state.create_account_txn_account.data;
+            twm_file.accounts[this_account.username].safex_public_key = this.state.create_account_txn_account.publicKey;
+            twm_file.accounts[this_account.username].safex_private_key = this.state.create_account_txn_account.privateKey;
+            twm_file.accounts[this_account.username].urls = {};
+
+            console.log(`before`);
+            console.log(twm_file.accounts);
+            console.log(`after`);
+
+            try {
+                const algorithm = 'aes-256-ctr';
+                const cipher = crypto.createCipher(algorithm, this.state.password);
+                let crypted = cipher.update(JSON.stringify(twm_file), 'utf8', 'hex');
+                crypted += cipher.final('hex');
+
+                const hash1 = crypto.createHash('sha256');
+                hash1.update(JSON.stringify(twm_file));
+                console.log(`password ${this.state.password}`);
+                console.log(JSON.stringify(twm_file));
+
+                let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
+
+                try {
+
+                    let open_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
+                    console.log(open_twm_file);
+
+                    localStorage.setItem('twm_file', JSON.stringify(open_twm_file.contents));
+
+                    console.log("committed transaction");
+
+
+                    alert(`transaction successfully submitted 
+                        transaction id: ${this.state.create_account_txn_id}
+                        tokens locked for 300 blocks: 100 SFT
+                        fee: ${this.state.create_account_txn_fee / 10000000000}`);
+                    localStorage.setItem('twm_file', twm_file);
+
+                    this.setState({twm_file: twm_file});
+                } catch (err) {
+                    console.error(err);
+                    console.error(`error opening twm file after save to verify`);
+                    alert(`error at saving to the twm file during account creation verification stage`);
+                }
+                console.log(twm_save);
+
+            } catch (err) {
+                console.error(err);
+                console.error(`error at initial save of the twm file`);
+                alert(`error at saving to the twm file during account creation initialization stage`);
+            }
+
+
+        }
+    };
+
+
+    edit_account_top = async (e) => {
+        e.preventDefault();
+
+    };
+
+    edit_account_first_callback = async(error, edit_account_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at edit account first callback`);
+        }  else {
+
+        }
+    };
+
+    handleChange = (event) => {
+        this.setState({[event.target.name]: event.target.value});
+    }
+
+    handleMerchantTabChange = (tab) => {
+        this.setState({merchantTabs: tab})
+    }
 
     //basic send transactions
     token_send = async (e) => {
@@ -500,28 +541,12 @@ class WalletHome extends React.Component {
                 console.log(confirmed);
                 if (confirmed) {
                     try {
-                        let token_txn = await send_tokens(wallet, e.target.destination.value, e.target.amount.value, mixins);
-                        let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${token_txn.fee() / 10000000000} SFX Safex Cash`);
-                        let fee = token_txn.fee();
-                        let txid = token_txn.transactionsIds();
-                        let amount = e.target.amount.value;
-                        if (confirmed_fee) {
-                            try {
-                                let committed_txn = await commit_txn(token_txn);
-                                console.log(committed_txn);
-                                console.log(token_txn);
-                                alert(`token transaction successfully submitted 
-                                        transaction id: ${txid}
-                                        amount: ${amount} SFT
-                                        fee: ${fee / 10000000000} SFX`);
-                            } catch (err) {
-                                console.error(err);
-                                console.error(`error when trying to commit the token transaction to the blockchain`);
-                                alert(`error when trying to commit the token transaction to the blockchain`);
-                            }
-                        } else {
-                            console.log("token transaction cancelled");
-                        }
+                        this.setState({
+                            token_txn_amount: e.target.amount.value,
+                            token_txn_destination: e.target.destination.value.trim()
+                        });
+                        send_tokens(wallet, e.target.destination.value.trim(), e.target.amount.value, mixins, this.token_send_first);
+
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the token transaction formation it was not commited`);
@@ -538,6 +563,57 @@ class WalletHome extends React.Component {
         }
     };
 
+    token_send_first = async (error, token_txn) => {
+        console.log(token_txn);
+        console.log(error);
+        if (error) {
+            console.error(error);
+            console.error(`error at the token transaction send`);
+            alert(`error at the token transaction send`);
+            alert(error);
+        } else {
+            try {
+                let confirmed_fee = window.confirm(`the fee to send this token transaction will be:  ${token_txn.fee() / 10000000000} SFX Safex Cash
+             sending ${this.state.token_txn_amount} SFT to ${this.state.token_txn_destination}`);
+                let fee = token_txn.fee();
+                let txid = token_txn.transactionsIds();
+                let amount = this.state.token_txn_amount;
+                if (confirmed_fee) {
+                    try {
+                        this.setState({token_txn_id: txid, token_txn_fee: fee});
+                        token_txn.commit(this.commit_token_txn_callback);
+                    } catch (err) {
+                        console.error(err);
+                        console.error(`error when trying to commit the token transaction to the blockchain`);
+                        alert(`error when trying to commit the token transaction to the blockchain`);
+                    }
+                } else {
+                    console.log(`token transaction cancelled`);
+                }
+            } catch (err) {
+                console.error(err);
+                console.error(`error at stepping into confirming the transaction`)
+            }
+        }
+    };
+
+    commit_token_txn_callback = async (error, txn) => {
+        console.log(error);
+        if (error) {
+            console.error(`error when trying to commit the token transaction to the blockchain`);
+            alert(`error when trying to commit the token transaction to the blockchain`);
+            console.error(error);
+            alert(error);
+        } else {
+            console.log(txn);
+            console.log(txn);
+            alert(`token transaction successfully submitted 
+                                        transaction id: ${this.state.token_txn_id}
+                                        amount: ${this.state.token_txn_amount} SFT
+                                        fee: ${this.state.token_txn_fee / 10000000000} SFX`);
+        }
+    };
+
     cash_send = async (e) => {
         e.preventDefault();
         e.persist();
@@ -549,30 +625,13 @@ class WalletHome extends React.Component {
                 console.log(confirmed);
                 if (confirmed) {
                     try {
-                        let cash_txn = await send_cash(wallet, e.target.destination.value, e.target.amount.value, mixins);
-                        console.log(cash_txn);
-                        let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${cash_txn.fee() / 10000000000} SFX Safex Cash`);
-                        let fee = cash_txn.fee();
-                        let txid = cash_txn.transactionsIds();
-                        let amount = e.target.amount.value;
-                        if (confirmed_fee) {
-                            try {
+                        this.setState({
+                            cash_txn_amount: e.target.amount.value,
+                            cash_txn_destination: e.target.destination.value.trim()
+                        });
+                        send_cash(wallet, e.target.destination.value.trim(), e.target.amount.value, mixins, this.cash_send_first);
 
-                                let committed_txn = await commit_txn(cash_txn);
-                                console.log(committed_txn);
-                                console.log(cash_txn);
-                                alert(`cash transaction successfully submitted 
-                                        transaction id: ${txid}
-                                        amount: ${amount}
-                                        fee: ${fee / 10000000000}`);
-                            } catch (err) {
-                                console.error(err);
-                                console.error(`error at commiting the cash transaction to the blockchain network`);
-                                alert(`error at commiting the cash transaction to the blockchain network`);
-                            }
-                        } else {
-                            alert(`the cash transaction was cancelled`)
-                        }
+
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the cash transaction formation it was not commited`);
@@ -589,102 +648,155 @@ class WalletHome extends React.Component {
         }
     };
 
-    handleChange = (event) => {
-        this.setState({[event.target.name]: event.target.value});
-    }
+    cash_send_first = async (error, cash_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the cash send transaction`);
+            alert(`error at the the cash send transaction`);
+            alert(error);
+        } else {
+            let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${cash_txn.fee() / 10000000000} SFX Safex Cash 
+            sending ${this.state.cash_txn_amount} SFX to ${this.state.cash_txn_destination}`);
+            let fee = cash_txn.fee();
+            let txid = cash_txn.transactionsIds();
+            if (confirmed_fee) {
+                try {
+                    this.setState({cash_txn_fee: fee, cash_txn_id: txid});
+                    cash_txn.commit(this.commit_cash_txn_callback);
+
+                } catch (err) {
+                    console.error(err);
+                    console.error(`error at commiting the cash transaction to the blockchain network`);
+                    alert(`error at commiting the cash transaction to the blockchain network`);
+                }
+            } else {
+                alert(`the cash transaction was cancelled`)
+            }
+        }
+    };
+
+    commit_cash_txn_callback = async (error, txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at committing the cash transaction`);
+            alert(`error at the cash transaction`);
+            alert(error);
+        } else {
+            alert(`cash transaction successfully submitted 
+                                        transaction id: ${this.state.cash_txn_id}
+                                        amount: ${this.state.cash_txn_amount}
+                                        fee: ${this.state.cash_txn_fee / 10000000000}`);
+        }
+    };
 
     //view shifting
     go_home = () => {
         this.setState({interface_view: 'home'});
     };
 
+    //Show loading screen
+    show_loading = () => {
+        this.setState({interface_view: 'loading'})
+    };
+
     //open market view from navigation
     show_market = () => {
-        var offrs = wallet.listSafexOffers(true);
-        let non_offers = [];
-        let twm_offers = [];
+        this.show_loading()
 
-        for (var i in offrs) {/*
-            console.log("Safex offer " + i + " title: " + offrs[i].title);
-            console.log("Safex offer description: " + offrs[i].description);
-            console.log("Safex offer quantity: " + offrs[i].quantity);
-            console.log("Safex offer price: " + offrs[i].price);
-            console.log("Safex offer minSfxPrice: " + offrs[i].minSfxPrice);
-            console.log("Safex offer pricePegUsed: " + offrs[i].pricePegUsed);
-            console.log("Safex offer pricePegID: " + offrs[i].pricePegID);
-            console.log("Safex offer seller: " + offrs[i].seller);
-            console.log("Safex offer active: " + offrs[i].active);
-            console.log("Safex offer offerID: " + offrs[i].offerID);
-            console.log("Safex offer currency: " + offrs[i].currency);
-*/
-            try {
-                let offer_description = JSON.parse(offrs[i].description);
-                if (offer_description.version > 0) {
-                    offrs[i].descprition = offer_description;
-                    twm_offers.push(offrs[i]);
+        setTimeout(() => {  
 
-                } else {
+            var offrs = wallet.listSafexOffers(true);
+            let non_offers = [];
+            let twm_offers = [];
+
+            for (var i in offrs) {/*
+                console.log("Safex offer " + i + " title: " + offrs[i].title);
+                console.log("Safex offer description: " + offrs[i].description);
+                console.log("Safex offer quantity: " + offrs[i].quantity);
+                console.log("Safex offer price: " + offrs[i].price);
+                console.log("Safex offer minSfxPrice: " + offrs[i].minSfxPrice);
+                console.log("Safex offer pricePegUsed: " + offrs[i].pricePegUsed);
+                console.log("Safex offer pricePegID: " + offrs[i].pricePegID);
+                console.log("Safex offer seller: " + offrs[i].seller);
+                console.log("Safex offer active: " + offrs[i].active);
+                console.log("Safex offer offerID: " + offrs[i].offerID);
+                console.log("Safex offer currency: " + offrs[i].currency);
+    */
+                try {
+                    let offer_description = JSON.parse(offrs[i].description);
+                    if (offer_description.version > 0) {
+                        offrs[i].descprition = offer_description;
+                        twm_offers.push(offrs[i]);
+
+                    } else {
+                        non_offers.push(offrs[i]);
+                        console.log("not a twm structured offer");
+                    }
+
+                } catch (err) {
+                    console.error(`error at parsing json from description`);
+                    console.error(err);
                     non_offers.push(offrs[i]);
-                    console.log("not a twm structured offer");
                 }
-
-            } catch (err) {
-                console.error(`error at parsing json from description`);
-                console.error(err);
-                non_offers.push(offrs[i]);
             }
-        }
+        
 
-        this.setState({
-            twm_offers: twm_offers,
-            non_offers: non_offers,
-            interface_view: 'market'
-        });
+            this.setState({
+                twm_offers: twm_offers,
+                non_offers: non_offers,
+                interface_view: 'market'
+            });
+        }, 500);
     };
 
     //open merchant management view from navigation
     show_merchant = () => {
 
-        var offrs = wallet.listSafexOffers(true);
-        let non_offers = [];
-        let twm_offers = [];
+        this.show_loading()
 
-        for (var i in offrs) {/*
-            console.log("Safex offer " + i + " title: " + offrs[i].title);
-            console.log("Safex offer description: " + offrs[i].description);
-            console.log("Safex offer quantity: " + offrs[i].quantity);
-            console.log("Safex offer price: " + offrs[i].price);
-            console.log("Safex offer minSfxPrice: " + offrs[i].minSfxPrice);
-            console.log("Safex offer pricePegUsed: " + offrs[i].pricePegUsed);
-            console.log("Safex offer pricePegID: " + offrs[i].pricePegID);
-            console.log("Safex offer seller: " + offrs[i].seller);
-            console.log("Safex offer active: " + offrs[i].active);
-            console.log("Safex offer offerID: " + offrs[i].offerID);
-            console.log("Safex offer currency: " + offrs[i].currency);
-*/
-            try {
-                let offer_description = JSON.parse(offrs[i].description);
-                if (offer_description.version > 0) {
-                    offrs[i].descprition = offer_description;
-                    twm_offers.push(offrs[i]);
+        setTimeout(() => {
 
-                } else {
+            var offrs = wallet.listSafexOffers(true);
+            let non_offers = [];
+            let twm_offers = [];
+
+            for (var i in offrs) {/*
+                console.log("Safex offer " + i + " title: " + offrs[i].title);
+                console.log("Safex offer description: " + offrs[i].description);
+                console.log("Safex offer quantity: " + offrs[i].quantity);
+                console.log("Safex offer price: " + offrs[i].price);
+                console.log("Safex offer minSfxPrice: " + offrs[i].minSfxPrice);
+                console.log("Safex offer pricePegUsed: " + offrs[i].pricePegUsed);
+                console.log("Safex offer pricePegID: " + offrs[i].pricePegID);
+                console.log("Safex offer seller: " + offrs[i].seller);
+                console.log("Safex offer active: " + offrs[i].active);
+                console.log("Safex offer offerID: " + offrs[i].offerID);
+                console.log("Safex offer currency: " + offrs[i].currency);
+    */
+                try {
+                    let offer_description = JSON.parse(offrs[i].description);
+                    if (offer_description.version > 0) {
+                        offrs[i].descprition = offer_description;
+                        twm_offers.push(offrs[i]);
+
+                    } else {
+                        non_offers.push(offrs[i]);
+                        console.log("not a twm structured offer");
+                    }
+
+                } catch (err) {
+                    console.error(`error at parsing json from description`);
+                    console.error(err);
                     non_offers.push(offrs[i]);
-                    console.log("not a twm structured offer");
                 }
-
-            } catch (err) {
-                console.error(`error at parsing json from description`);
-                console.error(err);
-                non_offers.push(offrs[i]);
             }
-        }
 
-        this.setState({
-            twm_offers: twm_offers,
-            non_offers: non_offers,
-            interface_view: 'merchant'
-        });
+            this.setState({
+                twm_offers: twm_offers,
+                non_offers: non_offers,
+                interface_view: 'merchant'
+            });
+        }, 500);
     };
 
     //open staking view from navigation
@@ -749,6 +861,16 @@ class WalletHome extends React.Component {
         this.setState({show_new_account_form: true});
     };
 
+    //show modal of Edit Account Form
+    handleShowEditAccountForm = (account) => {
+        this.setState({show_edit_account_form: true, show_edit_account: account});
+    };
+
+    //close modal of Edit Account Form
+    handleCloseEditAccountForm = () => {
+        this.setState({show_edit_account_form: false});
+    };
+
     //show modal of Edit Offer Form
     handleShowEditOfferForm = (listing) => {
         this.setState({show_edit_offer_form: true, show_edit_offer: listing});
@@ -803,48 +925,56 @@ class WalletHome extends React.Component {
 
         try {
             let mixins = e.target.mixins.value - 1;
-            let new_offer_transaction = wallet.createAdvancedTransaction({
-                tx_type: '8',
-                safex_username: e.target.username.value,
-                safex_offer_title: e.target.title.value,
-                safex_offer_price: e.target.price.value * 10000000000,
-                safex_offer_quantity: e.target.quantity.value,
-                safex_offer_description: JSON.stringify(o_obj),
-                safex_offer_price_peg_used: 0,
-                mixin: mixins
-            }).then((tx) => {
-                console.log(tx);
-                let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${tx.fee() / 10000000000} SFX Safex Cash`);
-                let fee = tx.fee();
-                let txid = tx.transactionsIds();
-                if (confirmed_fee) {
-                    tx.commit().then(async (commit) => {
-                        console.log(commit);
-                        console.log("committed transaction");
-                        alert(`Transaction successfully submitted. 
-                        Transaction ID: ${txid}
-                        
-                        Fee: ${fee / 10000000000}`);
-
-                        this.setState({ show_new_offer_form: false })
-
-                    }).catch((err) => {
-                        console.error(err);
-                        console.error(`Error at the committing of the account registration transaction.`);
-                        alert(`There was an error when committing the transaction to the blockchain.`);
-                    })
-                } else {
-                    alert(`Your transaction was cancelled. No account registration was completed.`);
-                }
-
-            }).catch((err) => {
-                console.error(err);
-                alert(`Error when committing the transaction. It is likely that it has not gone through.`)
-            })
+            this.setState({create_offer_txn_title: e.target.title.value});
+            create_offer(wallet,
+                e.target.username.value,
+                e.target.title.value,
+                e.target.price.value,
+                e.target.quantity.value,
+                JSON.stringify(o_obj),
+                mixins, this.create_offer_first_callback);
         } catch (err) {
             console.error(err);
             console.error("Error at listing the offer.");
         }
+    };
+
+    create_offer_first_callback = async (error, create_offer_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at first callback create new offer transaction`);
+            alert(`error at first call back create new offer transaction`);
+            alert(error);
+        } else {
+            console.log(create_offer_txn);
+            let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${create_offer_txn.fee() / 10000000000} SFX Safex Cash
+            to list ${this.state.create_offer_txn_title} clicking OK will confirm this transaction`);
+            let fee = create_offer_txn.fee();
+            let txid = create_offer_txn.transactionsIds();
+            if (confirmed_fee) {
+                this.setState({create_offer_txn_fee: fee, create_offer_txn_id: txid});
+                create_offer_txn.commit(this.create_offer_commit_callback)
+            } else {
+                alert(`your transaction was cancelled, the listing for ${this.state.create_offer_txn_title} was cancelled`);
+                this.setState({create_offer_txn_title: '', create_offer_txn_id: '', create_offer_txn_fee: 0})
+            }
+        }
+    };
+
+    create_offer_commit_callback = async (error, txn) => {
+        if (error) {
+            this.setState({create_offer_txn_title: '', create_offer_txn_id: '', create_offer_txn_fee: 0})
+            console.error(error);
+            console.error(`error at commit callback create new offer transaction`);
+            alert(`error at commit call back create new offer transaction`);
+            alert(error);
+        } else {
+            console.log("committed create offer transaction");
+            alert(`transaction successfully submitted listing ${this.state.create_offer_txn_title}
+                        transaction id: ${this.state.create_offer_txn_id}
+                        fee: ${this.state.create_offer_txn_fee / 10000000000}`);
+        }
+
     };
 
     make_token_stake = async (e) => {
@@ -857,28 +987,9 @@ class WalletHome extends React.Component {
                 console.log(confirmed);
                 if (confirmed) {
                     try {
-                        let stake_txn = await stake_tokens(wallet, e.target.amount.value, mixins);
-                        let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${stake_txn.fee() / 10000000000} SFX Safex Cash`);
-                        let fee = stake_txn.fee();
-                        let txid = stake_txn.transactionsIds();
-                        let amount = e.target.amount.value;
-                        if (confirmed_fee) {
-                            try {
-                                let committed_txn = await commit_txn(stake_txn);
-                                console.log(committed_txn);
-                                console.log(stake_txn);
-                                alert(`token staking transaction successfully submitted 
-                                        transaction id: ${txid}
-                                        amount: ${amount} SFT
-                                        fee: ${fee / 10000000000} SFX`);
-                            } catch (err) {
-                                console.error(err);
-                                console.error(`error when trying to commit the token staking transaction to the blockchain`);
-                                alert(`error when trying to commit the token staking transaction to the blockchain`);
-                            }
-                        } else {
-                            console.log("token staking transaction cancelled");
-                        }
+                        this.setState({stake_txn_amount: e.target.amount.value});
+                        stake_tokens(wallet, e.target.amount.value, mixins, this.stake_first_callback);
+
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the token staking transaction formation it was not commited`);
@@ -895,6 +1006,42 @@ class WalletHome extends React.Component {
         }
     };
 
+    stake_first_callback = async (error, stake_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at first call back stake token txn`);
+            alert(`error at the first call back stake token txn`);
+            alert(error);
+        } else {
+            let confirmed_fee = window.confirm(`the network fee to stake ${this.state.stake_txn_amount} SFT will be:  ${stake_txn.fee() / 10000000000} SFX Safex Cash`);
+            let fee = stake_txn.fee();
+            let txid = stake_txn.transactionsIds();
+            this.setState({stake_txn_id: txid, stake_txn_fee: fee});
+            if (confirmed_fee) {
+                console.log(stake_txn);
+                stake_txn.commit(this.stake_commit_callback);
+            } else {
+                console.log("token staking transaction cancelled");
+            }
+        }
+    };
+
+    stake_commit_callback = async (error, txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at committing the stake token transaction`);
+            alert(`error at committing the stake token transaction`);
+            alert(error);
+        } else {
+            alert(`token staking transaction successfully submitted 
+                                        transaction id: ${this.state.stake_txn_id}
+                                        staking ${this.state.stake_txn_amount} SFT
+                                        fee: ${this.state.stake_txn_fee / 10000000000} SFX`);
+
+            this.setState({stake_txn_id: '', stake_txn_fee: 0, stake_txn_amount: 0});
+        }
+    };
+
     make_token_unstake = async (e) => {
         e.preventDefault();
         e.persist();
@@ -905,28 +1052,9 @@ class WalletHome extends React.Component {
                 console.log(confirmed);
                 if (confirmed) {
                     try {
-                        let unstake_txn = await unstake_tokens(wallet, e.target.amount.value, mixins);
-                        let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${unstake_txn.fee() / 10000000000} SFX Safex Cash`);
-                        let fee = unstake_txn.fee();
-                        let txid = unstake_txn.transactionsIds();
-                        let amount = e.target.amount.value;
-                        if (confirmed_fee) {
-                            try {
-                                let committed_txn = await commit_txn(unstake_txn);
-                                console.log(committed_txn);
-                                console.log(unstake_txn);
-                                alert(`token unstake transaction committed  
-                                        transaction id: ${txid}
-                                        amount: ${amount} SFT
-                                        fee: ${fee / 10000000000} SFX`);
-                            } catch (err) {
-                                console.error(err);
-                                console.error(`error when trying to commit the token unstaking transaction to the blockchain`);
-                                alert(`error when trying to commit the token unstaking transaction to the blockchain`);
-                            }
-                        } else {
-                            console.log("token staking transaction cancelled");
-                        }
+                        this.setState({unstake_txn_amount: e.target.amount.value});
+                        unstake_tokens(wallet, e.target.amount.value, mixins, this.unstake_first_callback);
+
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the token unstaking transaction formation it was not commited`);
@@ -940,6 +1068,47 @@ class WalletHome extends React.Component {
                 alert(`choose fewer mixins`);
             }
             console.error(`error at the token unstake transaction`);
+        }
+    };
+
+    unstake_first_callback = async (error, unstake_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the unstake first callback`);
+            alert(`error at the unstake first callback`);
+            alert(error);
+        } else {
+            let confirmed_fee = window.confirm(`the network fee to unstake ${this.state.unstake_txn_amount} SFT will be:  ${unstake_txn.fee() / 10000000000} SFX Safex Cash`);
+            let fee = unstake_txn.fee();
+            let txid = unstake_txn.transactionsIds();
+            if (confirmed_fee) {
+                try {
+                    this.setState({unstake_txn_id: txid, unstake_txn_fee: fee});
+                    unstake_txn.commit(this.unstake_commit_callback);
+
+
+                } catch (err) {
+                    console.error(err);
+                    console.error(`error when trying to commit the token unstaking transaction to the blockchain`);
+                    alert(`error when trying to commit the token unstaking transaction to the blockchain`);
+                }
+            } else {
+                console.log("token staking transaction cancelled");
+            }
+        }
+    };
+
+    unstake_commit_callback = async (error, txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the unstake commit callback`);
+            alert(`error at the unstake commit callback`);
+            alert(error);
+        } else {
+            alert(`token unstake transaction committed  
+                                        transaction id: ${this.state.unstake_txn_id}
+                                        amount: ${this.state.unstake_txn_amount} SFT
+                                        fee: ${this.state.unstake_txn_fee / 10000000000} SFX`);
         }
     };
 
@@ -1007,7 +1176,7 @@ class WalletHome extends React.Component {
         console.log(e.target.quantity.value);
         console.log(`mixins`);
         console.log(e.target.mixins.value);
-        
+
 
         let total_cost = e.target.quantity.value * (listing.price / 10000000000);
 
@@ -1039,41 +1208,21 @@ class WalletHome extends React.Component {
                     console.log(confirmed);
                     if (confirmed) {
                         try {
-                            let purchase_txn = await purchase_offer(
+                            this.setState({
+                                purchase_txn_quantity: e.target.quantity.value,
+                                purchase_txn_title: listing.title,
+                                purchase_txn_offerid: listing.offerID,
+                                purchase_txn_price: listing.price / 10000000000,
+                                purchase_txn_total_cost: total_cost
+                            });
+                            purchase_offer(
                                 wallet,
                                 total_cost,
                                 listing.offerID,
                                 e.target.quantity.value,
-                                mixins
+                                mixins,
+                                this.purchase_first_callback
                             );
-                            let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${purchase_txn.fee() / 10000000000}SFX`);
-                            let fee = purchase_txn.fee();
-                            let txid = purchase_txn.transactionsIds();
-                            console.log(purchase_txn);
-                            if (confirmed_fee) {
-                                try {
-                                    let committed_txn = await commit_txn(purchase_txn);
-                                    console.log(committed_txn);
-                                    console.log(purchase_txn);
-                                    copy(`https://stagenet1.safex.org/search?value=${txid}`)
-                                    this.setState({show_purchase_form: false})
-                                    alert(`
-                                        Purchase transaction committed.
-                                        Transaction ID: ${txid}
-                                        amount: ${amount} X ${listing.title}
-                                        Price: ${total_cost} SFX
-                                        Fee: ${fee / 10000000000} SFX
-                                        A link to this transaction on the Safex Block Explorer has been copied to your clipboard 
-                                        https://stagenet1.safex.org/search?value=${txid} 
-                                        `);
-                                } catch (err) {
-                                    console.error(err);
-                                    console.error(`error when trying to commit the purchase transaction to the blockchain`);
-                                    alert(`error when trying to commit the purchase transaction to the blockchain`);
-                                }
-                            } else {
-                                console.log("purchase transaction cancelled");
-                            }
                         } catch (err) {
                             console.error(err);
                             console.error(`error at the purchase transaction formation it was not commited`);
@@ -1091,95 +1240,168 @@ class WalletHome extends React.Component {
         }
     };
 
+    purchase_first_callback = async (error, purchase_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the first call back purchase txn`);
+            alert(`error at the first call back purchase txn`);
+            alert(error);
+        } else {
+            let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${purchase_txn.fee() / 10000000000}SFX`);
+            let fee = purchase_txn.fee();
+            let txid = purchase_txn.transactionsIds();
+            if (confirmed_fee) {
+                try {
+                    this.setState({purchase_txn_id: txid, purchase_txn_fee: fee});
+                    purchase_txn.commit(this.purchase_commit_callback);
+
+                } catch (err) {
+                    console.error(err);
+                    console.error(`error when trying to commit the purchase transaction to the blockchain`);
+                    alert(`error when trying to commit the purchase transaction to the blockchain`);
+                }
+            } else {
+                console.log("purchase transaction cancelled");
+            }
+        }
+    };
+
+    purchase_commit_callback = async (error, txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the purchase commit callback`);
+            alert(`error at the purchase commit callback`);
+            alert(error);
+        } else {
+            copy(`https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`)
+            alert(`
+                                        Purchase transaction committed.
+                                        Transaction ID: ${this.state.purchase_txn_id}
+                                        amount: ${this.state.purchase_txn_quantity} X ${this.state.purchase_txn_title}
+                                        Price: ${this.state.purchase_txn_price} SFX
+                                        Network Fee: ${this.state.purchase_txn_fee / 10000000000} SFX
+                                        A link to this transaction on the Safex Block Explorer has been copied to your clipboard 
+                                        https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id} 
+                                        `);
+        }
+    };
+
     copyAddressToClipboard = () => {
         copy(this.state.address);
         alert('Copied address!');
     };
 
+
+
     make_edit_offer = async (e) => {
         e.preventDefault();
         e.persist();
         console.log(`let's list the offer it`);
-        let vees = e.target;
+        let va = e.target;
 
-        console.log(vees.offerid.value);
+        console.log(va.offerid.value);
 
         let o_obj = {};
         o_obj.twm_version = 1;
 
-        if (vees.description.value.length > 0) {
-            o_obj.description = vees.description.value;
+        if (va.description.value.length > 0) {
+            o_obj.description = va.description.value;
         }
-        if (vees.main_image.value.length > 0) {
-            o_obj.main_image = vees.main_image.value;
+        if (va.main_image.value.length > 0) {
+            o_obj.main_image = va.main_image.value;
         }
-        if (vees.sku.value.length > 0) {
-            o_obj.sku = vees.sku.value;
+        if (va.sku.value.length > 0) {
+            o_obj.sku = va.sku.value;
         }
-        if (vees.barcode.value.length > 0) {
-            o_obj.barcode = vees.barcode.value;
+        if (va.barcode.value.length > 0) {
+            o_obj.barcode = va.barcode.value;
         }
-        if (vees.weight.value.length > 0) {
-            o_obj.weight = vees.weight.value;
+        if (va.weight.value.length > 0) {
+            o_obj.weight = va.weight.value;
         }
-        if (vees.country.value.length > 0) {
-            o_obj.country = vees.country.value;
+        if (va.country.value.length > 0) {
+            o_obj.country = va.country.value;
         }
-        if (vees.message_type.value.length > 0) {
-            o_obj.message_type = vees.message_type.value;
+        if (va.message_type.value.length > 0) {
+            o_obj.message_type = va.message_type.value;
         }
-        if (vees.physical.value.length > 0) {
-            o_obj.physical = vees.physical.value;
+        if (va.physical.value.length > 0) {
+            o_obj.physical = va.physical.value;
         }
         let active = 0;
-        if (vees.active.value === 'True' || vees.active.value === 'true') {
+        if (va.active.value === 'True' || va.active.value === 'true') {
             active = 1;
         }
         try {
-            let mixins = vees.mixins.value - 1;
+            let mixins = va.mixins.value - 1;
             if (mixins >= 0) {
-                let confirmed = window.confirm(`are you sure you want to edit ${vees.title.value} offer id:  ${vees.offerid.value}?`);
+                let confirmed = window.confirm(`are you sure you want to edit ${va.title.value} offer id:  ${va.offerid.value}?`);
                 console.log(confirmed);
-                console.log(vees.offerid.value);
-                console.log(vees.username.value);
-                console.log(vees.offerid.value);
                 if (confirmed) {
+                    this.setState({edit_offer_txn_offerid: va.offerid.value, edit_offer_txn_title: va.title.value});
                     let edit_txn = await edit_offer(
                         wallet,
-                        vees.offerid.value,
-                        vees.username.value,
-                        vees.title.value,
-                        vees.price.value,
-                        vees.quantity.value,
+                        va.offerid.value,
+                        va.username.value,
+                        va.title.value,
+                        va.price.value,
+                        va.quantity.value,
                         JSON.stringify(o_obj),
                         active,
-                        mixins
+                        mixins,
+                        this.edit_offer_first_callback
                     );
-                    let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${edit_txn.fee() / 10000000000} SFX Safex Cash`);
-                    let fee = edit_txn.fee();
-                    let txid = edit_txn.transactionsIds();
-                    if (confirmed_fee) {
-                        try {
-                            let committed_edit_txn = await commit_txn(edit_txn);
-                            console.log(committed_edit_txn);
-                            console.log(edit_txn);
-                            alert(`edit offer committed 
-                                        transaction id: ${txid}
-                                        for offerid: ${vees.offerid.value}
-                                        titled: ${vees.title.value}
-                                        fee: ${fee / 10000000000} SFX`);
-                        } catch (err) {
-                            console.error(err);
-                            console.error(`error at committing the edit offer transaction for ${vees.offerid.value}`);
-                        }
-                    } else {
-                        alert(`your transaction was cancelled, no edit for the offer was completed`);
-                    }
                 }
             }
         } catch (err) {
             console.error(err);
             console.error(`error at creating the edit offer transaction`);
+        }
+    };
+
+    edit_offer_first_callback = async (error, edit_offer_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the edit offer first callback`);
+            alert(`error at the edit offer first callback`);
+            alert(error);
+        } else {
+            let confirmed_fee = window.confirm(`the network fee to edit the ${this.state.edit_offer_txn_title} will be:  ${edit_offer_txn.fee() / 10000000000} SFX Safex Cash`);
+            let fee = edit_offer_txn.fee();
+            let txid = edit_offer_txn.transactionsIds();
+            if (confirmed_fee) {
+                try {
+                    this.setState({edit_offer_txn_id: txid, edit_offer_txn_fee: fee});
+                    edit_offer_txn.commit(this.edit_offer_commit_callback);
+                } catch (err) {
+                    console.error(err);
+                    console.error(`error at committing the edit offer transaction for ${this.state.edit_offer_txn_offerid}`);
+                }
+            } else {
+                alert(`your transaction was cancelled, no edit for the offer was completed`);
+            }
+        }
+    };
+
+    edit_offer_commit_callback = async (error, txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at the edit offer commit callback`);
+            alert(`error at the edit offer commit callback`);
+            alert(error);
+        } else {
+            alert(`edit offer committed 
+                                        transaction id: ${this.state.edit_offer_txn_id}
+                                        for offerid: ${this.state.edit_offer_txn_offerid}
+                                        titled: ${this.state.edit_offer_txn_title}
+                                        fee: ${this.state.edit_offer_txn_fee / 10000000000} SFX`);
+            this.setState({
+                edit_offer_txn_id: '',
+                edit_offer_txn_fee: 0,
+                edit_offer_txn_title: '',
+                edit_offer_txn_offerid: ''
+            });
+
         }
     };
 
@@ -1191,87 +1413,52 @@ class WalletHome extends React.Component {
                     return (
                         <Row lg className="justify-content-around">
 
-                            
 
+                            <div className="cash-box p-2 font-size-small">
 
-                                <div className="cash-box p-2 font-size-small">
+                                <h3> Send Safex </h3>
 
-                                    <h3> Send Safex </h3>
+                                <hr class="border border-light w-100"></hr>
 
-                                    <hr class="border border-light w-100"></hr>
+                                <ul>
+                                    <Col>
+                                        <li id="wallet-balance">{this.state.cash.toLocaleString()} SFX</li>
 
-                                    <ul>
-                                        <Col>
-                                            <li id="wallet-balance">{this.state.cash.toLocaleString()} SFX </li>
-
-                                            {this.state.pending_cash > 0 ?
-                                                (<li className="border border-warning p-1"> {this.state.pending_cash.toLocaleString()} SFX Pending</li>) : ''}
-                                        </Col>
-                                        {/*
+                                        {this.state.pending_cash > 0 ?
+                                            (
+                                                <li className="border border-warning p-1"> {this.state.pending_cash.toLocaleString()} SFX
+                                                    Pending</li>) : ''}
+                                    </Col>
+                                    {/*
                                         this.state.pending_cash > 0 ?
                                             (<li>{this.state.cash + this.state.pending_cash} NET</li>) : ''
                                             */}
-                                    </ul>
+                                </ul>
 
-                                    <hr class="border border-light w-100"></hr>
+                                <hr class="border border-light w-100"></hr>
 
-                                    <Form id="send_cash" onSubmit={this.cash_send}>
-                                        Destination Address 
-                                        <Form.Control name="destination"
-                                            defaultValue="Safex5..."
-                                            placedholder="the destination address"/>
+                                <Form id="send_cash" onSubmit={this.cash_send}>
+                                    Destination Address <Form.Control name="destination"
+                                                                      defaultValue="Safex5..."
+                                                                      placedholder="the destination address"/>
+                                    Amount (SFX)<Form.Control name="amount" defaultValue="0"
+                                                              placedholder="the amount to send"/>
+                                    {/*<select multiple={true} value={['1','2','3','4','5','6','7']}/>*/}
+                                    Mixin Ring Size <Form.Control name="mixins" defaultValue="7"
+                                                                  placedholder="choose the number of mixins"/>
+                                    <Button className="mt-2 safex-cash-green" type="submit" size="lg" block>
+                                        Send Safex
+                                    </Button>
+                                </Form>
 
-                                        Amount (SFX)
-                                        <Form.Control name="amount" defaultValue="0"
-                                                                  placedholder="the amount to send"/>
-                                        <Form.Group>
-                                            <Form.Label>
-                                                Mixins
-                                                <IconContext.Provider className="ml-5"  value={{color: 'white', size: '20px'}}>
-                                                    <FaInfoCircle 
-                                                    data-tip data-for='apiInfo' 
-                                                    className="blockchain-icon ml-8 white-text"/>
-                                                    
-                                                    <ReactTooltip className="ml-5" id='apiInfo' type='info' effect='solid'>
-                                                        <span>
-                                                            Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                            They are combined with yours for private transactions.<br/>
-                                                            Changing this from the default could hurt your privacy.<br/>
-                                                        </span>
-                                                    </ReactTooltip>
-                                                </IconContext.Provider>
-                                            </Form.Label>
-                                            
-                                            <Form.Control 
-                                                name="mixins" 
-                                                as="select"
-                                                defaultValue="7"
-                                            >
-                                                <option>1</option>
-                                                <option>2</option>
-                                                <option>3</option>
-                                                <option>4</option>
-                                                <option>5</option>
-                                                <option>6</option>
-                                                <option>7</option>
-                                            </Form.Control>
-
-                                        </Form.Group>
-
-                                        <Button className="mt-2 safex-cash-green" type="submit" size="lg" block>
-                                            Send Safex
-                                        </Button>
-                                    </Form>
-
-                                </div>
-
-                            
+                            </div>
 
 
                             <Col className="accounts" sm={8}>
                                 <div className="account-list border border-light justify-content-center">
-                                    <h2 className="text-center m-2">If you are reading this,</h2> 
-                                    <h2 className="text-center m-2">You are part of the few chosen to help free humanity.</h2> 
+                                    <h2 className="text-center m-2">If you are reading this,</h2>
+                                    <h2 className="text-center m-2">You are part of the few chosen to help free
+                                        humanity.</h2>
                                     <h1 className="text-center m-2">Together we can make history.</h1>
                                 </div>
 
@@ -1304,115 +1491,105 @@ class WalletHome extends React.Component {
                         console.log(key);
 
                         try {
-                           
-                                var data = {};
-                                data.description = '';
-                                data.main_image = '';
-                                data.sku = '';
-                                data.barcode = '';
-                                data.weight = '';
-                                data.country = '';
-                                data.message_type = '';
-                                data.physical = '';
-                                data.twm_version = '';
-                                try {
-                                    let parsed_data = JSON.parse(listing.description);
-                                    console.log(parsed_data);
-                                    if (parsed_data.twm_version === 1) {
-                                        data.twm_version = 1
-                                        if (parsed_data.hasOwnProperty('main_image')) {
-                                            data.main_image = parsed_data.main_image;
-                                        }
-                                        if (parsed_data.hasOwnProperty('description')) {
-                                            data.description = parsed_data.description;
-                                        }
-                                        if (parsed_data.hasOwnProperty('sku')) {
-                                            data.sku = parsed_data.sku;
-                                        }
-                                        if (parsed_data.hasOwnProperty('barcode')) {
-                                            data.barcode = parsed_data.barcode;
-                                        }
-                                        if (parsed_data.hasOwnProperty('weight')) {
-                                            data.weight = parsed_data.weight;
-                                        }
-                                        if (parsed_data.hasOwnProperty('country')) {
-                                            data.country = parsed_data.country;
-                                        }
-                                        if (parsed_data.hasOwnProperty('message_type')) {
-                                            data.message_type = parsed_data.message_type;
-                                        }
-                                        if (parsed_data.hasOwnProperty('physical')) {
-                                            data.physical = parsed_data.physical;
-                                        }
+
+                            var data = {};
+                            data.description = '';
+                            data.main_image = '';
+                            data.sku = '';
+                            data.barcode = '';
+                            data.weight = '';
+                            data.country = '';
+                            data.message_type = '';
+                            data.physical = '';
+                            try {
+                                let parsed_data = JSON.parse(listing.description);
+                                console.log(parsed_data);
+                                if (parsed_data.twm_version === 1) {
+                                    if (parsed_data.hasOwnProperty('main_image')) {
+                                        data.main_image = parsed_data.main_image;
                                     }
-                                } catch (err) {
-                                    console.error(err);
+                                    if (parsed_data.hasOwnProperty('description')) {
+                                        data.description = parsed_data.description;
+                                    }
+                                    if (parsed_data.hasOwnProperty('sku')) {
+                                        data.sku = parsed_data.sku;
+                                    }
+                                    if (parsed_data.hasOwnProperty('barcode')) {
+                                        data.barcode = parsed_data.barcode;
+                                    }
+                                    if (parsed_data.hasOwnProperty('weight')) {
+                                        data.weight = parsed_data.weight;
+                                    }
+                                    if (parsed_data.hasOwnProperty('country')) {
+                                        data.country = parsed_data.country;
+                                    }
+                                    if (parsed_data.hasOwnProperty('message_type')) {
+                                        data.message_type = parsed_data.message_type;
+                                    }
+                                    if (parsed_data.hasOwnProperty('physical')) {
+                                        data.physical = parsed_data.physical;
+                                    }
                                 }
+                            } catch (err) {
+                                console.error(err);
+                            }
 
-                        try {
-                            return <tr key={key}>
-                                <td 
-                                    onClick={() => this.handleShowPurchaseForm(listing)}
-                                    className="title-row" data-tip data-for={`offerTitle${key}`}
-                                >
-                                    <h4>{listing.title}</h4>
-                                    <ReactTooltip className="offer-tooltip" id={`offerTitle${key}`} type='light' effect='float'>
-                                        
-                                        {data.twm_version === 1 ? 
-                                            <div className="d-flex flex-row justify-content-around p-3">
-                                                <div className="d-flex flex-column justify-content-center">
-                                                    <Image className="border border-dark" src={data.main_image}></Image>
-                                                    
+                            try {
+                                return <tr key={key}>
+                                    <td className="title-row" data-tip data-for={`offerTitle${key}`}>
+                                        {listing.title}
+                                        <ReactTooltip className="offer-tooltip" id={`offerTitle${key}`} type='light'
+                                                      effect='float'>
+
+                                            {data.main_image ?
+                                                <div className="d-flex flex-row justify-content-around p-3">
+                                                    <Image className="border border-dark"
+                                                           src={data.main_image}></Image>
+
+                                                    <div className="d-flex flex-column justify-content-center">
+                                                        <h3>{listing.title}</h3>
+                                                        <hr class="border border-dark w-100"></hr>
+                                                        <ul>
+                                                            <li>Price: {listing.price} SFX</li>
+                                                            <li>Seller: {listing.seller}</li>
+                                                        </ul>
+                                                        <hr class="border border-primary w-100"></hr>
+                                                        <p>{data.description}</p>
+                                                    </div>
+
                                                 </div>
-
-                                                <div className="d-flex p-3 flex-column justify-content-center"> 
+                                                :
+                                                <div>
+                                                    <Image src={require("./../../img/sails-logo.png")}></Image>
                                                     <h3>{listing.title}</h3>
-
-                                                    <hr class="border border-dark w-100"></hr>
-
-                                                    <ul>
-                                                        <li>Price: {listing.price  / 10000000000} SFX</li>
-                                                        <li>Seller: {listing.seller}</li>
-                                                    </ul>  
-
-                                                    <hr class="border border-dark w-100"></hr>
-
-                                                    <p>{this.to_ellipsis(data.description, 500, 0)}</p>
-                                                    
                                                 </div>
-                                                
-                                            </div>
-                                            :
-                                            <div>
-                                                <Image src={require("./../../img/sails-logo.png")}></Image>
-                                                <h3>{listing.title}</h3>
-                                            </div>
-                                        }    
-                                            <hr class="border border-primary w-100"></hr>  
+                                            }
+                                            <hr class="border border-dark w-100"></hr>
                                             <p className="my-3">{listing.offerID}</p>
-                                    </ReactTooltip>
+                                        </ReactTooltip>
 
-                                </td>
-                                <td className="quantity-row">{listing.price / 10000000000}</td>
-                                <td className="quantity-row">{listing.quantity}</td>
-                                <td className="quantity-row">{listing.seller}</td>
-                                <td className="title-row" data-tip data-for={`offerID${key}`}>
-                                    {this.to_ellipsis(listing.offerID, 10, 10)}
-                                    <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
-                                        <span>{listing.offerID}</span>
-                                    </ReactTooltip>
-                                </td>
-                                <td className="quantity-row"><select className="light-blue-back" id="quantity">
-                                    <option value="1">1</option>
-                                </select></td>
-                                <td className="quantity-row">
-                                   
-                                        <Button size="lg" variant="success" 
+                                    </td>
+                                    <td className="quantity-row">{listing.quantity}</td>
+                                    <td className="quantity-row">{listing.price / 10000000000}</td>
+                                    <td className="quantity-row">{listing.seller}</td>
+                                    <td className="title-row" data-tip data-for={`offerID${key}`}>
+                                        {this.to_ellipsis(listing.offerID, 10, 10)}
+                                        <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
+                                            <span>{listing.offerID}</span>
+                                        </ReactTooltip>
+                                    </td>
+                                    <td className="quantity-row"><select className="light-blue-back" id="quantity">
+                                        <option value="1">1</option>
+                                    </select></td>
+                                    <td className="quantity-row">
+
+                                        <Button size="lg" variant="success"
                                                 onClick={() => this.handleShowPurchaseForm(listing)}>
                                             BUY
                                         </Button>
 
                                         <Modal className="new-account-form" animation={false}
+                                                size="lg"
                                                show={this.state.show_purchase_form}
                                                onHide={this.handleClosePurchaseForm}>
                                             <Modal.Header closeButton>
@@ -1424,12 +1601,36 @@ class WalletHome extends React.Component {
 
                                                 <Form id="purchase_item"
                                                       onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
-                                                    <ul>
+                                                    
 
-                                                        <li>{this.state.show_purchase_offer.title}</li>
+                                                        <h2>{this.state.show_purchase_offer.title}</h2>
+                                                        {data.main_image ?
+                                                            <div className="d-flex flex-row justify-content-around p-3">
+                                                                <Image className="border border-dark"
+                                                                    src={data.main_image}></Image>
+
+                                                                <div className="d-flex flex-column justify-content-center">
+                                                                    <h3>{listing.title}</h3>
+                                                                    <hr class="border border-dark w-100"></hr>
+                                                                    <ul>
+                                                                        <li>Price: {listing.price} SFX</li>
+                                                                        <li>Seller: {listing.seller}</li>
+                                                                    </ul>
+                                                                    <hr class="border border-primary w-100"></hr>
+                                                                    <p>{data.description}</p>
+                                                                </div>
+
+                                                            </div>
+                                                            :
+                                                            <div>
+                                                                <Image src={require("./../../img/sails-logo.png")}></Image>
+                                                                <h3>{listing.title}</h3>
+                                                            </div>
+                                                        }
+                                                    <ul>    
                                                         <li>{this.state.show_purchase_offer.price / 10000000000}</li>
                                                         <li>{this.state.show_purchase_offer.seller}</li>
-                                                        <li>{this.to_ellipsis(this.state.show_purchase_offer.offerID,0,0)}</li>
+                                                        <li>{this.to_ellipsis(this.state.show_purchase_offer.offerID)}</li>
                                                     </ul>
 
                                                     {this.state.show_purchase_offer.quantity} available <Form.Control
@@ -1484,13 +1685,13 @@ class WalletHome extends React.Component {
                                 </td>
                             </tr>
 
+                            } catch (err) {
+                                console.error(`failed to properly parse the user data formatting`);
+                                console.error(err);
+                            }
                         } catch (err) {
-                            console.error(`failed to properly parse the user data formatting`);
                             console.error(err);
                         }
-                    } catch (err) {
-                        console.error(err);
-                    }
 
                     });
                     return (
@@ -1855,7 +2056,7 @@ class WalletHome extends React.Component {
                                             <Button 
                                                 size="lg" 
                                                 variant="success"
-                                                onClick={() => this.handleShowEditOfferForm()}>
+                                                onClick={() => this.handleShowEditOfferForm(listing)}>
                                             EDIT
                                             </Button>
                                             
@@ -1866,7 +2067,8 @@ class WalletHome extends React.Component {
                                                 onHide={this.handleCloseEditOfferForm}
                                             >
                                                 <Modal.Header closeButton>
-                                                    <Modal.Title>Edit Offer {this.state.show_edit_offer.title}</Modal.Title>
+                                                    <Modal.Title>Edit
+                                                        Offer {this.state.show_edit_offer.title}</Modal.Title>
                                                 </Modal.Header>
                                                 
                                                 <Modal.Body>
@@ -1885,17 +2087,18 @@ class WalletHome extends React.Component {
                                                                                 name="description"
                                                                                 defaultValue={data.description}/>
                                                         Price (SFX) <Form.Control name="price"
-                                                                                defaultValue={this.state.show_edit_offer.price / 10000000000}/>
+                                                                                  defaultValue={this.state.show_edit_offer.price / 10000000000}/>
                                                         Available Quantity <Form.Control name="quantity"
-                                                                                        defaultValue={this.state.show_edit_offer.quantity}/>
-                                                        SKU <Form.Control name="sku" 
-                                                                        defaultValue={data.sku}/>
-                                                        Barcode (ISBN, UPC, GTIN, etc) <Form.Control name="barcode" 
-                                                                                                    defaultValue={data.barcode}/>
+                                                                                         defaultValue={this.state.show_edit_offer.quantity}/>
+                                                        SKU <Form.Control name="sku"
+                                                                          defaultValue={data.sku}/>
+                                                        Barcode (ISBN, UPC, GTIN, etc) <Form.Control name="barcode"
+                                                                                                     defaultValue={data.barcode}/>
 
                                                         Message Type <Form.Control name="message_type"
-                                                                                defaultValue={data.message_type}/>
-                                                        Weight <Form.Control name="weight" defaultValue={data.weight}/>
+                                                                                   defaultValue={data.message_type}/>
+                                                        Weight <Form.Control name="weight"
+                                                                             defaultValue={data.weight}/>
                                                         Physical Item? <Form.Control name="physical"
                                                                                     defaultValue={data.physical}/>
                                                         Country of Origin <Form.Control name="country"
@@ -1934,11 +2137,13 @@ class WalletHome extends React.Component {
                                                             </Form.Control>
                                                         </Form.Group>
 
-                                                        <Button block size="lg" type="submit" variant="success">Submit Edit</Button>
+                                                        <Button block size="lg" type="submit" variant="success">Submit
+                                                            Edit</Button>
                                                     </Form>
                                                 </Modal.Body>
                                                 <Modal.Footer className="align-self-start">
-                                                    <Button size="lg" variant="danger" onClick={this.handleCloseEditOfferForm}>
+                                                    <Button size="lg" variant="danger"
+                                                            onClick={this.handleCloseEditOfferForm}>
                                                         Close
                                                     </Button>
                                                 </Modal.Footer>
@@ -1985,9 +2190,9 @@ class WalletHome extends React.Component {
                                 <Col>
 
                                     <Image
-                                        width={50} 
-                                        height={50} 
-                                        src={avatar} 
+                                        width={50}
+                                        height={50}
+                                        src={avatar}
                                         roundedCircle
                                         className="border border-white grey-back"
                                     />
@@ -2032,221 +2237,333 @@ class WalletHome extends React.Component {
                     try {
                         return (
                             <Row>
-                                <Col>
+                                <Col className="no-gutters">
 
-                                    <Row className="no-gutters p-3 justify-content-between grey-back b-r10">
-
-                                        <Col md={5} className="account-list no-gutters p-3">
-
-                                            {accounts_table}
-                                        </Col>
-                                        {selected !== void (0) ? (
-                                            <Col md={3}
-                                                 className="no-gutters d-flex flex-column align-items-center b-r10 merchant-profile-view text-align-center"
+                                    <Row className="no-gutters">
+                                        <Col md={1}>
+                                            <Col 
+                                                className={this.state.merchantTabs === "accounts" ?  
+                                                "merchant-tab border border-dark safex-cash-green" : 
+                                                "merchant-tab border border-light white-text" }
+                                                onClick={() => this.handleMerchantTabChange("accounts")}
                                             >
-                                                <Row>
-                                                    <ul>
-                                                        <li>
-                                                            <Image 
-                                                                className="border border-white grey-back" 
-                                                                width={100} 
-                                                                height={100} 
-                                                                src={data.avatar}
-                                                                roundedCircle
-                                                            />
-                                                        </li>
-                                                        <h2>{selected.username}</h2>
+                                                <h2>Accounts</h2>
 
-                                                    </ul>
-                                                </Row>
-                                                <Col id="account-edit-buttons" className=" d-flex flex-column">
-                                                    <Button>Edit</Button>
-                                                    <Button onClick={() => this.register_twmapi(selected)}>
-                                                        Register API
-                                                    </Button>
-                                                    <Button>Remove</Button>
-                                                </Col>
+                                                <IconContext.Provider  value={{color: 'white', size: '50px'}}>
+                                                    <MdPeople data-tip data-for='accountsInfo'/>
+                                                    
+                                                    <ReactTooltip id='accountsInfo' type='info' effect='solid'>
+                                                        <span>
+                                                            Manage your accounts
+                                                        </span>
+                                                    </ReactTooltip>
+                                                </IconContext.Provider>
                                             </Col>
-                                        ) : ''}
-
-                                        <Col className="align-self-center" md={2}>
-                                            <Button block size="lg" variant="success"
-                                                    onClick={this.handleShowNewAccountForm}>
-                                                New Account
-                                            </Button>
-
-                                            <Modal 
-                                                animation={false}
-                                                show={this.state.show_new_account_form}
-                                                onHide={this.handleCloseNewAccountForm}
+                                            
+                                            <Col 
+                                                className={this.state.merchantTabs === "orders" ?  
+                                                "merchant-tab border border-dark safex-cash-green" : 
+                                                "merchant-tab border border-light white-text" }
+                                                onClick={() => this.handleMerchantTabChange("orders")}
                                             >
-                                                <Modal.Header closeButton>
-                                                    <Modal.Title>Create New Account</Modal.Title>
-                                                </Modal.Header>
-                                                
-                                                <Modal.Body>
-                                                    <Form id="create_account" onSubmit={this.register_account}>
-                                                        <Form.Row>
-                                                            <Col md="8">
-                                                                <Form.Group as={Col}>
-                                                                    <Form.Label>Username</Form.Label>
-                                                                    <Form.Control name="username" placedholder="enter your desired username"/>
-                                                                </Form.Group>
-                                                                
-                                                                <Form.Group as={Col}>
-                                                                    <Form.Label>Avatar URL</Form.Label>
-                                                                    <Form.Control 
-                                                                        onChange={this.handleChange}
-                                                                        value={this.state.new_account_image} 
-                                                                        name="new_account_image" 
-                                                                        placedholder="enter the url of your avatar"
-                                                                    />
-                                                                </Form.Group>
-                                                            </Col>
+                                                    
+                                                <h2>Orders</h2>
 
-                                                            <Col md="4">
-                                                                <Image 
-                                                                    className="border border-white grey-back" 
-                                                                    width={150} 
-                                                                    height={150} 
-                                                                    src={this.state.new_account_image}
+
+                                                <IconContext.Provider  value={{color: 'white', size: '50px'}}>
+                                                    <MdReceipt data-tip data-for='ordersInfo'/>
+                                                    
+                                                    <ReactTooltip id='ordersInfo' type='info' effect='solid'>
+                                                        <span>
+                                                            Manage your orders
+                                                        </span>
+                                                    </ReactTooltip>
+                                                </IconContext.Provider>
+                                            </Col>
+                                        </Col>
+
+                                        {/*Accounts Tab*/}
+                                        <Col 
+                                            className={this.state.merchantTabs === "accounts" ?  
+                                                "d-flex no-gutters p-3 justify-content-around grey-back b-r10" : 
+                                                "display-none" }  
+                                            md={11}
+                                            >
+                                            <Col md={5} className="account-list no-gutters p-3">
+
+                                                {accounts_table}
+                                            </Col>
+                                            {selected !== void (0) ? (
+                                                <Col md={3}
+                                                    className="
+                                                    no-gutters d-flex flex-column 
+                                                    align-items-center justify-content-center b-r10 
+                                                    merchant-profile-view text-align-center"
+                                                >
+                                                    <Row>
+                                                        <ul>
+                                                            <li>
+                                                                <Image
+                                                                    className="border border-white grey-back"
+                                                                    width={100}
+                                                                    height={100}
+                                                                    src={data.avatar}
                                                                     roundedCircle
                                                                 />
-                                                            </Col>
-                                                        </Form.Row>
+                                                            </li>
+                                                            <h2>{selected.username}</h2>
 
-                                                        <Form.Row>
-                                                            <Col>
-                                                                <Form.Group as={Col}>
-                                                                    <Form.Label>Biography</Form.Label>
-                                                                    <Form.Control 
-                                                                        maxLength="500" 
-                                                                        as="textarea" 
-                                                                        name="biography"
-                                                                        placedholder="type up your biography"
-                                                                        style={{maxHeight: 150}}
-                                                                    />
-                                                                </Form.Group>
-                                                                
-                                                                
-                                                                    <Form.Group as={Col}>
-                                                                        <Form.Label>Location</Form.Label>
-                                                                        <Form.Control 
-                                                                            name="location" 
-                                                                            defaultValue="Earth"
-                                                                            placedholder="your location"
-                                                                        />
-                                                                    </Form.Group> 
-                                                                    
-                                                                    <Form.Group as={Col}>
-
-                                                                        <Form.Label>Email</Form.Label>
-                                                                        <Form.Control 
-                                                                            name="email"
-                                                                            defaultValue="xyz@example.com"
-                                                                            placedholder="your location"
-                                                                        />
-                                                                    </Form.Group>
-
-                                                                <Form.Group>
-                                                                    <Form.Group  md="6" as={Col}>
-                                                                        <Form.Label>Twitter Link</Form.Label>
-                                                                        <Form.Control 
-                                                                            name="twitter"
-                                                                            defaultValue="twitter.com"
-                                                                            placedholder="enter the link to your twitter handle"
-                                                                        />
-                                                                
-                                                                    </Form.Group>
-                                                                
-                                                                    <Form.Group  md="6" as={Col}>
-                                                                        <Form.Label>Facebook Link</Form.Label>
-                                                                        <Form.Control 
-                                                                            name="facebook"
-                                                                            defaultValue="facebook.com"
-                                                                            placedholder="enter the to of your facebook page"
-                                                                        />
-
-                                                                    </Form.Group>
-                                                                
-                                                                    <Form.Group md="6" as={Col}>
-                                                                        <Form.Label>LinkedIn Link</Form.Label>
-                                                                        <Form.Control 
-                                                                            name="linkedin"
-                                                                            defaultValue="linkedin.com"
-                                                                            placedholder="enter the link to your linkedin handle"
-                                                                        />
-                                                                    </Form.Group>
-                                                                
-                                                                    <Form.Group md="6" as={Col}>
-
-                                                                        <Form.Label>Website</Form.Label>
-                                                                        <Form.Control 
-                                                                            name="website" 
-                                                                            defaultValue="safex.org"
-                                                                            placedholder="if you have your own website: paste your link here"
-                                                                        />
-                                                                    </Form.Group>
-
-                                                                </Form.Group>
-                                                               
-
-                                                                <Form.Group as={Col}>
-
-                                                                    <Form.Label>Mixins</Form.Label>
-                                                                    <IconContext.Provider  value={{color: 'white', size: '20px'}}>
-                                                                        <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon mx-4 white-text"/>
-                                                                        
-                                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                                            <span>
-                                                                                Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                                They are combined with yours for private transactions.<br/>
-                                                                                Changing this from the default could hurt your privacy.<br/>
-                                                                            </span>
-                                                                        </ReactTooltip>
-                                                                    </IconContext.Provider>
-                                                                
-                                                            
-                                                                    <Form.Control 
-                                                                        name="mixins" 
-                                                                        as="select"
-                                                                        defaultValue="7"
-                                                                    >
-                                                                        <option>1</option>
-                                                                        <option>2</option>
-                                                                        <option>3</option>
-                                                                        <option>4</option>
-                                                                        <option>5</option>
-                                                                        <option>6</option>
-                                                                        <option>7</option>
-                                                                    </Form.Control>
-                                                                    
-                                                                </Form.Group>
-                                                            </Col>
-
-                                                            
-                                                        </Form.Row>
-                                                   
-                                                        <Button 
-                                                            block 
-                                                            size="lg" 
-                                                            variant="success" 
-                                                            type="submit"
-                                                            className="my-5"
-                                                        >
-                                                            
-                                                        Create Account
+                                                        </ul>
+                                                    </Row>
+                                                    <div id="account-edit-buttons" className=" d-flex flex-column">
+                                                        <Button size="lg" variant="success"
+                                                                onClick={() => this.handleShowEditAccountForm(selected)}>
+                                                            EDIT
                                                         </Button>
-                                                    </Form>
-                                                </Modal.Body>
-                                                <Modal.Footer className="align-self-start">
+                                                        <Modal className="new-account-form" animation={false}
+                                                            show={this.state.show_edit_account_form}
+                                                            onHide={this.handleCloseEditAccountForm}>
+                                                            <Modal.Header closeButton>
+                                                                <Modal.Title>Edit
+                                                                    Account {selected.username}</Modal.Title>
+                                                            </Modal.Header>
+                                                            <Modal.Body>
 
-                                                    <Button variant="danger" onClick={this.handleCloseNewAccountForm}>
-                                                        Close
-                                                    </Button>
-                                                </Modal.Footer>
-                                            </Modal>
+                                                                <Form id="edit_account"
+                                                                    onSubmit={(e) => this.edit_account_top(e)}>
+
+                                                                    Username <Form.Control name="username" defaultValue={selected.username} />
+                                                                    Avatar URL <Form.Control name="avatar" defaultValue={data.avatar} />
+                                                                    Twitter Link <Form.Control name="twitter" defaultValue={data.twitter ? data.twitter : ''} />
+                                                                    Facebook Link <Form.Control name="facebook" defaultValue={data.facebook ? data.facebook : ''} />
+                                                                    LinkedIn Link <Form.Control name="linkedin" defaultValue={data.linkedin ? data.linkedin : ''} />
+                                                                    Biography <Form.Control maxLength="200" as="textarea" name="biography" defaulValue={data.biography ? data.biography : ''} />
+                                                                    Website <Form.Control name="website" defaultValue={data.website ? data.website : ''} />
+                                                                    Location <Form.Control name="location" defaultValue={data.location ? data.location : ''} />
+                                                                    Email <Form.Control name="email" defaultValue={data.email ? data.email : ''} />
+                                                                    Mixins <Form.Control name="mixins" defaultValue="7" />
+
+                                                                    <Button block size="lg" type="submit" variant="success">Submit
+                                                                        Edit</Button>
+                                                                </Form>
+                                                            </Modal.Body>
+                                                            <Modal.Footer className="align-self-start">
+                                                                <Button size="lg" variant="danger"
+                                                                        onClick={this.handleCloseEditAccountForm}>
+                                                                    Close
+                                                                </Button>
+                                                            </Modal.Footer>
+                                                        </Modal>
+                                                        <Button onClick={() => this.register_twmapi(selected)}>
+                                                            Register API
+                                                        </Button>
+                                                        <Button>Remove</Button>
+                                                    </div>
+                                                </Col>
+                                            ) : ''}
+
+                                            <Col className="align-self-center" md={2}>
+                                                <Button block size="lg" variant="success"
+                                                        onClick={this.handleShowNewAccountForm}>
+                                                    New Account
+                                                </Button>
+
+                                                <Modal 
+                                                    animation={false}
+                                                    show={this.state.show_new_account_form}
+                                                    onHide={this.handleCloseNewAccountForm}
+                                                >
+                                                    <Modal.Header closeButton>
+                                                        <Modal.Title>Create New Account</Modal.Title>
+                                                    </Modal.Header>
+                                                    
+                                                    <Modal.Body>
+                                                        <Form id="create_account" onSubmit={this.register_account}>
+                                                            <Form.Row>
+                                                                <Col md="8">
+                                                                    <Form.Group as={Col}>
+                                                                        <Form.Label>Username</Form.Label>
+                                                                        <Form.Control name="username" placedholder="enter your desired username"/>
+                                                                    </Form.Group>
+                                                                    
+                                                                    <Form.Group as={Col}>
+                                                                        <Form.Label>Avatar URL</Form.Label>
+                                                                        <Form.Control 
+                                                                            onChange={this.handleChange}
+                                                                            value={this.state.new_account_image} 
+                                                                            name="new_account_image" 
+                                                                            placedholder="enter the url of your avatar"
+                                                                        />
+                                                                    </Form.Group>
+                                                                </Col>
+
+                                                                <Col md="4">
+                                                                    <Image 
+                                                                        className="border border-white grey-back" 
+                                                                        width={150} 
+                                                                        height={150} 
+                                                                        src={this.state.new_account_image}
+                                                                        roundedCircle
+                                                                    />
+                                                                </Col>
+                                                            </Form.Row>
+
+                                                            <Form.Row>
+                                                                <Col>
+                                                                    <Form.Group as={Col}>
+                                                                        <Form.Label>Biography</Form.Label>
+                                                                        <Form.Control 
+                                                                            maxLength="500" 
+                                                                            as="textarea" 
+                                                                            name="biography"
+                                                                            placedholder="type up your biography"
+                                                                            style={{maxHeight: 150}}
+                                                                        />
+                                                                    </Form.Group>
+                                                                    
+                                                                    
+                                                                        <Form.Group as={Col}>
+                                                                            <Form.Label>Location</Form.Label>
+                                                                            <Form.Control 
+                                                                                name="location" 
+                                                                                defaultValue="Earth"
+                                                                                placedholder="your location"
+                                                                            />
+                                                                        </Form.Group> 
+                                                                        
+                                                                        <Form.Group as={Col}>
+
+                                                                            <Form.Label>Email</Form.Label>
+                                                                            <Form.Control 
+                                                                                name="email"
+                                                                                defaultValue="xyz@example.com"
+                                                                                placedholder="your location"
+                                                                            />
+                                                                        </Form.Group>
+
+                                                                    <Form.Group>
+                                                                        <Form.Group  md="6" as={Col}>
+                                                                            <Form.Label>Twitter Link</Form.Label>
+                                                                            <Form.Control 
+                                                                                name="twitter"
+                                                                                defaultValue="twitter.com"
+                                                                                placedholder="enter the link to your twitter handle"
+                                                                            />
+                                                                    
+                                                                        </Form.Group>
+                                                                    
+                                                                        <Form.Group  md="6" as={Col}>
+                                                                            <Form.Label>Facebook Link</Form.Label>
+                                                                            <Form.Control 
+                                                                                name="facebook"
+                                                                                defaultValue="facebook.com"
+                                                                                placedholder="enter the to of your facebook page"
+                                                                            />
+
+                                                                        </Form.Group>
+                                                                    
+                                                                        <Form.Group md="6" as={Col}>
+                                                                            <Form.Label>LinkedIn Link</Form.Label>
+                                                                            <Form.Control 
+                                                                                name="linkedin"
+                                                                                defaultValue="linkedin.com"
+                                                                                placedholder="enter the link to your linkedin handle"
+                                                                            />
+                                                                        </Form.Group>
+                                                                    
+                                                                        <Form.Group md="6" as={Col}>
+
+                                                                            <Form.Label>Website</Form.Label>
+                                                                            <Form.Control 
+                                                                                name="website" 
+                                                                                defaultValue="safex.org"
+                                                                                placedholder="if you have your own website: paste your link here"
+                                                                            />
+                                                                        </Form.Group>
+
+                                                                    </Form.Group>
+                                                                
+
+                                                                    <Form.Group as={Col}>
+
+                                                                        <Form.Label>Mixins</Form.Label>
+                                                                        <IconContext.Provider  value={{color: 'white', size: '20px'}}>
+                                                                            <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon mx-4 white-text"/>
+                                                                            
+                                                                            <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                                                <span>
+                                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                                    They are combined with yours for private transactions.<br/>
+                                                                                    Changing this from the default could hurt your privacy.<br/>
+                                                                                </span>
+                                                                            </ReactTooltip>
+                                                                        </IconContext.Provider>
+                                                                    
+                                                                
+                                                                        <Form.Control 
+                                                                            name="mixins" 
+                                                                            as="select"
+                                                                            defaultValue="7"
+                                                                        >
+                                                                            <option>1</option>
+                                                                            <option>2</option>
+                                                                            <option>3</option>
+                                                                            <option>4</option>
+                                                                            <option>5</option>
+                                                                            <option>6</option>
+                                                                            <option>7</option>
+                                                                        </Form.Control>
+                                                                        
+                                                                    </Form.Group>
+                                                                </Col>
+
+                                                                
+                                                            </Form.Row>
+                                                    
+                                                            <Button 
+                                                                block 
+                                                                size="lg" 
+                                                                variant="success" 
+                                                                type="submit"
+                                                                className="my-5"
+                                                            >
+                                                                
+                                                            Create Account
+                                                            </Button>
+                                                        </Form>
+                                                    </Modal.Body>
+                                                    <Modal.Footer className="align-self-start">
+
+                                                        <Button variant="danger"
+                                                                onClick={this.handleCloseNewAccountForm}>
+                                                            Close
+                                                        </Button>
+                                                    </Modal.Footer>
+                                                </Modal>
+                                            </Col>
+
                                         </Col>
+                                        
+                                        {/*Messages Tab*/}
+                                        <Col 
+                                            className={this.state.merchantTabs === "messages" ?  
+                                                "d-flex no-gutters p-3 justify-content-around grey-back b-r10" : 
+                                                "display-none" }  
+                                            md={11}
+                                        >
+                                            <h1>Messages</h1>
+                                        </Col>
+
+                                        {/*Orders Tab*/}
+                                        <Col 
+                                            className={this.state.merchantTabs === "orders" ?  
+                                                "d-flex no-gutters p-3 justify-content-around grey-back b-r10" : 
+                                                "display-none" }  
+                                            md={11}
+                                        >
+                                            <h1>Orders</h1>
+                                        </Col>
+
                                     </Row>
 
                                     <Col lg className="merchant-product-view b-r10 px-3 pb-5 opaque-black no-gutters mt-5">
@@ -2379,7 +2696,8 @@ class WalletHome extends React.Component {
                                                         </Form>
                                                     </Modal.Body>
                                                     <Modal.Footer className="align-self-start">
-                                                        <Button size="lg" variant="danger" onClick={this.handleCloseNewOfferForm}>
+                                                        <Button size="lg" variant="danger"
+                                                                onClick={this.handleCloseNewOfferForm}>
                                                             Close
                                                         </Button>
                                                     </Modal.Footer>
@@ -2400,7 +2718,8 @@ class WalletHome extends React.Component {
 
                                         <Row className="no-gutters">
                                             {this.state.twm_offers.length > 1 ? (
-                                                    <Table color="white" className="white-text border border-white b-r10">
+                                                    <Table color="white"
+                                                           className="white-text border border-white b-r10">
                                                         <thead>
                                                         <tr>
                                                             <th>Title</th>
@@ -2421,7 +2740,7 @@ class WalletHome extends React.Component {
                                               
                                                 </thead>
                                                 <tbody>
-                                                    {non_listings_table}
+                                                {non_listings_table}
                                                 </tbody>
                                             </Table>
                                         </Row>
@@ -2452,13 +2771,14 @@ class WalletHome extends React.Component {
                         console.error(`error at the interval loading of stacking`);
                     }
                     return (
-                        <div className="wallet no-gutters flex-column border-bottom border-white b-r10 oflow-y-scroll">
+                        <div
+                            className="wallet no-gutters flex-column border-bottom border-white b-r10 oflow-y-scroll">
 
                             <h1 className="text-center m-2"> Token Management </h1>
 
                             <hr class="border border-light w-100"></hr>
 
-                            <div className="d-flex justify-content-around" >
+                            <div className="d-flex justify-content-around">
 
                                 <div className="token-box p-2 font-size-small">
                                     <h3> Send Tokens </h3>
@@ -2469,9 +2789,11 @@ class WalletHome extends React.Component {
                                         <Col>
                                             <li id="wallet-balance">{this.state.tokens.toLocaleString()} SFT</li>
                                             {this.state.pending_tokens > 0 ?
-                                            (<li className="border border-warning p-1">{this.state.pending_tokens.toLocaleString()} SFT Pending</li>) : ''}
+                                                (
+                                                    <li className="border border-warning p-1">{this.state.pending_tokens.toLocaleString()} SFT
+                                                        Pending</li>) : ''}
                                         </Col>
-                                            {/*
+                                        {/*
                                             this.state.pending_tokens > 0 ?
                                                 ( <li>{this.state.tokens.toLocaleString() + this.state.pending_tokens.toLocaleString()} NET</li>) : ''
                                             */}
@@ -2481,8 +2803,8 @@ class WalletHome extends React.Component {
 
                                     <Form id="send_token" onSubmit={this.token_send}>
                                         Destination Address <Form.Control name="destination"
-                                                                        defaultValue="Safex5..."
-                                                                        placedholder="the destination address"/>
+                                                                          defaultValue="Safex5..."
+                                                                          placedholder="the destination address"/>
                                         Amount (SFT)<Form.Control name="amount" defaultValue="0"
                                                                 placedholder="the amount to send"/>
                                         <Form.Group>
@@ -2528,7 +2850,7 @@ class WalletHome extends React.Component {
                                         <h2 className="text-center "> Stakes </h2>
 
                                         <Table color="white"
-                                            className="white-text border border-white b-r10 light-blue-back ">
+                                               className="white-text border border-white b-r10 light-blue-back ">
                                             <thead className="opaque-black">
                                             <tr>
                                                 <th>TXID</th>
@@ -2546,11 +2868,11 @@ class WalletHome extends React.Component {
 
                                     <div className="staking-box border border-light rounded  my-3">
 
-                                    <div className="token-box grey-back p-2 font-size-small">
+                                        <div className="token-box grey-back p-2 font-size-small">
 
-                                        <h3 className="text-center m-2"> Stake Tokens </h3>
+                                            <h3 className="text-center m-2"> Stake Tokens </h3>
 
-                                        <Form id="stake_tokens" onSubmit={this.make_token_stake}>
+                                       <Form id="stake_tokens" onSubmit={this.make_token_stake}>
                                             Amount (SFT)<Form.Control name="amount" defaultValue="0"
                                                                     placedholder="The amount to stake"/>
                                             <Form.Group>
@@ -2604,72 +2926,80 @@ class WalletHome extends React.Component {
                                                     this.state.pending_cash > 0 ?
                                                         (
                                                             <li>{this.state.cash.toLocaleString() + this.state.pending_cash.toLocaleString()} NET</li>) : ''
-                                                        */}
-                                                </td>
-                                            </tr>
+                                                    */}    
+                                                    </td>
+                                                </tr>
 
-                                            <tr>
-                                                <td>
-                                                    <li>{this.state.tokens.toLocaleString()} SFT</li>
-                                                    {this.state.pending_tokens > 0 ?
-                                                        (<li>{this.state.pending_tokens.toLocaleString()} SFT Pending</li>) : ''}
-                                                    {this.state.pending_tokens > 0 ?
-                                                        (
-                                                            <li>{this.state.tokens.toLocaleString() + this.state.pending_tokens.toLocaleString()} NET</li>) : ''}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <li>Total Staked Tokens: {this.state.blockchain_tokens_staked.toLocaleString()}</li>
-                                                </td>
-                                            </tr>
+                                                <tr>
+                                                    <td>
+                                                        <li>{this.state.tokens.toLocaleString()} SFT</li>
+                                                        {this.state.pending_tokens > 0 ?
+                                                            (<li>{this.state.pending_tokens.toLocaleString()} SFT
+                                                                Pending</li>) : ''}
+                                                        {this.state.pending_tokens > 0 ?
+                                                            (
+                                                                <li>{this.state.tokens.toLocaleString() + this.state.pending_tokens.toLocaleString()} NET</li>) : ''}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <li>Total Staked
+                                                            Tokens: {this.state.blockchain_tokens_staked.toLocaleString()}</li>
+                                                    </td>
+                                                </tr>
 
-                                            <tr>
-                                                <td>
-                                                    <li>Your Total Staked Tokens: {unlocked_tokens.toLocaleString()} {pending_stake > 0 ? (
-                                                        <span>| {pending_stake.toLocaleString()} Pending</span>) : ''}</li>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <li>Current Block: {this.state.blockchain_height.toLocaleString()}</li>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <li>Next Payout: {100 - (this.state.blockchain_height % 100)} Blocks
-                                                    </li>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <li>
-                                                        Interest
-                                                        Accrued: {this.state.blockchain_current_interest.cash_per_token / 10000000000} SFX
-                                                        per token
-                                                    </li>
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                            <tfoot>
-                                            <tr>
-                                                <td>
-                                                    <li>Block Interval {interval[0] * 10} : {interest[0]} SFX per token</li>
-                                                </td>
-                                            </tr>
-                                            </tfoot>
-                                        </Table>
-                                    </div>
+                                                <tr>
+                                                    <td>
+                                                        <li>Your Total Staked
+                                                            Tokens: {unlocked_tokens.toLocaleString()} {pending_stake > 0 ? (
+                                                                <span>| {pending_stake.toLocaleString()} Pending</span>) : ''}</li>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <li>Current
+                                                            Block: {this.state.blockchain_height.toLocaleString()}</li>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <li>Next
+                                                            Payout: {100 - (this.state.blockchain_height % 100)} Blocks
+                                                        </li>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <li>
+                                                            Interest
+                                                            Accrued: {this.state.blockchain_current_interest.cash_per_token / 10000000000} SFX
+                                                            per token
+                                                        </li>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                <tr>
+                                                    <td>
+                                                        <li>Block Interval {interval[0] * 10} : {interest[0]} SFX
+                                                            per
+                                                            token
+                                                        </li>
+                                                    </td>
+                                                </tr>
+                                                </tfoot>
+                                            </Table>
+                                        </div>
 
-                                    <div className="token-box p-2 grey-back font-size-small">
+                                        <div className="token-box p-2 grey-back font-size-small">
 
-                                        <h3 className="text-center m-2"> Unstake Tokens </h3>
+                                            <h3 className="text-center m-2"> Unstake Tokens </h3>
 
-                                        <select className="opaque-black" id="stakes">
-                                            <option value="">Choose Stake ID</option>
-                                        </select>
+                                            <select className="opaque-black" id="stakes">
+                                                <option value="">Choose Stake ID</option>
+                                            </select>
 
-                                        <Form id="unstake_tokens" onSubmit={this.make_token_unstake}>
+                                            <Form id="unstake_tokens" onSubmit={this.make_token_unstake}>
 
                                             Amount (SFT) (MAX: {unlocked_tokens.toLocaleString()})<Form.Control name="amount"
                                                                                             defaultValue="0"
@@ -2708,19 +3038,31 @@ class WalletHome extends React.Component {
                                             </Button>
                                         </Form>
 
+                                        </div>
                                     </div>
-                                </div>
 
                                 </Col>
 
-                            </div>    
+                            </div>
 
                         </div>
                     );
                 }
-                case "settings":
+                case "settings": {
                     return (
                         <div></div>
+                    );
+                }
+                case "loading":
+                    return (
+                        <Container className="align-items-center justify-content-center d-flex white-text" fluid>
+                            <Image
+                                style={{height: 500}} 
+                                className="align-content-center"
+                                src={require("./../../img/panda.png")}
+                            />
+                            <h1 className="white-text">Bear with us... we're doing science stuff...</h1>
+                        </Container>
                     );
 
                 default:
@@ -2771,7 +3113,7 @@ class WalletHome extends React.Component {
                                     </li>
                                     <li className={this.state.interface_view === 'market' ? "menu__list-item menu-link-active" : "menu__list-item"}>
                                         <a className="menu__link" href="javascript:void(0)"
-                                        onClick={this.show_market}>Market</a>
+                                        onClick={ this.show_market}>Market</a>
                                     </li>
                                     <li className={this.state.interface_view === 'merchant' ? "menu__list-item menu-link-active" : "menu__list-item"}>
                                         <a className="menu__link" href="javascript:void(0)"
@@ -2781,11 +3123,9 @@ class WalletHome extends React.Component {
                                         <a className="menu__link" href="javascript:void(0)"
                                         onClick={this.show_tokens}>Tokens</a>
                                     </li>
-
-
                                 </ul>
-
                             </Col>
+                            
                             <div className="d-flex flex-column">
                                 <a className="menu__link" href="javascript:void(0)"
                                 onClick={this.show_settings}><FaCogs size={20} className="m-3"/></a>

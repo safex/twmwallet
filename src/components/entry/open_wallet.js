@@ -1,13 +1,19 @@
 import React from 'react';
 import {Row, Col, OverlayTrigger, Container, Button, Form} from 'react-bootstrap';
-import {open_wallet} from '../../utils/wallet_creation';
+import {open_wallet_util} from '../../utils/wallet_creation';
 import {FaBackward} from 'react-icons/fa';
 import WalletHome from '../wallet/home';
 import {open_twm_file, save_twm_file} from "../../utils/twm_actions";
 
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
+
+import Loader from 'react-loader-spinner'
+
 const crypto = window.require('crypto');
 
 let {dialog} = window.require("electron").remote;
+
+let ipath = '';
 
 export default class OpenWallet extends React.Component {
     constructor(props) {
@@ -54,11 +60,99 @@ export default class OpenWallet extends React.Component {
         console.log(e.target.daemon_host.value);
     };
 
+    open_wallet_result = async(error, wallet) => {
+        if (error) {
+
+        } else {
+            try {
+                localStorage.setItem('wallet', JSON.stringify(wallet));
+
+                try {
+
+                    console.log(`the path ${ipath}`);
+                    let twm_file = await open_twm_file(ipath + '.twm', this.state.password);
+                    if (twm_file.success) {
+                        //parse the json and pack it into the local storage for usages
+                        console.log(`success`);
+                        console.log(twm_file);
+                        localStorage.setItem('twm_file', JSON.stringify(twm_file.contents));
+                    } else {
+                        console.log(`error`);
+                        console.log(twm_file);
+                        throw `error`;
+                    }
+
+                } catch (err) {
+                    console.error(err);
+                    try {
+
+                        let twm_obj = {};
+
+                        twm_obj.version = 1;
+                        twm_obj.api = {};
+                        twm_obj.api.urls = {};/*
+                    twm_obj.api.urls.theworldmarketplace = {};
+                    twm_obj.api.urls.theworldmarketplace.url = 'api.theworldmarketplace.com';*/
+                        twm_obj.accounts = {};
+                        twm_obj.settings = {};
+
+                        //for each account make one, and within an account you have urls and keys  the top lvel api urls is for top level non account actions
+                        var accs = wallet.getSafexAccounts();
+                        for (const acc of accs) {
+                            console.log(acc);
+                            twm_obj.accounts[acc.username] = {};
+                            twm_obj.accounts[acc.username].username = acc.username;
+                            twm_obj.accounts[acc.username].data = acc.data;
+                            twm_obj.accounts[acc.username].safex_public_key = acc.publicKey;
+                            twm_obj.accounts[acc.username].safex_private_key = acc.privateKey;
+                            twm_obj.accounts[acc.username].urls = {};
+                            /*
+                                                    twm_obj.accounts[acc.username].urls.theworldmarketplace = {};
+                                                    twm_obj.accounts[acc.username].urls.theworldmarketplace.url = 'api.theworldmarketplace.com';
+                            */
+                        }
+
+                        const algorithm = 'aes-256-ctr';
+                        const cipher = crypto.createCipher(algorithm, this.state.password);
+                        let crypted = cipher.update(JSON.stringify(twm_obj), 'utf8', 'hex');
+                        crypted += cipher.final('hex');
+
+                        const hash1 = crypto.createHash('sha256');
+                        hash1.update(JSON.stringify(twm_obj));
+                        console.log(`password ${this.state.password}`);
+                        console.log(JSON.stringify(twm_obj));
+
+                        let twm_save = await save_twm_file(ipath + '.twm', crypted, this.state.password, hash1.digest('hex'));
+
+                        try {
+                            let twm_file = await open_twm_file(ipath + '.twm', this.state.password);
+                            console.log(twm_file);
+                            localStorage.setItem('twm_file', JSON.stringify(twm_file.contents));
+                        } catch (err) {
+                            console.error(err);
+                            console.error(`error opening twm file after save to verify`);
+                        }
+                        console.log(twm_save);
+                    } catch (err) {
+                        console.error(err);
+                        console.error(`error at initial save of the twm file`);
+                    }
+                }
+                this.setState({wallet_made: true, wallet: wallet, password: this.state.password});
+            } catch (err) {
+                console.error(err);
+                console.error("error on initial recovery");
+                alert(err);
+            }
+        }
+    };
+
+
     open_wallet = async (e) => {
         e.preventDefault();
 
         let the_password = e.target.password.value;
-        let ipath = '';
+        this.setState({password: the_password});
 
         if (this.state.new_path.includes('.keys')) {
             ipath = this.state.new_path.substring(0, this.state.new_path.length - 5);
@@ -73,95 +167,19 @@ export default class OpenWallet extends React.Component {
         }
 
         //now check if you can load the .twm file if not you have to make it
-        try {
-            let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
-            let wallet = await open_wallet(ipath,
-                e.target.password.value,
-                0,
-                this.state.network,
-                daemon_string);
-            console.log(wallet);
-            localStorage.setItem('wallet', JSON.stringify(wallet));
 
-            try {
 
-                console.log(`the path ${ipath}`);
-                let twm_file = await open_twm_file(ipath + '.twm', this.state.password);
-                if (twm_file.success) {
-                    //parse the json and pack it into the local storage for usages
-                    console.log(`success`);
-                    console.log(twm_file);
-                    localStorage.setItem('twm_file', JSON.stringify(twm_file.contents));
-                } else {
-                    console.log(`error`);
-                    console.log(twm_file);
-                    throw `error`;
-                }
+        let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
 
-            } catch (err) {
-                console.error(err);
-                try {
-
-                    let twm_obj = {};
-
-                    twm_obj.version = 1;
-                    twm_obj.api = {};
-                    twm_obj.api.urls = {};/*
-                    twm_obj.api.urls.theworldmarketplace = {};
-                    twm_obj.api.urls.theworldmarketplace.url = 'api.theworldmarketplace.com';*/
-                    twm_obj.accounts = {};
-                    twm_obj.settings = {};
-
-                    //for each account make one, and within an account you have urls and keys  the top lvel api urls is for top level non account actions
-                    var accs = wallet.getSafexAccounts();
-                    for (const acc of accs) {
-                        console.log(acc);
-                        twm_obj.accounts[acc.username] = {};
-                        twm_obj.accounts[acc.username].username = acc.username;
-                        twm_obj.accounts[acc.username].data = acc.data;
-                        twm_obj.accounts[acc.username].safex_public_key = acc.publicKey;
-                        twm_obj.accounts[acc.username].safex_private_key = acc.privateKey;
-                        twm_obj.accounts[acc.username].urls = {};
-                        /*
-                                                twm_obj.accounts[acc.username].urls.theworldmarketplace = {};
-                                                twm_obj.accounts[acc.username].urls.theworldmarketplace.url = 'api.theworldmarketplace.com';
-                        */
-                    }
-
-                    const algorithm = 'aes-256-ctr';
-                    const cipher = crypto.createCipher(algorithm, this.state.password);
-                    let crypted = cipher.update(JSON.stringify(twm_obj), 'utf8', 'hex');
-                    crypted += cipher.final('hex');
-
-                    const hash1 = crypto.createHash('sha256');
-                    hash1.update(JSON.stringify(twm_obj));
-                    console.log(`password ${this.state.password}`);
-                    console.log(JSON.stringify(twm_obj));
-
-                    let twm_save = await save_twm_file(ipath + '.twm', crypted, this.state.password, hash1.digest('hex'));
-
-                    try {
-                        let twm_file = await open_twm_file(ipath + '.twm', this.state.password);
-                        console.log(twm_file);
-                        localStorage.setItem('twm_file', JSON.stringify(twm_file.contents));
-                    } catch (err) {
-                        console.error(err);
-                        console.error(`error opening twm file after save to verify`);
-                    }
-                    console.log(twm_save);
-                } catch (err) {
-                    console.error(err);
-                    console.error(`error at initial save of the twm file`);
-                }
-            }
-
-            this.setState({wallet_made: true, wallet: wallet, password: the_password});
-        } catch (err) {
-            console.error(err);
-            console.error("error on initial recovery");
-            alert(err);
-        }
+        open_wallet_util(ipath,
+            e.target.password.value,
+            0,
+            this.state.network,
+            daemon_string, this.open_wallet_result)
     };
+
+
+
 
     set_to_testnet = (e) => {
         e.preventDefault();
@@ -186,7 +204,7 @@ export default class OpenWallet extends React.Component {
 
     render() {
         return (
-            <Container fluid className="height100 d-flex flex-column justify-content-center ">
+            <Container fluid className="height100 d-flex flex-column justify-content-center align-items-center">
                 {this.state.wallet_made ?
                     (<Container fluid className="height100 justify-content-between">
                         <WalletHome
@@ -195,8 +213,14 @@ export default class OpenWallet extends React.Component {
                             daemon_port={this.state.daemon_port}
                             password={this.state.password}
                         />
-                    </Container>) :
-                    (<Container  className="font-size-small b-r25 grey-back d-flex flex-column white-text" >
+                    </Container>) 
+                    :
+                    (<Container   className={this.state.new_path.length > 0 &&
+                        this.state.daemon_host.length > 0 &&
+                        this.state.password.length > 0 ?  "display-none"
+                        :
+                        "font-size-small b-r25 grey-back d-flex flex-column white-text"
+                        } >
                     
                     <div className="auto_margin_50 d-flex flex-column">    
                         <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
@@ -298,21 +322,28 @@ export default class OpenWallet extends React.Component {
                                 </div>)
                             }
 
-                            {this.state.new_path.length > 0 &&
+                            
+                        </div>
+                    </Container>)}
+
+                    {this.state.new_path.length > 0 &&
                             this.state.daemon_host.length > 0 &&
+                            this.state.wallet_made === false &&
                             this.state.password.length > 0 ?
-                                (<div>
-                                    <Row className="justify-content-md-center">
-                                        <Col sm={6}>
-                                            <p>Opening your wallet...</p>
-                                        </Col>
-                                    </Row>
-                                </div>) :
+                            
+                                (
+                                <Loader className="justify-content-center align-content-center" 
+                                    type="TailSpin"
+                                    color="#00BFFF"
+                                    height={100}
+                                    width={100}
+                                    //3 secs
+                            
+                                />
+                                ) :
                                 (<div>
                                 </div>)
                             }
-                        </div>
-                    </Container>)}
             </Container>);
     }
 }

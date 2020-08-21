@@ -211,6 +211,12 @@
 
 /* Merchant CSS Start */
 
+    .merchant-tab {
+        border-radius: 10px 0 0 10px;
+        padding: 1rem;
+        text-align: center;
+    }
+
     .accounts {
         display: flex;
         flex-direction: column;

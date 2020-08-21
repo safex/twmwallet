@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Col, Container, Row, Image} from 'react-bootstrap'
+import {Button, Col, Container, Row, Image, Tabs, Tab} from 'react-bootstrap'
 import { FaHistory, FaAlignLeft, FaKey, FaFolderPlus, FaFolderOpen } from 'react-icons/fa'
 
 
