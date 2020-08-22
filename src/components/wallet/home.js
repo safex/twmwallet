@@ -483,6 +483,7 @@ class WalletHome extends React.Component {
                     console.log("committed transaction");
 
 
+
                     alert(`transaction successfully submitted 
                         transaction id: ${this.state.create_account_txn_id}
                         tokens locked for 300 blocks: 100 SFT
@@ -937,6 +938,44 @@ class WalletHome extends React.Component {
             console.error(err);
             console.error("Error at listing the offer.");
         }
+    };
+
+    create_offer_first_callback = async (error, create_offer_txn) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at first callback create new offer transaction`);
+            alert(`error at first call back create new offer transaction`);
+            alert(error);
+        } else {
+            console.log(create_offer_txn);
+            let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${create_offer_txn.fee() / 10000000000} SFX Safex Cash
+            to list ${this.state.create_offer_txn_title} clicking OK will confirm this transaction`);
+            let fee = create_offer_txn.fee();
+            let txid = create_offer_txn.transactionsIds();
+            if (confirmed_fee) {
+                this.setState({create_offer_txn_fee: fee, create_offer_txn_id: txid});
+                create_offer_txn.commit(this.create_offer_commit_callback)
+            } else {
+                alert(`your transaction was cancelled, the listing for ${this.state.create_offer_txn_title} was cancelled`);
+                this.setState({create_offer_txn_title: '', create_offer_txn_id: '', create_offer_txn_fee: 0})
+            }
+        }
+    };
+
+    create_offer_commit_callback = async (error, txn) => {
+        if (error) {
+            this.setState({create_offer_txn_title: '', create_offer_txn_id: '', create_offer_txn_fee: 0})
+            console.error(error);
+            console.error(`error at commit callback create new offer transaction`);
+            alert(`error at commit call back create new offer transaction`);
+            alert(error);
+        } else {
+            console.log("committed create offer transaction");
+            alert(`transaction successfully submitted listing ${this.state.create_offer_txn_title}
+                        transaction id: ${this.state.create_offer_txn_id}
+                        fee: ${this.state.create_offer_txn_fee / 10000000000}`);
+        }
+
     };
 
     create_offer_first_callback = async (error, create_offer_txn) => {
@@ -1537,6 +1576,7 @@ class WalletHome extends React.Component {
                             try {
                                 return <tr key={key}>
                                     <td className="title-row" data-tip data-for={`offerTitle${key}`}>
+
                                         {listing.title}
                                         <ReactTooltip className="offer-tooltip" id={`offerTitle${key}`} type='light'
                                                       effect='float'>
@@ -1574,6 +1614,7 @@ class WalletHome extends React.Component {
                                     <td className="quantity-row">{listing.seller}</td>
                                     <td className="title-row" data-tip data-for={`offerID${key}`}>
                                         {this.to_ellipsis(listing.offerID, 10, 10)}
+
                                         <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
                                             <span>{listing.offerID}</span>
                                         </ReactTooltip>
@@ -1582,6 +1623,7 @@ class WalletHome extends React.Component {
                                         <option value="1">1</option>
                                     </select></td>
                                     <td className="quantity-row">
+
 
                                         <Button size="lg" variant="success"
                                                 onClick={() => this.handleShowPurchaseForm(listing)}>
@@ -1684,6 +1726,7 @@ class WalletHome extends React.Component {
                                     <Button size="lg" variant="info">CONTACT</Button>
                                 </td>
                             </tr>
+
 
                             } catch (err) {
                                 console.error(`failed to properly parse the user data formatting`);
@@ -1859,6 +1902,7 @@ class WalletHome extends React.Component {
                                                 <div class="form-group col-sm-2">
                                                     <button class="btn btn-primary mx-3">
                                                         Set Market API 
+
                                                     </button>
                                                     <IconContext.Provider  value={{color: 'white', size: '20px'}}>
                                                         
@@ -2058,6 +2102,7 @@ class WalletHome extends React.Component {
                                                 variant="success"
                                                 onClick={() => this.handleShowEditOfferForm(listing)}>
                                             EDIT
+
                                             </Button>
                                             
                                             <Modal 
@@ -2081,6 +2126,7 @@ class WalletHome extends React.Component {
                                                                             value={this.state.show_edit_offer.seller}/>
                                                         Image URL <Form.Control name="main_image"
                                                                                         defaultValue={data.main_image}/>
+
                                                         Title <Form.Control name="title"
                                                                             defaultValue={this.state.show_edit_offer.title}/>
                                                         Description <Form.Control maxLength="2000" as="textarea"
@@ -2136,6 +2182,7 @@ class WalletHome extends React.Component {
                                                                 <option>7</option>
                                                             </Form.Control>
                                                         </Form.Group>
+
 
                                                         <Button block size="lg" type="submit" variant="success">Submit
                                                             Edit</Button>
@@ -2292,6 +2339,7 @@ class WalletHome extends React.Component {
                                             <Col md={5} className="account-list no-gutters p-3">
 
                                                 {accounts_table}
+
                                             </Col>
                                             {selected !== void (0) ? (
                                                 <Col md={3}
@@ -2552,6 +2600,7 @@ class WalletHome extends React.Component {
                                             md={11}
                                         >
                                             <h1>Messages</h1>
+
                                         </Col>
 
                                         {/*Orders Tab*/}
@@ -2690,6 +2739,7 @@ class WalletHome extends React.Component {
                                                                     <option>7</option>
                                                                 </Form.Control>
                                                             </Form.Group>
+
                                                             <Button block size="lg" variant="success" type="submit">
                                                                 List Offer
                                                             </Button>
@@ -2836,6 +2886,7 @@ class WalletHome extends React.Component {
                                                 <option>7</option>
                                             </Form.Control>
                                         </Form.Group>
+
                                         <Button className="mt-2" type="submit" variant="warning" size="lg" block>
                                             Send Tokens
                                         </Button>
@@ -2847,6 +2898,7 @@ class WalletHome extends React.Component {
                                 <Col sm={8} className="no-gutters pt-3 b-r10 opaque-black">
                                     
                                     <div className="staking-table mt-2 border rounded border-white grey-back">
+
                                         <h2 className="text-center "> Stakes </h2>
 
                                         <Table color="white"
@@ -2927,6 +2979,7 @@ class WalletHome extends React.Component {
                                                         (
                                                             <li>{this.state.cash.toLocaleString() + this.state.pending_cash.toLocaleString()} NET</li>) : ''
                                                     */}    
+
                                                     </td>
                                                 </tr>
 
@@ -3038,6 +3091,7 @@ class WalletHome extends React.Component {
                                             </Button>
                                         </Form>
 
+
                                         </div>
                                     </div>
 
@@ -3079,6 +3133,7 @@ class WalletHome extends React.Component {
                         className="no-gutters my-5 p-2 border border-light b-r10 opaque-black"
                     >
 
+
                         <Row className="justify-content-between align-items-center">
 
                             <Col sm={2} className="p-1 align-self-center b-r10 white-text light-blue-back">
@@ -3091,6 +3146,7 @@ class WalletHome extends React.Component {
                                     </IconContext.Provider>
                                     <p className="mb-2"><b>{this.state.blockchain_height.toLocaleString()}</b></p>
                                 </div>
+
 
                                 {this.state.wallet_height < this.state.blockchain_height ?
                                     (<p className="mb-2">
@@ -3142,6 +3198,7 @@ class WalletHome extends React.Component {
                             <Col id="balances" sm={3}>
                                 <li>
                                     SFX: {this.state.cash.toLocaleString()} {this.state.pending_cash > 0 ? `(${this.state.pending_cash.toLocaleString()} SFX Pending)` : ''}
+
                                 </li>
                                 <li className="">
                                     SFT: {this.state.tokens.toLocaleString()} {this.state.pending_tokens > 0 ? `(${this.state.pending_tokens.toLocaleString()} SFT Pending)` : ''}
@@ -3164,6 +3221,7 @@ class WalletHome extends React.Component {
                                         <Button variant="danger" onClick={this.rescan}>
                                             Hard Rescan
                                         </Button>
+
 
                                         <Button variant="primary" onClick={this.handleShow}>
                                             Show Keys
@@ -3216,6 +3274,7 @@ class WalletHome extends React.Component {
                  
                     
                 
+
 
                 {twmwallet()}
 
