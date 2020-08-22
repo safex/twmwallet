@@ -79,6 +79,7 @@ class WalletHome extends React.Component {
             blockchain_current_interest: {},
             twm_file: {},
             show_purchase_offer: {title: '', quantity: 0, offerID: '', seller: ''},
+            show_purchase_offer_data: {main_image: false},
             show_edit_offer: {},
             new_account_image: require('./../../img/sails-logo.png'),
             merchantTabs: 'accounts'            
@@ -853,8 +854,8 @@ class WalletHome extends React.Component {
     };
 
     //show modal of Purchase Form
-    handleShowPurchaseForm = (listing) => {
-        this.setState({show_purchase_form: true, show_purchase_offer: listing});
+    handleShowPurchaseForm = (listing, data) => {
+        this.setState({show_purchase_form: true, show_purchase_offer: listing, show_purchase_offer_data: data});
     };
 
     //show modal of new account
@@ -1626,100 +1627,11 @@ class WalletHome extends React.Component {
 
 
                                         <Button size="lg" variant="success"
-                                                onClick={() => this.handleShowPurchaseForm(listing)}>
+                                                onClick={() => this.handleShowPurchaseForm(listing, data)}>
                                             BUY
                                         </Button>
 
-                                        <Modal className="new-account-form" animation={false}
-                                                size="lg"
-                                               show={this.state.show_purchase_form}
-                                               onHide={this.handleClosePurchaseForm}>
-                                            <Modal.Header closeButton>
-                                                <Modal.Title>
-                                                    Purchase {this.state.show_purchase_offer.title}
-                                                </Modal.Title>
-                                            </Modal.Header>
-                                            <Modal.Body>
 
-                                                <Form id="purchase_item"
-                                                      onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
-                                                    
-
-                                                        <h2>{this.state.show_purchase_offer.title}</h2>
-                                                        {data.main_image ?
-                                                            <div className="d-flex flex-row justify-content-around p-3">
-                                                                <Image className="border border-dark"
-                                                                    src={data.main_image}></Image>
-
-                                                                <div className="d-flex flex-column justify-content-center">
-                                                                    <h3>{listing.title}</h3>
-                                                                    <hr class="border border-dark w-100"></hr>
-                                                                    <ul>
-                                                                        <li>Price: {listing.price} SFX</li>
-                                                                        <li>Seller: {listing.seller}</li>
-                                                                    </ul>
-                                                                    <hr class="border border-primary w-100"></hr>
-                                                                    <p>{data.description}</p>
-                                                                </div>
-
-                                                            </div>
-                                                            :
-                                                            <div>
-                                                                <Image src={require("./../../img/sails-logo.png")}></Image>
-                                                                <h3>{listing.title}</h3>
-                                                            </div>
-                                                        }
-                                                    <ul>    
-                                                        <li>{this.state.show_purchase_offer.price / 10000000000}</li>
-                                                        <li>{this.state.show_purchase_offer.seller}</li>
-                                                        <li>{this.to_ellipsis(this.state.show_purchase_offer.offerID)}</li>
-                                                    </ul>
-
-                                                    {this.state.show_purchase_offer.quantity} available <Form.Control
-                                                    className="light-blue-back"
-                                                    id="quantity"
-                                                    name="quantity"/>
-                                                    Send Message <Form.Control name="message"/>
-                                                    <Form.Group>
-                                                        <Form.Label>
-                                                            Mixins
-                                                            <IconContext.Provider  value={{color: 'black', size: '20px'}}>
-                                                                <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon mx-4"/>
-                                                                
-                                                                <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                                    <span>
-                                                                        Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                        They are combined with yours for private transactions.<br/>
-                                                                        Changing this from the default could hurt your privacy.<br/>
-                                                                    </span>
-                                                                </ReactTooltip>
-                                                            </IconContext.Provider>
-                                                        </Form.Label>
-                                                        <Form.Control 
-                                                            name="mixins" 
-                                                            as="select"
-                                                            defaultValue="7"
-                                                        >
-                                                            <option>1</option>
-                                                            <option>2</option>
-                                                            <option>3</option>
-                                                            <option>4</option>
-                                                            <option>5</option>
-                                                            <option>6</option>
-                                                            <option>7</option>
-                                                            </Form.Control>
-                                                    </Form.Group>
-
-                                                    <Button size="lg" className="mt-2" type="submit" variant="success">Confirm Payment</Button>
-                                                </Form>
-                                            </Modal.Body>
-                                            <Modal.Footer className="align-self-start">
-
-                                                <Button size="lg" variant="danger" onClick={this.handleClosePurchaseForm}>
-                                                    Close
-                                                </Button>
-                                            </Modal.Footer>
-                                        </Modal>
                                     
                                 </td>
                                 <td className="quantity-row">
@@ -1745,6 +1657,96 @@ class WalletHome extends React.Component {
                                 className="no-gutters mt-5 p-2 border border-light b-r10 black-back h-25 sticky"
                                 style={{height: "200px"}}
                             >
+                                <Modal className="new-account-form" animation={false}
+                                       size="lg"
+                                       show={this.state.show_purchase_form}
+                                       onHide={this.handleClosePurchaseForm}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>
+                                            Purchase {this.state.show_purchase_offer.title}
+                                        </Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>
+
+                                        <Form id="purchase_item"
+                                              onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
+
+
+                                            <h2>{this.state.show_purchase_offer.title}</h2>
+                                            {this.state.show_purchase_offer_data.main_image ?
+                                                <div className="d-flex flex-row justify-content-around p-3">
+                                                    <Image className="border border-dark"
+                                                           src={this.state.show_purchase_offer_data.main_image}></Image>
+
+                                                    <div className="d-flex flex-column justify-content-center">
+                                                        <h3>{this.state.show_purchase_offer.title}</h3>
+                                                        <hr class="border border-dark w-100"></hr>
+                                                        <ul>
+                                                            <li>Price: {this.state.show_purchase_offer.price / 10000000000} SFX</li>
+                                                            <li>Seller: {this.state.show_purchase_offer.seller}</li>
+                                                        </ul>
+                                                        <hr class="border border-primary w-100"></hr>
+                                                        <p>{this.state.show_purchase_offer_data.description}</p>
+                                                    </div>
+
+                                                </div>
+                                                :
+                                                <div>
+                                                    <Image src={require("./../../img/sails-logo.png")}></Image>
+                                                    <h3>{this.state.show_purchase_offer.title}</h3>
+                                                </div>
+                                            }
+                                            <ul>
+                                                <li>{this.state.show_purchase_offer.price / 10000000000}</li>
+                                                <li>{this.state.show_purchase_offer.seller}</li>
+                                                <li>{this.to_ellipsis(this.state.show_purchase_offer.offerID)}</li>
+                                            </ul>
+
+                                            {this.state.show_purchase_offer.quantity} available <Form.Control
+                                            className="light-blue-back"
+                                            id="quantity"
+                                            name="quantity"/>
+                                            Send Message <Form.Control name="message"/>
+                                            <Form.Group>
+                                                <Form.Label>
+                                                    Mixins
+                                                    <IconContext.Provider  value={{color: 'black', size: '20px'}}>
+                                                        <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon mx-4"/>
+
+                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                                    <span>
+                                                                        Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                        They are combined with yours for private transactions.<br/>
+                                                                        Changing this from the default could hurt your privacy.<br/>
+                                                                    </span>
+                                                        </ReactTooltip>
+                                                    </IconContext.Provider>
+                                                </Form.Label>
+                                                <Form.Control
+                                                    name="mixins"
+                                                    as="select"
+                                                    defaultValue="7"
+                                                >
+                                                    <option>1</option>
+                                                    <option>2</option>
+                                                    <option>3</option>
+                                                    <option>4</option>
+                                                    <option>5</option>
+                                                    <option>6</option>
+                                                    <option>7</option>
+                                                </Form.Control>
+                                            </Form.Group>
+
+                                            <Button size="lg" className="mt-2" type="submit" variant="success">Confirm Payment</Button>
+                                        </Form>
+                                    </Modal.Body>
+                                    <Modal.Footer className="align-self-start">
+
+                                        <Button size="lg" variant="danger" onClick={this.handleClosePurchaseForm}>
+                                            Close
+                                        </Button>
+                                    </Modal.Footer>
+                                </Modal>
 
                         <Row className="justify-content-between align-items-center">
 
@@ -2363,6 +2365,7 @@ class WalletHome extends React.Component {
 
                                                         </ul>
                                                     </Row>
+
                                                     <div id="account-edit-buttons" className=" d-flex flex-column">
                                                         <Button size="lg" variant="success"
                                                                 onClick={() => this.handleShowEditAccountForm(selected)}>
