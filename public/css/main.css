@@ -103,14 +103,39 @@
         border-color: #fff!important;
     }
 
+    .ml-8 {
+        margin-left: 8rem!important;
+    }
 /* Dimensions CSS End */
 
+/* Attributes CSS Start */
+
+    .sticky {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .display-none {
+        display: none;
+    }
+
+/* Attributes CSS End */
 
 
 /* Colors CSS Start */
 
     .light-blue-back {
         background-color: rgba(24, 189, 231, 0.5);
+    }
+
+    .black-back {
+        background-color: black;
+    }
+
+    .solid-grey-back {
+        background-color: rgba(219, 219, 219, 1);;
     }
 
     .opaque-black {

@@ -5,6 +5,10 @@ import {FaBackward} from 'react-icons/fa';
 import WalletHome from '../wallet/home';
 import {open_twm_file, save_twm_file} from "../../utils/twm_actions";
 
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
+
+import Loader from 'react-loader-spinner'
+
 const crypto = window.require('crypto');
 
 let {dialog} = window.require("electron").remote;
@@ -176,7 +180,6 @@ export default class OpenWallet extends React.Component {
 
 
 
-
     set_to_testnet = (e) => {
         e.preventDefault();
         const target = e.target;
@@ -200,7 +203,7 @@ export default class OpenWallet extends React.Component {
 
     render() {
         return (
-            <Container fluid className="height100 d-flex flex-column justify-content-center ">
+            <Container fluid className="height100 d-flex flex-column justify-content-center align-items-center">
                 {this.state.wallet_made ?
                     (<Container fluid className="height100 justify-content-between">
                         <WalletHome
@@ -209,8 +212,14 @@ export default class OpenWallet extends React.Component {
                             daemon_port={this.state.daemon_port}
                             password={this.state.password}
                         />
-                    </Container>) :
-                    (<Container  className="font-size-small b-r25 grey-back d-flex flex-column white-text" >
+                    </Container>) 
+                    :
+                    (<Container   className={this.state.new_path.length > 0 &&
+                        this.state.daemon_host.length > 0 &&
+                        this.state.password.length > 0 ?  "display-none"
+                        :
+                        "font-size-small b-r25 grey-back d-flex flex-column white-text"
+                        } >
                     
                     <div className="auto_margin_50 d-flex flex-column">    
                         <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
@@ -223,6 +232,9 @@ export default class OpenWallet extends React.Component {
                                 <p>
                                     Open an existing Safex wallet by selecting the .keys file and
                                     entering your password.
+                                </p>
+                                <p>
+                                THIS WALLET IS STAGENET V1 THIS IS NOT A REGULAR SAFEX WALLET USE ONLY FOR TESTING ONLY JULY 13, 2020
                                 </p>
 
                                 <div className="mt-4">
@@ -309,21 +321,28 @@ export default class OpenWallet extends React.Component {
                                 </div>)
                             }
 
-                            {this.state.new_path.length > 0 &&
+                            
+                        </div>
+                    </Container>)}
+
+                    {this.state.new_path.length > 0 &&
                             this.state.daemon_host.length > 0 &&
+                            this.state.wallet_made === false &&
                             this.state.password.length > 0 ?
-                                (<div>
-                                    <Row className="justify-content-md-center">
-                                        <Col sm={6}>
-                                            <p>Opening your wallet...</p>
-                                        </Col>
-                                    </Row>
-                                </div>) :
+                            
+                                (
+                                <Loader className="justify-content-center align-content-center" 
+                                    type="TailSpin"
+                                    color="#00BFFF"
+                                    height={100}
+                                    width={100}
+                                    //3 secs
+                            
+                                />
+                                ) :
                                 (<div>
                                 </div>)
                             }
-                        </div>
-                    </Container>)}
             </Container>);
     }
 }

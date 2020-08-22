@@ -3,6 +3,8 @@
 .safex-background {
     background-image:url(./../images/wall3.jpg);
     background-position: bottom right;
+    background-size: cover contain;
+    
 }
 
 .entry-form {

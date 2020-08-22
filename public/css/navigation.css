@@ -6,7 +6,7 @@
 }
 
 html, body {
-    color: white!important;
+    
     margin: 0;
     padding: 0;
     min-width: 500px;
@@ -96,27 +96,6 @@ body {
 
 
 
-.merchant_product_view {
-    
-    background-color: #38bdd2;
-    
-    color: #fff;
-    width: 100%;
-    min-height: 140px;
-    margin: 0 -10px;
-    max-height: 1000px;
-}
-
-.merchant-profile-view {
-    
-    background-color: #38bdd2;
-    border: 2px solid #fff;
-    color: #fff;
-    width: 100%;
-    min-height: 140px;
-    margin: 0 -10px;
-    max-height: 800px;
-}
 
 .overflow-x {
     overflow-x: auto!important;
