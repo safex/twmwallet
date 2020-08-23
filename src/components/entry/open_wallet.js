@@ -180,7 +180,6 @@ export default class OpenWallet extends React.Component {
 
 
 
-
     set_to_testnet = (e) => {
         e.preventDefault();
         const target = e.target;
