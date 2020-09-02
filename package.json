@@ -110,7 +110,7 @@
     ],
     "mac": {
       "category": "public.app-category.business",
-      "icon": "public/images/icons/wallet-icon2.icns",
+      "icon": "build/icons/icon.icns",
       "type": "distribution",
       "target": [
         "dmg"
