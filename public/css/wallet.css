@@ -47,10 +47,6 @@
     opacity: 1;
   } 
 
-    #balances div {
-        width: min-content!important;
-    }
-
 
     #header #balances {
         font-size: 1.3rem;
@@ -232,7 +228,7 @@
         flex-direction: column;
         align-items: center;
         flex: 1;
-        overflow-y: auto;
+        overflow-y: scroll;
         border-radius: 10px;
         
 
