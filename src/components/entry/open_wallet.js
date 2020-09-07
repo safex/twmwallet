@@ -221,7 +221,7 @@ export default class OpenWallet extends React.Component {
                         "font-size-small b-r25 grey-back d-flex flex-column white-text"
                         } >
                     
-                    <div className="auto_margin_50 d-flex flex-column">    
+                    <div className="auto_margin_50 my-5 d-flex flex-column">    
                         <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
 
                         <Row className="align-items-center mb-5 justify-content-center">
@@ -336,8 +336,6 @@ export default class OpenWallet extends React.Component {
                                     color="#00BFFF"
                                     height={100}
                                     width={100}
-                                    //3 secs
-                            
                                 />
                                 ) :
                                 (<div>
