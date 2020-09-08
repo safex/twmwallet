@@ -1462,7 +1462,12 @@ class WalletHome extends React.Component {
 
                                 <ul>
                                     <Col>
-                                        <li id="wallet-balance">{this.state.cash.toLocaleString()} SFX</li>
+                                        <li id="wallet-balance" className="d-flex flex-row">
+                                            {this.state.first_refresh === true ? 
+                                                (this.state.cash.toLocaleString()) : 
+                                                    (<Loader className="mr-3" type="ThreeDots" color="#00BFFF" height={20} width={20} />)
+                                            } SFX
+                                        </li>
 
                                         {this.state.pending_cash > 0 ?
                                             (
@@ -1811,11 +1816,28 @@ class WalletHome extends React.Component {
                         <Row
                             className="no-gutters p-2 justify-content-between align-items-center b-r10 white-text">
                             <Col id="balances" sm={3}>
-                                <li>
-                                    SFX: {this.state.cash.toLocaleString()} {this.state.pending_cash > 0 ? `(${this.state.pending_cash.toLocaleString()} SFX Pending)` : ''}
+                                <li className="d-flex flex-row">
+                                    SFX: {this.state.first_refresh === true ? 
+                                            (this.state.cash.toLocaleString()) : 
+                                                (<Loader className="ml-5" type="ThreeDots" color="#00BFFF" height={20} width={20} />)
+                                            }
+                                             
+                                            {this.state.pending_cash > 0 ? 
+                                                `(${this.state.pending_cash.toLocaleString()} SFX Pending)` : 
+                                                ''
+                                            }
                                 </li>
-                                <li className="">
-                                    SFT: {this.state.tokens.toLocaleString()} {this.state.pending_tokens > 0 ? `(${this.state.pending_tokens.toLocaleString()} SFT Pending)` : ''}
+                                
+                                <li className="d-flex flex-row">
+                                    SFT: {this.state.first_refresh === true ? 
+                                            (this.state.tokens.toLocaleString()) : 
+                                                (<Loader className="ml-5" type="ThreeDots" color="#00BFFF" height={20} width={20} />)
+                                            }
+                                             
+                                            {this.state.pending_tokens > 0 ? 
+                                                `(${this.state.pending_tokens.toLocaleString()} SFX Pending)` : 
+                                                ''
+                                            }
                                 </li>
                             </Col>
                             <Col className="text-align-center" sm={8}>
@@ -2308,7 +2330,7 @@ class WalletHome extends React.Component {
                                                     </ReactTooltip>
                                                 </IconContext.Provider>
                                             </Col>
-                                            
+
                                             <Col 
                                                 className={this.state.merchantTabs === "orders" ?  
                                                 "merchant-tab border border-dark safex-cash-green" : 
@@ -3147,7 +3169,11 @@ class WalletHome extends React.Component {
                                             <GrCubes className="blockchain-icon m-1 white-text"/>
                                         </div>
                                     </IconContext.Provider>
-                                    <p className="mb-2"><b>{this.state.blockchain_height.toLocaleString()}</b></p>
+                                    {this.state.first_refresh === true ? 
+                                        (<p className="mb-2 ml-3"><b>{this.state.blockchain_height.toLocaleString()}</b></p>) : 
+                                        (<Loader className="ml-3" type="ThreeDots" color="#00BFFF" height={20} width={20} />)
+                                    }
+                                    
                                 </div>
 
 
@@ -3199,14 +3225,37 @@ class WalletHome extends React.Component {
                         <Row
                             className="no-gutters p-2 justify-content-between align-items-center b-r10 white-text">
                             <Col id="balances" sm={3}>
+<<<<<<< HEAD
+                                <li className="d-flex flex-row">
+                                    SFX: {this.state.first_refresh === true ? 
+                                            (this.state.cash.toLocaleString()) : 
+                                                (<Loader className="ml-5" type="ThreeDots" color="#00BFFF" height={20} width={20} />)
+                                            }
+                                             
+                                            {this.state.pending_cash > 0 ? 
+                                                `(${this.state.pending_cash.toLocaleString()} SFX Pending)` : 
+                                                ''
+                                            }
+=======
                                 <li>
                                     SFX: {this.state.cash.toLocaleString()} {this.state.pending_cash > 0 ? `(${this.state.pending_cash.toLocaleString()} SFX Pending)` : ''}
 
+>>>>>>> 9d7b9b8bf5a1ba50a4290491cd496d95ada525c1
                                 </li>
-                                <li className="">
-                                    SFT: {this.state.tokens.toLocaleString()} {this.state.pending_tokens > 0 ? `(${this.state.pending_tokens.toLocaleString()} SFT Pending)` : ''}
+
+                                <li className="d-flex flex-row">
+                                    SFT: {this.state.first_refresh === true ? 
+                                            (this.state.tokens.toLocaleString()) : 
+                                                (<Loader className="ml-5" type="ThreeDots" color="#00BFFF" height={20} width={20} />)
+                                            }
+                                             
+                                            {this.state.pending_tokens > 0 ? 
+                                                `(${this.state.pending_tokens.toLocaleString()} SFX Pending)` : 
+                                                ''
+                                            }
                                 </li>
                             </Col>
+
                             <Col className="text-align-center" sm={8}>
                                 <p>SFX + SFT Public Address:<br/>
                                     <br/>
