@@ -136,6 +136,27 @@
 
     }
 
+    .home-carousel-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+    }
+
+    .home-carousel {
+        max-width: 400px;
+        max-height: 300px;
+    }
+
+    .carousel-inner {
+        border-radius: 10px;
+    }
+
+    .carousel-caption {
+        background-color: rgba(0, 13, 255, 0.57);
+        border-radius: 25px;
+    }
+
 
 /* Home CSS End */
 
@@ -182,6 +203,26 @@
         padding-right: 0!important;
     }
 
+    .purchase-offer-modal {
+        color:  black;
+        font-size: 1.25rem!important;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .purchase-offer-modal img {
+        max-height: 40vh;
+        min-height: 40vh;
+
+        max-width: 40vh;
+        min-width: 40vh;
+    }
+
+    .purchase-offer-modal textarea {
+        max-height: 100px;
+    }
     .offer-tooltip {
         display: flex;
         flex-direction: column;
@@ -198,7 +239,10 @@
 
     .offer-tooltip img {
        
-        height: 30vh;
+        max-width: 30vh;
+        min-width: 30vh;
+        min-height: 30vh;
+        max-height: 30vh;
         
     }
 
@@ -221,10 +265,16 @@
         text-align: center;
     }
 
+    .pending-order {
+        background-color: var(--safex-cash-green)!important;
+        color: black;
+    }
+
     .accounts {
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
+
     }
 
     .account-list {
@@ -346,7 +396,7 @@
 /* Tokens CSS Start */
 
     .staking-table {
-        width: 90%;
+        width: 100%;
         min-height: 10vh;
         margin: 0 auto;
     }

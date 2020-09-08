@@ -180,6 +180,7 @@ export default class OpenWallet extends React.Component {
 
 
 
+
     set_to_testnet = (e) => {
         e.preventDefault();
         const target = e.target;
@@ -331,7 +332,8 @@ export default class OpenWallet extends React.Component {
                             this.state.password.length > 0 ?
                             
                                 (
-                                <Loader className="justify-content-center align-content-center" 
+                                <Loader 
+                                    className="justify-content-center align-content-center" 
                                     type="TailSpin"
                                     color="#00BFFF"
                                     height={100}
