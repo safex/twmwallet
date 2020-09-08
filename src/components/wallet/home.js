@@ -3225,7 +3225,6 @@ class WalletHome extends React.Component {
                         <Row
                             className="no-gutters p-2 justify-content-between align-items-center b-r10 white-text">
                             <Col id="balances" sm={3}>
-<<<<<<< HEAD
                                 <li className="d-flex flex-row">
                                     SFX: {this.state.first_refresh === true ? 
                                             (this.state.cash.toLocaleString()) : 
@@ -3236,11 +3235,6 @@ class WalletHome extends React.Component {
                                                 `(${this.state.pending_cash.toLocaleString()} SFX Pending)` : 
                                                 ''
                                             }
-=======
-                                <li>
-                                    SFX: {this.state.cash.toLocaleString()} {this.state.pending_cash > 0 ? `(${this.state.pending_cash.toLocaleString()} SFX Pending)` : ''}
-
->>>>>>> 9d7b9b8bf5a1ba50a4290491cd496d95ada525c1
                                 </li>
 
                                 <li className="d-flex flex-row">
