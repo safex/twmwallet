@@ -349,8 +349,8 @@ class WalletHome extends React.Component {
 
                 let d_obj = {};
                 d_obj.twm_version = 1;
-                if (vees.avatar.value.length > 0) {
-                    d_obj.avatar = vees.avatar.value;
+                if (vees.new_account_image.value.length > 0) {
+                    d_obj.avatar = vees.new_account_image.value;
                 }
                 if (vees.twitter.value.length > 0) {
                     d_obj.twitter = vees.twitter.value;
