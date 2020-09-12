@@ -114,6 +114,11 @@
         display: none;
     }
 
+    .text-align-center {
+        text-align: center!important;
+    }
+
+
 /* Attributes CSS End */
 
 

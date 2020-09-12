@@ -81,6 +81,7 @@ class WalletHome extends React.Component {
             show_purchase_offer: {title: '', quantity: 0, offerID: '', seller: ''},
             show_purchase_offer_data: {main_image: false},
             show_edit_offer: {},
+            show_orders: false,
             new_account_image: require('./../../img/sails-logo.png'),
             new_offer_image: '',
             merchantTabs: 'accounts',
@@ -351,8 +352,8 @@ class WalletHome extends React.Component {
 
                 let d_obj = {};
                 d_obj.twm_version = 1;
-                if (vees.new_account_image.value.length > 0) {
-                    d_obj.avatar = vees.new_account_image.value;
+                if (vees.avatar.value.length > 0) {
+                    d_obj.avatar = vees.avatar.value;
                 }
                 if (vees.twitter.value.length > 0) {
                     d_obj.twitter = vees.twitter.value;
@@ -810,6 +811,13 @@ class WalletHome extends React.Component {
             });
         }, 500);
     };
+
+    //Show Merchant Orders
+
+    show_orders = () => {
+        this.setState({show_orders: !this.state.show_orders})
+        console.log(this.state.show_orders)
+    }
 
     
     //open staking view from navigation
@@ -2300,13 +2308,14 @@ class WalletHome extends React.Component {
                                     <td className="quantity-row text-align-center">{listing.seller}</td>
                                     <td className="actions-row text-align-center">{listing.offerID}</td>
                                     <td className="title-row text-align-center">
-                                        <Col className="align-self-center" md={2}>
+                                        
                                             <Button 
                                                 size="lg" 
                                                 variant="success"
                                                 onClick={() => this.handleShowEditOfferForm(listing)}
+                                                className="mx-2"
                                             >
-                                            Edit
+                                                Edit
                                             </Button>
                                             
                                             <Modal 
@@ -2529,7 +2538,15 @@ class WalletHome extends React.Component {
                                                     </Button>
                                                 </Modal.Footer>
                                             </Modal>
-                                        </Col>
+                                        
+                                            <Button 
+                                                size="lg" 
+                                                variant="success"
+                                                onClick={this.show_orders}
+                                                className="mx-2"
+                                            >
+                                                Show Orders
+                                            </Button>
                                     </td>
                                 </tr>
                             }
@@ -2701,7 +2718,7 @@ class WalletHome extends React.Component {
                                                     <div id="account-edit-buttons" className=" d-flex flex-column">
                                                         <Button size="lg" variant="success"
                                                                 onClick={() => this.handleShowEditAccountForm(selected)}>
-                                                            EDIT
+                                                            Edit
                                                         </Button>
 
                                                         <Modal 
@@ -3054,26 +3071,47 @@ class WalletHome extends React.Component {
                                            
                                             {selected !== void (0) ? 
                                                 (
-                                                    <Table>
-                                                        <thead>
-                                                    
-                                                        </thead>
-                                                        <tbody>
-                                                            {non_listings_table}
-                                                        </tbody>
-                                                    </Table>
+                                                   <div>
+                                                        { this.state.show_orders ?
+                                                            (<Row>
+                                                                <Col>
+                                                                    <Button variant="danger"
+                                                                            onClick={this.show_orders}>
+                                                                        Back
+                                                                    </Button>
+                                                                </Col>
+                                                                <Col>
+                                                            <h1>*Offer Title* Orders Table</h1>
+                                                                </Col>
+                                                            </Row>
+
+                                                            
+                                                            )
+
+                                                            :
+                                                            (<Table>
+                                                                <thead>
+                                                        
+                                                                </thead>
+
+                                                                <tbody>
+                                                                    {non_listings_table}
+                                                                </tbody>
+                                                            </Table>)
+                                                        }
+                                                    </div> 
                                                 )
                                                 :
                                                 (
                                                     <div className="d-flex flex-column align-items-center">
                                                     
-                                                    <Image 
-                                                        src={require("./../../img/eating-panda.png")}
-                                                        width={100}
-                                                        height={100}
-                                                    />
+                                                        <Image 
+                                                            src={require("./../../img/eating-panda.png")}
+                                                            width={100}
+                                                            height={100}
+                                                        />
 
-                                                    <h3>You haven't selected an account so Panda decided to have a snack... <a className="black-text" href="javascript:void(0)" onClick={() => this.handleMerchantTabChange('accounts')}><u> select or create an account</u></a> to get started!</h3>
+                                                        <h3>You haven't selected an account so Panda decided to have a snack... <a className="black-text" href="javascript:void(0)" onClick={() => this.handleMerchantTabChange('accounts')}><u> select or create an account</u></a> to get started!</h3>
                                                     </div>
                                                 )
                                             }
@@ -3386,11 +3424,26 @@ class WalletHome extends React.Component {
                                     <hr class="border border-light w-100"></hr>
 
                                     <Form id="send_token" onSubmit={this.token_send}>
-                                        Destination Address <Form.Control name="destination"
-                                                                          defaultValue="Safex5..."
-                                                                          placedholder="the destination address"/>
-                                        Amount (SFT)<Form.Control name="amount" defaultValue="0"
-                                                                placedholder="the amount to send"/>
+                                        <Form.Group>
+                                            <Form.Label>Destination Address</Form.Label>
+                                            
+                                            <Form.Control 
+                                                name="destination"
+                                                defaultValue="Safex5..."
+                                                placedholder="the destination address"
+                                            />
+                                        </Form.Group>
+
+                                        <Form.Group>
+                                            <Form.Label>Amount (SFT)</Form.Label>
+                                        
+                                            <Form.Control 
+                                                name="amount" 
+                                                defaultValue="0"
+                                                placedholder="the amount to send"
+                                            />
+                                        </Form.Group>
+
                                         <Form.Group>
                                             <Form.Label>
                                                 Mixins
@@ -3672,24 +3725,27 @@ class WalletHome extends React.Component {
 
                             <Col sm={2} className="p-1 align-self-center b-r10 white-text light-blue-back">
 
-                                <div className="d-flex flex-row justify-content-center align-items-end">
+                                <div className="d-flex flex-row text-align-center justify-content-center align-items-end">
                                     <IconContext.Provider value={{color: 'white', size: '20px'}}>
                                         <div className="white-text">
                                             <GrCubes className="blockchain-icon m-1 white-text"/>
                                         </div>
                                     </IconContext.Provider>
                                     {this.state.first_refresh === true ? 
-                                        (<p className="mb-2 ml-3"><b>{this.state.blockchain_height.toLocaleString()}</b></p>) : 
+                                        (<h5 className="mb-2 ml-3">
+                                            <b>
+                                                {
+                                                    this.state.wallet_height < this.state.blockchain_height ? 
+                                                    this.state.wallet_height + ' / ' + this.state.blockchain_height : 
+                                                    this.state.blockchain_height.toLocaleString()
+                                                }
+                                            </b>
+                                        </h5>) : 
                                         (<Loader className="ml-3" type="ThreeDots" color="#00BFFF" height={20} width={20} />)
                                     }
                                     
                                 </div>
-
-
-                                {this.state.wallet_height < this.state.blockchain_height ?
-                                    (<p className="mb-2" text-align-center>
-                                        {this.state.wallet_height} / {this.state.blockchain_height}
-                                    </p>) : ''}
+                                
                                 <p className="mb-2 text-align-center">{this.state.connection_status}</p>
 
                             </Col>
