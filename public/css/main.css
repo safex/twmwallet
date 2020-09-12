@@ -5,17 +5,6 @@
         padding: 0;
     }
 
-    table {
-        border-collapse: collapse;
-    }
-
-    td, th {
-        border: 1px solid #999;
-        padding: 0.5rem;
-        text-align: left;
-    }
-
-
     li {
         word-wrap: break-word
     }
@@ -49,6 +38,10 @@
 
     .oflow-y-scroll {
         overflow-y: scroll;
+    }
+
+    .oflow-y-auto {
+        overflow-y: auto;
     }
 
     .overflow-x {
@@ -121,10 +114,18 @@
         display: none;
     }
 
+    .text-align-center {
+        text-align: center!important;
+    }
+
+
 /* Attributes CSS End */
 
 
 /* Colors CSS Start */
+    :root {
+        --safex-cash-green: rgb(38, 232, 185);
+    }
 
     .light-blue-back {
         background-color: rgba(24, 189, 231, 0.5);
@@ -151,7 +152,7 @@
     }
 
     .safex-blue {
-        background-color: rgb(9, 51, 111);
+        background-color: rgb(9, 51, 111)!important;
     }
 
     .white-text {
