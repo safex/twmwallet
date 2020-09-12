@@ -1548,8 +1548,58 @@ class WalletHome extends React.Component {
                             </Col>
 
                             <Col sm={9}>
-                                <Col className="my-4">
+                                <Row className="my-4">
                                     <Carousel className="home-carousel mx-auto">
+                                        <Carousel.Item>
+                                            <img
+                                            className="d-block w-100"
+                                            src={require("./../../img/bike.jpg")}
+                                            alt="First slide"
+                                            />
+                                            <Carousel.Caption>
+                                            <h3>Racing Bike</h3>
+                                            <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+                                            </Carousel.Caption>
+                                        </Carousel.Item>
+                                        <Carousel.Item>
+                                            <img
+                                            className="d-block w-100"
+                                            src={require("./../../img/watch.jpg")}
+                                            alt="Third slide"
+                                            />
+
+                                            <Carousel.Caption>
+                                            <h3>A Pull Watch</h3>
+                                            <p>Better than an Apple watch; a watch you pull.</p>
+                                            </Carousel.Caption>
+                                        </Carousel.Item>
+                                        <Carousel.Item>
+                                            <img
+                                            className="d-block w-100"
+                                            src={require("./../../img/camera.jpg")}
+                                            alt="Third slide"
+                                            />
+
+                                            <Carousel.Caption>
+                                            <h3>Vintage Camera</h3>
+                                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                                            </Carousel.Caption>
+                                        </Carousel.Item>
+                                        <Carousel.Item>
+                                            <img
+                                            className="d-block w-100"
+                                            src={require("./../../img/headphones.jpg")}
+                                            alt="Fourth slide"
+                                            />
+
+                                            <Carousel.Caption>
+                                            <h3>Premium Headphones</h3>
+                                            <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
+                                            </Carousel.Caption>
+                                        </Carousel.Item>
+                                    </Carousel>
+
+                                    <Carousel sm={6} className="home-carousel mx-auto">
                                         <Carousel.Item>
                                             <img
                                             className="d-block w-100"
@@ -1598,7 +1648,7 @@ class WalletHome extends React.Component {
                                             </Carousel.Caption>
                                         </Carousel.Item>
                                     </Carousel>
-                                </Col>
+                                </Row>
 
                                 <Col className="white-text d-flex flex-column justify-content-center align-items-center border border-light b-r10">
                                     <h2>Purchases</h2>
