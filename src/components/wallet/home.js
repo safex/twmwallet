@@ -123,7 +123,9 @@ class WalletHome extends React.Component {
                 wallet_height: wallet.blockchainHeight(),
                 blockchain_height: wallet.daemonBlockchainHeight(),
                 daemon_host: this.props.daemon_host,
-                daemon_port: this.props.daemon_port
+                daemon_port: this.props.daemon_port,
+                password: this.props.password,
+                new_path: this.props.wallet_path
             });
 
             try {
@@ -243,35 +245,15 @@ class WalletHome extends React.Component {
             console.error(`error at getting the staked tokens from the blockchain`);
         }
         try {
-            m_wallet.store((error, result) => {
-                if (error) {
-                    console.error(error);
-                } else {
-                    console.log("wallet stored refresh");
-                    var accs = wallet.getSafexAccounts();
+            m_wallet.store(this.wallet_store_callback);
 
-                    this.setState({
-                        address: m_wallet.address(),
-                        pending_cash: normalize_8decimals(
-                            Math.abs(m_wallet.balance() - m_wallet.unlockedBalance())
-                        ),
-                        synced: m_wallet.synchronized() ? true : false,
-                        wallet_height: wallet.blockchainHeight(),
-                        blockchain_height: wallet.daemonBlockchainHeight(),
-                        cash: normalize_8decimals(m_wallet.unlockedBalance()),
-                        pending_tokens: normalize_8decimals(m_wallet.tokenBalance() - m_wallet.unlockedTokenBalance()),
-                        tokens: normalize_8decimals(m_wallet.unlockedTokenBalance()),
-                        first_refresh: true,
-                        usernames: accs
-                    });
-                }
-            });
 
         } catch (err) {
             console.error(err);
             console.error("error getting height");
         }
     };
+
 
     check = () => {
         console.log(`wallet cash balance ${wallet.balance()}`);
@@ -316,15 +298,41 @@ class WalletHome extends React.Component {
         if (confirmed) {
             wallet.off();
             wallet.rescanBlockchain();
-            wallet.store().then(() => {
-                console.log("wallet stored")
-            }).catch((err) => {
-                console.log("unable to store wallet: " + err)
-            });
+            wallet.store(this.wallet_store_callback);
             wallet.on('refreshed', () => {
                 console.log();
                 this.refresh_action();
             });
+        }
+    };
+
+    wallet_store_callback = async(error, store) =>  {
+        if (error) {
+            console.error(error);
+            console.error(`error at storing the wallet`);
+            alert(`error at storing the wallet`);
+            alert(error);
+        } else {
+           console.log(`wallet stored`);
+           console.log(store);
+
+           console.log("wallet stored refresh");
+           var accs = wallet.getSafexAccounts();
+
+          this.setState({
+               address: wallet.address(),
+               pending_cash: normalize_8decimals(
+                   Math.abs(wallet.balance() - wallet.unlockedBalance())
+               ),
+               synced: wallet.synchronized() ? true : false,
+               wallet_height: wallet.blockchainHeight(),
+               blockchain_height: wallet.daemonBlockchainHeight(),
+               cash: normalize_8decimals(wallet.unlockedBalance()),
+               pending_tokens: normalize_8decimals(wallet.tokenBalance() - wallet.unlockedTokenBalance()),
+               tokens: normalize_8decimals(wallet.unlockedTokenBalance()),
+               first_refresh: true,
+               usernames: accs
+           });
         }
     };
 
@@ -352,8 +360,8 @@ class WalletHome extends React.Component {
 
                 let d_obj = {};
                 d_obj.twm_version = 1;
-                if (vees.avatar.value.length > 0) {
-                    d_obj.avatar = vees.avatar.value;
+                if (vees.new_account_image.value.length > 0) {
+                    d_obj.avatar = vees.new_account_image.value;
                 }
                 if (vees.twitter.value.length > 0) {
                     d_obj.twitter = vees.twitter.value;
@@ -465,8 +473,11 @@ class WalletHome extends React.Component {
             console.log(`after`);
 
             try {
+
+                const crypto = window.require('crypto');
                 const algorithm = 'aes-256-ctr';
-                const cipher = crypto.createCipher(algorithm, this.state.password);
+                console.log(this.state.password);
+                const cipher = crypto.createCipher(algorithm, this.state.password.toString());
                 let crypted = cipher.update(JSON.stringify(twm_file), 'utf8', 'hex');
                 crypted += cipher.final('hex');
 
@@ -831,14 +842,20 @@ class WalletHome extends React.Component {
     };
 
     logout = () => {
-        wallet.close(true)
-            .then(() => {
-                console.log("wallet closed")
-                this.props.history.push({pathname: '/'});
-            })
-            .catch((e) => {
-                console.log("unable to close wallet: " + e)
-            });
+        wallet.close(true, this.logout_callback);
+    };
+
+    logout_callback = async (error, out) => {
+        if (error) {
+            console.error(error);
+            console.error(`error at logging out`);
+            alert(`error at logging out`);
+            alert(error);
+        } else {
+            alert(`until next time :)`);
+            console.log("wallet closed");
+            this.props.history.push({pathname: '/'});
+        }
     };
 
     //close modal of private keys
@@ -1463,7 +1480,7 @@ class WalletHome extends React.Component {
                                 <div className="cash-box p-2 font-size-small">
                                     <h3> Send Safex </h3>
 
-                                    <hr class="border border-light w-100"></hr>
+                                    <hr className="border border-light w-100"></hr>
 
                                     <ul>
                                         <Col>
@@ -2306,8 +2323,6 @@ class WalletHome extends React.Component {
                     });
 
                     var non_listings_table = this.state.non_offers.map((listing, key) => {
-                        console.log(listing);
-
                         try {
                             if (listing.seller === this.state.selected_user.username) {
                                 var data = {};
