@@ -3562,8 +3562,16 @@ class WalletHome extends React.Component {
                                             <h3 className="text-center m-2"> Stake Tokens </h3>
 
                                        <Form id="stake_tokens" onSubmit={this.make_token_stake}>
-                                            Amount (SFT)<Form.Control name="amount" defaultValue="0"
-                                                                    placedholder="The amount to stake"/>
+                                            <Form.Group>
+                                                <Form.Label>Amount (SFT)</Form.Label>
+                                                
+                                                <Form.Control 
+                                                    name="amount" 
+                                                    defaultValue="0"
+                                                    placedholder="The amount to stake"
+                                                />
+                                            </Form.Group>
+                                            
                                             <Form.Group>
                                                 <Form.Label>
                                                     Mixins
@@ -3691,51 +3699,56 @@ class WalletHome extends React.Component {
 
                                             <Form id="unstake_tokens" onSubmit={this.make_token_unstake}>
 
-                                            Amount (SFT) (MAX: {unlocked_tokens.toLocaleString()})<Form.Control name="amount"
-                                                                                            defaultValue="0"
-                                                                                            placedholder="the amount to send"/>
-                                            <Form.Group>
-                                                <Form.Label>
-                                                    Mixins
-                                                    <IconContext.Provider  value={{color: 'white', size: '20px'}}>
-                                                        <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon ml-8 white-text"/>
-                                                        
-                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                            <span>
-                                                                Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                They are combined with yours for private transactions. <br/>
-                                                                Changing this from the default could hurt your privacy. <br/>
-                                                            </span>
-                                                        </ReactTooltip>
-                                                    </IconContext.Provider>
-                                                </Form.Label>
-                                                <Form.Control 
-                                                name="mixins" 
-                                                as="select"
-                                                defaultValue="7"
-                                                >
-                                                    <option>1</option>
-                                                    <option>2</option>
-                                                    <option>3</option>
-                                                    <option>4</option>
-                                                    <option>5</option>
-                                                    <option>6</option>
-                                                    <option>7</option>
-                                                </Form.Control>
-                                            </Form.Group>
-                                            <Button className="mt-2" type="submit" variant="danger" size="lg" block>
-                                                Unstake and Collect
-                                            </Button>
-                                        </Form>
+                                                <Form.Group>
+                                                    <Form.Label>
+                                                        Amount (SFT) (MAX: {unlocked_tokens.toLocaleString()})
+                                                    </Form.Label>
 
-
+                                                    <Form.Control 
+                                                        name="amount"
+                                                        defaultValue="0"
+                                                        placedholder="the amount to send"
+                                                    />
+                                                </Form.Group>
+                                            
+                                            
+                                                <Form.Group>
+                                                    <Form.Label>
+                                                        Mixins
+                                                        <IconContext.Provider  value={{color: 'white', size: '20px'}}>
+                                                            <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon ml-8 white-text"/>
+                                                            
+                                                            <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                                <span>
+                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                    They are combined with yours for private transactions. <br/>
+                                                                    Changing this from the default could hurt your privacy. <br/>
+                                                                </span>
+                                                            </ReactTooltip>
+                                                        </IconContext.Provider>
+                                                    </Form.Label>
+                                                    <Form.Control 
+                                                    name="mixins" 
+                                                    as="select"
+                                                    defaultValue="7"
+                                                    >
+                                                        <option>1</option>
+                                                        <option>2</option>
+                                                        <option>3</option>
+                                                        <option>4</option>
+                                                        <option>5</option>
+                                                        <option>6</option>
+                                                        <option>7</option>
+                                                    </Form.Control>
+                                                </Form.Group>
+                                                <Button className="mt-2" type="submit" variant="danger" size="lg" block>
+                                                    Unstake and Collect
+                                                </Button>
+                                            </Form>
                                         </div>
                                     </div>
-
                                 </Col>
-
                             </div>
-
                         </div>
                     );
                 }
