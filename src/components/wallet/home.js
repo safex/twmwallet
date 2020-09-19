@@ -216,7 +216,7 @@ class WalletHome extends React.Component {
             gst_obj.interval = 0;
             gst_obj.daemon_host = this.state.daemon_host;
             gst_obj.daemon_port = this.state.daemon_port;
-            let gst = await get_staked_tokens(gst_obj);
+            //let gst = await get_staked_tokens(gst_obj);
             try {
                 let height = wallet.daemonBlockchainHeight();
                 console.log(height);
@@ -229,12 +229,28 @@ class WalletHome extends React.Component {
 
                 console.log(`gim object`);
                 console.log(gim_obj);
-                let gim = await get_interest_map(gim_obj);
+                //let gim = await get_interest_map(gim_obj);
 
-                this.setState({
+               /* this.setState({
                     blockchain_tokens_staked: gst.pairs[0].amount / 10000000000,
                     blockchain_interest_history: gim.interest_per_interval.slice(0, 4),
                     blockchain_current_interest: gim.interest_per_interval[4]
+                });*/
+                var accs = wallet.getSafexAccounts();
+
+                this.setState({
+                    address: wallet.address(),
+                    pending_cash: normalize_8decimals(
+                        Math.abs(wallet.balance() - wallet.unlockedBalance())
+                    ),
+                    synced: wallet.synchronized() ? true : false,
+                    wallet_height: wallet.blockchainHeight(),
+                    blockchain_height: wallet.daemonBlockchainHeight(),
+                    cash: normalize_8decimals(wallet.unlockedBalance()),
+                    pending_tokens: normalize_8decimals(wallet.tokenBalance() - wallet.unlockedTokenBalance()),
+                    tokens: normalize_8decimals(wallet.unlockedTokenBalance()),
+                    first_refresh: true,
+                    usernames: accs
                 });
             } catch (err) {
                 console.error(err);
@@ -245,7 +261,7 @@ class WalletHome extends React.Component {
             console.error(`error at getting the staked tokens from the blockchain`);
         }
         try {
-            m_wallet.store(this.wallet_store_callback);
+           m_wallet.store(this.wallet_store_callback);
 
 
         } catch (err) {
@@ -313,26 +329,8 @@ class WalletHome extends React.Component {
             alert(`error at storing the wallet`);
             alert(error);
         } else {
-           console.log(`wallet stored`);
-           console.log(store);
+           console.log("wallet stored callback");
 
-           console.log("wallet stored refresh");
-           var accs = wallet.getSafexAccounts();
-
-          this.setState({
-               address: wallet.address(),
-               pending_cash: normalize_8decimals(
-                   Math.abs(wallet.balance() - wallet.unlockedBalance())
-               ),
-               synced: wallet.synchronized() ? true : false,
-               wallet_height: wallet.blockchainHeight(),
-               blockchain_height: wallet.daemonBlockchainHeight(),
-               cash: normalize_8decimals(wallet.unlockedBalance()),
-               pending_tokens: normalize_8decimals(wallet.tokenBalance() - wallet.unlockedTokenBalance()),
-               tokens: normalize_8decimals(wallet.unlockedTokenBalance()),
-               first_refresh: true,
-               usernames: accs
-           });
         }
     };
 
@@ -441,6 +439,9 @@ class WalletHome extends React.Component {
             if (confirmed_fee) {
 
                 this.setState({create_account_txn_id: txid, create_account_txn_fee: fee});
+                console.log(this.create_account_txn_id);
+                console.log(this.create_account_txn_fee);
+                console.log(`before the crash`);
                 register_txn.commit(this.create_account_commit_callback);
 
             } else {
@@ -653,9 +654,26 @@ class WalletHome extends React.Component {
                             cash_txn_amount: e.target.amount.value,
                             cash_txn_destination: e.target.destination.value.trim()
                         });
-                        send_cash(wallet, e.target.destination.value.trim(), e.target.amount.value, mixins, this.cash_send_first);
-
-
+                        let s_cash = await this.send_cash_async(wallet, e.target.destination.value.trim(), e.target.amount.value, mixins);
+                        console.log(s_cash);
+                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${s_cash.fee() / 10000000000} SFX Safex Cash 
+            sending ${this.state.cash_txn_amount} SFX to ${this.state.cash_txn_destination}`);
+                        let fee = s_cash.fee();
+                        let txid = s_cash.transactionsIds();
+                        if (confirmed_fee) {
+                            try {
+                                this.setState({cash_txn_fee: fee, cash_txn_id: txid});
+                                let final = await this.commit_txn_async(s_cash);
+                                console.log(final);
+                                console.log(`final`);
+                            } catch (err) {
+                                console.error(err);
+                                console.error(`Error at commiting the cash transaction to the blockchain network.`);
+                                alert(`Error at commiting the cash transaction to the blockchain network.`);
+                            }
+                        } else {
+                            alert(`The cash transaction was cancelled.`)
+                        }
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the cash transaction formation it was not commited`);
@@ -672,45 +690,51 @@ class WalletHome extends React.Component {
         }
     };
 
-    cash_send_first = async (error, cash_txn) => {
-        if (error) {
-            console.error(error);
-            console.error(`error at the cash send transaction`);
-            alert(`error at the the cash send transaction`);
-            alert(error);
-        } else {
-            let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${cash_txn.fee() / 10000000000} SFX Safex Cash 
-            sending ${this.state.cash_txn_amount} SFX to ${this.state.cash_txn_destination}`);
-            let fee = cash_txn.fee();
-            let txid = cash_txn.transactionsIds();
-            if (confirmed_fee) {
-                try {
-                    this.setState({cash_txn_fee: fee, cash_txn_id: txid});
-                    cash_txn.commit(this.commit_cash_txn_callback);
-
-                } catch (err) {
-                    console.error(err);
-                    console.error(`Error at commiting the cash transaction to the blockchain network.`);
-                    alert(`Error at commiting the cash transaction to the blockchain network.`);
-                }
-            } else {
-                alert(`The cash transaction was cancelled.`)
+    //SFXszkSYo4oH3iURSzYMxfaZkU8GFd3JHSRgoSrqkDUMMHNsv3iP6gGCAAerXJpUwtE18coAdnDY9WCWRkv27p5tKYcQgyrMxJT
+    send_cash_async = async (wallet, destination, amount, mixins) => {
+        return new Promise((resolve, reject) => {
+            try {
+                send_cash(wallet, destination, amount, mixins, (err, res) => {
+                    if (err) {
+                        console.error(err);
+                        console.error(`error at the cash send transaction`);
+                        alert(`error at the the cash send transaction`);
+                        alert(err);
+                        reject(err);
+                    } else {
+                        resolve(res);
+                    }
+                });
             }
-        }
+            catch (err) {
+                reject(err);
+            }
+        });
     };
 
-    commit_cash_txn_callback = async (error, txn) => {
-        if (error) {
-            console.error(error);
-            console.error(`error at committing the cash transaction`);
-            alert(`error at the cash transaction`);
-            alert(error);
-        } else {
-            alert(`cash transaction successfully submitted 
+    commit_txn_async = (txn) => {
+        return new Promise((resolve, reject) => {
+            try {
+                txn.commit((err, res) => {
+                    if (err) {
+                        console.error(err);
+                        console.error(`error at committing the cash transaction`);
+                        alert(`error at the cash transaction`);
+                        alert(err);
+                        reject(err);
+                    } else {
+                        alert(`cash transaction successfully submitted 
                                         transaction id: ${this.state.cash_txn_id}
                                         amount: ${this.state.cash_txn_amount}
                                         fee: ${this.state.cash_txn_fee / 10000000000}`);
-        }
+                        resolve(res);
+                    }
+                });
+            }
+            catch (err) {
+                reject(err);
+            }
+        });
     };
 
     //view shifting
@@ -1189,6 +1213,7 @@ class WalletHome extends React.Component {
             };
             const key = await openpgp.generateKey(options);
             let keys = nacl.sign.keyPair.fromSecretKey(Buffer.from(this.state.usernames[0].privateKey));
+
             console.log(keys);
 
             console.log(key);
@@ -2621,12 +2646,9 @@ class WalletHome extends React.Component {
                         }
                     });
                     var accounts_table = this.state.usernames.map((user, key) => {
-                        console.log(user);
-                        console.log(key);
                         let avatar = '';
                         try {
                             if (user.data.length > 0) {
-                                console.log(`user data is longer than my friend`)
                                 let usee_d = JSON.parse(user.data);
 
                                 if (usee_d.twm_version === 1) {
