@@ -1109,7 +1109,25 @@ class WalletHome extends React.Component {
                 if (confirmed) {
                     try {
                         this.setState({stake_txn_amount: e.target.amount.value});
-                        stake_tokens(wallet, e.target.amount.value, mixins, this.stake_first_callback);
+
+                        let staked_token = await this.token_stake_async(wallet, e.target.amount.value, mixins);
+                        let confirmed_fee = window.confirm(`the network fee to stake ${this.state.stake_txn_amount} SFT will be:  ${staked_token.fee() / 10000000000} SFX Safex Cash`);
+                        let fee = staked_token.fee();
+                        let txid = staked_token.transactionsIds();
+                        this.setState({stake_txn_id: txid, stake_txn_fee: fee});
+                        if (confirmed_fee) {
+                            try {
+                                let commit_stake = await this.commit_token_stake_txn_async(staked_token);
+
+                            } catch(err) {
+                                console.error(err);
+                                console.error(`error at the token stake committing`);
+                            }
+
+                        } else {
+                            console.log("token staking transaction cancelled");
+                        }
+
 
                     } catch (err) {
                         console.error(err);
@@ -1127,40 +1145,50 @@ class WalletHome extends React.Component {
         }
     };
 
-    stake_first_callback = async (error, stake_txn) => {
-        if (error) {
-            console.error(error);
-            console.error(`error at first call back stake token txn`);
-            alert(`error at the first call back stake token txn`);
-            alert(error);
-        } else {
-            let confirmed_fee = window.confirm(`the network fee to stake ${this.state.stake_txn_amount} SFT will be:  ${stake_txn.fee() / 10000000000} SFX Safex Cash`);
-            let fee = stake_txn.fee();
-            let txid = stake_txn.transactionsIds();
-            this.setState({stake_txn_id: txid, stake_txn_fee: fee});
-            if (confirmed_fee) {
-                console.log(stake_txn);
-                stake_txn.commit(this.stake_commit_callback);
-            } else {
-                console.log("token staking transaction cancelled");
+    token_stake_async = async (wallet, amount, mixins) => {
+        return new Promise((resolve, reject) => {
+            try {
+                stake_tokens(wallet, amount, mixins, (err, res) => {
+                    if (err) {
+                        console.error(err);
+                        console.error(`error at first call back stake token txn`);
+                        alert(`error at the first call back stake token txn`);
+                        alert(err);
+                        reject(err);
+                    } else {
+                        resolve(res);
+                    }
+                });
+            } catch (err) {
+                reject(err);
             }
-        }
+        });
     };
 
-    stake_commit_callback = async (error, txn) => {
-        if (error) {
-            console.error(error);
-            console.error(`error at committing the stake token transaction`);
-            alert(`error at committing the stake token transaction`);
-            alert(error);
-        } else {
-            alert(`token staking transaction successfully submitted 
+    commit_token_stake_txn_async = (txn) => {
+        return new Promise((resolve, reject) => {
+            try {
+                txn.commit((err, res) => {
+                    if (err) {
+                        console.error(err);
+                        console.error(`error at committing the stake token transaction`);
+                        alert(`error at committing the stake token transaction`);
+                        alert(err);
+                        reject(err);
+                    } else {
+                        alert(`token staking transaction successfully submitted 
                                         transaction id: ${this.state.stake_txn_id}
                                         staking ${this.state.stake_txn_amount} SFT
                                         fee: ${this.state.stake_txn_fee / 10000000000} SFX`);
 
-            this.setState({stake_txn_id: '', stake_txn_fee: 0, stake_txn_amount: 0});
-        }
+                        this.setState({stake_txn_id: '', stake_txn_fee: 0, stake_txn_amount: 0});
+                        resolve(res);
+                    }
+                });
+            } catch (err) {
+                reject(err);
+            }
+        });
     };
 
     make_token_unstake = async (e) => {
