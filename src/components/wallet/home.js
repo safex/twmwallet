@@ -616,8 +616,8 @@ class WalletHome extends React.Component {
                         }
                     } catch (err) {
                         console.error(err);
-                        console.error(`error at the token transaction formation it was not commited`);
-                        alert(`error at the token transaction formation it was not commited`);
+                        console.error(`error at the token transaction formation it was not committed`);
+                        alert(`error at the token transaction formation it was not committed`);
                     }
                 }
             }
@@ -703,16 +703,16 @@ class WalletHome extends React.Component {
                                 console.log(`final`);
                             } catch (err) {
                                 console.error(err);
-                                console.error(`Error at commiting the cash transaction to the blockchain network.`);
-                                alert(`Error at commiting the cash transaction to the blockchain network.`);
+                                console.error(`Error at committing the cash transaction to the blockchain network.`);
+                                alert(`Error at committing the cash transaction to the blockchain network.`);
                             }
                         } else {
                             alert(`The cash transaction was cancelled.`)
                         }
                     } catch (err) {
                         console.error(err);
-                        console.error(`error at the cash transaction formation it was not commited`);
-                        alert(`error at the cash transaction formation it was not commited`);
+                        console.error(`error at the cash transaction formation it was not committed`);
+                        alert(`error at the cash transaction formation it was not committed`);
                     }
                 }
             }
@@ -983,7 +983,7 @@ class WalletHome extends React.Component {
         console.log(index);
     };
 
-    list_new_offer = (e) => {
+    list_new_offer = async (e) => {
         e.preventDefault();
         e.persist();
         console.log(`let's list the offer it`);
@@ -1021,59 +1021,82 @@ class WalletHome extends React.Component {
         try {
             let mixins = e.target.mixins.value - 1;
             this.setState({create_offer_txn_title: e.target.title.value});
-            create_offer(wallet,
+            let create_offer_tx = await this.list_offer_async(wallet,
                 e.target.username.value,
                 e.target.title.value,
                 e.target.price.value,
                 e.target.quantity.value,
                 JSON.stringify(o_obj),
-                mixins, this.create_offer_first_callback);
+                mixins);
+            console.log(create_offer_tx);
+            let confirmed_fee = window.confirm(`The fee will be:  ${create_offer_tx.fee() / 10000000000} SFX
+            to list ${this.state.create_offer_txn_title.toUpperCase()}. Clicking OK will confirm this transaction`);
+            let fee = create_offer_tx.fee();
+            let txid = create_offer_tx.transactionsIds();
+            if (confirmed_fee) {
+                this.setState({create_offer_txn_fee: fee, create_offer_txn_id: txid});
+                try {
+                    let commit_create_offer = await this.commit_list_offer_txn_async(create_offer_tx);
+                } catch (error) {
+                    console.error(error);
+                    console.error(`error at committing the offer listing`);
+                }
+            } else {
+                alert(`Your transaction was cancelled, the listing for ${this.state.create_offer_txn_title.toUpperCase()} was cancelled`);
+                this.setState({create_offer_txn_title: '', create_offer_txn_id: '', create_offer_txn_fee: 0})
+            }
         } catch (err) {
             console.error(err);
             console.error("Error at listing the offer.");
         }
     };
 
-    create_offer_first_callback = async (error, create_offer_txn) => {
-        if (error) {
-            console.error(error);
-            console.error(`Error at first callback create new offer transaction`);
-            alert(`Error at first call back create new offer transaction`);
-            alert(error);
-        } else {
-            console.log(create_offer_txn);
-            let confirmed_fee = window.confirm(`The fee will be:  ${create_offer_txn.fee() / 10000000000} SFX
-            to list ${this.state.create_offer_txn_title.toUpperCase()}. Clicking OK will confirm this transaction`);
-            let fee = create_offer_txn.fee();
-            let txid = create_offer_txn.transactionsIds();
-            if (confirmed_fee) {
-                this.setState({create_offer_txn_fee: fee, create_offer_txn_id: txid});
-                create_offer_txn.commit(this.create_offer_commit_callback)
-            } else {
-                alert(`Your transaction was cancelled, the listing for ${this.state.create_offer_txn_title.toUpperCase()} was cancelled`);
-                this.setState({create_offer_txn_title: '', create_offer_txn_id: '', create_offer_txn_fee: 0})
+    list_offer_async = async (wallet, username, title, price, quantity, data, mixins) => {
+        return new Promise((resolve, reject) => {
+            try {
+                create_offer(wallet, username, title, price, quantity, data, mixins, (err, res) => {
+                    if (err) {
+                        console.error(err);
+                        console.error(`Error at first callback create new offer transaction`);
+                        alert(`Error at first call back create new offer transaction`);
+                        alert(err);
+                        reject(err);
+                    } else {
+                        resolve(res);
+                    }
+                });
+            } catch (err) {
+                reject(err);
             }
-        }
+        });
     };
 
-    create_offer_commit_callback = async (error, txn) => {
-        if (error) {
-            this.setState({create_offer_txn_title: '', create_offer_txn_id: '', create_offer_txn_fee: 0})
-            console.error(error);
-            console.error(`Error at commit callback create new offer transaction`);
-            alert(`Error at commit call back create new offer transaction`);
-            alert(error);
-        } else {
-            console.log("committed create offer transaction");
-            alert(`Transaction listing ${this.state.create_offer_txn_title.toUpperCase()} successfully submitted.  
+    commit_list_offer_txn_async = (txn) => {
+        return new Promise((resolve, reject) => {
+            try {
+                txn.commit((err, res) => {
+                    if (err) {
+                        this.setState({create_offer_txn_title: '', create_offer_txn_id: '', create_offer_txn_fee: 0})
+                        console.error(err);
+                        console.error(`Error at commit callback create new offer transaction`);
+                        alert(`Error at commit call back create new offer transaction`);
+                        alert(err);
+                        reject(err);
+                    } else {
+                        console.log("committed create offer transaction");
+                        alert(`Transaction listing ${this.state.create_offer_txn_title.toUpperCase()} successfully submitted.  
                         Transaction ID: ${this.state.create_offer_txn_id}
                         Fee: ${this.state.create_offer_txn_fee / 10000000000} SFX`);
 
-            this.handleCloseNewOfferForm()
-        }
-
+                        this.handleCloseNewOfferForm();
+                        resolve(res);
+                    }
+                });
+            } catch (err) {
+                reject(err);
+            }
+        });
     };
-
 
     make_token_stake = async (e) => {
         e.preventDefault();
