@@ -41,6 +41,7 @@ export async function save_twm_file(filepath, content, password, hash1) {
 export async function open_twm_file(filepath, password) {
     try {
         let twm_file = await fs.readFile(filepath);
+        console.log(`read the file to open ${filepath}`);
         const algorithm = 'aes-256-ctr';
 
         const decipher = crypto.createDecipher(algorithm, password);
