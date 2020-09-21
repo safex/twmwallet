@@ -1202,7 +1202,26 @@ class WalletHome extends React.Component {
                 if (confirmed) {
                     try {
                         this.setState({unstake_txn_amount: e.target.amount.value});
-                        unstake_tokens(wallet, e.target.amount.value, mixins, this.unstake_first_callback);
+                        let unstaked = await this.token_unstake_async(wallet, e.target.amount.value, mixins);
+                        let confirmed_fee = window.confirm(`the network fee to unstake ${this.state.unstake_txn_amount} SFT will be:  ${unstaked.fee() / 10000000000} SFX Safex Cash`);
+                        let fee = unstaked.fee();
+                        let txid = unstaked.transactionsIds();
+                        if (confirmed_fee) {
+                            try {
+                                this.setState({unstake_txn_id: txid, unstake_txn_fee: fee});
+                                let commit_unstake = await this.commit_token_unstake_txn_async(unstaked);
+
+                                console.log(`unstake committed`);
+
+                            } catch (err) {
+                                console.error(err);
+                                console.error(`error when trying to commit the token unstaking transaction to the blockchain`);
+                                alert(`error when trying to commit the token unstaking transaction to the blockchain`);
+                            }
+                        } else {
+                            console.log("token staking transaction cancelled");
+                        }
+
 
                     } catch (err) {
                         console.error(err);
@@ -1220,47 +1239,49 @@ class WalletHome extends React.Component {
         }
     };
 
-    unstake_first_callback = async (error, unstake_txn) => {
-        if (error) {
-            console.error(error);
-            console.error(`error at the unstake first callback`);
-            alert(`error at the unstake first callback`);
-            alert(error);
-        } else {
-            let confirmed_fee = window.confirm(`the network fee to unstake ${this.state.unstake_txn_amount} SFT will be:  ${unstake_txn.fee() / 10000000000} SFX Safex Cash`);
-            let fee = unstake_txn.fee();
-            let txid = unstake_txn.transactionsIds();
-            if (confirmed_fee) {
-                try {
-                    this.setState({unstake_txn_id: txid, unstake_txn_fee: fee});
-                    unstake_txn.commit(this.unstake_commit_callback);
-
-
-                } catch (err) {
-                    console.error(err);
-                    console.error(`error when trying to commit the token unstaking transaction to the blockchain`);
-                    alert(`error when trying to commit the token unstaking transaction to the blockchain`);
-                }
-            } else {
-                console.log("token staking transaction cancelled");
+    token_unstake_async = async (wallet, amount, mixins) => {
+        return new Promise((resolve, reject) => {
+            try {
+                unstake_tokens(wallet, amount, mixins, (err, res) => {
+                    if (err) {
+                        console.error(err);
+                        console.error(`error at the unstake first callback`);
+                        alert(`error at the unstake first callback`);
+                        alert(err);
+                        reject(err);
+                    } else {
+                        resolve(res);
+                    }
+                });
+            } catch (err) {
+                reject(err);
             }
-        }
+        });
     };
 
-    unstake_commit_callback = async (error, txn) => {
-        if (error) {
-            console.error(error);
-            console.error(`error at the unstake commit callback`);
-            alert(`error at the unstake commit callback`);
-            alert(error);
-        } else {
-            alert(`token unstake transaction committed  
+    commit_token_unstake_txn_async = (txn) => {
+        return new Promise((resolve, reject) => {
+            try {
+                txn.commit((err, res) => {
+                    if (err) {
+                        console.error(err);
+                        console.error(`error at the unstake commit callback`);
+                        alert(`error at the unstake commit callback`);
+                        alert(err);
+                        reject(err);
+                    } else {
+                        alert(`token unstake transaction committed  
                                         transaction id: ${this.state.unstake_txn_id}
                                         amount: ${this.state.unstake_txn_amount} SFT
                                         fee: ${this.state.unstake_txn_fee / 10000000000} SFX`);
-        }
+                        resolve(res);
+                    }
+                });
+            } catch (err) {
+                reject(err);
+            }
+        });
     };
-
 
     register_twmapi = async (user, twm_api_url = 'http://127.0.0.1:17700 ') => {
         console.log(user);
