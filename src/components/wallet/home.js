@@ -1119,7 +1119,7 @@ class WalletHome extends React.Component {
                             try {
                                 let commit_stake = await this.commit_token_stake_txn_async(staked_token);
 
-                            } catch(err) {
+                            } catch (err) {
                                 console.error(err);
                                 console.error(`error at the token stake committing`);
                             }
@@ -1393,16 +1393,35 @@ class WalletHome extends React.Component {
                                 purchase_txn_price: listing.price / 10000000000,
                                 purchase_txn_total_cost: total_cost
                             });
-                            purchase_offer(
+
+                            let purchase_txn = await this.purchase_offer_async(
                                 wallet,
                                 total_cost,
                                 listing.offerID,
                                 e.target.quantity.value,
-                                mixins,
-                                this.purchase_first_callback
+                                mixins
                             );
+
+                            let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${purchase_txn.fee() / 10000000000}SFX`);
+                            let fee = purchase_txn.fee();
+                            let txid = purchase_txn.transactionsIds();
+                            if (confirmed_fee) {
+                                try {
+                                    this.setState({purchase_txn_id: txid, purchase_txn_fee: fee});
+                                    let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
+                                    console.log(`purchase transaction committed`);
+                                } catch (err) {
+                                    this.setState({showLoader: false});
+                                    console.error(err);
+                                    console.error(`error when trying to commit the purchase transaction to the blockchain`);
+                                    alert(`error when trying to commit the purchase transaction to the blockchain`);
+                                }
+                            } else {
+                                this.setState({showLoader: false});
+                                console.log("purchase transaction cancelled");
+                            }
                         } catch (err) {
-                            this.setState({showLoader: false})
+                            this.setState({showLoader: false});
                             console.error(err);
                             console.error(`error at the purchase transaction formation it was not commited`);
                             alert(`error at the purchase transaction formation it was not commited`);
@@ -1410,7 +1429,7 @@ class WalletHome extends React.Component {
                     }
                 }
             } catch (err) {
-                this.setState({showLoader: false})
+                this.setState({showLoader: false});
                 console.error(err);
                 if (err.toString().startsWith('not enough outputs')) {
                     alert(`Choose fewer mixins`);
@@ -1420,57 +1439,59 @@ class WalletHome extends React.Component {
         }
     };
 
-    purchase_first_callback = async (error, purchase_txn) => {
-        if (error) {
-            this.setState({showLoader: false})
-            console.error(error);
-            console.error(`error at the first call back purchase txn`);
-            alert(`error at the first call back purchase txn`);
-            alert(error);
-        } else {
-            let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${purchase_txn.fee() / 10000000000}SFX`);
-            let fee = purchase_txn.fee();
-            let txid = purchase_txn.transactionsIds();
-            if (confirmed_fee) {
-                try {
-                    this.setState({purchase_txn_id: txid, purchase_txn_fee: fee});
-                    purchase_txn.commit(this.purchase_commit_callback);
-
-                } catch (err) {
-                    this.setState({showLoader: false})
-                    console.error(err);
-                    console.error(`error when trying to commit the purchase transaction to the blockchain`);
-                    alert(`error when trying to commit the purchase transaction to the blockchain`);
-                }
-            } else {
-                this.setState({showLoader: false})
-                console.log("purchase transaction cancelled");
+    purchase_offer_async = async (wallet, the_cost, offer_id, quantity, mixins) => {
+        return new Promise((resolve, reject) => {
+            try {
+                purchase_offer(wallet, the_cost, offer_id, quantity, mixins, (err, res) => {
+                    if (err) {
+                        this.setState({showLoader: false});
+                        console.error(err);
+                        console.error(`error at the first call back purchase txn`);
+                        alert(`error at the first call back purchase txn`);
+                        alert(err);
+                        reject(err);
+                    } else {
+                        resolve(res);
+                    }
+                });
+            } catch (err) {
+                reject(err);
             }
-        }
+        });
     };
 
-    purchase_commit_callback = async (error, txn) => {
-        if (error) {
-            this.setState({showLoader: false})
-            console.error(error);
-            console.error(`error at the purchase commit callback`);
-            alert(`error at the purchase commit callback`);
-            alert(error);
-        } else {
-            this.setState({showLoader: false})
-            copy(`https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`)
-            alert(
-                `Purchase transaction committed.
-                    Transaction ID: ${this.state.purchase_txn_id}
-                    Amount: ${this.state.purchase_txn_quantity} X ${this.state.purchase_txn_title}
-                    Price: ${this.state.purchase_txn_price} SFX
-                    Network Fee: ${this.state.purchase_txn_fee / 10000000000} SFX
-                    A link to this transaction on the Safex Block Explorer has been copied to your clipboard 
-                    https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`
-            );
+    commit_purchase_offer_async = (txn) => {
+        return new Promise((resolve, reject) => {
+            try {
+                txn.commit((err, res) => {
+                    if (err) {
+                        this.setState({showLoader: false});
+                        console.error(err);
+                        console.error(`error at the purchase commit callback`);
+                        alert(`error at the purchase commit callback`);
+                        alert(err);
+                        reject(err);
+                    } else {
+                        this.setState({showLoader: false});
+                        copy(`https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`);
+                        alert(
+                            `Purchase transaction committed.
+                            Transaction ID: ${this.state.purchase_txn_id}
+                            Amount: ${this.state.purchase_txn_quantity} X ${this.state.purchase_txn_title}
+                            Price: ${this.state.purchase_txn_price} SFX
+                            Network Fee: ${this.state.purchase_txn_fee / 10000000000} SFX
+                            A link to this transaction on the Safex Block Explorer has been copied to your clipboard 
+                            https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`
+                        );
 
-            this.handleClosePurchaseForm()
-        }
+                        this.handleClosePurchaseForm();
+                        resolve(res);
+                    }
+                });
+            } catch (err) {
+                reject(err);
+            }
+        });
     };
 
     copyAddressToClipboard = () => {
@@ -1481,8 +1502,7 @@ class WalletHome extends React.Component {
     copyOfferToClipboard = (offerID) => {
         copy(this.state.show_purchase_offer.offerID);
         alert('Copied offer ID to clipboard');
-    }
-
+    };
 
     make_edit_offer = async (e) => {
         e.preventDefault();
