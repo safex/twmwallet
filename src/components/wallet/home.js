@@ -74,6 +74,7 @@ class WalletHome extends React.Component {
             show_purchase_form: false,
             show_edit_offer_form: false,
             show_edit_account_form: false,
+            show_purchase_confirm_modal: false,
             blockchain_tokens_staked: 0,
             blockchain_interest_history: [],
             blockchain_current_interest: {},
@@ -416,7 +417,7 @@ class WalletHome extends React.Component {
                     create_account(wallet, e.target.username.value, mixins, this.create_account_first_callback);
 
                 } else {
-                    alert(`not enough tokens, an issue making an account`);
+                    alert(`Not enough tokens for making an account`);
                 }
 
             } catch (err) {
@@ -849,10 +850,10 @@ class WalletHome extends React.Component {
         if (error) {
             console.error(error);
             console.error(`error at logging out`);
-            alert(`error at logging out`);
+            alert(`Error logging out`);
             alert(error);
         } else {
-            alert(`until next time :)`);
+            alert(`Until next time :)`);
             console.log("wallet closed");
             this.props.history.push({pathname: '/'});
         }
@@ -892,6 +893,12 @@ class WalletHome extends React.Component {
     //show modal of Purchase Form
     handleShowPurchaseForm = (listing, data) => {
         this.setState({show_purchase_form: true, show_purchase_offer: listing, show_purchase_offer_data: data});
+    };
+
+    // Show order confirmed modal
+   
+     handleConfirmationModal = () => {
+        this.setState({show_purchase_confirm_modal: !this.state.show_purchase_confirm_modal});
     };
 
     //show modal of new account
@@ -1327,9 +1334,9 @@ class WalletHome extends React.Component {
             alert(`error at the purchase commit callback`);
             alert(error);
         } else {
-            this.setState({showLoader: false})
-            copy(`https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`)
-            alert(
+            this.setState({showLoader: false, show_purchase_confirm_modal: true})
+           
+            /*alert(
                     `Purchase transaction committed.
                     Transaction ID: ${this.state.purchase_txn_id}
                     Amount: ${this.state.purchase_txn_quantity} X ${this.state.purchase_txn_title}
@@ -1338,9 +1345,10 @@ class WalletHome extends React.Component {
                     A link to this transaction on the Safex Block Explorer has been copied to your clipboard 
                     https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`
                 );
-                
-                this.handleClosePurchaseForm()
-            }
+              */  
+            this.handleClosePurchaseForm()
+            
+        }
     };
 
     copyAddressToClipboard = () => {
@@ -1348,9 +1356,14 @@ class WalletHome extends React.Component {
         alert('Copied address!');
     };
 
-    copyOfferToClipboard = (offerID) => {
+    copyOfferToClipboard = () => {
         copy(this.state.show_purchase_offer.offerID); 
-        alert('Copied offer ID to clipboard');
+        alert('Copied offer ID!');
+    }
+
+    copyOrderToClipboard = () => {
+        copy(this.state.this.state.purchase_txn_id); 
+        alert('Copied offer ID!');
     }
 
 
@@ -1874,7 +1887,7 @@ class WalletHome extends React.Component {
                                                                 <FaCopy
                                                                     className="ml-4" 
                                                                     data-tip data-for='copyIDInfo'
-                                                                    onClick={this.copyOfferToClipboard(this.state.show_purchase_offer.offerID)}
+                                                                    onClick={this.copyOfferToClipboard}
                                                                 />
 
                                                                 <ReactTooltip id='copyIDInfo' type='info' effect='solid'>
@@ -2006,6 +2019,42 @@ class WalletHome extends React.Component {
                                             Close
                                         </Button>
                                     </Modal.Footer>
+                                </Modal>
+
+                                <Modal className="purchase-offer-modal text-align-center" animation={false}
+                                       centered
+                                       show={this.state.show_purchase_confirm_modal}
+                                       onHide={this.handleConfirmationModal}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>
+                                            Purchase Confirmed: {this.state.show_purchase_offer.title.toUpperCase()}
+                                        </Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>
+                                            <ul>
+                                                <li>Purchase transaction committed.</li>
+                                                <li>Transaction ID: ${this.state.purchase_txn_id}</li>
+                                                <li>Amount: ${this.state.purchase_txn_quantity} X ${this.state.purchase_txn_title}</li>
+                                                <li>Price: ${this.state.purchase_txn_price} SFX</li>
+                                                <li>
+                                                    Network Fee: ${this.state.purchase_txn_fee / 10000000000} SFX
+                                                    <IconContext.Provider  value={{color: 'black', size: '20px'}}>
+                                                        <FaCopy 
+                                                            className="ml-4"
+                                                            data-tip data-for='copyIDInfo1'
+                                                            onClick={this.copyOrderToClipboard}
+                                                        />
+
+                                                        <ReactTooltip id='copyIDInfo1' type='info' effect='solid'>
+                                                            <span>
+                                                                Copy Offer ID
+                                                            </span>
+                                                        </ReactTooltip>
+                                                    </IconContext.Provider>
+                                                </li>
+                                            </ul>
+                                    </Modal.Body>
+
                                 </Modal>
 
                         <Row className="justify-content-between align-items-center">
@@ -3185,7 +3234,7 @@ class WalletHome extends React.Component {
 
                                     </Row>
 
-                                    {/*<Col lg className="merchant-product-view b-r10 px-3 pb-5 opaque-black no-gutters mt-5">
+                                    <Col lg className="merchant-product-view b-r10 px-3 pb-5 opaque-black no-gutters mt-5">
                                         {selected !== void (0) ? (
                                             <div className="pt-5 align-items-center sticky safex-cash-green d-flex flex-column">
                                                 <div>
@@ -3431,7 +3480,7 @@ class WalletHome extends React.Component {
                                                 </tbody>
                                             </Table>
                                         </Row>
-                                    </Col>*/}
+                                    </Col>
                                 </Col>
                             </Row>);
                     } catch (err) {
@@ -3459,7 +3508,7 @@ class WalletHome extends React.Component {
                     }
                     return (
                         <div
-                            className="wallet no-gutters flex-column border-bottom border-white b-r10 oflow-y-scroll">
+                            className="wallet no-gutters blue-gradient-back flex-column border-bottom border-white b-r10 oflow-y-scroll">
 
                             <h1 className="text-center m-2"> Token Management </h1>
 
@@ -3547,7 +3596,7 @@ class WalletHome extends React.Component {
 
                                 <div className="vl"></div>
 
-                                <Col sm={8} className="no-gutters pt-3 b-r10 opaque-black">
+                                <Col sm={8} className="blue-gradient-back no-gutters pt-3 b-r10 opaque-black">
                                     
                                     <div className="staking-table mt-2 rounded grey-back">
 
