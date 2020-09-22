@@ -1571,6 +1571,61 @@ class WalletHome extends React.Component {
         }
     };
 
+    edit_offer_async = async (wallet, the_cost, offer_id, quantity, mixins) => {
+        return new Promise((resolve, reject) => {
+            try {
+                purchase_offer(wallet, the_cost, offer_id, quantity, mixins, (err, res) => {
+                    if (err) {
+                        this.setState({showLoader: false});
+                        console.error(err);
+                        console.error(`error at the first call back purchase txn`);
+                        alert(`error at the first call back purchase txn`);
+                        alert(err);
+                        reject(err);
+                    } else {
+                        resolve(res);
+                    }
+                });
+            } catch (err) {
+                reject(err);
+            }
+        });
+    };
+
+    commit_edit_offer_async = (txn) => {
+        return new Promise((resolve, reject) => {
+            try {
+                txn.commit((err, res) => {
+                    if (err) {
+                        this.setState({showLoader: false});
+                        console.error(err);
+                        console.error(`error at the purchase commit callback`);
+                        alert(`error at the purchase commit callback`);
+                        alert(err);
+                        reject(err);
+                    } else {
+                        this.setState({showLoader: false});
+                        copy(`https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`);
+                        alert(
+                            `Purchase transaction committed.
+                            Transaction ID: ${this.state.purchase_txn_id}
+                            Amount: ${this.state.purchase_txn_quantity} X ${this.state.purchase_txn_title}
+                            Price: ${this.state.purchase_txn_price} SFX
+                            Network Fee: ${this.state.purchase_txn_fee / 10000000000} SFX
+                            A link to this transaction on the Safex Block Explorer has been copied to your clipboard 
+                            https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`
+                        );
+
+                        this.handleClosePurchaseForm();
+                        resolve(res);
+                    }
+                });
+            } catch (err) {
+                reject(err);
+            }
+        });
+    };
+
     edit_offer_first_callback = async (error, edit_offer_txn) => {
         if (error) {
             console.error(error);
