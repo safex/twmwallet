@@ -7,6 +7,12 @@ import {FaBackward} from 'react-icons/fa'
 import WalletHome from "../wallet/home";
 import {open_twm_file, save_twm_file} from "../../utils/twm_actions";
 
+import Loader from 'react-loader-spinner' 
+
+import { FaInfoCircle } from 'react-icons/fa'
+import { IconContext } from 'react-icons'
+import ReactTooltip from "react-tooltip";
+
 const crypto = window.require('crypto');
 
 let {dialog} = window.require("electron").remote;
@@ -25,7 +31,8 @@ export default class CreateWallet extends React.Component {
             network: 'stagenet',
             testnet: false,
             wallet: null,
-            wallet_made: false
+            wallet_made: false,
+            loading: false,
         };
         this.wallet_meta = null;
     }
@@ -80,6 +87,7 @@ export default class CreateWallet extends React.Component {
 
     make_wallet_result = async (error, wallet) => {
         if (error) {
+            this.setState({loading: false})
 
         } else {
             try {
@@ -132,17 +140,20 @@ export default class CreateWallet extends React.Component {
 
                         localStorage.setItem('twm_file', JSON.stringify(twm_file.contents));
                     } catch (err) {
+                        this.setState({loading: false})
                         console.error(err);
                         console.error(`error opening twm file after save to verify`);
                     }
                     console.log(twm_save);
 
                 } catch (err) {
+                    this.setState({loading: false})
                     console.error(err);
                     console.error(`error at initial save of the twm file`);
                 }
-                this.setState({wallet_made: true, wallet: wallet});
+                this.setState({wallet_made: true, wallet: wallet, loading: false});
             } catch (err) {
+                this.setState({loading: false})
                 console.error(err);
                 console.error(`error at open_wallet_result`);
             }
@@ -150,11 +161,13 @@ export default class CreateWallet extends React.Component {
     };
     make_wallet = async (e) => {
         e.preventDefault();
+        this.setState({loading: true})
         try {
             let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
             create_wallet_util(this.state.new_path, this.state.password, 0, this.state.network, daemon_string, this.make_wallet_result);
 
         } catch (err) {
+            this.setState({loading: false})
             console.error(err);
             console.error("error on initial recovery");
         }
@@ -188,9 +201,9 @@ export default class CreateWallet extends React.Component {
 
     render() {
         return (
-            <Container className="height100 d-flex flex-column justify-content-center ">
+            <Container fluid className="height100 d-flex flex-column justify-content-center align-items-center">
                 {this.state.wallet_made ?
-                    (<div>
+                    (<Container fluid className="height100 justify-content-between">
                         <WalletHome
                             wallet={this.state.wallet}
                             daemon_host={this.state.daemon_host}
@@ -198,8 +211,14 @@ export default class CreateWallet extends React.Component {
                             password={this.state.password}
                             wallet_path={this.state.new_path}
                         />
-                    </div>) :
-                    (<Container className="font-size-small b-r25 grey-back d-flex flex-column  white-text">
+                     </Container>) 
+                    :
+                    (<Container 
+                        className={this.state.new_path.length > 0 &&
+                        this.state.daemon_host.length > 0 &&
+                        this.state.password.length > 0 && 
+                        this.state.loading === true ? "display-none"
+                        :"font-size-medium b-r25 grey-back d-flex flex-column white-text"}>
                         <div className="auto_margin_50 my-5 d-flex flex-column">
                             <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward
                                 className="mr-2"/>Go Back</Button>
@@ -228,15 +247,32 @@ export default class CreateWallet extends React.Component {
 
 
                                 {this.state.new_path.length > 0 ?
-                                    (<div></div>) :
+                                    (<div>
+                                        <Col className="d-flex flex-column mb-2 mt-2 border  b-r25">
+                                            <p className="mt-2 mb-2">
+                                                Your new wallet file will be saved
+                                                to: <b><u>{this.state.new_path}</u></b> 
+                                                <br/>
+                                            </p>
+                                            <Button
+                                                className="align-self-center mb-2 mt-2"
+                                                size="lg"
+                                                onClick={this.change_path}
+                                            >
+                                                Change File Location
+                                            </Button>
+
+                                        </Col>
+                                    </div>) :
                                     (
-                                        <div className="mt-2 border   b-r25">
+                                        <div className="mt-2 border b-r25">
                                             <p>
                                                 Set the path where to save your new wallet file
                                             </p>
                                             <Form className="mt-2 mb-2" id="set_path" onSubmit={this.set_path}>
-                                                <Button type="submit" variant="primary" size="lg">Select File
-                                                    Path</Button>
+                                                <Button type="submit" variant="primary" size="lg">
+                                                    Select File Path
+                                                </Button>
                                             </Form>
                                         </div>
                                     )
@@ -247,14 +283,51 @@ export default class CreateWallet extends React.Component {
                                         <Col className="mb-2 mt-2 border  b-r25">
                                             <Form id="set_daemon" className="auto_margin_50"
                                                   onSubmit={this.set_daemon_state}>
-                                                <Form.Control className="mt-2 mb-2" name="daemon_host"
-                                                              defaultValue="stagenetrpc.safex.org"
-                                                              placedholder="set the ip address of the safex blockchain"/>
-                                                <Form.Control className="mt-2 mb-2" name="daemon_port"
-                                                              defaultValue="30393"
-                                                              placedholder="set the port of the safex blockchain"/>
-                                                <Button className="mb-2" type="submit" variant="primary" size="lg">Set
-                                                    Connection</Button>
+                                                <Form.Group>
+                                                    <Form.Label>
+                                                        Daemon Host
+
+                                                        <IconContext.Provider  value={{color: 'white', size: '20px'}}>
+                                                            <FaInfoCircle data-tip data-for='daemonHostInfo' className="blockchain-icon ml-3 white-text"/>
+                                                            
+                                                            <ReactTooltip id='daemonHostInfo' type='info' effect='solid'>
+                                                                <span>
+                                                                    This is the URL used to connect to the Safex blockchain.<br/>
+                                                                    You can use the default provided by the Safex Foundation<br/>
+                                                                    or replace it with your own full node.<br/><br/>
+                                                                    <ul className="mb-4">
+                                                                        <li>The default self hosted wallet setup would be:</li>
+                                                                        <li className="mt-4">HOST: <b>127.0.0.1</b></li>
+                                                                        <li className="mt-1">PORT: <b>17402</b></li>
+                                                                        <li className="mt-2">The default is rpc.safex.org</li>
+                                                                    </ul>
+                                                                </span>
+                                                            </ReactTooltip>
+                                                        </IconContext.Provider>
+                                                    </Form.Label>
+                                                    
+                                                    <Form.Control 
+                                                        className="mt-2 mb-2" 
+                                                        name="daemon_host"
+                                                        defaultValue="stagenetrpc.safex.org"
+                                                        placedholder="set the ip address of the safex blockchain"
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group>
+                                                    <Form.Label>Daemon Port</Form.Label>
+
+                                                    <Form.Control 
+                                                        className="mt-2 mb-2" 
+                                                        name="daemon_port"
+                                                        defaultValue="30393"
+                                                        placedholder="set the port of the safex blockchain"
+                                                    />
+                                                </Form.Group>
+
+                                                <Button className="mb-2" type="submit" variant="primary" size="lg">
+                                                    Set Connection
+                                                </Button>
                                             </Form>
                                         </Col>
                                     ) :
@@ -268,6 +341,7 @@ export default class CreateWallet extends React.Component {
                                             </p>
                                             <Button
                                                 className="align-self-center mb-2 mt-2"
+                                                size="lg"
                                                 onClick={this.change_daemon}>Change Safex Network Connection
                                             </Button>
 
@@ -283,25 +357,47 @@ export default class CreateWallet extends React.Component {
                                     (<Col className="mb-2 mt-2 border  b-r25 ">
                                             <Form id="set_password" className="auto_margin_50"
                                                   onSubmit={this.set_password}>
-                                                <Form.Control name="password" className="mt-2 mb-2" type="password"
-                                                              placedholder="Set the ip address of the Safex blockchain"/>
-                                                <Form.Control name="repeat_password" className="mt-2 mb-2"
-                                                              type="password"
-                                                              placedholder="Set the port of the Safex blockchain"/>
-                                                <Button type="submit" variant="primary" className="mb-2" size="lg"
-                                                        block>Set
-                                                    Password</Button>
+                                                <Form.Group>
+                                                    <Form.Label>
+                                                        Choose A Password
+                                                    </Form.Label>
+
+                                                    <Form.Control 
+                                                        type="password"
+                                                        name="password" 
+                                                        className="mt-2 mb-2 black-text" 
+                                                        placedholder="Choose A Password"
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group>
+                                                    <Form.Label>Confirm Your Password</Form.Label>
+
+                                                    <Form.Control 
+                                                        name="repeat_password" 
+                                                        className="mt-2 mb-2"
+                                                        type="password"
+                                                        placedholder="Confirm Your Password"
+                                                    />
+                                                </Form.Group>
+                                                
+                                                
+                                                <Button type="submit" variant="primary" className="mb-2" size="lg" block>
+                                                    Set Password
+                                                </Button>
                                             </Form>
                                         </Col>
 
                                     ) :
                                     (
-                                        <Col className="d-flex flex-column mb-5 border  b-r25">
+                                        <Col className={ this.state.password.length < 1 ? "display-none" : "d-flex flex-column mb-5 border b-r25"}>
+                                                
                                             <p className="mt-2 mb-2">
                                                 Your chosen password
                                                 is: {[...Array(this.state.password.length)].map(() =>
                                                 <span>♦</span>)}
                                             </p>
+                                            
                                             <Row className="align-self-center mt-2 mb-2">
                                                 <Button className="mt-2 mr-2"
                                                         onClick={this.show_password}>Show Password</Button>
@@ -341,6 +437,24 @@ export default class CreateWallet extends React.Component {
                         </div>
                     </Container>)
                 }
+                {this.state.new_path.length > 0 &&
+                            this.state.daemon_host.length > 0 &&
+                            this.state.wallet_made === false &&
+                            this.state.password.length > 0 &&
+                            this.state.loading === true ?
+                            
+                                (
+                                <Loader 
+                                    className="justify-content-center align-content-center" 
+                                    type="TailSpin"
+                                    color="#00BFFF"
+                                    height={100}
+                                    width={100}
+                                />
+                                ) :
+                                (<div>
+                                </div>)
+                            }
             </Container>
         );
     }
