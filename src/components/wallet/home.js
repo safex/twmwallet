@@ -74,6 +74,7 @@ class WalletHome extends React.Component {
             show_purchase_form: false,
             show_edit_offer_form: false,
             show_edit_account_form: false,
+            show_purchase_confirm_modal: false,
             blockchain_tokens_staked: 0,
             blockchain_interest_history: [],
             blockchain_current_interest: {},
@@ -429,7 +430,7 @@ class WalletHome extends React.Component {
                     }
 
                 } else {
-                    alert(`not enough tokens, an issue making an account`);
+                    alert(`Not enough tokens for making an account`);
                 }
 
             } catch (err) {
@@ -906,10 +907,10 @@ class WalletHome extends React.Component {
         if (error) {
             console.error(error);
             console.error(`error at logging out`);
-            alert(`error at logging out`);
+            alert(`Error logging out`);
             alert(error);
         } else {
-            alert(`until next time :)`);
+            alert(`Until next time :)`);
             console.log("wallet closed");
             this.props.history.push({pathname: '/'});
         }
@@ -949,6 +950,12 @@ class WalletHome extends React.Component {
     //show modal of Purchase Form
     handleShowPurchaseForm = (listing, data) => {
         this.setState({show_purchase_form: true, show_purchase_offer: listing, show_purchase_offer_data: data});
+    };
+
+    // Show order confirmed modal
+   
+     handleConfirmationModal = () => {
+        this.setState({show_purchase_confirm_modal: !this.state.show_purchase_confirm_modal});
     };
 
     //show modal of new account
@@ -1472,9 +1479,9 @@ class WalletHome extends React.Component {
                         alert(err);
                         reject(err);
                     } else {
-                        this.setState({showLoader: false});
+                        this.setState({showLoader: false, show_purchase_confirm_modal: true});
                         copy(`https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`);
-                        alert(
+                        /*alert(
                             `Purchase transaction committed.
                             Transaction ID: ${this.state.purchase_txn_id}
                             Amount: ${this.state.purchase_txn_quantity} X ${this.state.purchase_txn_title}
@@ -1482,7 +1489,7 @@ class WalletHome extends React.Component {
                             Network Fee: ${this.state.purchase_txn_fee / 10000000000} SFX
                             A link to this transaction on the Safex Block Explorer has been copied to your clipboard 
                             https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`
-                        );
+                        );*/
 
                         this.handleClosePurchaseForm();
                         resolve(res);
@@ -1499,10 +1506,17 @@ class WalletHome extends React.Component {
         alert('Copied address!');
     };
 
-    copyOfferToClipboard = (offerID) => {
-        copy(this.state.show_purchase_offer.offerID);
-        alert('Copied offer ID to clipboard');
-    };
+    copyOfferToClipboard = () => {
+        copy(this.state.show_purchase_offer.offerID); 
+        alert('Copied offer ID!');
+    }
+
+    copyOrderToClipboard = () => {
+        copy(this.state.this.state.purchase_txn_id); 
+        alert('Copied offer ID!');
+    }
+
+
 
     make_edit_offer = async (e) => {
         e.preventDefault();
@@ -2083,7 +2097,7 @@ class WalletHome extends React.Component {
                                                                 <FaCopy
                                                                     className="ml-4"
                                                                     data-tip data-for='copyIDInfo'
-                                                                    onClick={this.copyOfferToClipboard(this.state.show_purchase_offer.offerID)}
+                                                                    onClick={this.copyOfferToClipboard}
                                                                 />
 
                                                                 <ReactTooltip id='copyIDInfo' type='info'
@@ -2220,7 +2234,43 @@ class WalletHome extends React.Component {
                                     </Modal.Footer>
                                 </Modal>
 
-                                <Row className="justify-content-between align-items-center">
+                                <Modal className="purchase-offer-modal text-align-center" animation={false}
+                                       centered
+                                       show={this.state.show_purchase_confirm_modal}
+                                       onHide={this.handleConfirmationModal}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>
+                                            Purchase Confirmed: {this.state.show_purchase_offer.title.toUpperCase()}
+                                        </Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>
+                                            <ul>
+                                                <li>Purchase transaction committed.</li>
+                                                <li>Transaction ID: ${this.state.purchase_txn_id}</li>
+                                                <li>Amount: ${this.state.purchase_txn_quantity} X ${this.state.purchase_txn_title}</li>
+                                                <li>Price: ${this.state.purchase_txn_price} SFX</li>
+                                                <li>
+                                                    Network Fee: ${this.state.purchase_txn_fee / 10000000000} SFX
+                                                    <IconContext.Provider  value={{color: 'black', size: '20px'}}>
+                                                        <FaCopy 
+                                                            className="ml-4"
+                                                            data-tip data-for='copyIDInfo1'
+                                                            onClick={this.copyOrderToClipboard}
+                                                        />
+
+                                                        <ReactTooltip id='copyIDInfo1' type='info' effect='solid'>
+                                                            <span>
+                                                                Copy Offer ID
+                                                            </span>
+                                                        </ReactTooltip>
+                                                    </IconContext.Provider>
+                                                </li>
+                                            </ul>
+                                    </Modal.Body>
+
+                                </Modal>
+
+                        <Row className="justify-content-between align-items-center">
 
                                     <Col sm={2} className="p-1 white-text align-self-center b-r10 light-blue-back">
 
@@ -3432,7 +3482,7 @@ class WalletHome extends React.Component {
 
                                     </Row>
 
-                                    {/*<Col lg className="merchant-product-view b-r10 px-3 pb-5 opaque-black no-gutters mt-5">
+                                    <Col lg className="merchant-product-view b-r10 px-3 pb-5 opaque-black no-gutters mt-5">
                                         {selected !== void (0) ? (
                                             <div className="pt-5 align-items-center sticky safex-cash-green d-flex flex-column">
                                                 <div>
@@ -3678,7 +3728,7 @@ class WalletHome extends React.Component {
                                                 </tbody>
                                             </Table>
                                         </Row>
-                                    </Col>*/}
+                                    </Col>
                                 </Col>
                             </Row>);
                     } catch (err) {
@@ -3706,7 +3756,7 @@ class WalletHome extends React.Component {
                     }
                     return (
                         <div
-                            className="wallet no-gutters flex-column border-bottom border-white b-r10 oflow-y-scroll">
+                            className="wallet no-gutters blue-gradient-back flex-column border-bottom border-white b-r10 oflow-y-scroll">
 
                             <h1 className="text-center m-2"> Token Management </h1>
 
@@ -3795,8 +3845,8 @@ class WalletHome extends React.Component {
 
                                 <div className="vl"></div>
 
-                                <Col sm={8} className="no-gutters pt-3 b-r10 opaque-black">
-
+                                <Col sm={8} className="blue-gradient-back no-gutters pt-3 b-r10 opaque-black">
+                                    
                                     <div className="staking-table mt-2 rounded grey-back">
 
                                         <h2 className="text-center "> Stakes </h2>
@@ -3824,17 +3874,24 @@ class WalletHome extends React.Component {
 
                                             <h3 className="text-center m-2"> Stake Tokens </h3>
 
-                                            <Form id="stake_tokens" onSubmit={this.make_token_stake}>
-                                                Amount (SFT)<Form.Control name="amount" defaultValue="0"
-                                                                          placedholder="The amount to stake"/>
-                                                <Form.Group>
-                                                    <Form.Label>
-                                                        Mixins
-                                                        <IconContext.Provider value={{color: 'white', size: '20px'}}>
-                                                            <FaInfoCircle data-tip data-for='apiInfo'
-                                                                          className="blockchain-icon ml-8 white-text"/>
-
-                                                            <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                       <Form id="stake_tokens" onSubmit={this.make_token_stake}>
+                                            <Form.Group>
+                                                <Form.Label>Amount (SFT)</Form.Label>
+                                                
+                                                <Form.Control 
+                                                    name="amount" 
+                                                    defaultValue="0"
+                                                    placedholder="The amount to stake"
+                                                />
+                                            </Form.Group>
+                                            
+                                            <Form.Group>
+                                                <Form.Label>
+                                                    Mixins
+                                                    <IconContext.Provider  value={{color: 'white', size: '20px'}}>
+                                                        <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon ml-8 white-text"/>
+                                                        
+                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
                                                             <span>
                                                                 Mixins are transactions that have also been sent on the Safex blockchain. <br/>
                                                                 They are combined with yours for private transactions. <br/>
@@ -3957,30 +4014,38 @@ class WalletHome extends React.Component {
 
                                             <Form id="unstake_tokens" onSubmit={this.make_token_unstake}>
 
-                                                Amount (SFT) (MAX: {unlocked_tokens.toLocaleString()})<Form.Control
-                                                name="amount"
-                                                defaultValue="0"
-                                                placedholder="the amount to send"/>
+                                                <Form.Group>
+                                                    <Form.Label>
+                                                        Amount (SFT) (MAX: {unlocked_tokens.toLocaleString()})
+                                                    </Form.Label>
+
+                                                    <Form.Control 
+                                                        name="amount"
+                                                        defaultValue="0"
+                                                        placedholder="the amount to send"
+                                                    />
+                                                </Form.Group>
+                                            
+                                            
                                                 <Form.Group>
                                                     <Form.Label>
                                                         Mixins
-                                                        <IconContext.Provider value={{color: 'white', size: '20px'}}>
-                                                            <FaInfoCircle data-tip data-for='apiInfo'
-                                                                          className="blockchain-icon ml-8 white-text"/>
-
+                                                        <IconContext.Provider  value={{color: 'white', size: '20px'}}>
+                                                            <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon ml-8 white-text"/>
+                                                            
                                                             <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                            <span>
-                                                                Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                They are combined with yours for private transactions. <br/>
-                                                                Changing this from the default could hurt your privacy. <br/>
-                                                            </span>
+                                                                <span>
+                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                    They are combined with yours for private transactions. <br/>
+                                                                    Changing this from the default could hurt your privacy. <br/>
+                                                                </span>
                                                             </ReactTooltip>
                                                         </IconContext.Provider>
                                                     </Form.Label>
-                                                    <Form.Control
-                                                        name="mixins"
-                                                        as="select"
-                                                        defaultValue="7"
+                                                    <Form.Control 
+                                                    name="mixins" 
+                                                    as="select"
+                                                    defaultValue="7"
                                                     >
                                                         <option>1</option>
                                                         <option>2</option>
@@ -3995,15 +4060,10 @@ class WalletHome extends React.Component {
                                                     Unstake and Collect
                                                 </Button>
                                             </Form>
-
-
                                         </div>
                                     </div>
-
                                 </Col>
-
                             </div>
-
                         </div>
                     );
                 }

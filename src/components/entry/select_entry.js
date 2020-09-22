@@ -82,23 +82,23 @@ export default class SelectEntry extends React.Component {
         return (
             <div className="width100 height100 d-flex flex-column text-center">
                 
-                <Container className="height100 flex-column p-5 d-flex">
+                <Container className="height100 flex-column p-5 d-flex justify-content-center">
                     <Row className="row justify-content-md-center justify-content-center p-3">
                         <Image className="entry-image align-content-center mb-5" src={require("./../../img/safex-logo.png")}/>
                     </Row>
                     
                     <Row className="row justify-content-md-center justify-content-center p-3">
-                        <Col sm={10}>
-                            <Button onClick={this.open_existing} className="font_size_medium" variant="primary" size="lg" block>
+                        <Col sm={6}>
+                            <Button onClick={this.open_existing} className="font-size-medium" variant="primary" size="lg" block>
                                 <FaFolderOpen className="mr-3"/>
                                 Open Existing
                             </Button>
                         </Col>
                     </Row>
 
-                    <Row className="justify-content-md-center font_size_medium justify-content-center p-3">
-                        <Col sm={10}>
-                            <Button onClick={this.create_new} className="font_size_medium" variant="primary" size="lg" block>
+                    <Row className="justify-content-md-center font-size-medium justify-content-center p-3">
+                        <Col sm={6}>
+                            <Button onClick={this.create_new} className="font-size-medium" variant="primary" size="lg" block>
                                 <FaFolderPlus className="mr-3"/>
                                 Create New
                             </Button>
@@ -106,8 +106,8 @@ export default class SelectEntry extends React.Component {
                     </Row>
 
                     <Row className="justify-content-md-center justify-content-center p-3">
-                        <Col sm={10}>
-                            <Button onClick={this.restore_keys} className="font_size_medium" variant="primary" size="lg" block>
+                        <Col sm={6}>
+                            <Button onClick={this.restore_keys} className="font-size-medium" variant="primary" size="lg" block>
                                 <FaKey className="mr-3"/>
                                 Recover From Keys
                             </Button>
@@ -115,8 +115,8 @@ export default class SelectEntry extends React.Component {
                     </Row>
 
                     <Row className="justify-content-md-center justify-content-center p-3">
-                        <Col sm={10}>
-                            <Button onClick={this.seed_phrase} className="font_size_medium" variant="primary" size="lg" block>
+                        <Col sm={6}>
+                            <Button onClick={this.seed_phrase} className="font-size-medium" variant="primary" size="lg" block>
                                 <FaAlignLeft className="mr-3"/>
                                 Recover From Seed Phrase
                             </Button>
@@ -125,8 +125,8 @@ export default class SelectEntry extends React.Component {
 
                     {this.state.legacy_detected ? (
                         <Row className="justify-content-md-center justify-content-center p-3">
-                            <Col sm={8}>
-                                <Button onClick={this.restore_legacy} className="font_size_medium" variant="warning" size="lg" block>
+                            <Col sm={5}>
+                                <Button onClick={this.restore_legacy} className="font-size-medium" variant="warning" size="lg" block>
                                     <FaHistory className="mr-3"/> 
                                     Open Legacy Wallet
                                 </Button>

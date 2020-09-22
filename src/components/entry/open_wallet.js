@@ -7,7 +7,10 @@ import {open_twm_file, save_twm_file} from "../../utils/twm_actions";
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 
-import Loader from 'react-loader-spinner'
+import Loader from 'react-loader-spinner' 
+import { FaInfoCircle } from 'react-icons/fa'
+import { IconContext } from 'react-icons'
+import ReactTooltip from "react-tooltip";
 
 const crypto = window.require('crypto');
 
@@ -216,21 +219,22 @@ export default class OpenWallet extends React.Component {
                         />
                     </Container>) 
                     :
-                    (<Container   className={this.state.new_path.length > 0 &&
+                    (<Row   
+                        className={this.state.new_path.length > 0 &&
                         this.state.daemon_host.length > 0 &&
-                        this.state.password.length > 0 ?  "display-none"
+                        this.state.password.length > 0 ? "display-none"
                         :
-                        "font-size-small b-r25 grey-back d-flex flex-column white-text"
+                        "font-size-medium b-r25 grey-back d-flex flex-column white-text"
                         } >
                     
-                    <div className="auto_margin_50 my-5 d-flex flex-column">    
+                    <Col sm={8} className="auto_margin_50 my-5 d-flex flex-column">    
                         <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
 
                         <Row className="align-items-center mb-5 justify-content-center">
                             <h1>Open Wallet</h1>
                         </Row>
 
-                            <Col sm={8} className="d-flex justify-content-center align-self-center flex-column text-center" >
+                            <Col sm={6} className="d-flex justify-content-center align-self-center flex-column text-center" >
                                 <p>
                                     Open an existing Safex wallet by selecting the .keys file and
                                     entering your password.
@@ -279,24 +283,57 @@ export default class OpenWallet extends React.Component {
                                 (
                                     <Col sm={8} className="d-flex justify-content-center align-self-center flex-column ">
                                         <div>
-                                            <p>
-                                                This is the URL used to connect to the Safex blockchain.
-                                                You can use the default provided by the Safex Foundation
-                                                or replace it with your own full node.
-                                            </p>
-                                            <ul className="mb-4">
-                                                <li>The default self hosted wallet setup would be:</li>
-                                                <li className="mt-4">HOST: <b>127.0.0.1</b></li>
-                                                <li className="mt-1">PORT: <b>17402</b></li>
-                                                <li className="mt-2">The default is rpc.safex.org</li>
-
-                                            </ul>
                                             <Form id="set_daemon" onSubmit={this.set_daemon_state}>
-                                                <b>Safexd Host</b> <Form.Control className="mb-4" name="daemon_host" defaultValue="stagenetrpc.safex.org"
-                                                                        placedholder="set the ip address of the safex blockchain"/>
-                                                <b>Safexd Port</b> <Form.Control  name="daemon_port" defaultValue="30393"
-                                                                        placedholder="set the port of the safex blockchain"/>
-                                                <Button className="mt-5 mb-5" type="submit" variant="primary" size="lg" block>Set Connection</Button>
+                                                <Form.Group>
+                                                    <Form.Label>
+                                                        Daemon Host
+
+                                                        <IconContext.Provider  value={{color: 'white', size: '20px'}}>
+                                                            <FaInfoCircle data-tip data-for='daemonHostInfo' className="blockchain-icon ml-3 white-text"/>
+                                                            
+                                                            <ReactTooltip id='daemonHostInfo' type='info' effect='solid'>
+                                                                <span>
+                                                                    This is the URL used to connect to the Safex blockchain.<br/>
+                                                                    You can use the default provided by the Safex Foundation<br/>
+                                                                    or replace it with your own full node.<br/><br/>
+                                                                    <ul className="mb-4">
+                                                                        <li>The default self hosted wallet setup would be:</li>
+                                                                        <li className="mt-4">HOST: <b>127.0.0.1</b></li>
+                                                                        <li className="mt-1">PORT: <b>17402</b></li>
+                                                                        <li className="mt-2">The default is rpc.safex.org</li>
+                                                                    </ul>
+                                                                </span>
+                                                            </ReactTooltip>
+                                                        </IconContext.Provider>
+                                                    </Form.Label>
+                                                    
+                                                    <Form.Control 
+                                                        className="mb-4" 
+                                                        name="daemon_host" 
+                                                        defaultValue="stagenetrpc.safex.org"
+                                                        placedholder="set the ip address of the safex blockchain"
+                                                    />
+                                                    
+                                                </Form.Group>
+
+                                                <Form.Group>
+                                                    <Form.Label>Daemon Port</Form.Label>
+                                                        
+                                                    <Form.Control  
+                                                        name="daemon_port" 
+                                                        defaultValue="30393"
+                                                        placedholder="set the port of the safex blockchain"
+                                                    />
+                                                    <Button 
+                                                        className="mt-5 mb-5" 
+                                                        type="submit" 
+                                                        variant="primary" 
+                                                        size="lg" 
+                                                        block
+                                                    >
+                                                        Set Connection
+                                                    </Button>
+                                                </Form.Group>
                                             </Form>
                                         </div>
                                     </Col>
@@ -324,8 +361,8 @@ export default class OpenWallet extends React.Component {
                             }
 
                             
-                        </div>
-                    </Container>)}
+                        </Col>
+                    </Row>)}
 
                     {this.state.new_path.length > 0 &&
                             this.state.daemon_host.length > 0 &&

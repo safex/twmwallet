@@ -23,8 +23,8 @@
     .w50 {
         width: 50%!important;
     }
-    .font_size_medium {
-        font-size: 2vmax!important;
+    .font-size-medium {
+        font-size: 1.8rem!important;
     }
 
     .font-size-small {
@@ -127,6 +127,10 @@
         --safex-cash-green: rgb(38, 232, 185);
     }
 
+    .blue-gradient-back {
+        background: linear-gradient(rgba(53,152,243,1), rgba(19,211,253,1));
+    }
+
     .light-blue-back {
         background-color: rgba(24, 189, 231, 0.5);
     }
@@ -148,7 +152,7 @@
     }
 
     .grey-back {
-        background-color: rgba(219, 219, 219, 0.5);
+        background: linear-gradient(rgba(110, 110, 110, 0.5), rgba(219, 219, 219, 0.5)); 
     }
 
     .safex-blue {
