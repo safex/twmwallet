@@ -327,8 +327,8 @@ class WalletHome extends React.Component {
         if (error) {
             console.error(error);
             console.error(`error at storing the wallet`);
-            alert(`error at storing the wallet`);
-            alert(error);
+            //alert(`error at storing the wallet`);
+            //alert(error);
         } else {
             console.log("wallet stored callback");
 
@@ -783,7 +783,7 @@ class WalletHome extends React.Component {
 
     //open market view from navigation
     show_market = () => {
-        this.show_loading()
+        this.show_loading();
 
         setTimeout(() => {
 
@@ -884,9 +884,9 @@ class WalletHome extends React.Component {
     //Show Merchant Orders
 
     show_orders = () => {
-        this.setState({show_orders: !this.state.show_orders})
+        this.setState({show_orders: !this.state.show_orders});
         console.log(this.state.show_orders)
-    }
+    };
 
 
     //open staking view from navigation
@@ -1003,8 +1003,8 @@ class WalletHome extends React.Component {
         if (vees.description.value.length > 0) {
             o_obj.description = vees.description.value;
         }
-        if (vees.main_image.value.length > 0) {
-            o_obj.main_image = vees.main_image.value;
+        if (vees.new_account_image.value.length > 0) {
+            o_obj.main_image = vees.new_account_image.value;
         }
         if (vees.sku.value.length > 0) {
             o_obj.sku = vees.sku.value;
@@ -1339,7 +1339,7 @@ class WalletHome extends React.Component {
     };
 
     to_ellipsis = (text, firstHalf, secondHalf) => {
-        const text_to_ellipse = text
+        const text_to_ellipse = text;
 
         const ellipse = `${text_to_ellipse.substring(0, firstHalf)}.....${text_to_ellipse.substring(text_to_ellipse.length - secondHalf, text_to_ellipse.length)}`
 
@@ -1366,7 +1366,7 @@ class WalletHome extends React.Component {
             alert_text += ` quantity can not be 0 or negative :)`;
             alert_bool = true;
         }
-        if (e.target.quantity.value % 1 != 0) {
+        if (e.target.quantity.value % 1 !== 0) {
             alert_text += ` quantity must be a whole number :)`;
             alert_bool = true;
         }
@@ -1509,12 +1509,12 @@ class WalletHome extends React.Component {
     copyOfferToClipboard = () => {
         copy(this.state.show_purchase_offer.offerID); 
         alert('Copied offer ID!');
-    }
+    };
 
     copyOrderToClipboard = () => {
         copy(this.state.this.state.purchase_txn_id); 
         alert('Copied offer ID!');
-    }
+    };
 
 
 
@@ -1564,7 +1564,7 @@ class WalletHome extends React.Component {
                 console.log(confirmed);
                 if (confirmed) {
                     this.setState({edit_offer_txn_offerid: va.offerid.value, edit_offer_txn_title: va.title.value});
-                    let edit_txn = await edit_offer(
+                    let edit_txn = await this.edit_offer_async(
                         wallet,
                         va.offerid.value,
                         va.username.value,
@@ -1573,9 +1573,23 @@ class WalletHome extends React.Component {
                         va.quantity.value,
                         JSON.stringify(o_obj),
                         active,
-                        mixins,
-                        this.edit_offer_first_callback
+                        mixins
                     );
+
+                    let confirmed_fee = window.confirm(`The network fee to edit ${this.state.edit_offer_txn_title} will be:  ${edit_txn.fee() / 10000000000} SFX`);
+                    let fee = edit_txn.fee();
+                    let txid = edit_txn.transactionsIds();
+                    if (confirmed_fee) {
+                        try {
+                            this.setState({edit_offer_txn_id: txid, edit_offer_txn_fee: fee});
+                            let commit_edit = await this.commit_edit_offer_txn_async(edit_txn);
+                        } catch (err) {
+                            console.error(err);
+                            console.error(`Error at committing the edit offer transaction for ${this.state.edit_offer_txn_offerid}`);
+                        }
+                    } else {
+                        alert(`Your transaction was cancelled, no edit for the offer was completed`);
+                    }
                     this.setState({new_offer_image: '', show_edit_offer_form: false})
                 }
             }
@@ -1585,15 +1599,15 @@ class WalletHome extends React.Component {
         }
     };
 
-    edit_offer_async = async (wallet, the_cost, offer_id, quantity, mixins) => {
+
+    edit_offer_async = async (wallet, offerid, username, title, price, quantity, data, active, mixins) => {
         return new Promise((resolve, reject) => {
             try {
-                purchase_offer(wallet, the_cost, offer_id, quantity, mixins, (err, res) => {
+                edit_offer(wallet, offerid, username, title, price, quantity, data, active, mixins, (err, res) => {
                     if (err) {
-                        this.setState({showLoader: false});
                         console.error(err);
-                        console.error(`error at the first call back purchase txn`);
-                        alert(`error at the first call back purchase txn`);
+                        console.error(`Error at first callback edit offer transaction`);
+                        alert(`Error at first call back edit offer transaction`);
                         alert(err);
                         reject(err);
                     } else {
@@ -1606,31 +1620,28 @@ class WalletHome extends React.Component {
         });
     };
 
-    commit_edit_offer_async = (txn) => {
+    commit_edit_offer_txn_async = (txn) => {
         return new Promise((resolve, reject) => {
             try {
                 txn.commit((err, res) => {
                     if (err) {
-                        this.setState({showLoader: false});
                         console.error(err);
-                        console.error(`error at the purchase commit callback`);
-                        alert(`error at the purchase commit callback`);
+                        console.error(`Error at commit callback edit offer transaction`);
+                        alert(`Error at commit call back edit offer transaction`);
                         alert(err);
                         reject(err);
                     } else {
-                        this.setState({showLoader: false});
-                        copy(`https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`);
-                        alert(
-                            `Purchase transaction committed.
-                            Transaction ID: ${this.state.purchase_txn_id}
-                            Amount: ${this.state.purchase_txn_quantity} X ${this.state.purchase_txn_title}
-                            Price: ${this.state.purchase_txn_price} SFX
-                            Network Fee: ${this.state.purchase_txn_fee / 10000000000} SFX
-                            A link to this transaction on the Safex Block Explorer has been copied to your clipboard 
-                            https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`
-                        );
-
-                        this.handleClosePurchaseForm();
+                        alert(`Edit offer committed 
+                    Transaction ID: ${this.state.edit_offer_txn_id}
+                    For Offer ID: ${this.state.edit_offer_txn_offerid}
+                    Title: ${this.state.edit_offer_txn_title}
+                    Fee: ${this.state.edit_offer_txn_fee / 10000000000} SFX`);
+                        this.setState({
+                            edit_offer_txn_id: '',
+                            edit_offer_txn_fee: 0,
+                            edit_offer_txn_title: '',
+                            edit_offer_txn_offerid: ''
+                        });
                         resolve(res);
                     }
                 });
@@ -1638,52 +1649,6 @@ class WalletHome extends React.Component {
                 reject(err);
             }
         });
-    };
-
-    edit_offer_first_callback = async (error, edit_offer_txn) => {
-        if (error) {
-            console.error(error);
-            console.error(`Error at the edit offer first callback`);
-            alert(`Error at the edit offer first callback`);
-            alert(error);
-        } else {
-            let confirmed_fee = window.confirm(`The network fee to edit ${this.state.edit_offer_txn_title} will be:  ${edit_offer_txn.fee() / 10000000000} SFX`);
-            let fee = edit_offer_txn.fee();
-            let txid = edit_offer_txn.transactionsIds();
-            if (confirmed_fee) {
-                try {
-                    this.setState({edit_offer_txn_id: txid, edit_offer_txn_fee: fee});
-                    edit_offer_txn.commit(this.edit_offer_commit_callback);
-                } catch (err) {
-                    console.error(err);
-                    console.error(`Error at committing the edit offer transaction for ${this.state.edit_offer_txn_offerid}`);
-                }
-            } else {
-                alert(`Your transaction was cancelled, no edit for the offer was completed`);
-            }
-        }
-    };
-
-    edit_offer_commit_callback = async (error, txn) => {
-        if (error) {
-            console.error(error);
-            console.error(`Error at the edit offer commit callback`);
-            alert(`Error at the edit offer commit callback`);
-            alert(error);
-        } else {
-            alert(`Edit offer committed 
-                    Transaction ID: ${this.state.edit_offer_txn_id}
-                    For Offer ID: ${this.state.edit_offer_txn_offerid}
-                    Title: ${this.state.edit_offer_txn_title}
-                    Fee: ${this.state.edit_offer_txn_fee / 10000000000} SFX`);
-            this.setState({
-                edit_offer_txn_id: '',
-                edit_offer_txn_fee: 0,
-                edit_offer_txn_title: '',
-                edit_offer_txn_offerid: ''
-            });
-
-        }
     };
 
     render() {
@@ -2246,11 +2211,11 @@ class WalletHome extends React.Component {
                                     <Modal.Body>
                                             <ul>
                                                 <li>Purchase transaction committed.</li>
-                                                <li>Transaction ID: ${this.state.purchase_txn_id}</li>
-                                                <li>Amount: ${this.state.purchase_txn_quantity} X ${this.state.purchase_txn_title}</li>
-                                                <li>Price: ${this.state.purchase_txn_price} SFX</li>
+                                                <li>Transaction ID: {this.state.purchase_txn_id}</li>
+                                                <li>Amount: {this.state.purchase_txn_quantity} X {this.state.purchase_txn_title}</li>
+                                                <li>Price: {this.state.purchase_txn_price} SFX</li>
                                                 <li>
-                                                    Network Fee: ${this.state.purchase_txn_fee / 10000000000} SFX
+                                                    Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
                                                     <IconContext.Provider  value={{color: 'black', size: '20px'}}>
                                                         <FaCopy 
                                                             className="ml-4"
@@ -3518,7 +3483,7 @@ class WalletHome extends React.Component {
                                                                     <Form.Control 
                                                                         disabled 
                                                                         name="username"
-                                                                        value={this.state.show_edit_offer.seller}
+                                                                        value={selected.username}
                                                                     />
                                                                 </Form.Group>
                                                                 <Form.Group  as={Col}>
@@ -3567,7 +3532,7 @@ class WalletHome extends React.Component {
                                                                 
                                                                 <Form.Control 
                                                                     name="price"
-                                                                    defaultValue={this.state.show_edit_offer.price / 10000000000}
+                                                                    defaultValue={1}
                                                                 />
                                                             </Form.Group>
 
@@ -3576,7 +3541,7 @@ class WalletHome extends React.Component {
                                                                 
                                                                 <Form.Control 
                                                                     name="quantity"
-                                                                    defaultValue={this.state.show_edit_offer.quantity}
+                                                                    defaultValue={1}
                                                                 />
                                                             </Form.Group>
                                                             
@@ -3625,7 +3590,7 @@ class WalletHome extends React.Component {
 
                                                                 <Form.Control 
                                                                     name="message_type"
-                                                                    defaultValue={data.message_type}
+                                                                    defaultValue="Shipping"
                                                                 />
                                                             </Form.Group>
                                                             
