@@ -3942,7 +3942,7 @@ class WalletHome extends React.Component {
                                                 <tr>
                                                     <td>
                                                         <li>Next
-                                                            Payout: {100 - (this.state.blockchain_height % 100)} Blocks
+                                                            Interval: {100 - (this.state.blockchain_height % 100)} Blocks
                                                         </li>
                                                     </td>
                                                 </tr>
@@ -3957,14 +3957,6 @@ class WalletHome extends React.Component {
                                                 </tr>
                                                 </tbody>
                                                 <tfoot>
-                                                <tr>
-                                                    <td>
-                                                        <li>Block Interval {interval[0] * 10} : {interest[0]} SFX
-                                                            per
-                                                            token
-                                                        </li>
-                                                    </td>
-                                                </tr>
                                                 </tfoot>
                                             </Table>
                                         </div>

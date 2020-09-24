@@ -235,14 +235,7 @@ export default class CreateWallet extends React.Component {
                                     This path creates a new set of keys and a Safex Wallet.
                                 </p>
                                 <p>
-                                    Testnet
-                                    <input
-                                        name="isTestnet"
-                                        type="checkbox"
-                                        checked={this.state.testnet}
-                                        onChange={this.set_to_testnet}
-                                        className="ml-2"
-                                    />
+                                    THIS WALLET IS STAGENET V2 THIS IS NOT A REGULAR SAFEX WALLET USE ONLY FOR TESTING ONLY September 24, 2020
                                 </p>
 
 

@@ -240,20 +240,10 @@ export default class OpenWallet extends React.Component {
                                     entering your password.
                                 </p>
                                 <p>
-                                THIS WALLET IS STAGENET V1 THIS IS NOT A REGULAR SAFEX WALLET USE ONLY FOR TESTING ONLY JULY 13, 2020
+                                THIS WALLET IS STAGENET V2 THIS IS NOT A REGULAR SAFEX WALLET USE ONLY FOR TESTING ONLY September 24, 2020
                                 </p>
 
                                 <div className="mt-4">
-                                    <p >
-                                        Testnet
-                                        <input
-                                            name="isTestnet"
-                                            type="checkbox"
-                                            checked={this.state.testnet}
-                                            onChange={this.set_to_testnet}
-                                            className="ml-2"
-                                        />
-                                    </p>
                                 </div>
 
                                 {this.state.new_path.length > 0 ?
