@@ -103,6 +103,7 @@
       "build/images/migration/*.*",
       "build/static/css/*.*",
       "build/static/js/*.*",
+      "build/static/media/*.*",
       "!node_modules/safex-nodejs-libwallet/boost*",
       "!node_modules/safex-nodejs-libwallet/safexcore",
       "!node_modules/safex-nodejs-libwallet/deps",
