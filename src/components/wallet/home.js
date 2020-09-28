@@ -3577,7 +3577,7 @@ class WalletHome extends React.Component {
                                                                 
                                                                 <Form.Control 
                                                                     name="physical"
-                                                                    defaultValue={data.physical}
+                                                                    defaultValue="true"
                                                                 />
                                                             </Form.Group>
                                                             
