@@ -119,7 +119,7 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "public/images/icons/twmwallet-0.0.4.ico"
+      "icon": "public/icons/favicon.png"
     },
     "linux": {
       "target": [
