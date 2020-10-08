@@ -3399,7 +3399,7 @@ class WalletHome extends React.Component {
 
                                     <Col lg className="merchant-product-view b-r10 px-3 pb-5 opaque-black no-gutters mt-5">
                                         {selected !== void (0) ? (
-                                            <div className="pt-5 align-items-center sticky safex-cash-green d-flex flex-column">
+                                            <div className="pt-5 align-items-center sticky d-flex flex-column">
                                                 <div>
                                                     <Button 
                                                         className="mb-5" 
