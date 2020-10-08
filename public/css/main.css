@@ -131,12 +131,17 @@
         background: linear-gradient(rgba(53,152,243,1), rgba(19,211,253,1));
     }
 
+    .blue-gradient-back-opaque {
+        background: linear-gradient(rgba(53,152,243,.8), rgba(19,211,253,.8));
+    }
+
+
     .light-blue-back {
         background-color: rgba(24, 189, 231, 0.5);
     }
 
     .black-back {
-        background-color: black;
+        background: linear-gradient(rgb(0, 0, 0), rgb(9, 51, 111));
     }
 
     .solid-grey-back {
@@ -144,7 +149,7 @@
     }
 
     .opaque-black {
-        background-color: rgba(0, 0, 0, 0.5);
+        background: linear-gradient(rgb(0, 0, 0.5), rgba(9, 51, 111, .5));
     }
 
     .safex-cash-green {
@@ -156,7 +161,7 @@
     }
 
     .safex-blue {
-        background-color: rgb(9, 51, 111)!important;
+        background: linear-gradient(rgb(9, 51, 111), rgb(41, 114, 216));
     }
 
     .white-text {
@@ -168,3 +173,15 @@
     }
 
 /* Colors CSS End */
+
+/* Custom Components Start */
+
+    .custom-button {
+        border-radius: 50px;
+    }
+
+    .custom-button:hover {
+        background-color: darkgray!important;
+    }
+
+/* Custom Components End */

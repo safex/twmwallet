@@ -1751,57 +1751,7 @@ class WalletHome extends React.Component {
 
                             <Col sm={9}>
                                 <Row className="my-4">
-                                    <Carousel className="home-carousel mx-auto">
-                                        <Carousel.Item>
-                                            <img
-                                                className="d-block w-100"
-                                                src={require("./../../img/bike.jpg")}
-                                                alt="First slide"
-                                            />
-                                            <Carousel.Caption>
-                                                <h3>Racing Bike</h3>
-                                                <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
-                                            </Carousel.Caption>
-                                        </Carousel.Item>
-                                        <Carousel.Item>
-                                            <img
-                                                className="d-block w-100"
-                                                src={require("./../../img/watch.jpg")}
-                                                alt="Third slide"
-                                            />
-
-                                            <Carousel.Caption>
-                                                <h3>A Pull Watch</h3>
-                                                <p>Better than an Apple watch; a watch you pull.</p>
-                                            </Carousel.Caption>
-                                        </Carousel.Item>
-                                        <Carousel.Item>
-                                            <img
-                                                className="d-block w-100"
-                                                src={require("./../../img/camera.jpg")}
-                                                alt="Third slide"
-                                            />
-
-                                            <Carousel.Caption>
-                                                <h3>Vintage Camera</h3>
-                                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                                            </Carousel.Caption>
-                                        </Carousel.Item>
-                                        <Carousel.Item>
-                                            <img
-                                                className="d-block w-100"
-                                                src={require("./../../img/headphones.jpg")}
-                                                alt="Fourth slide"
-                                            />
-
-                                            <Carousel.Caption>
-                                                <h3>Premium Headphones</h3>
-                                                <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
-                                            </Carousel.Caption>
-                                        </Carousel.Item>
-                                    </Carousel>
-
-                                    <Carousel sm={6} className="home-carousel mx-auto">
+                                    <Carousel sm={12} className="home-carousel mx-auto">
                                         <Carousel.Item>
                                             <img
                                                 className="d-block w-100"
@@ -3721,7 +3671,7 @@ class WalletHome extends React.Component {
                     }
                     return (
                         <div
-                            className="wallet no-gutters blue-gradient-back flex-column border-bottom border-white b-r10 oflow-y-scroll">
+                            className="wallet no-gutters blue-gradient-back-opaque flex-column border-bottom border-white b-r10 oflow-y-scroll">
 
                             <h1 className="text-center m-2"> Token Management </h1>
 
@@ -4037,7 +3987,7 @@ class WalletHome extends React.Component {
                                 className="align-content-center"
                                 src={require("./../../img/panda.png")}
                             />
-                            <h1 className="white-text">Bear with us... we're doing science stuff...</h1>
+                            <h1 className="white-text">Bear with us... we're just loading the market...</h1>
                         </Container>
                     );
 
@@ -4052,7 +4002,7 @@ class WalletHome extends React.Component {
                     <Container
                         fluid
                         id="header"
-                        className="no-gutters my-5 p-2 border border-light b-r10 opaque-black"
+                        className="no-gutters my-5 p-2 b-r10 opaque-black"
                     >
 
 

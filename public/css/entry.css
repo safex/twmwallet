@@ -1,9 +1,9 @@
 /* Select Entry CSS */
 
 .safex-background {
-    background-image:url(./../images/wall3.jpg);
+    background-image:url(./../images/safex-space2.jpg);
     background-position: bottom right;
-    background-size: contain;
+    background-size: cover;
     
 }
 
