@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactJson from 'react-json-view';
 
 import Navigation from './Navigation';
 
@@ -27,10 +28,8 @@ export default class Settings extends React.Component {
         return (
             <div style={{position: 'relative'}}>
                 <Container>
-                    <Row>
-                        <Navigation/>
-                    </Row>
 
+                    <ReactJson src={this.props.history} />
                     <Row>
                         <Col>
                         </Col>

@@ -6,6 +6,8 @@ import {MDBDataTable} from 'mdbreact'
 
 import {withRouter} from 'react-router-dom';
 
+import Settings from './Settings';
+
 import {normalize_8decimals} from '../../utils/wallet_creation';
 
 import {
@@ -97,6 +99,13 @@ class WalletHome extends React.Component {
             let twm_ls = localStorage.getItem('twm_file');
             console.log(twm_ls);
 
+            let history = wallet.history();
+
+            history.sort(function(a, b) {
+                return parseFloat(b.timestamp) - parseFloat(a.timestamp);
+            });
+
+
 
             let twm_file = JSON.parse(twm_ls);
 
@@ -126,7 +135,8 @@ class WalletHome extends React.Component {
                 daemon_host: this.props.daemon_host,
                 daemon_port: this.props.daemon_port,
                 password: this.props.password,
-                new_path: this.props.wallet_path
+                new_path: this.props.wallet_path,
+                history: history
             });
 
             try {
@@ -3976,7 +3986,11 @@ class WalletHome extends React.Component {
                 }
                 case "settings": {
                     return (
-                        <div></div>
+                        <div>
+                            <Settings
+                                history = {this.state.history}
+                            />
+                        </div>
                     );
                 }
                 case "loading":
