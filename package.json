@@ -36,13 +36,13 @@
   ],
   "devDependencies": {
     "electron": "^7.1.11",
+    "electron-builder": "^22.1.0",
     "electron-installer-dmg": "^3.0.0",
     "electron-packager": "^14.1.0",
     "electron-react-devtools": "^0.5.3",
     "electron-rebuild": "^1.10.0",
     "electron-winstaller": "^4.0.0",
     "foreman": "^3.0.1",
-    "electron-builder": "^22.1.0",
     "react-scripts": "^3.2.0"
   },
   "dependencies": {
@@ -64,6 +64,7 @@
     "react-file-download": "^0.3.5",
     "react-file-input": "^0.2.5",
     "react-icons": "^3.10.0",
+    "react-json-view": "^1.19.1",
     "react-loader-spinner": "^3.1.14",
     "react-number-format": "^4.3.1",
     "react-popper": "^2.2.3",

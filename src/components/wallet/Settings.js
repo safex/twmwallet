@@ -18,7 +18,8 @@ export default class Settings extends React.Component {
 
     async componentDidMount() {
         console.log("load settings");
-        console.log(this.props.wallet);
+        console.log(this.props.history);
+
 
     };
 
