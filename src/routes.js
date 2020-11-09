@@ -16,7 +16,7 @@ import LegacyKeys from './components/entry/legacy/2loadkeys';
 import ConvertLegacy from './components/entry/legacy/3makewallet';
 
 import WalletHome from './components/wallet/home';
-import Settings from './components/wallet/settings';
+import Settings from './components/wallet/Settings';
 
 
 
