@@ -1,16 +1,21 @@
 import React from 'react';
-import {Row, Col, OverlayTrigger, Container, Button, Form} from 'react-bootstrap';
+import {Row, Col, OverlayTrigger, Container, Button, Form, Image} from 'react-bootstrap';
 import {open_wallet_util} from '../../utils/wallet_creation';
 import {FaBackward} from 'react-icons/fa';
 import WalletHome from '../wallet/home';
 import {open_twm_file, save_twm_file} from "../../utils/twm_actions";
 
-import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
-
-import Loader from 'react-loader-spinner' 
-import { FaInfoCircle } from 'react-icons/fa'
-import { IconContext } from 'react-icons'
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+import Loader from 'react-loader-spinner'; 
 import ReactTooltip from "react-tooltip";
+
+import ProgressIcon from "../customComponents/ProgressIcon";
+
+import { AiOutlineInfoCircle } from 'react-icons/ai';
+import { IoIosArrowBack } from 'react-icons/io';
+import { FaInfoCircle } from 'react-icons/fa';
+import { IconContext } from 'react-icons';
+
 
 const crypto = window.require('crypto');
 
@@ -30,7 +35,11 @@ export default class OpenWallet extends React.Component {
             wallet: null,
             network: 'stagenet',
             testnet: false,
-            wallet_made: false
+            wallet_made: false,
+            loading: false,
+            freshStart: true,
+            pageNumber: 1,
+            error: '',
         };
     }
 
@@ -65,7 +74,7 @@ export default class OpenWallet extends React.Component {
 
     open_wallet_result = async(error, wallet) => {
         if (error) {
-
+            this.setState({error: 'password'})
         } else {
             try {
                 localStorage.setItem('wallet', JSON.stringify(wallet));
@@ -80,6 +89,7 @@ export default class OpenWallet extends React.Component {
                         console.log(twm_file);
                         localStorage.setItem('twm_file', JSON.stringify(twm_file.contents));
                     } else {
+                       
                         console.log(`error`);
                         console.log(twm_file);
                         throw `error`;
@@ -130,7 +140,7 @@ export default class OpenWallet extends React.Component {
                         try {
                             let twm_file = await open_twm_file(ipath + '.twm', this.state.password);
                             console.log(twm_file);
-                            localStorage.setItem('twm_file', JSON.stringify(twm_file.contents));
+                            localStorage.setItem('twm_file', JSON.stringify(twm_file.contents)); 
                         } catch (err) {
                             console.error(err);
                             console.error(`error opening twm file after save to verify`);
@@ -141,7 +151,7 @@ export default class OpenWallet extends React.Component {
                         console.error(`error at initial save of the twm file`);
                     }
                 }
-                this.setState({wallet_made: true, wallet: wallet, password: this.state.password});
+                this.setState({wallet_made: true, wallet: wallet, password: this.state.password, loading: true});
             } catch (err) {
                 console.error(err);
                 console.error("error on initial recovery");
@@ -155,7 +165,7 @@ export default class OpenWallet extends React.Component {
         e.preventDefault();
 
         let the_password = e.target.password.value;
-        this.setState({password: the_password});
+        this.setState({password: the_password, error: 'checking'});
 
         if (this.state.new_path.includes('.keys')) {
             ipath = this.state.new_path.substring(0, this.state.new_path.length - 5);
@@ -207,9 +217,11 @@ export default class OpenWallet extends React.Component {
 
     render() {
         return (
-            <Container fluid className="height100 d-flex flex-column justify-content-center align-items-center">
-                {this.state.wallet_made ?
-                    (<Container fluid className="height100 justify-content-between">
+            <Container className="h-100">
+                {this.state.wallet_made && 
+                this.state.loading === false ?
+                (
+                    <Container fluid className="height100 justify-content-between">
                         <WalletHome
                             wallet={this.state.wallet}
                             daemon_host={this.state.daemon_host}
@@ -217,71 +229,162 @@ export default class OpenWallet extends React.Component {
                             password={this.state.password}
                             wallet_path={this.state.new_path}
                         />
-                    </Container>) 
-                    :
-                    (<Row   
-                        className={this.state.new_path.length > 0 &&
-                        this.state.daemon_host.length > 0 &&
-                        this.state.password.length > 0 ? "display-none"
-                        :
-                        "font-size-medium b-r25 grey-back d-flex flex-column white-text"
-                        } >
-                    
-                    <Col sm={8} className="auto_margin_50 my-5 d-flex flex-column">    
-                        <Button className="m-2 align-self-start btn-warning" onClick={this.exit_home}><FaBackward className="mr-2"/>Go Back</Button>
+                    </Container>
+                ) 
+                :
+                (
+                <Container fluid className="height100 d-flex flex-column justify-content-center align-items-center">
+                    {this.state.loading ? 
+                    (
+                        <div className="mx-auto h-100 welcome d-flex flex-column justify-content-center">
+                            {this.state.wallet_made ? 
+                            (<Container fluid className="height100 d-flex flex-column justify-content-center align-items-center">
+                                <Image className="entry-mini-logo" src={require("./../../img/safex-multi-small.svg")}/>
+                                <Image onClick={() => {alert('Closing Wallet... (TEST)')}} className="entry-off-button" src={require("./../../img/off.svg")}/>
+                                <Image className="entry-scene" src={require("./../../img/loading-scene.svg")}/>
+                                <Image className="plant3" src={require("./../../img/plant2.svg")}/>
+                                <p>Welcome to </p>
+                                <p>Safex </p>
+                                <p>World </p>
+                                <p>Marketplace</p>
 
-                        <Row className="align-items-center mb-5 justify-content-center">
-                            <h1>Open Wallet</h1>
+                                <button className="mx-auto custom-button-entry orange-border mt5" onClick={() => this.setState({loading: false})} >
+                                    Enter
+                                </button>
+                            </Container>
+                            )
+                            :
+                            (<Loader 
+                                className="justify-content-center align-content-center" 
+                                type="TailSpin"
+                                color="#13D3FD"
+                                height={200}
+                                width={200}
+                            />
+                            )}
+                        </div>
+                    ) 
+                    :
+                    (
+                        <Container className="h-100 d-flex flex-column justify-content-center align-items-center">
+
+                        <Image className="entry-mini-logo" src={require("./../../img/safex-multi-small.svg")}/>
+                        <Image className="plant" src={require("./../../img/plant.svg")}/>
+                        <Image className="plant2" src={require("./../../img/corner-plant.svg")}/>
+                        <Image className="entry-scene" src={require("./../../img/entry-scene.svg")}/>
+                        <Image className="entry-scene1" src={require("./../../img/entry-scene1.svg")}/>
+                        <Image onClick={() => {alert('Closing Wallet... (TEST)')}} className="entry-off-button" src={require("./../../img/off.svg")}/>
+                        
+                        <Row className="entry-progress-row">
+                            <Col onClick={this.backToSelect} className="d-flex align-items-center entry-back-text" md={2}>
+                                <IconContext.Provider  value={{color: '#13D3FD', size: '3rem'}}>
+                                    <IoIosArrowBack/>
+                                </IconContext.Provider>
+                                
+                                BACK
+                            </Col>
+                            
+                            <a onClick={() => {this.setState({pageNumber: 1, error: ''})}}>
+                                <ProgressIcon 
+                                    number={1} 
+                                    color={this.state.pageNumber === 1 ? 'progress-icon-color' : this.state.new_path.length > 0 ? 'progress-icon-color-complete' : ''}
+                                    title={"SELECT FILES"}
+                                    />
+                            </a>
+
+                            <a onClick={() => {this.setState({pageNumber: 2, error: ''})}}>
+                                <ProgressIcon 
+                                    number={2} 
+                                    title={"NETWORK CONNECTION"}
+                                    color={this.state.pageNumber === 2 ? 'progress-icon-color' : this.state.daemon_host.length > 0 ? 'progress-icon-color-complete' : ''}
+                                />
+                            </a>
+                            
+                            <a onClick={() => {this.setState({pageNumber: 3})}}>
+                                <ProgressIcon 
+                                    number={3} 
+                                    title={"YOUR PASSWORD"}
+                                    color={this.state.pageNumber === 3 ? 'progress-icon-color' : this.state.password.length > 0 ? 'progress-icon-color-complete' : ''}
+                                />
+                            </a>
+                            
                         </Row>
 
-                            <Col sm={6} className="d-flex justify-content-center align-self-center flex-column text-center" >
-                                <p>
-                                    Open an existing Safex wallet by selecting the .keys file and
-                                    entering your password.
-                                </p>
-                                <p>
-                                THIS WALLET IS STAGENET V2 THIS IS NOT A REGULAR SAFEX WALLET USE ONLY FOR TESTING ONLY September 24, 2020
-                                </p>
+                        {this.state.wallet_made ?
+                            (<Container fluid className="height100 justify-content-between">
+                                <WalletHome
+                                    wallet={this.state.wallet}
+                                    daemon_host={this.state.daemon_host}
+                                    daemon_port={this.state.daemon_port}
+                                    password={this.state.password}
+                                    wallet_path={this.state.new_path}
+                                />
+                            </Container>) 
+                            :
+                            (
+                                ''
+                            )
+                        }
 
-                                <div className="mt-4">
-                                </div>
 
+                        {
+                        this.state.pageNumber === 1 ?
+                            (<div>
                                 {this.state.new_path.length > 0 ?
-                                    (<Col className="mb-2 mt-2 border  b-r25">
-                                        <p className="mt-2">
-                                            Selected Wallet File: <b>{this.state.new_path}</b>
-                                        </p>
-                                        <Button className="mt-2 mb-2" onClick={this.change_path}>
-                                            Change File
-                                        </Button>
+                                    (<div className="entry-container">
+                                        <Col className="justify-content-around d-flex flex-column">
+                                            <p> Selected Wallet File: <i>{this.state.new_path}</i></p>
 
-                                    </Col>) :
-                                    (<div>
+                                            <button className="mx-auto custom-button-entry" onClick={this.change_path} >
+                                                Change File
+                                            </button>
 
-                                        <Form id="set_path" onSubmit={this.set_path}>
-                                            <Button className="mt-5 mb-5" type="submit" variant="primary" size="lg" block>
-                                                Select Wallet File
-                                            </Button>
-                                        </Form>
+                                            <button className="mx-auto custom-button-entry orange-border" onClick={() => this.setState({pageNumber: 2})} >
+                                                Continue
+                                            </button>
+                                        </Col>
+                                        
                                     </div>)
+                                :
+                                (<div className="entry-container">
+                                    <p>
+                                        Open an existing Safex wallet by selecting the <b>.keys file</b> 
+                                    </p>
+                                    
+                                    <Form className="mt-2 mb-2" id="set_path" onSubmit={this.set_path}>
+                                        <input className="display-none" type="file" />
+                                        <Col className="justify-content-around d-flex flex-column">
+                                            <button className="mx-auto custom-button-entry orange-border my-5" type="submit" variant="primary" size="lg">
+                                                Select File Path
+                                            </button>
+                                        </Col>
+                                        
+                                    </Form>
+                                </div>)
                                 }
-
-                            </Col>
-
-                            {this.state.new_path.length > 0 &&
-                            this.state.daemon_host.length < 1 ?
+                            </div>)
+                            :
                                 (
-                                    <Col sm={8} className="d-flex justify-content-center align-self-center flex-column ">
-                                        <div>
-                                            <Form id="set_daemon" onSubmit={this.set_daemon_state}>
-                                                <Form.Group>
-                                                    <Form.Label>
-                                                        Daemon Host
+                                    ""
+                                )
+                            
+                        }
 
-                                                        <IconContext.Provider  value={{color: 'white', size: '20px'}}>
-                                                            <FaInfoCircle data-tip data-for='daemonHostInfo' className="blockchain-icon ml-3 white-text"/>
+
+                        {this.state.new_path.length > 0 && 
+                        this.state.pageNumber === 2 ?
+                                            (
+                                                <div className="entry-container">
+                                                    <div className="entry-info-div">
+                                                        <IconContext.Provider  value={{color: '#767676', size: '30px'}}>
+                                                            <AiOutlineInfoCircle data-tip data-for='daemonHostInfo' />
                                                             
-                                                            <ReactTooltip id='daemonHostInfo' type='info' effect='solid'>
+                                                            <ReactTooltip 
+                                                                className="entry-tooltip-container" 
+                                                                id='daemonHostInfo' 
+                                                                effect='solid'
+                                                                place="bottom"
+                                                            >
                                                                 <span>
                                                                     This is the URL used to connect to the Safex blockchain.<br/>
                                                                     You can use the default provided by the Safex Foundation<br/>
@@ -290,87 +393,124 @@ export default class OpenWallet extends React.Component {
                                                                         <li>The default self hosted wallet setup would be:</li>
                                                                         <li className="mt-4">HOST: <b>127.0.0.1</b></li>
                                                                         <li className="mt-1">PORT: <b>17402</b></li>
-                                                                        <li className="mt-2">The default is rpc.safex.org</li>
+                                                                        <li className="mt-2">The default is rpc.safex.org:30393</li>
                                                                     </ul>
                                                                 </span>
                                                             </ReactTooltip>
                                                         </IconContext.Provider>
-                                                    </Form.Label>
-                                                    
-                                                    <Form.Control 
-                                                        className="mb-4" 
-                                                        name="daemon_host" 
-                                                        defaultValue="stagenetrpc.safex.org"
-                                                        placedholder="set the ip address of the safex blockchain"
-                                                    />
-                                                    
-                                                </Form.Group>
-
-                                                <Form.Group>
-                                                    <Form.Label>Daemon Port</Form.Label>
-                                                        
-                                                    <Form.Control  
-                                                        name="daemon_port" 
-                                                        defaultValue="30393"
-                                                        placedholder="set the port of the safex blockchain"
-                                                    />
-                                                    <Button 
-                                                        className="mt-5 mb-5" 
-                                                        type="submit" 
-                                                        variant="primary" 
-                                                        size="lg" 
-                                                        block
+                                                                    
+                                                    </div>
+                                                    {this.state.daemon_host.length < 1 ?
+                                                    (
+                                                    <form 
+                                                        id="set_daemon"
+                                                        onSubmit={this.set_daemon_state}
+                                                        className=""
                                                     >
-                                                        Set Connection
-                                                    </Button>
-                                                </Form.Group>
-                                            </Form>
-                                        </div>
-                                    </Col>
-                                ) :
-                                (<div>
-                                </div>)
+                                                    
+                                                            <label className="entry-form-label" htmlFor="daemon-host">
+                                                                Daemon Host:
+                                                            </label>
+                                                            
+                                                            <input
+                                                                id="daemon-host"
+                                                                className="my-2 entry-form-input" 
+                                                                name="daemon_host"
+                                                                defaultValue="stagenetrpc.safex.org"
+                                                                placedholder="set the ip address of the safex blockchain"
+                                                            />
 
-                            }
+                                                        
+                                                            <label htmlFor="daemon-port">Daemon Port:</label>
 
-                            {this.state.new_path.length > 0 &&
-                            this.state.daemon_host.length > 0 &&
-                            this.state.password.length < 1 ?
+                                                            <input 
+                                                                id="daemon-port"
+                                                                className="mt-2 mb-5" 
+                                                                name="daemon_port"
+                                                                defaultValue="30393"
+                                                                placedholder="set the port of the safex blockchain"
+                                                            />
+                                                        
 
-                                (<Col className="mt-2">
-                                    <Form id="set_password" className="auto_margin_50" onSubmit={this.open_wallet}>
-                                        Enter Your Password: <Form.Control name="password" type="password"
-                                                        placedholder="enter your password and open your wallet"/>
-                                        <Button className="mt-2 mb-5" type="submit" variant="primary" size="lg" block>
-                                            Open Wallet
-                                        </Button>
-                                    </Form>
-                                </Col>) :
-                                (<div>
-                                </div>)
-                            }
+                                                        <button className="custom-button-entry orange-border" type="submit" variant="primary" size="lg">
+                                                            Set Connection
+                                                        </button>
+                                                    </form>)
+                                                    :
+                                                    (<div className="d-flex flex-column justify-content-around h-100">
+                                                        <p>
+                                                            You will be connected to:<br/> 
+                                                            <i>{this.state.daemon_host}:{this.state.daemon_port}</i>
+                                                        </p>
 
-                            
-                        </Col>
-                    </Row>)}
+                                                        <button
+                                                            className="custom-button-entry"
+                                                            size="lg"
+                                                            onClick={this.change_daemon}
+                                                        >
+                                                            Reset Connection
+                                                        </button>
 
-                    {this.state.new_path.length > 0 &&
-                            this.state.daemon_host.length > 0 &&
-                            this.state.wallet_made === false &&
-                            this.state.password.length > 0 ?
-                            
-                                (
-                                <Loader 
-                                    className="justify-content-center align-content-center" 
-                                    type="TailSpin"
-                                    color="#00BFFF"
-                                    height={100}
-                                    width={100}
-                                />
-                                ) :
-                                (<div>
-                                </div>)
-                            }
-            </Container>);
+                                                        <button className="mx-auto custom-button-entry orange-border" onClick={() => this.setState({pageNumber: 3})} >
+                                                            Continue
+                                                        </button>
+                                                    </div>)}
+                                                
+                                                </div>
+                                            ) :
+                                            (
+                                            ""
+                                            )
+                                        }
+
+                                        {
+                                        this.state.pageNumber === 3 ?
+
+
+                                            (<div className="entry-container">
+                                                    <form id="set_password" 
+                                                        className={this.state.error === 'password' ? "wrong-password" : ""}
+                                                        onSubmit={this.open_wallet}>
+                                                        
+                                                            <label htmlFor="password-input">
+                                                               {this.state.error === 'password' ? 
+                                                                    'Looks Like You Made a Mistake. Please Try Again' 
+                                                                    : 
+                                                                    this.state.error === 'checking' ? 
+                                                                        <Loader type="ThreeDots" color="#13D3FD" height={40} width={80} /> 
+                                                                        : 
+                                                                        'Enter Your Password'
+                                                                }
+                                                            </label>
+
+                                                            <input 
+                                                                id="password-input"
+                                                                type="password"
+                                                                name="password" 
+                                                                className={this.state.error === 'checking' ? "opacity100" : "mt-2 mb-2"}
+                                                            />
+
+                                                        <button type="submit" className={this.state.error === 'checking' ? "opacity100" : "custom-button-entry orange-border my-5"}>
+                                                            Continue
+                                                        </button>
+                                                    </form>
+
+                                                </div>
+
+                                            ) :
+                                            (
+                                                ''
+                                            )
+                                        }
+
+                        <Row  className="w-100 entry-footer">
+                            <p>THE WORLD MARKETPLACE</p>
+                        </Row>
+
+                    </Container>)
+            }
+        </Container>)}
+
+        </Container>);
     }
 }

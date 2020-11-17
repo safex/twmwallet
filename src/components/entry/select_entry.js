@@ -53,6 +53,11 @@ export default class SelectEntry extends React.Component {
         }
     }
 
+    back = (e) => {
+        e.preventDefault();
+        this.props.history.push({pathname: '/'});
+    };
+
     open_existing = (e) => {
         e.preventDefault();
         this.props.history.push({pathname: '/open_wallet'});
@@ -70,7 +75,7 @@ export default class SelectEntry extends React.Component {
 
     seed_phrase = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/'});
+        this.props.history.push({pathname: '/recover_seed'});
     };
 
     restore_legacy = (e) => {
@@ -82,11 +87,54 @@ export default class SelectEntry extends React.Component {
         return (
             <div className="width100 height100 d-flex flex-column text-center">
                 
-                <Container className="height100 flex-column p-5 d-flex justify-content-center">
-                    <Row className="row justify-content-md-center justify-content-center p-3">
-                        <Image className="entry-image align-content-center mb-5" src={require("./../../img/safex-logo.png")}/>
-                    </Row>
+                <Container fluid className="height100 flex-column d-flex justify-content-center">
+
+                    <Image className="plant" src={require("./../../img/plant.svg")}/>
+                    <Image className="plant2" src={require("./../../img/corner-plant.svg")}/>
+                    <Image className="entry-scene" src={require("./../../img/entry-scene.svg")}/>
+                    <Image onClick={this.back} className="entry-off-button" src={require("./../../img/off.svg")}/>
                     
+
+                    <Row className="rowjustify-content-md-center justify-content-center p-3">
+                        <Image className="w-25" src={require("./../../img/safex-home-multi.svg")}/>
+                    </Row>
+
+                    <Col className="my-5">
+                        <Col className="my-2 p-3">
+                            <button onClick={this.open_existing} className="custom-button-entry">Open Existing Wallet</button>
+                        </Col>
+
+                        <Col className="my-2 p-3">
+                            <button onClick={this.create_new} className="custom-button-entry">Create New Wallet</button>
+                        </Col>
+
+                        <Col className="my-2 p-3">
+                            <button className="custom-button-entry">Recover Wallet From Keys</button>
+                        </Col>
+
+                        <Col className="my-2 p-3">
+                            <button onClick={this.seed_phrase} className="custom-button-entry">Recover Wallet From Seed Phrase</button>
+                        </Col>
+
+                        {this.state.legacy_detected ? 
+                        (
+                            <Col className="my-5 p-3">
+                                <button className="custom-button-entry orange-border">Open Legacy Wallet</button>
+                            </Col>
+                        ) 
+                        : 
+                            (<div></div>)
+                        }
+                        
+                    </Col>
+
+                    
+                    <Row  className="w-100 entry-footer">
+                        <p>THE WORLD MARKETPLACE</p>
+                    </Row>
+
+                   
+                    {/*
                     <Row className="row justify-content-md-center justify-content-center p-3">
                         <Col sm={6}>
                             <Button onClick={this.open_existing} className="font-size-medium" variant="primary" size="lg" block>
@@ -122,17 +170,8 @@ export default class SelectEntry extends React.Component {
                             </Button>
                         </Col>
                     </Row>
-
-                    {this.state.legacy_detected ? (
-                        <Row className="justify-content-md-center justify-content-center p-3">
-                            <Col sm={5}>
-                                <Button onClick={this.restore_legacy} className="font-size-medium" variant="warning" size="lg" block>
-                                    <FaHistory className="mr-3"/> 
-                                    Open Legacy Wallet
-                                </Button>
-                            </Col>
-                        </Row>) : (<div></div>)
-                    }
+                    */}
+                    
                 </Container>  
             </div>);
     }

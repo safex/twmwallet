@@ -111,7 +111,7 @@
     }
 
     .display-none {
-        display: none;
+        display: none!important;
     }
 
     .text-align-center {
@@ -125,6 +125,7 @@
 /* Colors CSS Start */
     :root {
         --safex-cash-green: rgb(38, 232, 185);
+        --light-blue-gradient: linear-gradient(90deg, #13D3FD 0%, #13D3FD 100%)
     }
 
     .blue-gradient-back {

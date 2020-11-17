@@ -1,3 +1,98 @@
+/* Start Page */
+
+
+.plant {
+    position: absolute;
+    left: 0;
+    top: 5rem;
+    height: 50vh;
+}
+
+.plant2 {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 25vh;
+    z-index: 1;
+}
+
+.plant3 {
+    position: absolute;
+    bottom: 0;
+    left: 5rem;
+    width: 50vh;
+    z-index: -1;
+}
+
+.entry-scene {
+    position: absolute;
+    right: 0;
+    height: 100vh;
+    z-index: -1;
+}
+
+.entry-scene1 {
+    position: absolute;
+    left: 2rem;
+    bottom: 10rem;
+    z-index: -1;
+}
+
+.entry-off-button {
+    position: absolute;
+    right: 3rem;
+    top: 3rem;
+    height: 4rem;
+}
+
+.entry-footer {
+    height: 5rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-image: linear-gradient(to right, #13D3FD 100%, #3698F3 0%)
+}
+
+.entry-footer p {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    color: white;
+    margin: auto;
+}
+
+.custom-button-entry {
+    width: 50%;
+    min-width: 400px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: 'Inter', sans-serif;
+    font-size: 3rem;
+    font-weight: 600;
+    text-align: center;
+    border: .5rem solid #13D3FD;
+    border-radius: 10px;
+    background-color: white;
+    color:#767676;
+    padding: .5rem;
+}
+
+.custom-button-entry:hover {
+    background: linear-gradient(270deg, #3697F3 0%, #13D3FD 101.67%);
+    color: white;
+
+}
+
+.orange-border {
+    border-color: #FEB056;
+}
+
+.orange-border:hover {
+    background: linear-gradient(90deg, #FED153 0%, #FEB056 100%)!important;
+    color: white;
+}
+
 /* Select Entry CSS */
 
 .safex-background {
@@ -26,6 +121,13 @@
 
 }
 
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+
 .entry-form button {
     margin-top: .5rem;
     margin-bottom: .5rem;
@@ -42,4 +144,241 @@
 
 
 
+/* Create New Wallet */
+
+.entry-mini-logo {
+    position: absolute;
+    top: 4rem;
+    left: 5rem;
+    z-index: -2;
+}
+
+.entry-container {
+    border-radius: 50px;
+    background: #fff;
+    height: 50vh;
+    width: 60vw;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    -webkit-box-shadow: 0px 0px 20px 10px rgba(19,211,253,0.3);
+    -moz-box-shadow: 0px 0px 20px 10px rgba(19,211,253,0.3);
+    box-shadow: 0px 0px 20px 10px rgba(19,211,253,0.3);
+}
+
+.entry-container p {
+    font-family: 'Exo 2';
+    font-size: 4rem;
+    font-weight: 500;
+    text-align: center;
+    color: #767676;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.entry-container i {
+
+    font-size: 3rem;
+    overflow-wrap: break-word;
+}
+
+.entry-info-div {
+    margin-left: auto;
+    width: fit-content;
+    position: relative;
+    right: 5rem;
+    top: 5rem;
+}
+
+.entry-tooltip-container {
+    color: #767676!important;
+    border-radius: 50px!important;
+    background: #fff!important;
+    display: flex!important;
+    flex-direction: column!important;
+    justify-content: center!important;
+
+
+    font-family: 'Exo 2';
+    font-size: 1.75rem!important;
+    font-weight: 500;
+    text-align: center;
+
+    -webkit-box-shadow: 0px 0px 20px 10px rgba(19,211,253,0.3)!important;
+    -moz-box-shadow: 0px 0px 20px 10px rgba(19,211,253,0.3)!important;
+    box-shadow: 0px 0px 20px 10px rgba(19,211,253,0.3)!important;
+}
+
+.progress-icon {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    max-width: fit-content;
+    width: 25%;
+    z-index: 2;
+}
+
+.progress-icon p {
+    padding: 0!important;
+}
+
+.progress-icon-color {
+    border-color: #13D3FD!important;
+    color: #13D3FD!important;
+}
+
+.progress-icon-color-complete {
+    border: 8px double #54E9B7!important;
+    color: #54E9B7!important;
+}
+
+.progress-bar-number {
+    width: 20%;
+    border-radius: 200px;
+    border: 4px solid #BDBDBD;
+    height: 7rem;
+    width: 7rem;
+    max-width: 7rem;
+    min-width: 7rem;
+    max-height: 7rem;
+    min-height: 7rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-family: 'Inter';
+    font-size: 3.5rem;
+    font-weight: 500;
+    text-align: center;
+    color: #BDBDBD;
+}
+
+.progress-bar-title {
+    width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    margin-left: 2rem;
+
+    border: none!important;
+
+    font-family: 'Inter';
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 2.2rem;
+    color: #BDBDBD;
+}
+
+.entry-progress-row {
+    width: 60vw;
+    position: absolute;
+    top: 5rem;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.entry-back-text {
+    font-family: 'Inter';
+    font-size: 3rem;
+    font-style: normal;
+    font-weight: 500;
+    text-align: center;
+    color: #13D3FD;
+}
+
+.entry-container label {
+    font-family: 'Exo 2';
+    font-size: 2.5rem;
+    font-weight: 600;
+    text-align: center;
+    color: #767676;
+
+}
+
+.entry-container input {
+    width: 50%!important;
+    margin-left: auto;
+    margin-right: auto;
+    padding: .5rem;
+    border: .5rem solid #13d3fd!important;
+    border-radius: 10px!important;
+
+    font-family: 'Exo 2';
+    font-size: 2.5rem;
+    font-weight: 500;
+    text-align: center;
+    color: #767676;
+
+}
+
+.loading-icon {
+    height: 175px;
+    width: 175px;
+}
+
+.welcome p {
+    font-family: 'Lato';
+    font-size: 10rem;
+    font-weight: 400;
+    line-height: 130px;
+    letter-spacing: 0em;
+    text-align: center;
+    color: #0F3863;
+}
+
+ /* Animation code */
+ @keyframes shake {
+    10%, 90% {
+      transform: translate3d(-1px, 0, 0);
+      border-color: #5a9fbe;
+    }
+    
+    20%, 80% {
+      transform: translate3d(2px, 0, 0);
+      border-color: #5a9fbe;
+    }
+  
+    30%, 50%, 70% {
+      transform: translate3d(-4px, 0, 0);
+      border-color: #9b7085;
+    }
+  
+    40%, 60% {
+      transform: translate3d(4px, 0, 0);
+      border-color: #bd5768;
+    }
+
+    50% {
+        transform: translate3d(-4px, 0, 0);
+        border-color: #EB353F;
+      }
+ }
+
+.wrong-password label {
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    animation-duration: 500ms;
+    animation-timing-function: ease-in-out;
+}
+
+.wrong-password input {
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    animation-duration: 500ms;
+    animation-timing-function: ease-in-out;
+}
+
+.opacity100 {
+    opacity: 0;
+}
 

@@ -2,8 +2,6 @@ import React from 'react';
 
 import {Row, Col, Container, Button, Table, Form, Image, Modal, Carousel, CarouselItem} from 'react-bootstrap';
 
-import {MDBDataTable} from 'mdbreact'
-
 import {withRouter} from 'react-router-dom';
 
 import Settings from './Settings';

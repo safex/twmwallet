@@ -10,6 +10,7 @@ import OpenWallet from './components/entry/open_wallet';
 import RecoverKeys from "./components/entry/recover_keys";
 import RecoverSeed from "./components/entry/recover_seed";
 
+import IntroScreen from './components/entry/intro_screen';
 import SelectEntry from './components/entry/select_entry';
 import LegacyPassword from './components/entry/legacy/1password';
 import LegacyKeys from './components/entry/legacy/2loadkeys';
@@ -22,9 +23,10 @@ import Settings from './components/wallet/Settings';
 
 const routes = (
     <Router>
-        <div className="height100 p-2 d-flex oflow-y-scroll safex-background" >
+        <div className="height100 d-flex" >
             <Switch className="height100 ">
-                <Route exact path="/" component={SelectEntry}/>
+                <Route exact path="/" component={IntroScreen}/>
+                <Route exact path="/select_entry" component={SelectEntry}/>
                 <Route exact path="/recover_keys" component={RecoverKeys}/>
                 <Route exact path="/recover_seed" component={RecoverSeed}/>
                 <Route exact path="/legacy_password" component={LegacyPassword}/>
