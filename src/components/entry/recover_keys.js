@@ -29,7 +29,7 @@ export default class RecoverKeys extends React.Component {
             password: '',
             safex_key: null,
             success: false,
-            network: 'mainnet',
+            network: 'stagenet',
             testnet: false,
             wallet: null,
             wallet_made: false,
@@ -100,6 +100,7 @@ export default class RecoverKeys extends React.Component {
     make_wallet = async (e) => {
         e.preventDefault();
         try {
+            this.setState({loading: true})
             let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
             recover_from_keys_util(
                 this.state.new_path,
@@ -111,6 +112,7 @@ export default class RecoverKeys extends React.Component {
                 this.state.viewkey,
                 this.state.spendkey, this.make_wallet_result);
         } catch (err) {
+            this.setState({loading: false})
             console.error(err);
             console.error("error on initial recovery");
         }
@@ -571,7 +573,7 @@ export default class RecoverKeys extends React.Component {
                                                             />
                                                         
                                                         
-                                                        <button type="submit" className="custom-button-entry orange-border my-5">
+                                                        <button type="submit" onClick={() => {this.setState({pageNumber: 4})}} className="custom-button-entry orange-border my-5">
                                                             Set Password
                                                         </button>
                                                     </form>
@@ -584,11 +586,7 @@ export default class RecoverKeys extends React.Component {
                                             )
                                         }
 
-                                        {this.state.new_path.length > 0 &&
-                                        this.state.daemon_host.length > 0 &&
-                                        this.state.wallet_made === false &&
-                                        this.state.password.length > 0 &&
-                                        this.state.pageNumber === 4 ?
+                                        {this.state.pageNumber === 4 ?
                                             (
                                                 <div className="entry-container">
                                                     <p>

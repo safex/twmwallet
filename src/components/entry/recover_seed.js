@@ -30,7 +30,7 @@ export default class RecoverSeed extends React.Component {
             password: '',
             safex_key: null,
             success: false,
-            network: 'mainnet',
+            network: 'stagenet',
             testnet: false,
             wallet: null,
             wallet_made: false,
