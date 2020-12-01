@@ -210,6 +210,11 @@ export default class OpenWallet extends React.Component {
         }
     };
 
+    backToSelect = (e) => {
+        e.preventDefault();
+        this.props.history.push({pathname: '/select_entry'});
+    };
+
     exit_home = (e) => {
         e.preventDefault();
         this.props.history.push({pathname: '/'});
@@ -217,7 +222,7 @@ export default class OpenWallet extends React.Component {
 
     render() {
         return (
-            <Container className="h-100">
+            <Container fluid className={this.state.wallet_made && this.state.loading === false ? 'h-100 blue-gradient-back' : 'h-100 background-entry-fix'}>
                 {this.state.wallet_made && 
                 this.state.loading === false ?
                 (

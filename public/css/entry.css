@@ -1,5 +1,9 @@
 /* Start Page */
 
+.background-entry-fix {
+    background-color: #fff;
+    z-index: 1;
+}
 
 .plant {
     position: absolute;
@@ -190,6 +194,7 @@ form {
     position: relative;
     right: 5rem;
     top: 5rem;
+    z-index: 1;
 }
 
 .entry-tooltip-container {
@@ -199,6 +204,11 @@ form {
     display: flex!important;
     flex-direction: column!important;
     justify-content: center!important;
+
+    overflow-wrap: break-word;
+
+    max-width: 400px;
+    margin: 2rem;
 
 
     font-family: 'Exo 2';
@@ -211,12 +221,15 @@ form {
     box-shadow: 0px 0px 20px 10px rgba(19,211,253,0.3)!important;
 }
 
+.entry-tooltip-container span {
+    margin: 2rem;
+}
+
 .progress-icon {
     display: flex;
     justify-content: start;
     align-items: center;
-    max-width: fit-content;
-    width: 25%;
+    width: min-content;
     z-index: 2;
 }
 
@@ -238,19 +251,20 @@ form {
     width: 20%;
     border-radius: 200px;
     border: 4px solid #BDBDBD;
-    height: 7rem;
-    width: 7rem;
-    max-width: 7rem;
-    min-width: 7rem;
-    max-height: 7rem;
-    min-height: 7rem;
+    height: 6rem;
+    width: 6rem;
+    max-width: 6rem;
+    min-width: 6rem;
+    max-height: 6rem;
+    min-height: 6rem;
+    margin-left: 1rem;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
     font-family: 'Inter';
-    font-size: 3.5rem;
+    font-size: 3rem;
     font-weight: 500;
     text-align: center;
     color: #BDBDBD;
@@ -261,12 +275,12 @@ form {
     display: flex;
     align-items: center;
     justify-content: start;
-    margin-left: 2rem;
+    margin-left: .5rem;
 
     border: none!important;
 
     font-family: 'Inter';
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 500;
     line-height: 2.2rem;
     color: #BDBDBD;
@@ -302,7 +316,7 @@ form {
 }
 
 .entry-container input {
-    width: 50%!important;
+    width: 50%;
     margin-left: auto;
     margin-right: auto;
     padding: .5rem;
@@ -315,6 +329,20 @@ form {
     text-align: center;
     color: #767676;
 
+}
+
+.entry-container textarea {
+    width: 75%;
+    padding: 1rem;
+
+    border: .5rem solid #13d3fd;
+    border-radius: 10px!important;
+
+    font-family: 'Inter';
+    color: #767676;
+    font-size: 1.8rem;
+    font-weight: 500;
+    text-align: center;
 }
 
 .loading-icon {

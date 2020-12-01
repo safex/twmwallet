@@ -23,7 +23,7 @@ import Settings from './components/wallet/Settings';
 
 const routes = (
     <Router>
-        <div className="height100 d-flex" >
+        <div className="height100 d-flex " >
             <Switch className="height100 ">
                 <Route exact path="/" component={IntroScreen}/>
                 <Route exact path="/select_entry" component={SelectEntry}/>

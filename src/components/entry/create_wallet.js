@@ -166,13 +166,13 @@ export default class CreateWallet extends React.Component {
     };
     make_wallet = async (e) => {
         e.preventDefault();
-        this.setState({loading: true})
+        this.setState({loading: true});
         try {
             let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
             create_wallet_util(this.state.new_path, this.state.password, 0, this.state.network, daemon_string, this.make_wallet_result);
 
         } catch (err) {
-            this.setState({loading: false})
+            this.setState({loading: false});
             console.error(err);
             console.error("error on initial recovery");
         }
@@ -218,7 +218,7 @@ export default class CreateWallet extends React.Component {
 
     render() {
         return (
-            <Container className="h-100">
+            <Container fluid className={this.state.wallet_made && this.state.loading === false ? 'h-100 blue-gradient-back' : 'h-100 background-entry-fix'}>
                 {this.state.wallet_made && 
                 this.state.loading === false ?
                 (

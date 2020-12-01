@@ -3,7 +3,7 @@ import React from 'react';
 export default function ProgressIcon(props) {
     
         return (
-            <div className="progress-icon">
+            <div className={`progress-icon`}>
                 <div className={`progress-bar-number ${props.color}`}>
                    {props.number}
                 </div>

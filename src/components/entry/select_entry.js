@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Col, Container, Row, Image, Tabs, Tab} from 'react-bootstrap'
+import {Button, Col, Container, Row, Image, Tabs, Tab, Alert, Collapse} from 'react-bootstrap'
 import { FaHistory, FaAlignLeft, FaKey, FaFolderPlus, FaFolderOpen } from 'react-icons/fa'
 
 
@@ -32,7 +32,8 @@ export default class SelectEntry extends React.Component {
 
         this.state = {
             legacy_wallet: '',
-            legacy_detected: false
+            legacy_detected: false,
+            showLegacyAlert: false
         };
     }
 
@@ -70,7 +71,7 @@ export default class SelectEntry extends React.Component {
 
     restore_keys = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/'});
+        this.props.history.push({pathname: '/recover_keys'});
     };
 
     seed_phrase = (e) => {
@@ -109,7 +110,7 @@ export default class SelectEntry extends React.Component {
                         </Col>
 
                         <Col className="my-2 p-3">
-                            <button className="custom-button-entry">Recover Wallet From Keys</button>
+                            <button onClick={this.restore_keys} className="custom-button-entry">Recover Wallet From Keys</button>
                         </Col>
 
                         <Col className="my-2 p-3">
@@ -119,7 +120,17 @@ export default class SelectEntry extends React.Component {
                         {this.state.legacy_detected ? 
                         (
                             <Col className="my-5 p-3">
-                                <button className="custom-button-entry orange-border">Open Legacy Wallet</button>
+                                <button className="custom-button-entry orange-border" onClick={() => this.setState({showLegacyAlert: !this.state.showLegacyAlert})}>Open Legacy Wallet</button>
+                                <Collapse in={this.state.showLegacyAlert}>
+                                <Alert 
+                                    variant="info" 
+                                    transition={false}
+                                    className="mt-3 w-50 mx-auto entry-back-text"    
+                                >
+                                    <Alert.Heading>We are working on this feature. Thank you for your patience!</Alert.Heading>
+                                   
+                                </Alert>
+                                </Collapse>
                             </Col>
                         ) 
                         : 

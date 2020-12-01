@@ -13,7 +13,7 @@ import Loader from 'react-loader-spinner'
 import { AiOutlineInfoCircle } from 'react-icons/ai'
 import { IoIosArrowBack } from 'react-icons/io'
 import { IconContext } from 'react-icons'
-import ReactTooltip from "react-tooltip";
+import ReactTooltip from 'react-tooltip';
 
 const safex = window.require("safex-nodejs-libwallet");
 
@@ -35,7 +35,10 @@ export default class RecoverSeed extends React.Component {
             wallet: null,
             wallet_made: false,
             seed: '',
-            seed_set: false
+            seed_set: false,
+            loading: false,
+            freshStart: true,
+            pageNumber: -1,
         };
     }
 
@@ -75,7 +78,7 @@ export default class RecoverSeed extends React.Component {
     set_password = (e) => {
         e.preventDefault();
         if (e.target.password.value === e.target.repeat_password.value) {
-            this.setState({password: e.target.password.value});
+            this.setState({password: e.target.password.value, pageNumber: 4});
         } else {
             alert("passwords dont match");
         }
@@ -88,7 +91,8 @@ export default class RecoverSeed extends React.Component {
 
     make_wallet_result = async(error, wallet) => {
         if (error) {
-
+            this.setState({loading: false})
+            alert(error)
         } else {
             this.setState({wallet_made: true, wallet: wallet});
         }
@@ -96,6 +100,7 @@ export default class RecoverSeed extends React.Component {
 
     make_wallet = async (e) => {
         e.preventDefault();
+        this.setState({loading: true});
         try {
             let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
             recover_from_seed_util(this.state.new_path,
@@ -105,8 +110,10 @@ export default class RecoverSeed extends React.Component {
                 daemon_string,
                 this.state.seed, this.make_wallet_result);
         } catch (err) {
+            this.setState({loading: false});
             console.error(err);
             console.error("error on initial recovery");
+            alert('error on initial recovery11')
         }
     };
 
@@ -138,14 +145,15 @@ export default class RecoverSeed extends React.Component {
             try {
                 this.setState({
                     seed: e.target.seed.value.trim(),
-                    seed_set: true
+                    seed_set: true,
+                    pageNumber: 1
                 });
             } catch (err) {
                 console.error(err);
                 console.error("error at setting the mnemonic");
             }
         } else {
-            alert(`you have not included enough words: you provided ${words.length} / 25`);
+            alert(`You have not included the right amount of words: you provided ${words.length} / 25`);
         }
 
     };
@@ -169,12 +177,12 @@ export default class RecoverSeed extends React.Component {
     };
 
     reset_seed = (e) => {
-        this.setState({seed_set: false});
+        this.setState({seed_set: false,});
     };
 
     render() {
         return (
-            <Container className="h-100">
+            <Container fluid className={this.state.wallet_made && this.state.loading === false ? 'h-100 blue-gradient-back' : 'h-100 background-entry-fix'}>
                 {this.state.wallet_made && 
                 this.state.loading === false ?
                 (
@@ -241,30 +249,38 @@ export default class RecoverSeed extends React.Component {
                                 BACK
                             </Col>
                             
-                            <a onClick={() => {this.setState({pageNumber: 1})}}>
-                                <ProgressIcon 
+                            
+                                <ProgressIcon
+                                    amount={4} 
                                     number={1} 
-                                    color={this.state.pageNumber === 1 ? 'progress-icon-color' : this.state.new_path.length > 0 ? 'progress-icon-color-complete' : ''}
+                                    color={this.state.pageNumber === 0 ? 'progress-icon-color' : this.state.seed_set ? 'progress-icon-color-complete' : ''}
                                     title={"SEED PHRASE"}
                                     />
-                            </a>
-
-                            <a onClick={() => {this.setState({pageNumber: 2})}}>
-                                <ProgressIcon 
+                            
+                                <ProgressIcon
+                                    amount={4} 
                                     number={2} 
+                                    title={"SAVE FILES"}
+                                    color={this.state.pageNumber === 1 ? 'progress-icon-color' : this.state.new_path.length > 0 ? 'progress-icon-color-complete' : ''}
+                                />
+                            
+                            
+                           
+                                <ProgressIcon
+                                    amount={4} 
+                                    number={3} 
                                     title={"NETWORK CONNECTION"}
                                     color={this.state.pageNumber === 2 ? 'progress-icon-color' : this.state.daemon_host.length > 0 ? 'progress-icon-color-complete' : ''}
                                 />
-                            </a>
+                           
                             
-                            <a onClick={() => {this.setState({pageNumber: 3})}}>
-                                <ProgressIcon 
-                                    number={3} 
+                            
+                                <ProgressIcon
+                                    amount={4} 
+                                    number={4} 
                                     title={"YOUR PASSWORD"}
                                     color={this.state.pageNumber === 3 ? 'progress-icon-color' : this.state.password.length > 0 ? 'progress-icon-color-complete' : ''}
                                 />
-                            </a>
-                            
                         </Row>
 
                         {this.state.wallet_made ?
@@ -279,7 +295,7 @@ export default class RecoverSeed extends React.Component {
                             </Container>) 
                             :
                             (<div 
-                                className={this.state.freshStart === false ? "display-none"
+                                className={this.state.pageNumber >= 0 ? "display-none"
                                 :" entry-container"}>
                                     <div className="entry-info-div">
                                         <IconContext.Provider  value={{color: '#767676', size: '30px'}}>
@@ -292,8 +308,9 @@ export default class RecoverSeed extends React.Component {
                                                 place="bottom"
                                             >
                                                 <span>
-                                                    Using this path you will recreate the existing Safex Wallet.
-                                                    Make sure you save wallet files and a new password.
+                                                    Using this path you will recreate and access your <b>Safex Wallet</b>.<br/><br/>
+                                                    You will need your <b>25 Word Mnemonic Key</b>.<br/><br/>
+                                                    In the future, make sure to keep your <b>Safex Wallet Files</b> and remember your new password.
                                                 </span>
                                             </ReactTooltip>
                                         </IconContext.Provider>
@@ -303,7 +320,7 @@ export default class RecoverSeed extends React.Component {
                                         <p>This path recovers an existing Safex Wallet from a 25 word seed phrase</p>    
 
                                         <button 
-                                            onClick={() => this.setState({freshStart: false, pageNumber: 1,})} 
+                                            onClick={() => this.setState({pageNumber: 0})} 
                                             className="mx-auto custom-button-entry orange-border"
                                         >
                                             Next
@@ -311,6 +328,26 @@ export default class RecoverSeed extends React.Component {
                                     </Col>
                                 
                             </div>)
+                        }
+
+                        {this.state.seed_set === false &&
+                        this.state.pageNumber === 0 ?
+                            (<div className="entry-container">
+                                <p>Enter your Seed Phrase</p>
+                                
+                                <Form id="set_seed" onSubmit={this.set_seed}>
+                                    <Form.Control name="seed" as="textarea" rows="3" maxLength=""/>
+
+                                    <button 
+                                        className="custom-button-entry orange-border my-5" 
+                                        type="submit"
+                                    >
+                                        Set Seed
+                                    </button>
+                                </Form>
+                            </div>)
+                            :
+                            ''
                         }
 
 
@@ -335,7 +372,7 @@ export default class RecoverSeed extends React.Component {
                                 :
                                 (<div className="entry-container">
                                     <p>
-                                        Where would you like to save your Safex Wallet Files?
+                                        Where would you like to save your new Safex Wallet Files?
                                     </p>
                                     <Form className="mt-2 mb-2" id="set_path" onSubmit={this.set_path}>
                                         <input className="display-none" type="file" />
@@ -503,7 +540,7 @@ export default class RecoverSeed extends React.Component {
                                                     </p>
 
                                                     <button onClick={this.make_wallet} className="my-5 mx-auto custom-button-entry orange-border">
-                                                        Create New Wallet
+                                                        Restore Wallet
                                                     </button>
                                                 </div>
                                             )
