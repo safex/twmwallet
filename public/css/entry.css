@@ -23,14 +23,15 @@
 .plant3 {
     position: absolute;
     bottom: 0;
-    left: 5rem;
-    width: 50vh;
+    left: 10rem;
+    width: 40vh;
     z-index: -1;
 }
 
 .entry-scene {
     position: absolute;
     right: 0;
+    bottom: 0;
     height: 100vh;
     z-index: -1;
 }

@@ -1,0 +1,44 @@
+.main-header {
+    width: 90vw;
+    justify-content: space-between;
+        
+    margin: 2rem 0 2rem auto;
+    border-radius: 15px 0 0 15px;
+    
+    background: linear-gradient(270deg, #3698F3 0%, #13D3FD 100%, #13D3FD 100%);
+    box-shadow: var(--blue-box-shadow);
+    
+    font-family: 'Inter';
+    font-size: 2.5rem;
+    font-style: normal;
+    font-weight: 700;
+    text-align: center;
+    color: #fff;
+}
+
+.main-header p {
+    margin: 0!important;
+}
+
+.menu-link-active p {
+    border-bottom: 4px solid #fff; 
+}
+
+.main-header .col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-header-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 1rem;
+}
+
+.main-header-logo img {
+    height: 75%;
+}
+
+

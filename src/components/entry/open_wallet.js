@@ -222,11 +222,11 @@ export default class OpenWallet extends React.Component {
 
     render() {
         return (
-            <Container fluid className={this.state.wallet_made && this.state.loading === false ? 'h-100 blue-gradient-back' : 'h-100 background-entry-fix'}>
+            <div className={this.state.wallet_made && this.state.loading === false ? 'h-100 w-100' : 'h-100 background-entry-fix w-100'}>
                 {this.state.wallet_made && 
                 this.state.loading === false ?
                 (
-                    <Container fluid className="height100 justify-content-between">
+                    <div className="height100 w-100">
                         <WalletHome
                             wallet={this.state.wallet}
                             daemon_host={this.state.daemon_host}
@@ -234,7 +234,7 @@ export default class OpenWallet extends React.Component {
                             password={this.state.password}
                             wallet_path={this.state.new_path}
                         />
-                    </Container>
+                    </div>
                 ) 
                 :
                 (
@@ -516,6 +516,6 @@ export default class OpenWallet extends React.Component {
             }
         </Container>)}
 
-        </Container>);
+        </div>);
     }
 }

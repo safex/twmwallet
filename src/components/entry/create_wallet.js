@@ -218,7 +218,7 @@ export default class CreateWallet extends React.Component {
 
     render() {
         return (
-            <Container fluid className={this.state.wallet_made && this.state.loading === false ? 'h-100 blue-gradient-back' : 'h-100 background-entry-fix'}>
+            <Container fluid className={this.state.wallet_made && this.state.loading === false ? 'h-100' : 'h-100 background-entry-fix'}>
                 {this.state.wallet_made && 
                 this.state.loading === false ?
                 (

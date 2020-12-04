@@ -136,17 +136,6 @@
 
     }
 
-    .home-carousel-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: start;
-        align-items: center;
-    }
-
-    .home-carousel {
-        max-width: 400px;
-        max-height: 300px;
-    }
 
     .carousel-inner {
         border-radius: 10px;

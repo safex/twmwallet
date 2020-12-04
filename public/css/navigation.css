@@ -33,39 +33,7 @@ body {
     position: relative;
 }
  
-.menu__list {
-    list-style-type: none;
-    height: 100%;
-    display: flex;
-    justify-content: space-between;
-}
 
-.menu__list-item {
-    display: inline-block;
-    height: 100%;
-    
-    color: #fff;
-}
-
-.menu__list-item:last-child {
-    margin-right: 0;
-}
-
-.menu__link {
-    color: #fff;
-    display: inline-block;
-    height: 100%;
-    font-size: 1.5rem;
-    text-decoration: none;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    padding: 0 3px;
-}
-
-.menu__link:hover {
-    color: #ffaa3b;
-}
 
 .menu-link-active a {
     display: inline-block;

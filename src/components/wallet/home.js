@@ -40,6 +40,13 @@ import Loader from 'react-loader-spinner'
 
 import {open_twm_file, save_twm_file} from "../../utils/twm_actions";
 
+// Custom Components
+import MainHeader from '../customComponents/MainHeader';
+import SendSafex from '../customComponents/SendSafex';
+import HomeInfo from '../customComponents/HomeInfo';
+import HomeCarousel from '../customComponents/HomeCarousel';
+import AccountInfo from '../customComponents/AccountInfo';
+
 const openpgp = window.require('openpgp');
 
 var nacl = window.require('tweetnacl');
@@ -931,7 +938,7 @@ class WalletHome extends React.Component {
 
     //show modal of private keys
     handleShow = () => {
-        this.setState({show_keys: true});
+        this.setState({show_keys: !this.state.show_keys});
     };
 
     //close modal of New Offer
@@ -1347,13 +1354,9 @@ class WalletHome extends React.Component {
     };
 
     to_ellipsis = (text, firstHalf, secondHalf) => {
-        const text_to_ellipse = text;
+        const ellipse = `${text.substring(0, firstHalf)}.....${text.substring(text.length - secondHalf, text.length)}`
 
-        const ellipse = `${text_to_ellipse.substring(0, firstHalf)}.....${text_to_ellipse.substring(text_to_ellipse.length - secondHalf, text_to_ellipse.length)}`
-
-        return (
-            ellipse
-        )
+        return (ellipse)
     };
 
     purchase_item = async (e, listing) => {
@@ -1488,7 +1491,7 @@ class WalletHome extends React.Component {
                         reject(err);
                     } else {
                         this.setState({showLoader: false, show_purchase_confirm_modal: true});
-                        copy(`https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`);
+                        
                         /*alert(
                             `Purchase transaction committed.
                             Transaction ID: ${this.state.purchase_txn_id}
@@ -1507,11 +1510,6 @@ class WalletHome extends React.Component {
                 reject(err);
             }
         });
-    };
-
-    copyAddressToClipboard = () => {
-        copy(this.state.address);
-        alert('Copied address!');
     };
 
     copyOfferToClipboard = () => {
@@ -1665,170 +1663,39 @@ class WalletHome extends React.Component {
 
                 case "home": {
                     return (
-                        <Row lg className="justify-content-around">
+                        <div className="home-main-div">
+                            <Col sm={4} className="no-padding d-flex flex-column justify-content-between">
+                                <HomeInfo
+                                    blockHeight={this.state.blockchain_height}
+                                    connection={this.state.connection_status}
+                                    firstRefresh={this.state.first_refresh}
+                                    cashBalance={this.state.cash}
+                                    tokenBalance={this.state.tokens}
+                                    penndingCash={this.state.pending_cash}
+                                    pendingTokens={this.state.pending_tokens}
+                                />
 
-                            <Col sm={2}>
-                                <div className="cash-box p-2 font-size-small">
-                                    <h3> Send Safex </h3>
-
-                                    <hr className="border border-light w-100"></hr>
-
-                                    <ul>
-                                        <Col>
-                                            <li id="wallet-balance" className="d-flex flex-row">
-                                                {this.state.first_refresh === true ?
-                                                    (this.state.cash.toLocaleString()) :
-                                                    (<Loader className="mr-3" type="ThreeDots" color="#00BFFF"
-                                                             height={20} width={20}/>)
-                                                } SFX
-                                            </li>
-
-                                            {this.state.pending_cash > 0 ?
-                                                (
-                                                    <li className="border border-warning p-1"> {this.state.pending_cash.toLocaleString()} SFX
-                                                        Pending</li>) : ''}
-                                        </Col>
-                                        {/*
-                                            this.state.pending_cash > 0 ?
-                                                (<li>{this.state.cash + this.state.pending_cash} NET</li>) : ''
-                                                */}
-                                    </ul>
-
-                                    <hr class="border border-light w-100"></hr>
-
-                                    <Form id="send_cash" onSubmit={this.cash_send}>
-                                        <Form.Group>
-                                            <Form.Label>Destination Address</Form.Label>
-
-                                            <Form.Control
-                                                name="destination"
-                                                defaultValue="Safex5..."
-                                                placedholder="the destination address"
-                                            />
-                                        </Form.Group>
-
-                                        <Form.Group>
-                                            <Form.Label>Amount (SFX)</Form.Label>
-
-                                            <Form.Control
-                                                name="amount"
-                                                defaultValue="0"
-                                                placedholder="the amount to send"
-                                            />
-                                        </Form.Group>
-
-                                        <Form.Group>
-                                            <Form.Label>Mixins</Form.Label>
-                                            <IconContext.Provider value={{color: 'white', size: '20px'}}>
-                                                <FaInfoCircle data-tip data-for='apiInfo'
-                                                              className="blockchain-icon mx-4 white-text"/>
-
-                                                <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                    <span>
-                                                        Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                        They are combined with yours for private transactions.<br/>
-                                                        Changing this from the default could hurt your privacy.<br/>
-                                                    </span>
-                                                </ReactTooltip>
-                                            </IconContext.Provider>
-
-
-                                            <Form.Control
-                                                name="mixins"
-                                                as="select"
-                                                defaultValue="7"
-                                            >
-                                                <option>1</option>
-                                                <option>2</option>
-                                                <option>3</option>
-                                                <option>4</option>
-                                                <option>5</option>
-                                                <option>6</option>
-                                                <option>7</option>
-                                            </Form.Control>
-
-                                        </Form.Group>
-
-                                        <Button className="mt-2 safex-cash-green" type="submit" size="lg" block>
-                                            Send Safex
-                                        </Button>
-                                    </Form>
-
-                                </div>
+                                <SendSafex send={this.cash_send}/>
                             </Col>
 
-                            <Col sm={9}>
-                                <Row className="my-4">
-                                    <Carousel sm={12} className="home-carousel mx-auto">
-                                        <Carousel.Item>
-                                            <img
-                                                className="d-block w-100"
-                                                src={require("./../../img/camera.jpg")}
-                                                alt="First slide"
-                                            />
-                                            <Carousel.Caption>
-                                                <h3>Vintage Camera</h3>
-                                                <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
-                                            </Carousel.Caption>
-                                        </Carousel.Item>
-                                        <Carousel.Item>
-                                            <img
-                                                className="d-block w-100"
-                                                src={require("./../../img/headphones.jpg")}
-                                                alt="Third slide"
-                                            />
+                            <Col sm={7} className="no-padding d-flex flex-column justify-content-between">
+                                <AccountInfo
+                                    rescan={this.rescan}
+                                    handleShow={this.handleShow}
+                                    show={this.state.show_keys}
+                                    address={this.props.wallet.address()}
+                                    spendKey={this.props.wallet.secretSpendKey()}
+                                    viewKey={this.props.wallet.secretViewKey()}
+                                    seed={this.props.wallet.seed()}
+                                    toEllipsis={this.to_ellipsis}
+                                />
 
-                                            <Carousel.Caption>
-                                                <h3>Premium Headphones</h3>
-                                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                                            </Carousel.Caption>
-                                        </Carousel.Item>
-                                        <Carousel.Item>
-                                            <img
-                                                className="d-block w-100"
-                                                src={require("./../../img/watch.jpg")}
-                                                alt="Third slide"
-                                            />
-
-                                            <Carousel.Caption>
-                                                <h3>A Pull Watch</h3>
-                                                <p>Better than an Apple watch; a watch you pull.</p>
-                                            </Carousel.Caption>
-                                        </Carousel.Item>
-                                        <Carousel.Item>
-                                            <img
-                                                className="d-block w-100"
-                                                src={require("./../../img/bike.jpg")}
-                                                alt="Fourth slide"
-                                            />
-
-                                            <Carousel.Caption>
-                                                <h3>Racing Bike</h3>
-                                                <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
-                                            </Carousel.Caption>
-                                        </Carousel.Item>
-                                    </Carousel>
-                                </Row>
-
-                                <Col
-                                    className="white-text d-flex flex-column justify-content-center align-items-center border border-light b-r10">
-                                    <h2>Purchases</h2>
-
-                                    <hr class="border border-light w-100"></hr>
-
-                                    <Image
-                                        src={require("./../../img/sleeping-panda.png")}
-                                        width={100}
-                                        height={100}
-                                    />
-
-                                    <h3>You don't have any purchases to protect so Panda fell asleep... <a
-                                        href="javascript:void(0)" onClick={this.show_market}>go to the market!</a></h3>
-                                </Col>
+                                <HomeCarousel/> 
                             </Col>
-                        </Row>
+                        </div>
                     );
                 }
+                
                 case "market":
 
                     var twm_listings_table = this.state.twm_offers.map((listing, key) => {
@@ -4009,183 +3876,29 @@ class WalletHome extends React.Component {
         };
 
         return (
-            <Container className="height100 justify-content-between whtie-text" fluid>
+            <div className="h-100 w-100" >
+
+                <Image className="entry-scene" src={require("./../../img/loading-scene.svg")}/>
+                <Image className="plant3" src={require("./../../img/plant2.svg")}/>
                 {this.state.interface_view === "market" ? "" :
-                    <Container
-                        fluid
-                        id="header"
-                        className="no-gutters my-5 p-2 b-r10 opaque-black"
-                    >
 
-
-                        <Row className="justify-content-between align-items-center">
-
-                            <Col sm={2} className="p-1 align-self-center b-r10 white-text light-blue-back">
-
-                                <div
-                                    className="d-flex flex-row text-align-center justify-content-center align-items-end">
-                                    <IconContext.Provider value={{color: 'white', size: '20px'}}>
-                                        <div className="white-text">
-                                            <GrCubes className="blockchain-icon m-1 white-text"/>
-                                        </div>
-                                    </IconContext.Provider>
-                                    {this.state.first_refresh === true ?
-                                        (<h5 className="mb-2 ml-3">
-                                            <b>
-                                                {
-                                                    this.state.wallet_height < this.state.blockchain_height ?
-                                                        this.state.wallet_height + ' / ' + this.state.blockchain_height :
-                                                        this.state.blockchain_height.toLocaleString()
-                                                }
-                                            </b>
-                                        </h5>) :
-                                        (<Loader className="ml-3" type="ThreeDots" color="#00BFFF" height={20}
-                                                 width={20}/>)
-                                    }
-
-                                </div>
-
-                                <p className="mb-2 text-align-center">{this.state.connection_status}</p>
-
-                            </Col>
-
-                            {/*<div className="menu-logo">
-                                <Image className=" align-content-center"
-                                    src={require("./../../img/sails-logo.png")}/>
-                                </div>*/}
-
-                            <Col sm={6} className="menu">
-                                <ul className="menu__list">
-                                    <li className={this.state.interface_view === 'home' ? "menu-link-active" : "menu__list-item"}>
-                                        <a className="menu__link" href="javascript:void(0)"
-                                           onClick={this.go_home}>Home</a>
-                                    </li>
-                                    <li className={this.state.interface_view === 'market' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                        <a className="menu__link" href="javascript:void(0)"
-                                           onClick={this.show_market}>Market</a>
-                                    </li>
-                                    <li className={this.state.interface_view === 'merchant' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                        <a className="menu__link" href="javascript:void(0)"
-                                           onClick={this.show_merchant}>Merchant</a>
-                                    </li>
-                                    <li className={this.state.interface_view === 'tokens' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                        <a className="menu__link" href="javascript:void(0)"
-                                           onClick={this.show_tokens}>Tokens</a>
-                                    </li>
-                                </ul>
-                            </Col>
-
-                            <div className="d-flex flex-column">
-                                <a className="menu__link" href="javascript:void(0)"
-                                   onClick={this.show_settings}><FaCogs size={20} className="m-3"/></a>
-
-
-                                <a className="menu__link" href="javascript:void(0)"
-                                   onClick={this.logout}><GiExitDoor className="m-3"/></a>
-                            </div>
-                        </Row>
-
-
-                        <Row
-                            className="no-gutters p-2 justify-content-between align-items-center b-r10 white-text">
-                            <Col id="balances" sm={3}>
-                                <li className="d-flex flex-row">
-                                    SFX: {this.state.first_refresh === true ?
-                                    (this.state.cash.toLocaleString()) :
-                                    (<Loader className="ml-5" type="ThreeDots" color="#00BFFF" height={20} width={20}/>)
-                                }
-
-                                    {this.state.pending_cash > 0 ?
-                                        ` - (${this.state.pending_cash.toLocaleString()} SFX Pending)` :
-                                        ''
-                                    }
-                                </li>
-
-                                <li className="d-flex flex-row">
-                                    SFT: {this.state.first_refresh === true ?
-                                    (this.state.tokens.toLocaleString()) :
-                                    (<Loader className="ml-5" type="ThreeDots" color="#00BFFF" height={20} width={20}/>)
-                                }
-
-                                    {this.state.pending_tokens > 0 ?
-                                        ` - (${this.state.pending_tokens.toLocaleString()} SFT Pending)` :
-                                        ''
-                                    }
-                                </li>
-                            </Col>
-
-                            <Col className="text-align-center" sm={8}>
-                                <p>SFX + SFT Public Address:<br/>
-                                    <br/>
-                                    <b>{this.state.address}</b>
-                                </p>
-                                <Row className="justify-content-center">
-
-                                    <div id="header-buttons" className="d-flex flex-row" sm={1}>
-
-                                        {this.state.synced === false ? (
-                                            <Button variant="warning" onClick={this.check}>
-                                                Check
-                                            </Button>) : ''}
-
-                                        <Button variant="danger" onClick={this.rescan}>
-                                            Hard Rescan
-                                        </Button>
-
-
-                                        <Button variant="primary" onClick={this.handleShow}>
-                                            Show Keys
-                                        </Button>
-
-                                        <Modal
-                                            className="width100 black-text"
-                                            animation={false}
-                                            show={this.state.show_keys}
-                                            onHide={this.handleClose}
-                                        >
-                                            <Modal.Header closeButton>
-                                                <Modal.Title>Your Private Keys</Modal.Title>
-                                            </Modal.Header>
-                                            <Modal.Body>
-                                                <ul>
-                                                    <li>
-                                                        <b>Address:</b> <br/> {this.props.wallet.address()}
-                                                    </li>
-                                                    <li>
-                                                        <b>Secret Spend Key:</b>
-                                                        <br/> {this.props.wallet.secretSpendKey()}
-                                                    </li>
-                                                    <li>
-                                                        <b>Secret View Key:</b>
-                                                        <br/> {this.props.wallet.secretViewKey()}
-                                                    </li>
-                                                    <li>
-                                                        <b>Mnemonic Seed:</b>
-                                                        <br/> {this.props.wallet.seed().toUpperCase()}
-                                                    </li>
-                                                </ul>
-                                            </Modal.Body>
-                                            <Modal.Footer>
-                                                <Button variant="secondary" onClick={this.handleClose}>
-                                                    Close
-                                                </Button>
-                                            </Modal.Footer>
-                                        </Modal>
-                                        <Button className="ml-3" onClick={this.copyAddressToClipboard}>
-                                            Copy Address
-                                        </Button>
-                                    </div>
-                                </Row>
-                            </Col>
-
-                        </Row>
-                    </Container>
+                
+                    <MainHeader 
+                        view={this.state.interface_view} 
+                        goHome={this.go_home} 
+                        goToTokens={this.show_tokens}
+                        goToMarket={this.show_market}
+                        goToMerchant={this.show_merchant}
+                        goToSettings={this.show_settings}
+                        logout={this.logout}
+                    />
+                    
                 }
 
 
                 {twmwallet()}
 
-            </Container>
+            </div>
         );
     }
 }
