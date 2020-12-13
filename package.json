@@ -1,7 +1,7 @@
 {
   "name": "twmwallet",
   "description": "graphical user interface to the world marketplace application on the safex blockchain",
-  "version": "v0.0.9",
+  "version": "v0.1.1",
   "homepage": "./",
   "repository": {
     "type": "git",
@@ -53,6 +53,7 @@
     "child_process": "^1.0.2",
     "copy-to-clipboard": "^3.3.1",
     "electron-context-menu": "^0.16.0",
+    "keccak256": "^1.0.2",
     "mdbreact": "^4.27.0",
     "openpgp": "^4.10.4",
     "os": "^0.1.1",
@@ -71,7 +72,7 @@
     "react-router-dom": "^5.1.2",
     "react-tooltip": "^3.11.6",
     "safe-buffer": "^5.2.0",
-    "safex-addressjs": "git+https://github.com/safex/safex_addressjs.git",
+    "safex-addressjs": "git+https://github.com/safex/safex_addressjs.git#e10f34db67c35ef356c18e9ab1f77c37a819ed80",
     "safex-nodejs-libwallet": "git+https://github.com/safex/safex-nodejs-libwallet.git",
     "save": "^2.4.0",
     "tweetnacl": "^1.0.3"
@@ -108,7 +109,8 @@
       "!node_modules/safex-nodejs-libwallet/boost*",
       "!node_modules/safex-nodejs-libwallet/safexcore",
       "!node_modules/safex-nodejs-libwallet/deps",
-      "!node_modules/safex-nodejs-libwallet/build"
+      "!node_modules/safex-nodejs-libwallet/build",
+      "!node_modules/openpgp/dist/openpgp.min.js"
     ],
     "mac": {
       "category": "public.app-category.business",

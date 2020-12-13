@@ -3,16 +3,18 @@ import {Button, Col, Container, Row, Image, Tabs, Tab} from 'react-bootstrap'
 import { FaHistory, FaAlignLeft, FaKey, FaFolderPlus, FaFolderOpen } from 'react-icons/fa'
 
 
+import {open_wallet_util} from "../../utils/wallet_creation";
+import {purchase_offer} from "../../utils/wallet_actions";
 
 import {save_twm_file, open_twm_file} from "../../utils/twm_actions";
+import copy from "copy-to-clipboard";
 const os = window.require('os');
 const fs = window.require('fs').promises;
 const libPath = window.require('path');
 const crypto = window.require('crypto');
-
+var walley;
 const WALLET_FILENAME = 'safexwallet.dat';
 const DEFAULT_WALLET_PATH = libPath.resolve(os.homedir(), WALLET_FILENAME);
-
 
 
 async function read_legacy_wallet(wallet_path) {
@@ -37,8 +39,8 @@ export default class SelectEntry extends React.Component {
     }
 
     async componentDidMount() {
-
         try {
+            localStorage.clear();
             let wallet = await read_legacy_wallet(DEFAULT_WALLET_PATH);
 
             //if there is an error loading the file, perhaps it doesn't exist
@@ -51,7 +53,9 @@ export default class SelectEntry extends React.Component {
             console.error(err);
             console.error("error at reading legacy wallet");
         }
-    }
+    };
+
+
 
     open_existing = (e) => {
         e.preventDefault();
@@ -65,12 +69,12 @@ export default class SelectEntry extends React.Component {
 
     restore_keys = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/'});
+        this.props.history.push({pathname: '/recover_keys'});
     };
 
     seed_phrase = (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: '/'});
+        this.props.history.push({pathname: '/recover_seed'});
     };
 
     restore_legacy = (e) => {
@@ -81,12 +85,17 @@ export default class SelectEntry extends React.Component {
     render() {
         return (
             <div className="width100 height100 d-flex flex-column text-center">
-                
+
                 <Container className="height100 flex-column p-5 d-flex justify-content-center">
                     <Row className="row justify-content-md-center justify-content-center p-3">
                         <Image className="entry-image align-content-center mb-5" src={require("./../../img/safex-logo.png")}/>
                     </Row>
-                    
+                    <Row className="row justify-content-md-center justify-content-center p-3">
+                        <p>
+
+                            This wallet is for testing Stagenet 3, December 11, 2020 ONLY USE THIS WALLET FOR TESTING
+                        </p>
+                        </Row>
                     <Row className="row justify-content-md-center justify-content-center p-3">
                         <Col sm={6}>
                             <Button onClick={this.open_existing} className="font-size-medium" variant="primary" size="lg" block>
@@ -127,13 +136,13 @@ export default class SelectEntry extends React.Component {
                         <Row className="justify-content-md-center justify-content-center p-3">
                             <Col sm={5}>
                                 <Button onClick={this.restore_legacy} className="font-size-medium" variant="warning" size="lg" block>
-                                    <FaHistory className="mr-3"/> 
+                                    <FaHistory className="mr-3"/>
                                     Open Legacy Wallet
                                 </Button>
                             </Col>
                         </Row>) : (<div></div>)
                     }
-                </Container>  
+                </Container>
             </div>);
     }
 }

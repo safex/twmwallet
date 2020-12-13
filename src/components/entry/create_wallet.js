@@ -99,8 +99,8 @@ export default class CreateWallet extends React.Component {
 
                     twm_obj.version = 1;
                     twm_obj.api = {};
-                    twm_obj.api.urls = {};/*
-                    twm_obj.api.urls.theworldmarketplace = {};
+                    twm_obj.api.urls = {};
+                    /*twm_obj.api.urls.theworldmarketplace = {};
                     twm_obj.api.urls.theworldmarketplace.url = 'api.theworldmarketplace.com';*/
                     twm_obj.accounts = {};
                     twm_obj.settings = {};
@@ -235,7 +235,7 @@ export default class CreateWallet extends React.Component {
                                     This path creates a new set of keys and a Safex Wallet.
                                 </p>
                                 <p>
-                                    THIS WALLET IS STAGENET V2 THIS IS NOT A REGULAR SAFEX WALLET USE ONLY FOR TESTING ONLY September 24, 2020
+                                    This wallet is for testing Stagenet 3, December 11, 2020 ONLY USE THIS WALLET FOR TESTING
                                 </p>
 
 
