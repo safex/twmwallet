@@ -1667,6 +1667,8 @@ class WalletHome extends React.Component {
             console.log(total_cost);
             console.log(listing.price);
             console.log(quant);
+            console.log(this.state.cash);
+            console.log(`listing quant ${listing.quantity}`)
 
             let alert_bool = false;
             let alert_text = ``;
@@ -1679,7 +1681,7 @@ class WalletHome extends React.Component {
                 alert_text += ` quantity must be a whole number :)`;
                 alert_bool = true;
             }
-            if (quant > listing.quantity) {
+            if (Number.parseInt(quant) > listing.quantity) {
                 alert_text += ` not enough quantity available: you wanted ${quant} but there are only ${listing.quantity} available`;
                 alert_bool = true;
             }
