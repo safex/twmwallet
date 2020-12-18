@@ -381,6 +381,17 @@
 
 /* Tokens CSS Start */
 
+    .token-main-box {
+        margin-left: 5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        
+        background-color: white;
+        border-radius: 50px;
+        box-shadow: var(--blue-box-shadow);
+    }
+
     .staking-table {
         width: 100%;
         min-height: 10vh;

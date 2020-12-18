@@ -46,6 +46,11 @@ import SendSafex from '../customComponents/SendSafex';
 import HomeInfo from '../customComponents/HomeInfo';
 import HomeCarousel from '../customComponents/HomeCarousel';
 import AccountInfo from '../customComponents/AccountInfo';
+import Stake from '../customComponents/Stake';
+import StakeInfo from '../customComponents/StakeInfo';
+import StakingTable from '../customComponents/StakingTable';
+import MerchantAccounts from '../customComponents/MerchantAccounts';
+import MerchantTabs from '../customComponents/MerchantTabs';
 
 const openpgp = window.require('openpgp');
 
@@ -73,6 +78,7 @@ class WalletHome extends React.Component {
             timer: '',
             first_refresh: false,
             show_keys: false,
+            keyRequest: false,
             twm_offers: [],
             non_offers: [],
             selected_user: {}, //merchant element
@@ -90,10 +96,13 @@ class WalletHome extends React.Component {
             show_purchase_offer_data: {main_image: false},
             show_edit_offer: {},
             show_orders: false,
-            new_account_image: require('./../../img/sails-logo.png'),
-            new_offer_image: '',
+            new_account_image: require('./../../img/NewAccountPanda.svg'), 
+            accountsImage: require('./../../img/accountsImage.svg'),
+            newOfferImage: require('./../../img/newOfferImage.svg'),
+            offersImage: require('./../../img/offersImage.svg'),
             merchantTabs: 'accounts',
             showLoader: false,
+            
         };
     }
 
@@ -951,11 +960,6 @@ class WalletHome extends React.Component {
         this.setState({show_new_offer_form: true});
     };
 
-    //close modal of new account
-    handleCloseNewAccountForm = () => {
-        this.setState({show_new_account_form: false});
-    };
-
     //close modal of Purchase Form
     handleClosePurchaseForm = () => {
         this.setState({show_purchase_form: false});
@@ -974,8 +978,8 @@ class WalletHome extends React.Component {
     };
 
     //show modal of new account
-    handleShowNewAccountForm = () => {
-        this.setState({show_new_account_form: true});
+    handleNewAccountForm = () => {
+        this.setState({show_new_account_form: !this.state.show_new_account_form});
     };
 
     //show modal of Edit Account Form
@@ -1664,25 +1668,32 @@ class WalletHome extends React.Component {
                 case "home": {
                     return (
                         <div className="home-main-div">
-                            <Col sm={4} className="no-padding d-flex flex-column justify-content-between">
+                            <Col sm={4} className="no-padding d-flex flex-column align-items-center justify-content-between">
                                 <HomeInfo
                                     blockHeight={this.state.blockchain_height}
                                     connection={this.state.connection_status}
                                     firstRefresh={this.state.first_refresh}
                                     cashBalance={this.state.cash}
                                     tokenBalance={this.state.tokens}
-                                    penndingCash={this.state.pending_cash}
+                                    pendingCash={this.state.pending_cash}
                                     pendingTokens={this.state.pending_tokens}
                                 />
 
-                                <SendSafex send={this.cash_send}/>
+                                <SendSafex 
+                                    title="SEND SAFEX"
+                                    style="cash"
+                                    send={this.cash_send}
+                                    id="send_cash"
+                                />
                             </Col>
 
-                            <Col sm={7} className="no-padding d-flex flex-column justify-content-between">
+                            <Col sm={7} className="no-padding d-flex flex-column  justify-content-between">
                                 <AccountInfo
                                     rescan={this.rescan}
                                     handleShow={this.handleShow}
                                     show={this.state.show_keys}
+                                    handleKeyRequest={() => {this.setState({keyRequest: !this.state.keyRequest})}}
+                                    keyRequest={this.state.keyRequest}
                                     address={this.props.wallet.address()}
                                     spendKey={this.props.wallet.secretSpendKey()}
                                     viewKey={this.props.wallet.secretViewKey()}
@@ -2700,16 +2711,14 @@ class WalletHome extends React.Component {
                             <Row
                                 className={
                                     this.state.selected_user.username === user.username ?
-
                                         "border border-white no-gutters account-element opaque-black"
-
-                                        : "border border-dark no-gutters account-element"}
+                                    : 
+                                        "border border-dark no-gutters account-element"}
                                 key={key}
                                 onClick={() => this.load_offers(user.username, key)}
                             >
 
                                 <Col>
-
                                     <Image
                                         width={50}
                                         height={50}
@@ -2718,18 +2727,22 @@ class WalletHome extends React.Component {
                                         className="border border-white grey-back"
                                     />
                                 </Col>
+
                                 <Col>
                                     <h2>{user.username}</h2>
-
                                 </Col>
-                                {user.status == 0 ? (
 
-                                    <Button variant="danger"
-                                            onClick={() => this.remove_account(user.username, key)}>
+                                {user.status == 0 ? 
+                                    <Button 
+                                        variant="danger"
+                                        onClick={() => this.remove_account(user.username, key)}
+                                    >
                                         Remove
                                     </Button>
 
-                                ) : ''}
+                                : 
+                                    ''
+                                }
                             </Row>
                         )
                     });
@@ -2757,776 +2770,58 @@ class WalletHome extends React.Component {
                     }
                     try {
                         return (
-                            <Row>
-                                <Col className="no-gutters">
-
-                                    <Row className="no-gutters">
-                                        <Col md={1}>
-                                            <Col
-                                                className={this.state.merchantTabs === "accounts" ?
-                                                    "merchant-tab border border-dark safex-cash-green" :
-                                                    "merchant-tab border border-light white-text"}
-                                                onClick={() => this.handleMerchantTabChange("accounts")}
-                                            >
-                                                <h2>Accounts</h2>
-
-                                                <IconContext.Provider value={{color: 'white', size: '50px'}}>
-                                                    <MdPeople data-tip data-for='accountsInfo'/>
-
-                                                    <ReactTooltip id='accountsInfo' type='info' effect='solid'>
-                                                        <span>
-                                                            Manage your accounts
-                                                        </span>
-                                                    </ReactTooltip>
-                                                </IconContext.Provider>
-                                            </Col>
-
-                                            <Col
-                                                className={this.state.merchantTabs === "offers" ?
-                                                    "merchant-tab border border-dark safex-cash-green" :
-                                                    "merchant-tab border border-light white-text"}
-                                                onClick={() => this.handleMerchantTabChange("offers")}
-                                            >
-
-                                                <h2>Offers</h2>
-
-
-                                                <IconContext.Provider value={{color: 'white', size: '50px'}}>
-                                                    <MdReceipt data-tip data-for='offersInfo'/>
-
-                                                    <ReactTooltip id='offersInfo' type='info' effect='solid'>
-                                                        <span>
-                                                            Manage your offers
-                                                        </span>
-                                                    </ReactTooltip>
-                                                </IconContext.Provider>
-                                            </Col>
-                                        </Col>
-
-                                        {/*Accounts Tab*/}
-                                        <Col
-                                            className={this.state.merchantTabs === "accounts" ?
-                                                "d-flex no-gutters p-3 justify-content-around grey-back b-r10" :
-                                                "display-none"}
-                                            md={11}
-                                        >
-                                            <Col md={5} className="account-list no-gutters p-3">
-
-                                                {accounts_table}
-
-                                            </Col>
-                                            {selected !== void (0) ? (
-                                                <Col md={3}
-                                                     className="
-                                                    no-gutters d-flex flex-column 
-                                                    align-items-center justify-content-center b-r10 
-                                                    merchant-profile-view text-align-center"
-                                                >
-                                                    <Row>
-                                                        <ul>
-                                                            <li>
-                                                                <Image
-                                                                    className="border border-white grey-back"
-                                                                    width={100}
-                                                                    height={100}
-                                                                    src={data.avatar}
-                                                                    roundedCircle
-                                                                />
-                                                            </li>
-                                                            <h2>{selected.username}</h2>
-
-                                                        </ul>
-                                                    </Row>
-
-                                                    <div id="account-edit-buttons" className=" d-flex flex-column">
-                                                        <Button size="lg" variant="success"
-                                                                onClick={() => this.handleShowEditAccountForm(selected)}>
-                                                            Edit
-                                                        </Button>
-
-                                                        <Modal
-                                                            animation={false}
-                                                            show={this.state.show_edit_account_form}
-                                                            onHide={this.handleCloseEditAccountForm}
-                                                        >
-                                                            <Modal.Header closeButton>
-                                                                <Modal.Title>
-                                                                    Edit Account {selected.username}
-                                                                </Modal.Title>
-                                                            </Modal.Header>
-
-                                                            <Modal.Body>
-
-                                                                <Form id="edit_account"
-                                                                      onSubmit={(e) => this.edit_account_top(e)}>
-                                                                    <Form.Row>
-                                                                        <Col md="8">
-                                                                            <Form.Group as={Col}>
-                                                                                <Form.Label>Username</Form.Label>
-
-                                                                                <Form.Control name="username"
-                                                                                              defaultValue={selected.username}/>
-                                                                            </Form.Group>
-
-                                                                            <Form.Group as={Col}>
-                                                                                <Form.Label>Avatar URL</Form.Label>
-
-                                                                                <Form.Control name="avatar"
-                                                                                              defaultValue={data.avatar}/>
-                                                                            </Form.Group>
-                                                                        </Col>
-
-                                                                        <Col md="4">
-                                                                            <Image
-                                                                                className="border border-white grey-back"
-                                                                                width={150}
-                                                                                height={150}
-                                                                                src={data.avatar}
-                                                                                roundedCircle
-                                                                            />
-                                                                        </Col>
-                                                                    </Form.Row>
-
-                                                                    <Form.Row>
-                                                                        <Col>
-                                                                            <Form.Group as={Col}>
-                                                                                <Form.Label>Biography</Form.Label>
-
-                                                                                <Form.Control maxLength="500"
-                                                                                              as="textarea"
-                                                                                              name="biography"
-                                                                                              defaulValue={data.biography ? data.biography : ''}/>
-                                                                            </Form.Group>
-
-
-                                                                            <Form.Group as={Col}>
-                                                                                <Form.Label>Location</Form.Label>
-
-                                                                                <Form.Control name="location"
-                                                                                              defaultValue={data.location ? data.location : ''}/>
-                                                                            </Form.Group>
-
-                                                                            <Form.Group as={Col}>
-                                                                                <Form.Label>Email</Form.Label>
-
-                                                                                <Form.Control name="email"
-                                                                                              defaultValue={data.email ? data.email : ''}/>
-                                                                            </Form.Group>
-
-                                                                            <Form.Group>
-                                                                                <Form.Group md="6" as={Col}>
-                                                                                    <Form.Label>Twitter
-                                                                                        Link</Form.Label>
-
-                                                                                    <Form.Control name="twitter"
-                                                                                                  defaultValue={data.twitter ? data.twitter : ''}/>
-                                                                                </Form.Group>
-
-                                                                                <Form.Group md="6" as={Col}>
-                                                                                    <Form.Label>Facebook
-                                                                                        Link</Form.Label>
-
-                                                                                    <Form.Control name="facebook"
-                                                                                                  defaultValue={data.facebook ? data.facebook : ''}/>
-                                                                                </Form.Group>
-
-                                                                                <Form.Group md="6" as={Col}>
-                                                                                    <Form.Label>LinkedIn
-                                                                                        Link</Form.Label>
-
-                                                                                    <Form.Control name="linkedin"
-                                                                                                  defaultValue={data.linkedin ? data.linkedin : ''}/>
-                                                                                </Form.Group>
-
-                                                                                <Form.Group md="6" as={Col}>
-
-                                                                                    <Form.Label>Website</Form.Label>
-                                                                                    <Form.Control name="website"
-                                                                                                  defaultValue={data.website ? data.website : ''}/>
-                                                                                </Form.Group>
-
-                                                                            </Form.Group>
-
-
-                                                                            <Form.Group as={Col}>
-
-                                                                                <Form.Label>Mixins</Form.Label>
-                                                                                <IconContext.Provider value={{
-                                                                                    color: 'white',
-                                                                                    size: '20px'
-                                                                                }}>
-                                                                                    <FaInfoCircle data-tip
-                                                                                                  data-for='apiInfo'
-                                                                                                  className="blockchain-icon mx-4 white-text"/>
-
-                                                                                    <ReactTooltip id='apiInfo'
-                                                                                                  type='info'
-                                                                                                  effect='solid'>
-                                                                                        <span>
-                                                                                            Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                                            They are combined with yours for private transactions.<br/>
-                                                                                            Changing this from the default could hurt your privacy.<br/>
-                                                                                        </span>
-                                                                                    </ReactTooltip>
-                                                                                </IconContext.Provider>
-
-
-                                                                                <Form.Control
-                                                                                    name="mixins"
-                                                                                    as="select"
-                                                                                    defaultValue="7"
-                                                                                >
-                                                                                    <option>1</option>
-                                                                                    <option>2</option>
-                                                                                    <option>3</option>
-                                                                                    <option>4</option>
-                                                                                    <option>5</option>
-                                                                                    <option>6</option>
-                                                                                    <option>7</option>
-                                                                                </Form.Control>
-
-                                                                            </Form.Group>
-                                                                        </Col>
-
-
-                                                                    </Form.Row>
-
-                                                                    <Button block size="lg" type="submit"
-                                                                            variant="success">
-                                                                        Submit Edit
-                                                                    </Button>
-                                                                </Form>
-                                                            </Modal.Body>
-                                                            <Modal.Footer className="align-self-start">
-                                                                <Button size="lg" variant="danger"
-                                                                        onClick={this.handleCloseEditAccountForm}>
-                                                                    Close
-                                                                </Button>
-                                                            </Modal.Footer>
-                                                        </Modal>
-                                                        <Button onClick={() => this.register_twmapi(selected)}>
-                                                            Register API
-                                                        </Button>
-                                                        <Button>Remove</Button>
-                                                    </div>
-                                                </Col>
-                                            ) : ''}
-
-                                            <Col className="align-self-center" md={2}>
-                                                <Button block size="lg" variant="success"
-                                                        onClick={this.handleShowNewAccountForm}>
-                                                    New Account
-                                                </Button>
-
-                                                <Modal
-                                                    animation={false}
-                                                    show={this.state.show_new_account_form}
-                                                    onHide={this.handleCloseNewAccountForm}
-                                                >
-                                                    <Modal.Header closeButton>
-                                                        <Modal.Title>Create New Account</Modal.Title>
-                                                    </Modal.Header>
-
-                                                    <Modal.Body>
-                                                        <Form id="create_account" onSubmit={this.register_account}>
-                                                            <Form.Row>
-                                                                <Col md="8">
-                                                                    <Form.Group as={Col}>
-                                                                        <Form.Label>Username</Form.Label>
-
-                                                                        <Form.Control name="username"
-                                                                                      placedholder="enter your desired username"/>
-                                                                    </Form.Group>
-
-                                                                    <Form.Group as={Col}>
-                                                                        <Form.Label>Avatar URL</Form.Label>
-                                                                        <Form.Control
-                                                                            onChange={this.handleChange}
-                                                                            value={this.state.new_account_image}
-                                                                            name="new_account_image"
-                                                                            placedholder="Enter the URL of your avatar"
-                                                                        />
-                                                                    </Form.Group>
-                                                                </Col>
-
-                                                                <Col md="4">
-                                                                    <Image
-                                                                        className="border border-white grey-back"
-                                                                        width={150}
-                                                                        height={150}
-                                                                        src={this.state.new_account_image}
-                                                                        roundedCircle
-                                                                    />
-                                                                </Col>
-                                                            </Form.Row>
-
-                                                            <Form.Row>
-                                                                <Col>
-                                                                    <Form.Group as={Col}>
-                                                                        <Form.Label>Biography</Form.Label>
-                                                                        <Form.Control
-                                                                            maxLength="500"
-                                                                            as="textarea"
-                                                                            name="biography"
-                                                                            placedholder="type up your biography"
-                                                                            style={{maxHeight: 150}}
-                                                                        />
-                                                                    </Form.Group>
-
-
-                                                                    <Form.Group as={Col}>
-                                                                        <Form.Label>Location</Form.Label>
-                                                                        <Form.Control
-                                                                            name="location"
-                                                                            defaultValue="Earth"
-                                                                            placedholder="your location"
-                                                                        />
-                                                                    </Form.Group>
-
-                                                                    <Form.Group as={Col}>
-
-                                                                        <Form.Label>Email</Form.Label>
-                                                                        <Form.Control
-                                                                            name="email"
-                                                                            defaultValue="xyz@example.com"
-                                                                            placedholder="your location"
-                                                                        />
-                                                                    </Form.Group>
-
-                                                                    <Form.Group>
-                                                                        <Form.Group md="6" as={Col}>
-                                                                            <Form.Label>Twitter Link</Form.Label>
-                                                                            <Form.Control
-                                                                                name="twitter"
-                                                                                defaultValue="twitter.com"
-                                                                                placedholder="enter the link to your twitter handle"
-                                                                            />
-
-                                                                        </Form.Group>
-
-                                                                        <Form.Group md="6" as={Col}>
-                                                                            <Form.Label>Facebook Link</Form.Label>
-                                                                            <Form.Control
-                                                                                name="facebook"
-                                                                                defaultValue="facebook.com"
-                                                                                placedholder="enter the to of your facebook page"
-                                                                            />
-
-                                                                        </Form.Group>
-
-                                                                        <Form.Group md="6" as={Col}>
-                                                                            <Form.Label>LinkedIn Link</Form.Label>
-                                                                            <Form.Control
-                                                                                name="linkedin"
-                                                                                defaultValue="linkedin.com"
-                                                                                placedholder="enter the link to your linkedin handle"
-                                                                            />
-                                                                        </Form.Group>
-
-                                                                        <Form.Group md="6" as={Col}>
-
-                                                                            <Form.Label>Website</Form.Label>
-                                                                            <Form.Control
-                                                                                name="website"
-                                                                                defaultValue="safex.org"
-                                                                                placedholder="if you have your own website: paste your link here"
-                                                                            />
-                                                                        </Form.Group>
-
-                                                                    </Form.Group>
-
-
-                                                                    <Form.Group as={Col}>
-
-                                                                        <Form.Label>Mixins</Form.Label>
-                                                                        <IconContext.Provider
-                                                                            value={{color: 'white', size: '20px'}}>
-                                                                            <FaInfoCircle data-tip data-for='apiInfo'
-                                                                                          className="blockchain-icon mx-4 white-text"/>
-
-                                                                            <ReactTooltip id='apiInfo' type='info'
-                                                                                          effect='solid'>
-                                                                                <span>
-                                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                                    They are combined with yours for private transactions.<br/>
-                                                                                    Changing this from the default could hurt your privacy.<br/>
-                                                                                </span>
-                                                                            </ReactTooltip>
-                                                                        </IconContext.Provider>
-
-
-                                                                        <Form.Control
-                                                                            name="mixins"
-                                                                            as="select"
-                                                                            defaultValue="7"
-                                                                        >
-                                                                            <option>1</option>
-                                                                            <option>2</option>
-                                                                            <option>3</option>
-                                                                            <option>4</option>
-                                                                            <option>5</option>
-                                                                            <option>6</option>
-                                                                            <option>7</option>
-                                                                        </Form.Control>
-
-                                                                    </Form.Group>
-                                                                </Col>
-
-
-                                                            </Form.Row>
-
-                                                            <Button
-                                                                block
-                                                                size="lg"
-                                                                variant="success"
-                                                                type="submit"
-                                                                className="my-5"
-                                                            >
-
-                                                                Create Account
-                                                            </Button>
-                                                        </Form>
-                                                    </Modal.Body>
-                                                    <Modal.Footer className="align-self-start">
-
-                                                        <Button variant="danger"
-                                                                onClick={this.handleCloseNewAccountForm}>
-                                                            Close
-                                                        </Button>
-                                                    </Modal.Footer>
-                                                </Modal>
-                                            </Col>
-
-                                        </Col>
-
-                                        {/*Messages Tab*/}
-                                        <Col
-                                            className={this.state.merchantTabs === "messages" ?
-                                                "d-flex no-gutters p-3 justify-content-around grey-back b-r10" :
-                                                "display-none"}
-                                            md={11}
-                                        >
-                                            <h1>Messages</h1>
-
-                                        </Col>
-
-                                        {/*Offers Tab*/}
-                                        <Col
-                                            className={this.state.merchantTabs === "offers" ?
-                                                "d-flex flex-column no-gutters p-3 justify-content-around grey-back b-r10" :
-                                                "display-none"}
-                                            md={11}
-                                        >
-
-                                            {selected !== void (0) ?
-                                                (
-                                                    <div>
-                                                        {this.state.show_orders ?
-                                                            (<Row>
-                                                                    <Col>
-                                                                        <Button variant="danger"
-                                                                                onClick={this.show_orders}>
-                                                                            Back
-                                                                        </Button>
-                                                                    </Col>
-                                                                    <Col>
-                                                                        <h1>*Offer Title* Orders Table</h1>
-                                                                    </Col>
-                                                                </Row>
-
-
-                                                            )
-
-                                                            :
-                                                            (<Table>
-                                                                <thead>
-
-                                                                </thead>
-
-                                                                <tbody>
-                                                                {non_listings_table}
-                                                                </tbody>
-                                                            </Table>)
-                                                        }
-                                                    </div>
-                                                )
-                                                :
-                                                (
-                                                    <div className="d-flex flex-column align-items-center">
-
-                                                        <Image
-                                                            src={require("./../../img/eating-panda.png")}
-                                                            width={100}
-                                                            height={100}
-                                                        />
-
-                                                        <h3>You haven't selected an account so Panda decided to have a
-                                                            snack... <a className="black-text" href="javascript:void(0)"
-                                                                        onClick={() => this.handleMerchantTabChange('accounts')}><u> select
-                                                                or create an account</u></a> to get started!</h3>
-                                                    </div>
-                                                )
-                                            }
-
-                                        </Col>
-
-                                    </Row>
-
-                                    <Col lg className="merchant-product-view b-r10 px-3 pb-5 opaque-black no-gutters mt-5">
-                                        {selected !== void (0) ? (
-                                            <div className="pt-5 align-items-center sticky d-flex flex-column">
-                                                <div>
-                                                    <Button 
-                                                        className="mb-5" 
-                                                        size="lg" 
-                                                        variant="success"
-                                                        onClick={this.handleShowNewOfferForm}>
-                                                    New Offer
-                                                    </Button>
-                                                </div>
-
-                                                <Modal 
-                                                    animation={false}
-                                                    show={this.state.show_new_offer_form}
-                                                    onHide={this.handleCloseNewOfferForm}
-                                                    size="lg"
-                                                >
-                                                    <Modal.Header closeButton>
-                                                        <Modal.Title>Create New Offer</Modal.Title>
-                                                    </Modal.Header>
-                                                    <Modal.Body>
-
-                                                        <Form 
-                                                            id="list_new_offer" 
-                                                            onSubmit={this.list_new_offer}
-                                                        >
-                                                            <Form.Row>
-                                                            <Col md="8">
-                                                                <Form.Group as={Col}>
-                                                                    <Form.Label>Username</Form.Label>
-
-                                                                    <Form.Control 
-                                                                        disabled 
-                                                                        name="username"
-                                                                        value={selected.username}
-                                                                    />
-                                                                </Form.Group>
-                                                                <Form.Group  as={Col}>
-                                                                    <Form.Label>Image URL</Form.Label>
-
-                                                                    <Form.Control 
-                                                                        name="new_account_image"
-                                                                        defaultValue={data.main_image}
-                                                                        onChange={this.handleChange}
-                                                                    />
-                                                                </Form.Group>
-                                                            </Col>
-
-                                                            <Col md="4">
-                                                                <Image 
-                                                                    className="border border-white grey-back" 
-                                                                    width={150} 
-                                                                    height={150} 
-                                                                    src={this.state.new_account_image}
-                                                                    roundedCircle
-                                                                />
-                                                            </Col>
-                                                        </Form.Row>
-
-                                                        <Form.Row  md="8">
-                                                            <Form.Group as={Col}>
-                                                                <Form.Label>Title</Form.Label>
-
-                                                                <Form.Control name="title"
-                                                                                defaultValue={this.state.show_edit_offer.title}/>
-                                                            </Form.Group>
-
-                                                            <Form.Group as={Col}>
-                                                                <Form.Label>Description</Form.Label>
-                                                                
-                                                                <Form.Control maxLength="2000" as="textarea"
-                                                                                    name="description"
-                                                                                    defaultValue={data.description}/>
-                                                            </Form.Group>
-                                                        </Form.Row>
-
-                                                        <Form.Row>
-
-                                                            <Form.Group  md="6" as={Col}>
-                                                                <Form.Label>Price (SFX)</Form.Label>
-                                                                
-                                                                <Form.Control 
-                                                                    name="price"
-                                                                    defaultValue={1}
-                                                                />
-                                                            </Form.Group>
-
-                                                            <Form.Group  md="6" as={Col}>
-                                                                <Form.Label>Available Quantity</Form.Label>
-                                                                
-                                                                <Form.Control 
-                                                                    name="quantity"
-                                                                    defaultValue={1}
-                                                                />
-                                                            </Form.Group>
-                                                            
-                                                            <Form.Group  md="6" as={Col}>
-                                                                <Form.Label>SKU</Form.Label>
-                                                                
-                                                                <Form.Control 
-                                                                    name="sku"
-                                                                    defaultValue={data.sku}
-                                                                />
-                                                            </Form.Group>
-                                                            
-                                                            <Form.Group  md="6" as={Col}>
-                                                                <Form.Label>Barcode (ISBN, UPC, GTIN, etc)</Form.Label>
-                                                                
-                                                                <Form.Control 
-                                                                    name="barcode"
-                                                                    defaultValue={data.barcode}
-                                                                />
-                                                            </Form.Group>
-                                                            
-                                                            <Form.Group  md="6" as={Col}>
-                                                                <Form.Label>Weight</Form.Label>
-                                                                
-                                                                <Form.Control 
-                                                                    name="weight"
-                                                                    defaultValue={data.weight}
-                                                                />
-                                                            </Form.Group>
-                                                            
-                                                            <Form.Group  md="6" as={Col}>
-                                                                <Form.Label>Physical Item?</Form.Label>
-                                                                
-                                                                <Form.Control 
-                                                                    name="physical"
-                                                                    defaultValue="true"
-                                                                />
-                                                            </Form.Group>
-                                                            
-                                                             
-                                                        </Form.Row>
-
-                                                        <Form.Row>
-                                                            <Form.Group md="6" as={Col}>
-                                                                <Form.Label>Message Type</Form.Label>
-
-                                                                <Form.Control 
-                                                                    name="message_type"
-                                                                    defaultValue="Shipping"
-                                                                />
-                                                            </Form.Group>
-                                                            
-                                                            <Form.Group md="6" as={Col}>
-                                                                <Form.Label>Country of Origin</Form.Label>
-
-                                                                <Form.Control 
-                                                                    name="country"
-                                                                    defaultValue={data.country}
-                                                                    placedholder="your location"
-                                                                />
-                                                            </Form.Group>
-
-                                                            
-
-                                                        </Form.Row>
-                                                             
-                                                            <Form.Group>
-                                                                <Form.Label>
-                                                                    Mixins
-                                                                    <IconContext.Provider  value={{color: 'black', size: '20px'}}>
-                                                                        <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon mx-4 white-text"/>
-                                                                        
-                                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                                            <span>
-                                                                                Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                                They are combined with yours for private transactions.<br/>
-                                                                                Changing this from the default could hurt your privacy.<br/>
-                                                                            </span>
-                                                                        </ReactTooltip>
-                                                                    </IconContext.Provider>
-                                                                </Form.Label>
-                                                                
-                                                                <Form.Control 
-                                                                    name="mixins" 
-                                                                    as="select"
-                                                                    defaultValue="7"
-                                                                >
-                                                                    <option>1</option>
-                                                                    <option>2</option>
-                                                                    <option>3</option>
-                                                                    <option>4</option>
-                                                                    <option>5</option>
-                                                                    <option>6</option>
-                                                                    <option>7</option>
-                                                                </Form.Control>
-                                                            </Form.Group>
-
-                                                            <Button block size="lg" variant="success" type="submit">
-                                                                List Offer
-                                                            </Button>
-                                                        </Form>
-                                                    </Modal.Body>
-                                                    <Modal.Footer className="align-self-start">
-                                                        <Button size="lg" variant="danger"
-                                                                onClick={this.handleCloseNewOfferForm}>
-                                                            Close
-                                                        </Button>
-                                                    </Modal.Footer>
-                                                </Modal>
-                                                <thead className="w-100 opaque-black text-align-center">
-
-                                                    <tr>
-                                                        <th className="title-row">Title</th>
-                                                        <th className="quantity-row">Price (SFX)</th>
-                                                        <th className="quantity-row">Quantity</th>
-                                                        <th className="quantity-row">Seller</th>
-                                                        <th className="actions-row">Offer ID</th>
-                                                        <th className="title-row">Actions</th>
-                                                        
-                                                    </tr>
-                                                </thead>
-                                            </div>) : ''}
-
-                                        <Row className="no-gutters">
-                                            {this.state.twm_offers.length > 1 ? (
-                                                    <Table color="white"
-                                                           className="white-text border border-white b-r10">
-                                                        <thead>
-                                                        <tr>
-                                                            <th>Title</th>
-                                                            <th>Price (SFX)</th>
-                                                            <th>Quantity</th>
-                                                            <th>Seller</th>
-                                                            <th>Offer ID</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        {twm_listings_table}
-                                                        </tbody>
-                                                    </Table>)
-                                                : (<div></div>)}
-
-                                            <Table>
-                                                <thead>
-                                              
-                                                </thead>
-                                                <tbody>
-                                                {non_listings_table}
-                                                </tbody>
-                                            </Table>
-                                        </Row>
-                                    </Col>
+                            <div className="home-main-div">
+                                <Col sm={4} className="no-padding d-flex flex-column align-items-center justify-content-between">
+                                    <HomeInfo
+                                        blockHeight={this.state.blockchain_height}
+                                        connection={this.state.connection_status}
+                                        firstRefresh={this.state.first_refresh}
+                                        cashBalance={this.state.cash}
+                                        tokenBalance={this.state.tokens}
+                                        pendingCash={this.state.pending_cash}
+                                        pendingTokens={this.state.pending_tokens}
+                                    />
+
+                                    <MerchantTabs
+                                        newAccountImage={this.state.new_account_image}
+                                        handleNewAccountForm={this.handleNewAccountForm}
+                                        handleChange={this.handleChange}
+                                        accountsImage={this.state.accountsImage}
+                                        newOfferImage={this.state.newOfferImage}
+                                        offersImage={this.state.offersImage}
+                                    />
                                 </Col>
-                            </Row>);
+
+                                <Col sm={7} className="no-padding d-flex flex-column  justify-content-between">
+                                    <AccountInfo
+                                        rescan={this.rescan}
+                                        handleShow={this.handleShow}
+                                        show={this.state.show_keys}
+                                        handleKeyRequest={() => {this.setState({keyRequest: !this.state.keyRequest})}}
+                                        keyRequest={this.state.keyRequest}
+                                        address={this.props.wallet.address()}
+                                        spendKey={this.props.wallet.secretSpendKey()}
+                                        viewKey={this.props.wallet.secretViewKey()}
+                                        seed={this.props.wallet.seed()}
+                                        toEllipsis={this.to_ellipsis}
+                                    />
+                                    
+                                    <MerchantAccounts
+                                        handleNewAccountForm={this.handleNewAccountForm}
+                                        showNewAccountForm={this.state.show_new_account_form}
+                                        newAccountImage={this.state.new_account_image}
+                                        registerAccount={this.register_account}
+                                    />  
+                                </Col>
+                            </div>);
+
                     } catch (err) {
                         console.log(err);
                         alert(err);
-                        return (<div><p>Error loading</p></div>);
+                        return (<p>Error loading</p>);
                     }
                 }
+
                 case "tokens": {
                     let staked_tokens = wallet.stakedTokenBalance() / 10000000000;
                     let unlocked_tokens = wallet.unlockedStakedTokenBalance() / 10000000000;
@@ -3545,310 +2840,64 @@ class WalletHome extends React.Component {
                         console.error(`error at the interval loading of stacking`);
                     }
                     return (
-                        <div
-                            className="wallet no-gutters blue-gradient-back-opaque flex-column border-bottom border-white b-r10 oflow-y-scroll">
+                        <div className="home-main-div">
+                            <Col sm={3} className="no-padding d-flex flex-column justify-content-around align-items-center">
+                                <HomeInfo
+                                    blockHeight={this.state.blockchain_height}
+                                    connection={this.state.connection_status}
+                                    firstRefresh={this.state.first_refresh}
+                                    cashBalance={this.state.cash}
+                                    tokenBalance={this.state.tokens}
+                                    pendingCash={this.state.pending_cash}
+                                    pendingTokens={this.state.pending_tokens}
+                                />
 
-                            <h1 className="text-center m-2"> Token Management </h1>
+                                <SendSafex 
+                                    title="SEND TOKENS"
+                                    style="token"
+                                    send={this.token_send}
+                                    id="send_token"
+                                />
+                            </Col>
 
-                            <hr class="border border-light w-100"></hr>
+                            <Col sm={9} className="no-padding token-main-box">
+                                <Row className="mx-auto w-100">
+                                    <StakingTable 
+                                        /*
+                                            rows={stakingRows}
+                                            Needs to be created using .map and StakingTableRow
+                                        */
+                                    />
 
-                            <div className="d-flex justify-content-around">
+                                    <Row className="justify-content-around w-100 mx-auto my-5">
+                                        <Stake
+                                            style="stake"
+                                            send={this.make_token_stake}
+                                            id="stake_token"
+                                        />
 
-                                <div className="token-box p-2 font-size-small">
-                                    <h3> Send Tokens </h3>
+                                        <StakeInfo
+                                            tokenBalance={this.state.tokens.toLocaleString()}
+                                            pendingStakeBalance={pending_stake.toLocaleString()}
+                                            stakedBalance={unlocked_tokens.toLocaleString()}
+                                            interest={this.state.blockchain_current_interest.cash_per_token / 10000000000}
+                                            blockHeight={this.state.blockchain_height.toLocaleString()}
+                                            nextInterval={100 - (this.state.blockchain_height % 100)}
+                                            totalNetworkStake={this.state.blockchain_tokens_staked.toLocaleString()}
+                                        />
 
-                                    <hr class="border border-light w-100"></hr>
-
-                                    <ul>
-                                        <Col>
-                                            <li id="wallet-balance">{this.state.tokens.toLocaleString()} SFT</li>
-                                            {this.state.pending_tokens > 0 ?
-                                                (
-                                                    <li className="border border-warning p-1">{this.state.pending_tokens.toLocaleString()} SFT
-                                                        Pending</li>) : ''}
-                                        </Col>
-                                        {/*
-                                            this.state.pending_tokens > 0 ?
-                                                ( <li>{this.state.tokens.toLocaleString() + this.state.pending_tokens.toLocaleString()} NET</li>) : ''
-                                            */}
-                                    </ul>
-
-                                    <hr class="border border-light w-100"></hr>
-
-                                    <Form id="send_token" onSubmit={this.token_send}>
-                                        <Form.Group>
-                                            <Form.Label>Destination Address</Form.Label>
-
-                                            <Form.Control
-                                                name="destination"
-                                                defaultValue="Safex5..."
-                                                placedholder="the destination address"
-                                            />
-                                        </Form.Group>
-
-                                        <Form.Group>
-                                            <Form.Label>Amount (SFT)</Form.Label>
-
-                                            <Form.Control
-                                                name="amount"
-                                                defaultValue="0"
-                                                placedholder="the amount to send"
-                                            />
-                                        </Form.Group>
-
-                                        <Form.Group>
-                                            <Form.Label>
-                                                Mixins
-                                                <IconContext.Provider value={{color: 'white', size: '20px'}}>
-                                                    <FaInfoCircle data-tip data-for='mixinTokenSendInfo'
-                                                                  className="blockchain-icon ml-8 white-text"/>
-
-                                                    <ReactTooltip id='mixinTokenSendInfo' type='info' effect='solid'>
-                                                        <span>
-                                                            Mixins are transactions that have also been sent on the Safex blockchain.<br/> 
-                                                            They are combined with yours for private transactions.<br/>
-                                                            Changing this from the default could hurt your privacy.<br/>
-                                                        </span><br/>
-                                                    </ReactTooltip>
-                                                </IconContext.Provider>
-                                            </Form.Label>
-                                            <Form.Control
-                                                name="mixins"
-                                                as="select"
-                                                defaultValue="7"
-                                            >
-                                                <option>1</option>
-                                                <option>2</option>
-                                                <option>3</option>
-                                                <option>4</option>
-                                                <option>5</option>
-                                                <option>6</option>
-                                                <option>7</option>
-                                            </Form.Control>
-                                        </Form.Group>
-
-                                        <Button className="mt-2" type="submit" variant="warning" size="lg" block>
-                                            Send Tokens
-                                        </Button>
-                                    </Form>
-                                </div>
-
-                                <div className="vl"></div>
-
-                                <Col sm={8} className="blue-gradient-back no-gutters pt-3 b-r10 opaque-black">
-                                    
-                                    <div className="staking-table mt-2 rounded grey-back">
-
-                                        <h2 className="text-center "> Stakes </h2>
-
-                                        <Table color="white"
-                                               className="white-text border border-white b-r10 light-blue-back ">
-                                            <thead className="opaque-black">
-                                            <tr>
-                                                <th>TXID</th>
-                                                <th>Amount (SFT)</th>
-                                                <th>Interest (SFX)</th>
-                                                <th>Block</th>
-
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-
-                                            </tbody>
-                                        </Table>
-                                    </div>
-
-                                    <div className="staking-box border border-light rounded  my-3">
-
-                                        <div className="token-box grey-back p-2 font-size-small">
-
-                                            <h3 className="text-center m-2"> Stake Tokens </h3>
-
-                                       <Form id="stake_tokens" onSubmit={this.make_token_stake}>
-                                            <Form.Group>
-                                                <Form.Label>Amount (SFT)</Form.Label>
-                                                
-                                                <Form.Control 
-                                                    name="amount" 
-                                                    defaultValue="0"
-                                                    placedholder="The amount to stake"
-                                                />
-                                            </Form.Group>
-                                            
-                                            <Form.Group>
-                                                <Form.Label>
-                                                    Mixins
-                                                    <IconContext.Provider  value={{color: 'white', size: '20px'}}>
-                                                        <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon ml-8 white-text"/>
-                                                        
-                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                            <span>
-                                                                Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                They are combined with yours for private transactions. <br/>
-                                                                Changing this from the default could hurt your privacy. <br/>
-                                                            </span>
-                                                            </ReactTooltip>
-                                                        </IconContext.Provider>
-                                                    </Form.Label>
-                                                    <Form.Control
-                                                        name="mixins"
-                                                        as="select"
-                                                        defaultValue="7"
-                                                    >
-                                                        <option>1</option>
-                                                        <option>2</option>
-                                                        <option>3</option>
-                                                        <option>4</option>
-                                                        <option>5</option>
-                                                        <option>6</option>
-                                                        <option>7</option>
-                                                    </Form.Control>
-                                                </Form.Group>
-                                                <Button className="mt-2" type="submit" variant="warning" size="lg"
-                                                        block>
-                                                    Stake Tokens
-                                                </Button>
-                                            </Form>
-                                        </div>
-                                        <div className="height-fit-content align-self-center b-r10 opaque-black">
-                                            <Table className="border border-light">
-                                                <thead>
-                                                <tr>
-                                                    <th>Status</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <li>{this.state.cash.toLocaleString()} SFX</li>
-                                                        {this.state.pending_cash > 0 ?
-                                                            (<li>{this.state.pending_cash.toLocaleString()} SFX
-                                                                Pending</li>) : ''}
-                                                        {/*
-                                                    this.state.pending_cash > 0 ?
-                                                        (
-                                                            <li>{this.state.cash.toLocaleString() + this.state.pending_cash.toLocaleString()} NET</li>) : ''
-                                                    */}
-
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td>
-                                                        <li>{this.state.tokens.toLocaleString()} SFT</li>
-                                                        {this.state.pending_tokens > 0 ?
-                                                            (<li>{this.state.pending_tokens.toLocaleString()} SFT
-                                                                Pending</li>) : ''}
-                                                        {this.state.pending_tokens > 0 ?
-                                                            (
-                                                                <li>{this.state.tokens.toLocaleString() + this.state.pending_tokens.toLocaleString()} NET</li>) : ''}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <li>Total Staked
-                                                            Tokens: {this.state.blockchain_tokens_staked.toLocaleString()}</li>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td>
-                                                        <li>Your Total Staked
-                                                            Tokens: {unlocked_tokens.toLocaleString()} {pending_stake > 0 ? (
-                                                                <span>| {pending_stake.toLocaleString()} Pending</span>) : ''}</li>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <li>Current
-                                                            Block: {this.state.blockchain_height.toLocaleString()}</li>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <li>Next
-                                                            Interval: {100 - (this.state.blockchain_height % 100)} Blocks
-                                                        </li>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <li>
-                                                            Interest
-                                                            Accrued: {this.state.blockchain_current_interest.cash_per_token / 10000000000} SFX
-                                                            per token
-                                                        </li>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                                <tfoot>
-                                                </tfoot>
-                                            </Table>
-                                        </div>
-
-                                        <div className="token-box p-2 grey-back font-size-small">
-
-                                            <h3 className="text-center m-2"> Unstake Tokens </h3>
-
-                                            <select className="opaque-black" id="stakes">
-                                                <option value="">Choose Stake ID</option>
-                                            </select>
-
-                                            <Form id="unstake_tokens" onSubmit={this.make_token_unstake}>
-
-                                                <Form.Group>
-                                                    <Form.Label>
-                                                        Amount (SFT) (MAX: {unlocked_tokens.toLocaleString()})
-                                                    </Form.Label>
-
-                                                    <Form.Control 
-                                                        name="amount"
-                                                        defaultValue="0"
-                                                        placedholder="the amount to send"
-                                                    />
-                                                </Form.Group>
-                                            
-                                            
-                                                <Form.Group>
-                                                    <Form.Label>
-                                                        Mixins
-                                                        <IconContext.Provider  value={{color: 'white', size: '20px'}}>
-                                                            <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon ml-8 white-text"/>
-                                                            
-                                                            <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                                <span>
-                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                    They are combined with yours for private transactions. <br/>
-                                                                    Changing this from the default could hurt your privacy. <br/>
-                                                                </span>
-                                                            </ReactTooltip>
-                                                        </IconContext.Provider>
-                                                    </Form.Label>
-                                                    <Form.Control 
-                                                    name="mixins" 
-                                                    as="select"
-                                                    defaultValue="7"
-                                                    >
-                                                        <option>1</option>
-                                                        <option>2</option>
-                                                        <option>3</option>
-                                                        <option>4</option>
-                                                        <option>5</option>
-                                                        <option>6</option>
-                                                        <option>7</option>
-                                                    </Form.Control>
-                                                </Form.Group>
-                                                <Button className="mt-2" type="submit" variant="danger" size="lg" block>
-                                                    Unstake and Collect
-                                                </Button>
-                                            </Form>
-                                        </div>
-                                    </div>
-                                </Col>
-                            </div>
+                                        <Stake 
+                                            style="unstake"
+                                            send={this.make_token_unstake}
+                                            id="stake_token"
+                                        />
+                                    </Row>
+                                </Row>
+                            </Col>
                         </div>
                     );
                 }
+
                 case "settings": {
                     return (
                         <div>
@@ -3858,6 +2907,7 @@ class WalletHome extends React.Component {
                         </div>
                     );
                 }
+
                 case "loading":
                     return (
                         <Container className="align-items-center justify-content-center d-flex white-text" fluid>
@@ -3877,12 +2927,11 @@ class WalletHome extends React.Component {
 
         return (
             <div className="h-100 w-100" >
-
                 <Image className="entry-scene" src={require("./../../img/loading-scene.svg")}/>
                 <Image className="plant3" src={require("./../../img/plant2.svg")}/>
+                
                 {this.state.interface_view === "market" ? "" :
 
-                
                     <MainHeader 
                         view={this.state.interface_view} 
                         goHome={this.go_home} 
@@ -3895,9 +2944,7 @@ class WalletHome extends React.Component {
                     
                 }
 
-
                 {twmwallet()}
-
             </div>
         );
     }

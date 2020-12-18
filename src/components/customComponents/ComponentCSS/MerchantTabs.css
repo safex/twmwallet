@@ -1,4 +1,4 @@
-.send-safex-box {
+.merchant-tabs-box {
     height: 50vh;
     max-height: 600px;
     width: 18vw;
@@ -15,6 +15,35 @@
     font-style: normal;
     font-weight: 500;
     color: #767676;
+}
+
+.merchant-tab {
+    width: 100%;
+    height: 22.5%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    border-radius: 25px;
+    box-shadow: var(--blue-box-shadow);
+}
+
+.merchant-tab h1 {
+    width: 50%;
+
+    font-family: 'Inter';
+    font-size: 2rem;
+    font-style: normal;
+    font-weight: 500;
+    text-align: left;
+
+}
+
+.merchant-tab img {
+    height: 75px;
+    width: 75px;
+
+    border: 2px solid #13D0FD;
 }
 
 .send-safex-box.token {
@@ -123,7 +152,3 @@
     border: .5rem solid #3698F3;
 }
 
-
-.send-safex-box > * {
-    margin-bottom: 3rem;
-} 

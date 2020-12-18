@@ -1,0 +1,36 @@
+.stake-info-box {
+    height: 50vh;
+    max-height: 600px;
+    width: 18vw;
+    border-radius: 50px;
+    padding: 2rem 2rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+
+    background-color: white;
+    box-shadow: var(--blue-box-shadow);
+}
+
+.stake-info-box p {
+    font-family: 'Inter';
+    font-size: 2rem;
+    font-style: normal;
+    font-weight: 700;
+    text-align: center;
+    color: #767676;
+    margin: 0 0 3rem 0;
+    
+}
+
+.stake-info-box li {
+    font-family: 'Inter';
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 600;
+    text-align: left;
+    color: #9A9C9D;
+    margin-bottom: 1.5rem;
+}
+

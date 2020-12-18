@@ -18,21 +18,21 @@ export default function MainHeader(props) {
                 <Col sm={6} className="d-flex">
                     
                         <Col className={props.view === 'home' ? "menu-link-active" : ""}>
-                            <p className="" href="javascript:void(0)" onClick={props.goHome}>
+                            <p tabIndex={0} className="" href="javascript:void(0)" onClick={props.goHome}>
                                 Home
                             </p>
                         </Col>
-                        <Col className={props.view === 'market' ? "menu-link-active" : ""}>
+                        <Col tabIndex={1} className={props.view === 'market' ? "menu-link-active" : ""}>
                             <p className="" href="javascript:void(0)" onClick={props.goToMarket}>
                                 Market
                             </p>
                         </Col>
-                        <Col className={props.view === 'merchant' ? "menu-link-active" : ""}>
+                        <Col tabIndex={2} className={props.view === 'merchant' ? "menu-link-active" : ""}>
                             <p className="" href="javascript:void(0)" onClick={props.goToMerchant}>
                                 Merchant
                             </p>
                         </Col>
-                        <Col className={props.view === 'tokens' ? "menu-link-active" : ""}>
+                        <Col tabIndex={3} className={props.view === 'tokens' ? "menu-link-active" : ""}>
                             <p className="" href="javascript:void(0)" onClick={props.goToTokens}>
                                 Tokens
                             </p>
@@ -41,9 +41,9 @@ export default function MainHeader(props) {
                 </Col>
 
                 <Col sm={2} className="">
-                    <BiCog size={40} className="m-3" onClick={props.goToSettings}/>
+                    <BiCog tabIndex={4} size={40} className="m-3" onClick={props.goToSettings}/>
 
-                    <BiPowerOff size={40} className="m-3" onClick={props.logout}/>
+                    <BiPowerOff tabIndex={5} size={40} className="m-3" onClick={props.logout}/>
                 </Col>
         </Row>
     )

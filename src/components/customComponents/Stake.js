@@ -9,17 +9,15 @@ import { AiOutlineInfoCircle } from 'react-icons/ai'
 
 import { IconContext } from 'react-icons'
 
-import './ComponentCSS/SendSafex.css'
+import './ComponentCSS/Stake.css'
 
-export default function SendSafex(props) {
+export default function Stake(props) {
 
     return (
-       
+            <form className="stake-token-box" id={props.id} onSubmit={props.send}>
 
-            <form className={`send-safex-box ${props.style}`} id={props.id} onSubmit={props.send}>
-
-                <p className> 
-                    { props.title }
+                <p > 
+                    { props.style.toUpperCase() } TOKENS
 
                     <IconContext.Provider  value={{color: '#767676', size: '25px'}}>
                         <AiOutlineInfoCircle className="ml-2 mb-2" data-tip data-for='sendSafexInfo' />
@@ -39,28 +37,41 @@ export default function SendSafex(props) {
                                 Example: Safex5zHGtYQYE41yEzLTRQWiajC5keyJHVwQamarNyp9ssouD87bbGhobVnYAtUEQa4me79ybZev2AmLUnbds4PRYv3P1KmW6j2F
                                 <br/>
                                 <br/>
-                                2. The amount that you are sending has to be grater than 0.
+                                2. The amount that you are staking has to be grater than 10,000.
                                 The transaction fee will be added on to the amount you are sending.
                             </span>
                         </ReactTooltip>
                     </IconContext.Provider>
                 </p>
-                    
-                <input
-                    name="destination"
-                    defaultValue="Safex5..."
-                    placedholder="the destination address"
-                />
 
-                <input
-                    name="amount"
-                    defaultValue="0"
-                    placedholder="the amount to send"
-                />
+                {props.style === 'stake' ?
+                    <div className="stake-label-div">
+                        <h5>Available: {props.tokenBalance} SFT</h5>    
 
+                        <input
+                            name="destination"
+                            defaultValue="How much to stake?"
+                            type="number"
+                        />
+                    </div>
+                :
+                    <div className="stake-label-div">
+                        <h5>Staked: {props.stakedBalance}</h5>
+                        <select
+                            name=""
+                        >
+                            <option>Choose Stake ID</option>
+                            <option>376S6B7OUWQ131Z8Y26XPISU1LVCHVWAJ9M3CPGV9QFS59CPMJFK7W2WDKUSBZCA</option>
+                            <option>UMAELCBVH7KKU5TL3D34Q7EVSK4QDIGQXCH1Y4COL1QWHPN1ZBTA8NCUCYG2NRHC</option>
+                            <option>ZP36FH4PK4P7WYXRELYZQZZ4HGFGM7GDMJT195CQBCZD2UC59WH2WC041DL540YS</option>
+                            <option>EMWPA4T2SC2KYDDUS2ORVTUO8JCWKYLN0VF40YNTXAAP365TXH3CFAKS80ORYCRR</option>
+                        </select>
+                    </div>
+                }
+                
 
                 <Row>
-                    <div className={`mixins-label ${props.style}`}>
+                    <div className="mixins-label">
                         <IconContext.Provider value={{color: '#767676', size: '25px'}}>
                             <AiOutlineInfoCircle data-tip data-for='mixinInfo'
                                         className=""/>
@@ -77,7 +88,6 @@ export default function SendSafex(props) {
                         <div>
                             <label>Mixins:</label>
                         </div>
-
                     </div>
 
                     <select className="w-25" name="mixins" defaultValue="7">
@@ -92,8 +102,8 @@ export default function SendSafex(props) {
                 </Row>
                     
 
-                <button className={`custom-button-send ${props.style}`} type="submit">
-                    SEND
+                <button className="custom-button-send" type="submit">
+                    {props.style.toUpperCase()}
                 </button>
             </form>
 

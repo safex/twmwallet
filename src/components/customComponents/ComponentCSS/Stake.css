@@ -1,4 +1,4 @@
-.send-safex-box {
+.stake-token-box {
     height: 50vh;
     max-height: 600px;
     width: 18vw;
@@ -15,24 +15,19 @@
     font-style: normal;
     font-weight: 500;
     color: #767676;
-}
-
-.send-safex-box.token {
     box-shadow: var(--blue-box-shadow);
 }
 
-.cash {
-    box-shadow: var(--green-box-shadow);
-}
 
-.send-safex-box input {
-
+.stake-token-box input {
     text-align: center!important;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.send-safex-box p {
+.stake-token-box p {
     font-family: 'Inter';
-    font-size: 3rem;
+    font-size: 2rem;
     font-style: normal;
     font-weight: 700;
     text-align: center;
@@ -40,36 +35,42 @@
     margin: 0;
 }
 
-.send-safex-box label {
+.stake-token-box h5 {
+    font-family: 'Inter';
+    font-size: 1.8rem;
+    font-style: normal;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.stake-label-div {
+    width: 90%;
+    
+}
+
+.stake-token-box label {
     margin: 0!important;
     font-weight: 500!important;
 }
 
-.send-safex-box input, select {
+.stake-token-box input, select {
     height: 4rem;
 
     border-radius: 10px;
     background: white;
 }
 
-.send-safex-box.cash input, select {
-    border: 3px solid #54E9B7;
-}
 
-.send-safex-box.token select, input {
+.stake-token-box select, input {
     border: 3px solid #3698F3;
 }
 
-.mixins-label.cash {
-    width: 70%;
-    border: 3px solid #54E9B7;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
+h5 + select {
+    width: 100%;
 }
 
-.mixins-label.token {
+.mixins-label {
     width: 70%;
     border: 3px solid #3698F3;
     border-radius: 10px;
@@ -78,11 +79,15 @@
     align-items: center;
 }
 
-.send-safex-box input {
-    width: 90%;
+.mixins-label + select {
+    padding-left: 1rem;
 }
 
-.send-safex-box .row {
+.stake-token-box input {
+    width: 100%;
+}
+
+.stake-token-box .row {
     width: 90%;
     justify-content: space-between;
 }
@@ -99,31 +104,17 @@
 
     color:#fff;
     padding: .5rem;
-}
-
-.custom-button-send.cash {
-    border: .5rem solid #93EB93;
-    border-radius: 10px;
-    background: linear-gradient(270deg, #54E9B7 0%, #93EB93 100%);
-}
-
-.custom-button-send.cash:hover {
-    background: linear-gradient(270deg, #93EB93 0%, #54E9B7 100%);
-    border: .5rem solid #54E9B7;
-}
-
-.custom-button-send.token {
     border: .5rem solid #3698F3;
     border-radius: 10px;
     background: linear-gradient(270deg, #3698F3 0%, #13D0FD 100%);
 }
 
-.custom-button-send.token:hover {
+.custom-button-send:hover {
     background: linear-gradient(270deg, #13D0FD 0%, #3698F3 100%);
     border: .5rem solid #3698F3;
 }
 
 
-.send-safex-box > * {
+.stake-token-box > * {
     margin-bottom: 3rem;
 } 

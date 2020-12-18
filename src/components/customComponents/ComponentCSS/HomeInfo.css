@@ -44,7 +44,7 @@
     font-size: 1.8rem;
     font-style: normal;
     font-weight: 700;
-    text-align: right;
+    text-align: center;
     color: #13D3FD;
-    width: 80%;
+    word-break: break-word;
 }
