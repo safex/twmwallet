@@ -24,7 +24,7 @@ function getInstallerConfig() {
     noMsi: true,
     outputDirectory: outPath,
     exe: "SafexTWMWallet.exe",
-    setupExe: "SafexTWMWalletWindowsInstaller0_0_8.exe",
+    setupExe: "SafexTWMWalletWindowsInstaller0_1_1.exe",
     setupIcon: "public/images/icons/wallet-icon2.ico",
     skipUpdateIcon: true
   });

@@ -20,6 +20,7 @@ import {
     edit_account
 } from "../../utils/wallet_actions";
 
+
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
 
 // Icon Imports
@@ -30,7 +31,6 @@ import {MdPeople, MdReceipt} from 'react-icons/md'
 import {TiMessages} from 'react-icons/ti'
 import {IconContext} from 'react-icons'
 
-
 import copy from "copy-to-clipboard"
 import ReactTooltip from "react-tooltip";
 
@@ -38,7 +38,7 @@ import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 
 import Loader from 'react-loader-spinner'
 
-import {open_twm_file, save_twm_file} from "../../utils/twm_actions";
+import {open_twm_file, save_twm_file, register_api, get_offers_url, get_seller_pubkey} from "../../utils/twm_actions";
 
 // Custom Components
 import MainHeader from '../customComponents/MainHeader';
@@ -53,6 +53,8 @@ import MerchantAccounts from '../customComponents/MerchantAccounts';
 import MerchantTabs from '../customComponents/MerchantTabs';
 
 const openpgp = window.require('openpgp');
+
+const sfxjs = window.require('safex-addressjs');
 
 var nacl = window.require('tweetnacl');
 
@@ -81,6 +83,9 @@ class WalletHome extends React.Component {
             keyRequest: false,
             twm_offers: [],
             non_offers: [],
+            api_offers: [],
+            api_url: '',
+            offer_loading_flag: '',
             selected_user: {}, //merchant element
             show_new_offer_form: false,
             show_new_account_form: false,
@@ -102,16 +107,53 @@ class WalletHome extends React.Component {
             offersImage: require('./../../img/offersImage.svg'),
             merchantTabs: 'accounts',
             showLoader: false,
-            
+            nft_switch: false,
+            shipping_switch: false,
+            open_message_switch: false
         };
     }
+
+    async componentWillUnmount() {
+
+        localStorage.removeItem('twm_file');
+        localStorage.removeItem('encrypted_wallet');
+        localStorage.removeItem('wallet');
+    };
 
     async componentDidMount() {
         try {
             console.log(this.props.wallet);
             wallet = this.props.wallet;
-            let twm_ls = localStorage.getItem('twm_file');
-            console.log(twm_ls);
+            try {
+                let twm_ls = localStorage.getItem('twm_file');
+                console.log(twm_ls);
+
+                let twm_file = JSON.parse(twm_ls);
+
+                const crypto = window.require('crypto');
+
+                const storage_hash = crypto.createHash('sha256');
+                storage_hash.update(twm_ls);
+
+                let s_hash = storage_hash.digest('hex');
+
+
+                const parse_hash = crypto.createHash('sha256');
+                parse_hash.update(JSON.stringify(twm_file));
+
+                let p_hash = parse_hash.digest('hex');
+
+                if (p_hash === s_hash) {
+                    this.setState({twm_file: twm_file});
+
+
+                } else {
+                    alert(`have an issue with the twm file!`);
+                }
+            } catch(err) {
+                console.error(err);
+                console.error(`error at mounting with the twm file`);
+            }
 
             let history = wallet.history();
 
@@ -119,30 +161,6 @@ class WalletHome extends React.Component {
                 return parseFloat(b.timestamp) - parseFloat(a.timestamp);
             });
 
-
-
-            let twm_file = JSON.parse(twm_ls);
-
-            const crypto = window.require('crypto');
-
-            const storage_hash = crypto.createHash('sha256');
-            storage_hash.update(twm_ls);
-
-            let s_hash = storage_hash.digest('hex');
-
-
-            const parse_hash = crypto.createHash('sha256');
-            parse_hash.update(JSON.stringify(twm_file));
-
-            let p_hash = parse_hash.digest('hex');
-
-            if (p_hash === s_hash) {
-                this.setState({twm_file: twm_file});
-
-
-            } else {
-                alert(`have an issue with the twm file!`);
-            }
             this.setState({
                 wallet_height: wallet.blockchainHeight(),
                 blockchain_height: wallet.daemonBlockchainHeight(),
@@ -573,8 +591,91 @@ class WalletHome extends React.Component {
     };
 
 
-    edit_account_top = async (e) => {
+    make_account_edit = async (e) => {
+        e.persist();
         e.preventDefault();
+        try {
+
+            let d_obj = {};
+            d_obj.twm_version = 1;
+            if (e.target.new_account_image.value.length > 0) {
+                d_obj.avatar = e.target.new_account_image.value;
+            }
+            if (e.target.twitter.value.length > 0) {
+                d_obj.twitter = e.target.twitter.value;
+            }
+            if (e.target.facebook.value.length > 0) {
+                d_obj.facebook = e.target.facebook.value;
+            }
+            if (e.target.linkedin.value.length > 0) {
+                d_obj.linkedin = e.target.linkedin.value;
+            }
+            if (e.target.email.value.length > 0) {
+                d_obj.email_address = e.target.email.value;
+            }
+            if (e.target.biography.value.length > 0) {
+                d_obj.biography = e.target.biography.value;
+            }
+            if (e.target.website.value.length > 0) {
+                d_obj.website = e.target.website.value;
+            }
+            if (e.target.location.value.length > 0) {
+                d_obj.location = e.target.location.value;
+            }
+           /* let account = wallet.createSafexAccount(e.target.username.value, JSON.stringify(d_obj));
+            console.log(account);
+            console.log(`account registered`);
+
+            var accs = wallet.getSafexAccounts();
+
+            console.log(accs);
+            console.log(`accounts`);
+            let mixins = e.target.mixins.value - 1;
+            if (account) {
+                console.log(`let's register it`);
+                console.log(account);
+                console.log(accs);
+
+
+                let this_account;
+
+                for (const acc of accs) {
+                    if (acc.username === e.target.username.value) {
+                        this_account = acc;
+                    }
+                }
+
+
+                console.log(`this_account`);
+                console.log(this_account);
+                console.log(`this_account`);
+                this.setState({create_account_txn_account: this_account});
+
+                let create_acc = await this.create_account_async(wallet, e.target.username.value, mixins);
+                let confirmed_fee = window.confirm(`the network fee to register this account ${this.state.create_account_txn_account.username} will be:  ${create_acc.fee() / 10000000000} SFX Safex Cash`);
+                let fee = create_acc.fee();
+                let txid = create_acc.transactionsIds();
+                if (confirmed_fee) {
+
+                    this.setState({create_account_txn_id: txid, create_account_txn_fee: fee});
+                    console.log(this.state.create_account_txn_id);
+                    console.log(this.state.create_account_txn_fee);
+                    console.log(`before the crash`);
+                    let commit_create = await this.commit_create_account_async(create_acc);
+                    console.log(commit_create);
+
+                } else {
+                    alert(`your transaction was cancelled, no account registration was completed`);
+                }
+
+            } else {
+                alert(`Not enough tokens for making an account`);
+            }
+*/
+        } catch (err) {
+            console.error(err);
+            console.error("error at the register account function");
+        }
 
     };
 
@@ -795,6 +896,68 @@ class WalletHome extends React.Component {
         });
     };
 
+    load_offers_from_api = async (e) => {
+        e.preventDefault();
+
+        //call the api here and load up the offers into the api_offers array.
+        try {
+            console.log(this.state.api_url);
+            let loaded_offers = await get_offers_url(this.state.api_url);
+            console.log(loaded_offers);
+            this.setState({
+                twm_url_offers: loaded_offers.offers,
+                offer_loading_flag: 'twmurl'
+            })
+
+        } catch(err) {
+            console.error(err);
+        }
+
+
+    };
+
+    load_offers_from_blockchain = async (e) => {
+        this.show_loading();
+
+        setTimeout(() => {
+
+            var offrs = wallet.listSafexOffers(true);
+            let twm_offers = [];
+
+            for (var i in offrs) {
+                try {
+                    let offer_description = JSON.parse(offrs[i].description);
+                    if (offer_description.twm_version > 0) {
+                        offrs[i].descprition = offer_description;
+                        offrs[i].price = offrs[i].price / 10000000000;
+                        twm_offers.push(offrs[i]);
+
+                    }
+
+                } catch (err) {
+                    console.error(`error at parsing json from description`);
+                    console.error(err);
+                }
+            }
+
+            console.log(twm_offers);
+            this.setState({
+                twm_offers: twm_offers,
+                interface_view: 'market',
+                offer_loading_flag: 'blockchaintwmoffers'
+
+            });
+        }, 500);
+    };
+
+
+    handle_change_api_fetch_url = (e) => {
+
+        e.preventDefault();
+        this.setState({api_url: e.target.value});
+    };
+
+
     //view shifting
     go_home = () => {
         this.setState({interface_view: 'home'});
@@ -811,45 +974,7 @@ class WalletHome extends React.Component {
 
         setTimeout(() => {
 
-            var offrs = wallet.listSafexOffers(true);
-            let non_offers = [];
-            let twm_offers = [];
-
-            for (var i in offrs) {/*
-                console.log("Safex offer " + i + " title: " + offrs[i].title);
-                console.log("Safex offer description: " + offrs[i].description);
-                console.log("Safex offer quantity: " + offrs[i].quantity);
-                console.log("Safex offer price: " + offrs[i].price);
-                console.log("Safex offer minSfxPrice: " + offrs[i].minSfxPrice);
-                console.log("Safex offer pricePegUsed: " + offrs[i].pricePegUsed);
-                console.log("Safex offer pricePegID: " + offrs[i].pricePegID);
-                console.log("Safex offer seller: " + offrs[i].seller);
-                console.log("Safex offer active: " + offrs[i].active);
-                console.log("Safex offer offerID: " + offrs[i].offerID);
-                console.log("Safex offer currency: " + offrs[i].currency);
-    */
-                try {
-                    let offer_description = JSON.parse(offrs[i].description);
-                    if (offer_description.version > 0) {
-                        offrs[i].descprition = offer_description;
-                        twm_offers.push(offrs[i]);
-
-                    } else {
-                        non_offers.push(offrs[i]);
-                        console.log("not a twm structured offer");
-                    }
-
-                } catch (err) {
-                    console.error(`error at parsing json from description`);
-                    console.error(err);
-                    non_offers.push(offrs[i]);
-                }
-            }
-
-
             this.setState({
-                twm_offers: twm_offers,
-                non_offers: non_offers,
                 interface_view: 'market'
             });
         }, 500);
@@ -957,7 +1082,7 @@ class WalletHome extends React.Component {
 
     //show modal of New Offer
     handleShowNewOfferForm = () => {
-        this.setState({show_new_offer_form: true});
+        this.setState({show_new_offer_form: true, nft_switch: false, shipping_switch: false, open_message_switch: false});
     };
 
     //close modal of Purchase Form
@@ -968,11 +1093,12 @@ class WalletHome extends React.Component {
 
     //show modal of Purchase Form
     handleShowPurchaseForm = (listing, data) => {
+        //here we need to fetch the pub keys of the seller.
         this.setState({show_purchase_form: true, show_purchase_offer: listing, show_purchase_offer_data: data});
     };
 
     // Show order confirmed modal
-   
+
      handleConfirmationModal = () => {
         this.setState({show_purchase_confirm_modal: !this.state.show_purchase_confirm_modal});
     };
@@ -994,7 +1120,37 @@ class WalletHome extends React.Component {
 
     //show modal of Edit Offer Form
     handleShowEditOfferForm = (listing) => {
-        this.setState({show_edit_offer_form: true, show_edit_offer: listing});
+
+        let nft_state = false;
+        let shipping_state = false;
+        let open_message_state = false;
+        try {
+            let p_data = JSON.parse(listing.description);
+            console.log(p_data);
+            if (p_data.hasOwnProperty('nft')) {
+                nft_state = p_data.nft;
+                console.log(nft_state);
+            }
+            if (p_data.hasOwnProperty('open_message')) {
+                open_message_state = p_data.open_message;
+            }
+            if (p_data.hasOwnProperty('shipping')) {
+                shipping_state = p_data.shipping;
+            }
+            console.log(p_data.hasOwnProperty('nft'));
+        } catch(err) {
+            console.error(err);
+            console.error(`error at the loading of listing data`);
+        }
+        console.log(listing.description);
+
+        this.setState({
+            show_edit_offer_form: true,
+            show_edit_offer: listing,
+            nft_switch: nft_state,
+            open_message_switch: open_message_state,
+            shipping_switch: shipping_state
+        });
     };
 
     //close modal of Edit Offer Form
@@ -1018,7 +1174,6 @@ class WalletHome extends React.Component {
         let o_obj = {};
         o_obj.twm_version = 1;
 
-
         if (vees.description.value.length > 0) {
             o_obj.description = vees.description.value;
         }
@@ -1037,12 +1192,13 @@ class WalletHome extends React.Component {
         if (vees.country.value.length > 0) {
             o_obj.country = vees.country.value;
         }
-        if (vees.message_type.value.length > 0) {
-            o_obj.message_type = vees.message_type.value;
-        }
         if (vees.physical.value.length > 0) {
             o_obj.physical = vees.physical.value;
         }
+
+        o_obj.shipping = this.state.shipping_switch;
+        o_obj.nft = this.state.nft_switch;
+        o_obj.open_message = this.state.open_message_switch;
 
         try {
             let mixins = e.target.mixins.value - 1;
@@ -1075,6 +1231,18 @@ class WalletHome extends React.Component {
             console.error(err);
             console.error("Error at listing the offer.");
         }
+    };
+
+
+    change_shipping_switch = () => {
+        this.setState({shipping_switch: !this.state.shipping_switch});
+    };
+
+    change_nft_switch = () => {
+        this.setState({nft_switch: !this.state.nft_switch});
+    };
+    change_open_message_switch = () => {
+        this.setState({open_message_switch: !this.state.open_message_switch});
     };
 
     list_offer_async = async (wallet, username, title, price, quantity, data, mixins) => {
@@ -1309,7 +1477,7 @@ class WalletHome extends React.Component {
         });
     };
 
-    register_twmapi = async (user, twm_api_url = 'http://127.0.0.1:17700 ') => {
+    register_twmapi = async (user, twm_api_url = 'http://127.0.0.1:17700') => {
         console.log(user);
 
         //here we contact the api and check if this user is already registered or not.
@@ -1317,44 +1485,140 @@ class WalletHome extends React.Component {
         //if it isn't let's generate for this user the pgp keys and pack them sign them and register with the api.
 
         //edit twm file and save
-        let twm_file = this.state.twm_file;
-        console.log(twm_file);
 
-        if (twm_file.accounts.hasOwnProperty(user.username)) {
-
-
-            console.log(twm_file);
-
-
-            //set the object
-
-            //modify local storage
-            //modify state
-            //save
-            //verify
-
-
-            console.log(`it has`);
-        }
         try {
-            var options = {
-                userIds: [{name: user.username}], // multiple user IDs
-                numBits: 4096,                                            // RSA key size
-                passphrase: this.state.password         // protects the private key
-            };
-            const key = await openpgp.generateKey(options);
-            let keys = nacl.sign.keyPair.fromSecretKey(Buffer.from(this.state.usernames[0].privateKey));
+            let twm_file = this.state.twm_file;
 
-            console.log(keys);
+            if (this.state.twm_file.accounts.hasOwnProperty(user.username)) {
+                console.log(twm_file);
 
-            console.log(key);
-            console.log(this.state.usernames[0].privateKey);
-            console.log(this.state.usernames[0].publicKey);
+                //set the object
 
-            console.log(String.fromCharCode.apply(null, keys.secretKey));
-        } catch (err) {
+                //modify local storage
+                //modify state
+                //save
+                //verify
+                console.log(`it has`);
+                if (twm_file.accounts[user.username].urls.hasOwnProperty(twm_api_url)) {
+                    alert(`this account is already registered with the api`);
+                } else {
+                    try {
+                        const crypto  = window.require('crypto');
+
+                        const { privateKey, publicKey } = await crypto.generateKeyPairSync('rsa', {
+                            modulusLength: 4096,
+                            publicKeyEncoding: {
+                                type: 'pkcs1',
+                                format: 'pem'
+                            },
+                            privateKeyEncoding: {
+                                type: 'pkcs8',
+                                format: 'pem',
+                            }
+                        });
+                        console.log(publicKey);
+                        console.log(privateKey);
+
+                        console.log(`RSA PUB KEY`);
+
+                        let r_obj = {};
+                        r_obj.rsa_pub_key = publicKey;
+                        r_obj.username = user.username;
+                        r_obj.message = 'registerAPI';
+
+                        let signature = sfxjs.sign_message(user.privateKey, JSON.stringify(r_obj), user.publicKey);
+
+                        let f_obj = {};
+                        f_obj.username = user.username;
+                        f_obj.message = JSON.stringify(r_obj);
+                        f_obj.signature = signature;
+                        f_obj.pub_key = user.publicKey;
+                        let r_obj_string = JSON.stringify(r_obj);
+                        f_obj.msg_hash = sfxjs.cn_fast_hash_safex(r_obj_string, r_obj_string.length);
+
+                        try {
+                            let register_msgg = await register_api(twm_api_url, f_obj);
+                            console.log(register_msgg)
+                            let pgp_obj = {};
+                            pgp_obj.pub_key = publicKey;
+                            pgp_obj.sec_key = privateKey;
+                            twm_file.accounts[user.username].urls[twm_api_url] = {};
+                            twm_file.accounts[user.username].urls[twm_api_url].pgp_key = pgp_obj;
+                            twm_file.accounts[user.username].urls[twm_api_url].messages = {};
+
+                            const algorithm = 'aes-256-ctr';
+                            const cipher = crypto.createCipher(algorithm, this.state.password);
+                            let crypted = cipher.update(JSON.stringify(twm_file), 'utf8', 'hex');
+                            crypted += cipher.final('hex');
+
+                            const hash1 = crypto.createHash('sha256');
+                            hash1.update(JSON.stringify(twm_file));
+                            console.log(`password ${this.state.password}`);
+                            console.log(JSON.stringify(twm_file));
+
+                            let twm_save = await save_twm_file(this.state.new_path, crypted, this.state.password, hash1.digest('hex'));
+
+                            try {
+
+                                let twm_file2 = await open_twm_file(this.state.new_path, this.state.password);
+                                console.log(twm_file2);
+
+                                localStorage.setItem('twm_file', JSON.stringify(twm_file2.contents));
+                                this.setState({twm_file: twm_file2.contents});
+                            } catch (err) {
+                                this.setState({loading: false})
+                                console.error(err);
+                                console.error(`error opening twm file after save to verify`);
+                            }
+                            console.log(twm_save);
+
+                            //need to update and save to the twm wallet
+
+                        } catch(err) {
+                            console.error(err);
+                            console.error(`error at the register_api function`);
+                        }
+
+                        /*
+
+                                            var enc_msg = `this is my message`;
+
+                                            const buffer = Buffer.from(enc_msg, 'utf8')
+                                            const encrypted = crypto.publicEncrypt(publicKey, buffer)
+                                            console.log(encrypted.toString('base64'));
+                                            console.log(encrypted);
+
+                                            //const dec_buf = Buffer.from(encrypted)
+
+                                            const decrypted = crypto.privateDecrypt(privateKey, encrypted);
+                                            console.log(decrypted.toString('utf8'));
+
+                                            let keys = nacl.sign.keyPair.fromSecretKey(Buffer.from(this.state.usernames[0].privateKey));
+
+                                            console.log(keys);
+                                            console.log(this.state.usernames[0].privateKey);
+                                            console.log(this.state.usernames[0].publicKey);
+
+                                            let sig = sfxjs.sign_message(this.state.usernames[0].privateKey, 'heyheyhey', this.state.usernames[0].publicKey);
+                                            console.log(sig);
+                                            console.log(String.fromCharCode.apply(null, keys.secretKey));*/
+
+
+
+                    } catch (err) {
+                        console.error(err);
+                    }
+                }
+
+            }
+
+        } catch(err) {
             console.error(err);
+            console.error(`error at the twm_file at register api`);
         }
+
+
+
     };
 
     to_ellipsis = (text, firstHalf, secondHalf) => {
@@ -1364,101 +1628,149 @@ class WalletHome extends React.Component {
     };
 
     purchase_item = async (e, listing) => {
-
         e.preventDefault();
-        console.log(listing);
-        console.log(e.target.quantity.value);
-        console.log(`mixins`);
-        console.log(e.target.mixins.value);
+
+        console.log(this.state.show_purchase_offer);
+
+        let quant = e.target.quantity.value;
+
+        let mixins = e.target.mixins.value - 1;
+        if (e.target.quantity.value > 0) {
+
+            console.log(listing);
+            console.log(e.target.quantity.value);
+            console.log(`mixins`);
+            console.log(e.target.mixins.value);
+            console.log(listing.username);
+
+            if (this.state.offer_loading_flag === 'twmurl') {
+                let seller = await get_seller_pubkey(listing.username);
+                console.log(seller);
+
+                if (listing.nft === true) {
+                    //expect ethereum address here
+                }
+                if (listing.shipping === true) {
+
+                }
+                if (listing.open_message === true) {
+
+                }
 
 
-        let total_cost = e.target.quantity.value * (listing.price / 10000000000);
 
-        let alert_bool = false;
-        let alert_text = ``;
+                //create message here,
+                //generate pgp keys for this moment,
+                //then encrypt the message, supply the pub key for response
+                //save to twm file
 
-        if (e.target.quantity.value < 1) {
-            alert_text += ` quantity can not be 0 or negative :)`;
-            alert_bool = true;
-        }
-        if (e.target.quantity.value % 1 !== 0) {
-            alert_text += ` quantity must be a whole number :)`;
-            alert_bool = true;
-        }
-        if (e.target.quantity.value > listing.quantity) {
-            alert_text += ` not enough quantity available: you wanted ${e.target.quantity.value} but there are only ${listing.quantity} available`;
-            alert_bool = true;
-        }
-        if (total_cost > this.state.cash) {
-            alert_text += ` not enough SFX available for this purchase: total cost: ${total_cost} SFX, your balance: ${this.state.cash.toLocaleString()} SFX`;
-            alert_bool = true;
-        }
 
-        if (alert_bool) {
-            alert(alert_text);
-        } else {
-            this.setState({showLoader: true});
+            }
 
-            try {
-                let mixins = e.target.mixins.value - 1;
-                if (mixins >= 0) {
+            let total_cost = quant * (listing.price);
+            console.log(`TOTAL COST!!!!!!!!`);
+            console.log(total_cost);
+            console.log(listing.price);
+            console.log(quant);
+            console.log(this.state.cash);
+            console.log(`listing quant ${listing.quantity}`)
 
-                    let amount = e.target.quantity.value;
-                    let confirmed = window.confirm(`Are you sure you want to purchase ${e.target.quantity.value} X ${listing.title} for a total of ${total_cost} SFX?`);
-                    console.log(confirmed);
-                    if (confirmed) {
-                        try {
-                            this.setState({
-                                purchase_txn_quantity: e.target.quantity.value,
-                                purchase_txn_title: listing.title,
-                                purchase_txn_offerid: listing.offerID,
-                                purchase_txn_price: listing.price / 10000000000,
-                                purchase_txn_total_cost: total_cost
-                            });
+            let alert_bool = false;
+            let alert_text = ``;
 
-                            let purchase_txn = await this.purchase_offer_async(
-                                wallet,
-                                total_cost,
-                                listing.offerID,
-                                e.target.quantity.value,
-                                mixins
-                            );
+            if (quant < 1) {
+                alert_text += ` quantity can not be 0 or negative :)`;
+                alert_bool = true;
+            }
+            if (quant % 1 !== 0) {
+                alert_text += ` quantity must be a whole number :)`;
+                alert_bool = true;
+            }
+            if (Number.parseInt(quant) > listing.quantity) {
+                alert_text += ` not enough quantity available: you wanted ${quant} but there are only ${listing.quantity} available`;
+                alert_bool = true;
+            }
+            if (total_cost > this.state.cash) {
+                alert_text += ` not enough SFX available for this purchase: total cost: ${total_cost} SFX, your balance: ${this.state.cash.toLocaleString()} SFX`;
+                alert_bool = true;
+            }
 
-                            let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${purchase_txn.fee() / 10000000000}SFX`);
-                            let fee = purchase_txn.fee();
-                            let txid = purchase_txn.transactionsIds();
-                            if (confirmed_fee) {
-                                try {
-                                    this.setState({purchase_txn_id: txid, purchase_txn_fee: fee});
-                                    let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
-                                    console.log(`purchase transaction committed`);
-                                } catch (err) {
+            if (alert_bool) {
+                alert(alert_text);
+            } else {
+                this.setState({showLoader: true});
+
+                try {
+                    if (mixins >= 0) {
+
+                        let confirmed = window.confirm(`Are you sure you want to purchase ${quant} X ${listing.title} for a total of ${total_cost} SFX?`);
+                        console.log(confirmed);
+                        if (confirmed) {
+                            try {
+                                console.log(quant);
+                                console.log(listing.title);
+                                console.log(listing.offer_id);
+                                console.log(listing.price);
+                                console.log(total_cost);
+                                console.log(mixins);
+                                this.setState({
+                                    purchase_txn_quantity: quant,
+                                    purchase_txn_title: listing.title,
+                                    purchase_txn_offerid: listing.offer_id,
+                                    purchase_txn_price: listing.price,
+                                    purchase_txn_total_cost: total_cost
+                                });
+
+
+                                let purchase_txn = await this.purchase_offer_async(
+                                    wallet,
+                                    total_cost,
+                                    listing.offer_id,
+                                    quant,
+                                    mixins
+                                );
+
+                                let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${purchase_txn.fee() / 10000000000}SFX`);
+                                let fee = purchase_txn.fee();
+                                let txid = purchase_txn.transactionsIds();
+                                if (confirmed_fee) {
+                                    try {
+                                        this.setState({purchase_txn_id: txid, purchase_txn_fee: fee});
+                                        let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
+                                        console.log(`purchase transaction committed`);
+                                    } catch (err) {
+                                        this.setState({showLoader: false});
+                                        console.error(err);
+                                        console.error(`error when trying to commit the purchase transaction to the blockchain`);
+                                        alert(`error when trying to commit the purchase transaction to the blockchain`);
+                                    }
+                                } else {
                                     this.setState({showLoader: false});
-                                    console.error(err);
-                                    console.error(`error when trying to commit the purchase transaction to the blockchain`);
-                                    alert(`error when trying to commit the purchase transaction to the blockchain`);
+                                    console.log("purchase transaction cancelled");
                                 }
-                            } else {
+                            } catch (err) {
                                 this.setState({showLoader: false});
-                                console.log("purchase transaction cancelled");
+                                console.error(err);
+                                console.error(`error at the purchase transaction formation it was not commited`);
+                                alert(`error at the purchase transaction formation it was not commited`);
                             }
-                        } catch (err) {
-                            this.setState({showLoader: false});
-                            console.error(err);
-                            console.error(`error at the purchase transaction formation it was not commited`);
-                            alert(`error at the purchase transaction formation it was not commited`);
                         }
                     }
+                } catch (err) {
+                    this.setState({showLoader: false});
+                    console.error(err);
+                    if (err.toString().startsWith('not enough outputs')) {
+                        alert(`Choose fewer mixins`);
+                    }
+                    console.error(`Error at the purchase transaction`);
                 }
-            } catch (err) {
-                this.setState({showLoader: false});
-                console.error(err);
-                if (err.toString().startsWith('not enough outputs')) {
-                    alert(`Choose fewer mixins`);
-                }
-                console.error(`Error at the purchase transaction`);
             }
+
+        } else {
+            alert(`can not have 0 quantity of purchase :)`);
         }
+
+
     };
 
     purchase_offer_async = async (wallet, the_cost, offer_id, quantity, mixins) => {
@@ -1502,7 +1814,7 @@ class WalletHome extends React.Component {
                             Amount: ${this.state.purchase_txn_quantity} X ${this.state.purchase_txn_title}
                             Price: ${this.state.purchase_txn_price} SFX
                             Network Fee: ${this.state.purchase_txn_fee / 10000000000} SFX
-                            A link to this transaction on the Safex Block Explorer has been copied to your clipboard 
+                            A link to this transaction on the Safex Block Explorer has been copied to your clipboard
                             https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`
                         );*/
 
@@ -1517,12 +1829,12 @@ class WalletHome extends React.Component {
     };
 
     copyOfferToClipboard = () => {
-        copy(this.state.show_purchase_offer.offerID); 
+        copy(this.state.show_purchase_offer.offer_id);
         alert('Copied offer ID!');
     };
 
     copyOrderToClipboard = () => {
-        copy(this.state.this.state.purchase_txn_id); 
+        copy(this.state.this.state.purchase_txn_id);
         alert('Copied offer ID!');
     };
 
@@ -1557,9 +1869,6 @@ class WalletHome extends React.Component {
         if (va.country.value.length > 0) {
             o_obj.country = va.country.value;
         }
-        if (va.message_type.value.length > 0) {
-            o_obj.message_type = va.message_type.value;
-        }
         if (va.physical.value.length > 0) {
             o_obj.physical = va.physical.value;
         }
@@ -1567,6 +1876,11 @@ class WalletHome extends React.Component {
         if (va.active.value === 'True' || va.active.value === 'true') {
             active = 1;
         }
+
+        o_obj.shipping = this.state.shipping_switch;
+        o_obj.nft = this.state.nft_switch;
+        o_obj.open_message = this.state.open_message_switch;
+
         try {
             let mixins = va.mixins.value - 1;
             if (mixins >= 0) {
@@ -1708,150 +2022,268 @@ class WalletHome extends React.Component {
                 }
                 
                 case "market":
-
-                    var twm_listings_table = this.state.twm_offers.map((listing, key) => {
-                        console.log(key);
-                        try {
-                            return <tr className="white-text" key={key}>
-                                <td>{listing.title}</td>
-                                <td>{listing.price / 10000000000}</td>
-                                <td>{listing.quantity}</td>
-                                <td>{listing.seller}</td>
-                                <td>{listing.offerID}</td>
-                            </tr>
-
-                        } catch (err) {
-                            console.error(`failed to properly parse the user data formatting`);
-                            console.error(err);
-                        }
-
-                    });
-
-                    var non_listings_table = this.state.non_offers.map((listing, key) => {
-                        console.log(key);
-
-                        try {
-
-                            var data = {};
-                            data.description = '';
-                            data.main_image = '';
-                            data.sku = '';
-                            data.barcode = '';
-                            data.weight = '';
-                            data.country = '';
-                            data.message_type = '';
-                            data.physical = '';
+                    var table_of_listings;
+                    if (this.state.offer_loading_flag === 'all') {
+                        table_of_listings = this.state.non_offers.map((listing, key) => {
+                            console.log(key);
+                            listing.offer_id = listing.offerID;
+                            listing.price = listing.price  / 10000000000;
                             try {
-                                let parsed_data = JSON.parse(listing.description);
-                                console.log(parsed_data);
-                                if (parsed_data.twm_version === 1) {
-                                    if (parsed_data.hasOwnProperty('main_image')) {
-                                        data.main_image = parsed_data.main_image;
-                                    }
-                                    if (parsed_data.hasOwnProperty('description')) {
-                                        data.description = parsed_data.description;
-                                    }
-                                    if (parsed_data.hasOwnProperty('sku')) {
-                                        data.sku = parsed_data.sku;
-                                    }
-                                    if (parsed_data.hasOwnProperty('barcode')) {
-                                        data.barcode = parsed_data.barcode;
-                                    }
-                                    if (parsed_data.hasOwnProperty('weight')) {
-                                        data.weight = parsed_data.weight;
-                                    }
-                                    if (parsed_data.hasOwnProperty('country')) {
-                                        data.country = parsed_data.country;
-                                    }
-                                    if (parsed_data.hasOwnProperty('message_type')) {
-                                        data.message_type = parsed_data.message_type;
-                                    }
-                                    if (parsed_data.hasOwnProperty('physical')) {
-                                        data.physical = parsed_data.physical;
-                                    }
-                                }
-                            } catch (err) {
-                                console.error(err);
-                            }
-
-                            try {
-                                return <tr key={key}>
-                                    <td className="title-row" data-tip data-for={`offerTitle${key}`}>
-
-                                        {listing.title}
-                                        <ReactTooltip className="offer-tooltip" id={`offerTitle${key}`} type='light'
-                                                      effect='float'>
-
-                                            {data.main_image ?
-                                                <div className="d-flex flex-row justify-content-around p-3">
-                                                    <Image className="border border-dark"
-                                                           src={data.main_image}></Image>
-
-                                                    <div className="d-flex flex-column justify-content-center">
-                                                        <h3>{listing.title}</h3>
-                                                        <hr class="border border-dark w-100"></hr>
-                                                        <ul>
-                                                            <li>Price: {listing.price / 10000000000} SFX</li>
-                                                            <li>Seller: {listing.seller}</li>
-                                                        </ul>
-                                                        <hr class="border border-primary w-100"></hr>
-                                                        <p>{data.description}</p>
-                                                    </div>
-
-                                                </div>
-                                                :
-                                                <div>
-                                                    <Image src={require("./../../img/sails-logo.png")}></Image>
-                                                    <h3>{listing.title}</h3>
-                                                </div>
-                                            }
-                                            <hr class="border border-dark w-100"></hr>
-                                            <p className="my-3">{listing.offerID}</p>
-                                        </ReactTooltip>
-
-                                    </td>
-                                    <td className="quantity-row">{listing.price / 10000000000}</td>
-                                    <td className="quantity-row">{listing.quantity}</td>
-                                    <td className="quantity-row">{listing.seller}</td>
-                                    <td className="title-row" data-tip data-for={`offerID${key}`}>
-                                        {this.to_ellipsis(listing.offerID, 10, 10)}
-
-                                        <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
-                                            <span>{listing.offerID}</span>
-                                        </ReactTooltip>
-                                    </td>
-                                    <td className="quantity-row"><select className="light-blue-back" id="quantity">
-                                        <option value="1">1</option>
-                                    </select></td>
-                                    <td className="quantity-row">
-                                        {listing.quantity <= 0 ?
-                                            (<Button size="lg" variant="secondary" disabled>
-                                                SOLD OUT
-                                            </Button>)
-                                            :
-                                            (<Button size="lg" variant="success"
-                                                     onClick={() => this.handleShowPurchaseForm(listing, data)}>
-                                                BUY
-                                            </Button>)
-                                        }
-
-
-                                    </td>
-                                    <td className="quantity-row">
-                                        <Button size="lg" variant="info">CONTACT</Button>
-                                    </td>
+                                return <tr className="white-text" key={key}>
+                                    <td>{listing.title}</td>
+                                    <td>{listing.price}</td>
+                                    <td>{listing.quantity}</td>
+                                    <td>{listing.seller}</td>
+                                    <td>{listing.offerID}</td>
                                 </tr>
-
 
                             } catch (err) {
                                 console.error(`failed to properly parse the user data formatting`);
                                 console.error(err);
                             }
-                        } catch (err) {
-                            console.error(err);
-                        }
 
-                    });
+                        });
+
+
+                    } else if (this.state.offer_loading_flag === 'blockchaintwmoffers') {
+                        table_of_listings = this.state.twm_offers.map((listing, key) => {
+
+                            try {
+                                var data = {};
+                                listing.offer_id = listing.offerID;
+                                data.description = listing.description;
+                                data.main_image = '';
+                                data.sku = '';
+                                data.barcode = '';
+                                data.weight = '';
+                                data.country = '';
+                                data.message_type = '';
+                                data.physical = '';
+                                data.shipping = false;
+                                data.nft = false;
+                                data.open_message = false;
+
+                                try {
+                                    let parsed_data = JSON.parse(listing.description);
+                                    if (parsed_data.twm_version === 1) {
+                                        if (parsed_data.hasOwnProperty('main_image')) {
+                                            data.main_image = parsed_data.main_image;
+                                        }
+                                        if (parsed_data.hasOwnProperty('description')) {
+                                            data.description = parsed_data.description;
+                                        }
+                                        if (parsed_data.hasOwnProperty('sku')) {
+                                            data.sku = parsed_data.sku;
+                                        }
+                                        if (parsed_data.hasOwnProperty('barcode')) {
+                                            data.barcode = parsed_data.barcode;
+                                        }
+                                        if (parsed_data.hasOwnProperty('weight')) {
+                                            data.weight = parsed_data.weight;
+                                        }
+                                        if (parsed_data.hasOwnProperty('country')) {
+                                            data.country = parsed_data.country;
+                                        }
+                                        if (parsed_data.hasOwnProperty('message_type')) {
+                                            data.message_type = parsed_data.message_type;
+                                        }
+                                        if (parsed_data.hasOwnProperty('physical')) {
+                                            data.physical = parsed_data.physical;
+                                        }
+                                        if (parsed_data.hasOwnProperty('shipping')) {
+                                            data.shipping = parsed_data.shipping;
+                                        }
+                                        if (parsed_data.hasOwnProperty('nft')) {
+                                            data.nft = parsed_data.nft;
+                                        }
+                                        if (parsed_data.hasOwnProperty('open_message')) {
+                                            data.open_message = parsed_data.open_message;
+                                        }
+                                    }
+                                } catch (err) {
+                                    console.error(err);
+                                }
+                                try {
+                                    return <tr key={key}>
+                                        <td className="title-row" data-tip data-for={`offerTitle${key}`}>
+
+                                            {listing.title}
+                                            <ReactTooltip className="offer-tooltip" id={`offerTitle${key}`} type='light'
+                                                          effect='float'>
+
+                                                {data.main_image ?
+                                                    <div className="d-flex flex-row justify-content-around p-3">
+                                                        <Image className="border border-dark"
+                                                               src={data.main_image}></Image>
+
+                                                        <div className="d-flex flex-column justify-content-center">
+                                                            <h3>{listing.title}</h3>
+                                                            <hr class="border border-dark w-100"></hr>
+                                                            <ul>
+                                                                <li>Price: {listing.price} SFX</li>
+                                                                <li>Seller: {listing.seller}</li>
+                                                            </ul>
+                                                            <hr class="border border-primary w-100"></hr>
+                                                            <p>{data.description}</p>
+                                                        </div>
+
+                                                    </div>
+                                                    :
+                                                    <div>
+                                                        <Image src={require("./../../img/sails-logo.png")}></Image>
+                                                        <h3>{listing.title}</h3>
+                                                    </div>
+                                                }
+                                                <hr class="border border-dark w-100"></hr>
+                                                <p className="my-3">{listing.offerID}</p>
+                                            </ReactTooltip>
+
+                                        </td>
+                                        <td className="quantity-row">{listing.price}</td>
+                                        <td className="quantity-row">{listing.quantity}</td>
+                                        <td className="quantity-row">{listing.seller}</td>
+                                        <td className="title-row" data-tip data-for={`offerID${key}`}>
+                                            {this.to_ellipsis(listing.offerID, 10, 10)}
+
+                                            <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
+                                                <span>{listing.offerID}</span>
+                                            </ReactTooltip>
+                                        </td>
+                                        <td className="quantity-row"><select className="light-blue-back" id="quantity">
+                                            <option value="1">1</option>
+                                        </select></td>
+                                        <td className="quantity-row">
+                                            {listing.quantity <= 0 ?
+                                                (<Button size="lg" variant="secondary" disabled>
+                                                    SOLD OUT
+                                                </Button>)
+                                                :
+                                                (<Button size="lg" variant="success"
+                                                         onClick={() => this.handleShowPurchaseForm(listing, data)}>
+                                                    BUY
+                                                </Button>)
+                                            }
+
+
+                                        </td>
+                                        <td className="quantity-row">
+                                            <Button size="lg" variant="info">CONTACT</Button>
+                                        </td>
+                                    </tr>
+
+
+                                } catch (err) {
+                                    console.error(`failed to properly parse the user data formatting`);
+                                    console.error(err);
+                                }
+                            } catch (err) {
+                                console.error(err);
+                            }
+
+                        });
+                    } else if (this.state.offer_loading_flag === 'twmurl') {
+                        table_of_listings = this.state.twm_url_offers.map((listing, key) => {
+                            listing.offerID = listing.offer_id;
+
+                            try {
+                                var data = {};
+                                data.description = listing.description;
+                                data.main_image = listing.main_image;
+                                data.sku = '';
+                                data.barcode = '';
+                                data.weight = '';
+                                data.country = '';
+                                data.message_type = '';
+                                data.physical = '';
+                                data.shipping = listing.shipping;
+                                data.nft = listing.nft;
+                                data.open_message = listing.open_message;
+
+
+                                try {
+                                    return <tr key={key}>
+                                        <td className="title-row" data-tip data-for={`offerTitle${key}`}>
+
+                                            {listing.title}
+                                            <ReactTooltip className="offer-tooltip" id={`offerTitle${key}`} type='light'
+                                                          effect='float'>
+
+                                                {data.main_image ?
+                                                    <div className="d-flex flex-row justify-content-around p-3">
+                                                        <Image className="border border-dark"
+                                                               src={data.main_image}></Image>
+
+                                                        <div className="d-flex flex-column justify-content-center">
+                                                            <h3>{listing.title}</h3>
+                                                            <hr class="border border-dark w-100"></hr>
+                                                            <ul>
+                                                                <li>Price: {listing.price} SFX</li>
+                                                                <li>Seller: {listing.username}</li>
+                                                            </ul>
+                                                            <hr class="border border-primary w-100"></hr>
+                                                            <p>{data.description}</p>
+                                                        </div>
+
+                                                    </div>
+                                                    :
+                                                    <div>
+                                                        <Image src={require("./../../img/sails-logo.png")}></Image>
+                                                        <h3>{listing.title}</h3>
+                                                    </div>
+                                                }
+                                                <hr class="border border-dark w-100"></hr>
+                                                <p className="my-3">{listing.offer_id}</p>
+                                            </ReactTooltip>
+
+                                        </td>
+                                        <td className="quantity-row">{listing.price}</td>
+                                        <td className="quantity-row">{listing.quantity}</td>
+                                        <td className="quantity-row">{listing.username}</td>
+                                        <td className="title-row" data-tip data-for={`offerID${key}`}>
+                                            {this.to_ellipsis(listing.offer_id, 10, 10)}
+
+                                            <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
+                                                <span>{listing.offer_id}</span>
+                                            </ReactTooltip>
+                                        </td>
+                                        <td className="quantity-row"><select className="light-blue-back" id="quantity">
+                                            <option value="1">1</option>
+                                        </select></td>
+                                        <td className="quantity-row">
+                                            {listing.quantity <= 0 ?
+                                                (<Button size="lg" variant="secondary" disabled>
+                                                    SOLD OUT
+                                                </Button>)
+                                                :
+                                                (<Button size="lg" variant="success"
+                                                         onClick={() => this.handleShowPurchaseForm(listing, data)}>
+                                                    BUY
+                                                </Button>)
+                                            }
+
+
+                                        </td>
+                                        <td className="quantity-row">
+                                            <Button size="lg" variant="info">CONTACT</Button>
+                                        </td>
+                                    </tr>
+
+
+                                } catch (err) {
+                                    console.error(`failed to properly parse the user data formatting`);
+                                    console.error(err);
+                                }
+                            } catch (err) {
+                                console.error(err);
+                            }
+
+                        });
+                    }
+
+
+
+
+
 
                     return (
                         <div className="overflow-y">
@@ -1887,13 +2319,13 @@ class WalletHome extends React.Component {
                                                         <h3>{this.state.show_purchase_offer.title.toUpperCase()}</h3>
                                                         <hr class="border border-dark w-100"></hr>
                                                         <ul>
-                                                            <li>Price: {this.state.show_purchase_offer.price / 10000000000} SFX</li>
+                                                            <li>Price: {this.state.show_purchase_offer.price} SFX</li>
                                                             <li>Seller: {this.state.show_purchase_offer.seller}</li>
                                                             <li data-tip data-for='offerID'>
                                                                 Offer
-                                                                ID: {this.to_ellipsis(this.state.show_purchase_offer.offerID, 10, 10)}
+                                                                ID: {this.to_ellipsis(this.state.show_purchase_offer.offer_id, 10, 10)}
                                                                 <ReactTooltip id='offerID' type='light' effect='solid'>
-                                                                    {this.state.show_purchase_offer.offerID}
+                                                                    {this.state.show_purchase_offer.offer_id}
                                                                 </ReactTooltip>
                                                                 <FaCopy
                                                                     className="ml-4"
@@ -1925,7 +2357,7 @@ class WalletHome extends React.Component {
                                                     <hr class="border border-dark w-100"></hr>
 
                                                     <ul>
-                                                        <li>Price: {this.state.show_purchase_offer.price / 10000000000} SFX</li>
+                                                        <li>Price: {this.state.show_purchase_offer.price} SFX</li>
                                                         <li>Seller: {this.state.show_purchase_offer.seller}</li>
                                                         <li>
                                                             Offer ID: {this.state.show_purchase_offer.offerID}
@@ -1964,15 +2396,36 @@ class WalletHome extends React.Component {
                                                     />
                                                 </Col>
                                             </Form.Group>
-
-                                            <Form.Group as={Row}>
+                                            {this.state.show_purchase_offer_data.nft ? (<Form.Group as={Row}>
                                                 <Form.Label column sm={3}>
-                                                    Send Message
+                                                    NFT Ethereum Address
                                                 </Form.Label>
                                                 <Col sm={9}>
-                                                    <Form.Control name="message" as="textarea" rows="3"/>
+                                                    <Form.Control name="eth_address" rows="3"/>
                                                 </Col>
-                                            </Form.Group>
+                                            </Form.Group>) : ''}
+                                            {this.state.show_purchase_offer_data.shipping ? (<Form.Group as={Row}>
+                                                <Form.Label column sm={3}>
+                                                    first name
+                                                </Form.Label>
+                                                <Col sm={4}>
+                                                    <Form.Control name="first_name" rows="3"/>
+                                                </Col>
+                                                <Form.Label column sm={3}>
+                                                    last name
+                                                </Form.Label>
+                                                <Col sm={4}>
+                                                    <Form.Control name="last_name" rows="3"/>
+                                                </Col>
+                                            </Form.Group>) : ''}
+                                            {this.state.show_purchase_offer_data.open_message ? (<Form.Group as={Row}>
+                                                <Form.Label column sm={3}>
+                                                    NFT Ethereum Address
+                                                </Form.Label>
+                                                <Col sm={9}>
+                                                    <Form.Control name="message" rows="3"/>
+                                                </Col>
+                                            </Form.Group>) : ''}
 
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm={3}>
@@ -2053,7 +2506,7 @@ class WalletHome extends React.Component {
                                                 <li>
                                                     Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
                                                     <IconContext.Provider  value={{color: 'black', size: '20px'}}>
-                                                        <FaCopy 
+                                                        <FaCopy
                                                             className="ml-4"
                                                             data-tip data-for='copyIDInfo1'
                                                             onClick={this.copyOrderToClipboard}
@@ -2243,11 +2696,15 @@ class WalletHome extends React.Component {
                                                   method="" enctype="multipart/form-data">
                                                 <div class="form-group col-sm-9 mr-5">
                                                     <input class="form-control" type="text"
-                                                           placeholder="eg. api.theworldmarketplace.com"/>
+                                                           onChange={this.handle_change_api_fetch_url} placeholder="eg. api.theworldmarketplace.com"/>
                                                 </div>
                                                 <div class="form-group col-sm-2">
-                                                    <button class="btn btn-primary mx-3">
+                                                    <button onClick={this.load_offers_from_api} class="btn btn-primary mx-3">
                                                         Set Market API
+
+                                                    </button>
+                                                    <button onClick={this.load_offers_from_blockchain} class="btn btn-primary mx-3">
+                                                        Load from Blockchain
 
                                                     </button>
                                                     <IconContext.Provider value={{color: 'white', size: '20px'}}>
@@ -2345,27 +2802,13 @@ class WalletHome extends React.Component {
 
                                     </div>
 
-                                    {this.state.twm_offers.length > 1 ? (
-                                        <Table color="white" className="white-text border border-white b-r10">
-                                            <thead>
-                                            <tr>
-                                                <th>Title</th>
-                                                <th>Price (SFX)</th>
-                                                <th>Quantity</th>
-                                                <th>Seller</th>
-                                                <th>Offer ID</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {twm_listings_table}
-                                            </tbody>
-                                        </Table>) : (<div></div>)}
+
 
                                     <Table>
 
 
                                         <tbody>
-                                        {non_listings_table}
+                                        {table_of_listings}
                                         </tbody>
                                     </Table>
                                 </Col>
@@ -2590,14 +3033,6 @@ class WalletHome extends React.Component {
                                                     </Form.Row>
 
                                                     <Form.Row>
-                                                        <Form.Group md="6" as={Col}>
-                                                            <Form.Label>Message Type</Form.Label>
-
-                                                            <Form.Control
-                                                                name="message_type"
-                                                                defaultValue={data.message_type}
-                                                            />
-                                                        </Form.Group>
 
                                                         <Form.Group md="6" as={Col}>
                                                             <Form.Label>Country of Origin</Form.Label>
@@ -2609,8 +3044,34 @@ class WalletHome extends React.Component {
                                                             />
                                                         </Form.Group>
 
+                                                        <Form.Row md="8">
+                                                            <Form.Group as={Col}>
+                                                                <Form.Label>shipping</Form.Label>
+
+                                                                <Form.Check
+                                                                    checked={this.state.shipping_switch}
+                                                                    onChange={this.change_shipping_switch} type="switch" id="shipping-switch2" name="shipping" />
+                                                            </Form.Group>
+                                                            <Form.Group as={Col}>
+                                                                <Form.Label>nft</Form.Label>
+
+                                                                <Form.Check
+                                                                    checked={this.state.nft_switch}
+                                                                    onChange={this.change_nft_switch} type="switch" id="nft-switch2" name="nft" />
+                                                            </Form.Group>
+
+                                                            <Form.Group as={Col}>
+                                                                <Form.Label>open messages</Form.Label>
+
+                                                                <Form.Check
+                                                                    checked={this.state.open_message_switch}
+                                                                    onChange={this.change_open_message_switch} type="switch" id="open-switch2" name="open_message" />
+                                                            </Form.Group>
+                                                        </Form.Row>
+
 
                                                     </Form.Row>
+
 
                                                     <Form.Row>
                                                         <Form.Group md="4" as={Col}>

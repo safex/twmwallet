@@ -3,16 +3,18 @@ import {Button, Col, Container, Row, Image, Tabs, Tab, Alert, Collapse} from 're
 import { FaHistory, FaAlignLeft, FaKey, FaFolderPlus, FaFolderOpen } from 'react-icons/fa'
 
 
+import {open_wallet_util} from "../../utils/wallet_creation";
+import {purchase_offer} from "../../utils/wallet_actions";
 
 import {save_twm_file, open_twm_file} from "../../utils/twm_actions";
+import copy from "copy-to-clipboard";
 const os = window.require('os');
 const fs = window.require('fs').promises;
 const libPath = window.require('path');
 const crypto = window.require('crypto');
-
+var walley;
 const WALLET_FILENAME = 'safexwallet.dat';
 const DEFAULT_WALLET_PATH = libPath.resolve(os.homedir(), WALLET_FILENAME);
-
 
 
 async function read_legacy_wallet(wallet_path) {
@@ -38,8 +40,8 @@ export default class SelectEntry extends React.Component {
     }
 
     async componentDidMount() {
-
         try {
+            localStorage.clear();
             let wallet = await read_legacy_wallet(DEFAULT_WALLET_PATH);
 
             //if there is an error loading the file, perhaps it doesn't exist
@@ -52,7 +54,9 @@ export default class SelectEntry extends React.Component {
             console.error(err);
             console.error("error at reading legacy wallet");
         }
-    }
+    };
+
+
 
     back = (e) => {
         e.preventDefault();
@@ -138,51 +142,10 @@ export default class SelectEntry extends React.Component {
                         }
                         
                     </Col>
-
                     
                     <Row  className="w-100 entry-footer">
                         <p>THE WORLD MARKETPLACE</p>
                     </Row>
-
-                   
-                    {/*
-                    <Row className="row justify-content-md-center justify-content-center p-3">
-                        <Col sm={6}>
-                            <Button onClick={this.open_existing} className="font-size-medium" variant="primary" size="lg" block>
-                                <FaFolderOpen className="mr-3"/>
-                                Open Existing
-                            </Button>
-                        </Col>
-                    </Row>
-
-                    <Row className="justify-content-md-center font-size-medium justify-content-center p-3">
-                        <Col sm={6}>
-                            <Button onClick={this.create_new} className="font-size-medium" variant="primary" size="lg" block>
-                                <FaFolderPlus className="mr-3"/>
-                                Create New
-                            </Button>
-                        </Col>
-                    </Row>
-
-                    <Row className="justify-content-md-center justify-content-center p-3">
-                        <Col sm={6}>
-                            <Button onClick={this.restore_keys} className="font-size-medium" variant="primary" size="lg" block>
-                                <FaKey className="mr-3"/>
-                                Recover From Keys
-                            </Button>
-                        </Col>
-                    </Row>
-
-                    <Row className="justify-content-md-center justify-content-center p-3">
-                        <Col sm={6}>
-                            <Button onClick={this.seed_phrase} className="font-size-medium" variant="primary" size="lg" block>
-                                <FaAlignLeft className="mr-3"/>
-                                Recover From Seed Phrase
-                            </Button>
-                        </Col>
-                    </Row>
-                    */}
-                    
                 </Container>  
             </div>);
     }

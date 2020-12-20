@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const fs = window.require('fs').promises;
 const crypto = window.require('crypto');
 
@@ -68,6 +70,69 @@ export async function open_twm_file(filepath, password) {
 };
 
 
+export async function register_api(twm_api_url = 'http://127.0.0.1:17700', r_obj) {
+    return axios({
+        method: 'post',
+        url: twm_api_url + '/users/register',
+        data: r_obj,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then((resp) => {
+        return resp.data;
+    });
+}
+
+export async function get_offers_url(twm_api_url = 'http://127.0.0.1:17700') {
+    return axios({
+        method: 'post',
+        url: twm_api_url + '/offers/get_all',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then((resp) => {
+        return resp.data;
+    });
+}
+
+
+export async function get_messages(twm_api_url = 'http://127.0.0.1:17700', r_obj) {
+    return axios({
+        method: 'post',
+        url: twm_api_url + '/messages/register',
+        data: r_obj,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then((resp) => {
+        return resp.data;
+    });
+}
+
+export async function send_message(twm_api_url = 'http://127.0.0.1:17700', r_obj) {
+    return axios({
+        method: 'post',
+        url: twm_api_url + '/messages/register',
+        data: r_obj,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then((resp) => {
+        return resp.data;
+    });
+}
+
+export async function get_seller_pubkey(username, twm_api_url = 'http://127.0.0.1:17700') {
+    return axios({
+        method: 'post',
+        url: twm_api_url + '/messages/get_seller/' + username,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then((resp) => {
+        return resp.data;
+    });
+}
 
 /*
 export async function create_twm_file(filepath) {

@@ -64,6 +64,11 @@ export async function purchase_offer(wallet, cost, offer_id, quantity, mixin, ca
     let mixi = mixin >= 0 ? mixin : 6;
     console.log(mixin);
     let amount2 = cost * 10000000000;
+    console.log(wallet.address());
+    console.log(cost);
+    console.log(offer_id);
+    console.log(quantity);
+    console.log(mixi);
     wallet.createAdvancedTransaction({
         tx_type: '5', //purchase offer transaction
         address: wallet.address(),
