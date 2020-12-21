@@ -22,6 +22,8 @@ import {
     edit_account
 } from "../../utils/wallet_actions";
 
+import keccak256 from 'keccak256';
+
 
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
 
@@ -1525,7 +1527,11 @@ class WalletHome extends React.Component {
                         f_obj.signature = signature;
                         f_obj.pub_key = user.publicKey;
                         let r_obj_string = JSON.stringify(r_obj);
-                        f_obj.msg_hash = sfxjs.cn_fast_hash_safex(r_obj_string, r_obj_string.length);
+                        /*console.log(`string length ${r_obj_string.length}`);
+                        console.log(r_obj_string);
+                        f_obj.msg_hash = sfxjs.cn_fast_hash(r_obj_string, r_obj_string.length);*/
+
+                        f_obj.msg_hash = keccak256(r_obj_string).toString('hex');
 
                         try {
                             let register_msgg = await register_api(twm_api_url, f_obj);
@@ -1638,29 +1644,7 @@ class WalletHome extends React.Component {
             console.log(e.target.mixins.value);
             console.log(listing.username);
 
-            if (this.state.offer_loading_flag === 'twmurl') {
-                let seller = await get_seller_pubkey(listing.username);
-                console.log(seller);
 
-                if (listing.nft === true) {
-                    //expect ethereum address here
-                }
-                if (listing.shipping === true) {
-
-                }
-                if (listing.open_message === true) {
-
-                }
-
-
-
-                //create message here,
-                //generate pgp keys for this moment,
-                //then encrypt the message, supply the pub key for response
-                //save to twm file
-
-
-            }
 
             let total_cost = quant * (listing.price);
             console.log(`TOTAL COST!!!!!!!!`);
@@ -1694,11 +1678,17 @@ class WalletHome extends React.Component {
                 alert(alert_text);
             } else {
                 this.setState({showLoader: true});
-
                 try {
                     if (mixins >= 0) {
+                        let confirmed;
 
-                        let confirmed = window.confirm(`Are you sure you want to purchase ${quant} X ${listing.title} for a total of ${total_cost} SFX?`);
+                        if (listing.nft === true) {
+
+                            confirmed = window.confirm(`Are you sure you want to purchase ${quant} X ${listing.title} for a total of ${total_cost} SFX? sent to ${e.target.eth_address.value}`);
+                        } else {
+                            confirmed = window.confirm(`Are you sure you want to purchase ${quant} X ${listing.title} for a total of ${total_cost} SFX?`);
+
+                        }
                         console.log(confirmed);
                         if (confirmed) {
                             try {
@@ -1716,7 +1706,6 @@ class WalletHome extends React.Component {
                                     purchase_txn_total_cost: total_cost
                                 });
 
-
                                 let purchase_txn = await this.purchase_offer_async(
                                     wallet,
                                     total_cost,
@@ -1732,6 +1721,80 @@ class WalletHome extends React.Component {
                                     try {
                                         this.setState({purchase_txn_id: txid, purchase_txn_fee: fee});
                                         let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
+
+                                        if (this.state.offer_loading_flag === 'twmurl') {
+
+                                            try {
+
+                                                let twm_file = this.state.twm_file;
+
+                                                let seller_pubkey = await get_seller_pubkey(listing.username);
+
+                                                console.log(seller_pubkey);
+
+                                                //generate pgp key
+
+                                                let purchase_obj = {};
+                                                purchase_obj.api_url = this.state.api_url;
+                                                purchase_obj.offer_id = listing.offer_id;
+                                                purchase_obj.title = listing.title;
+
+                                                const crypto  = window.require('crypto');
+
+                                                const { privateKey, publicKey } = await crypto.generateKeyPairSync('rsa', {
+                                                    modulusLength: 4096,
+                                                    publicKeyEncoding: {
+                                                        type: 'pkcs1',
+                                                        format: 'pem'
+                                                    },
+                                                    privateKeyEncoding: {
+                                                        type: 'pkcs8',
+                                                        format: 'pem',
+                                                    }
+                                                });
+                                                console.log(publicKey);
+                                                console.log(privateKey);
+
+                                                console.log(`RSA PUB KEY`);
+
+
+                                                if (twm_file.api.url.hasOwnProperty(this.state.api_url)) {
+                                                    if (twm_file.api.url[this.state.api_url].hasOwnProperty(listing.offer_id)) {
+                                                        //generate a new pgp key
+
+                                                        let api_file_url = twm_file.api.url[this.state.api_url];
+                                                        let api_file_url_offer_id = api_file_url[listing.offer_id];
+                                                        api_file_url_offer_id['keccak256ofsomething'] = {};
+
+
+
+                                                    } else {
+                                                        let api_file_url = twm_file.api.url[this.state.api_url];
+                                                        api_file_url[listing.offer_id] = {};
+                                                        let api_file_url_offer_id = api_file_url[listing.offer_id];
+                                                        api_file_url_offer_id['keccak256ofsomething'] = {};
+
+                                                    }
+
+                                                } else {
+                                                    //if the api was never yet before saved
+                                                    twm_file.api.url[this.state.api_url] = {};
+                                                    let api_file_url = twm_file.api.url[this.state.api_url];
+                                                    api_file_url[listing.offer_id] = {};
+                                                    let api_file_url_offer_id = api_file_url[listing.offer_id];
+                                                    api_file_url_offer_id['keccak256ofsomething'] = {};
+
+                                                }
+
+                                        } catch (err) {
+                                                alert(`error at getting the sellers public key from the api server`);
+                                                console.error(err);
+                                                console.error(`error at getting the sellers public key from the api server`);
+                                            }
+                                        }
+
+
+
                                         console.log(`purchase transaction committed`);
                                     } catch (err) {
                                         this.setState({showLoader: false});
