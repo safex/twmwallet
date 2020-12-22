@@ -2171,74 +2171,51 @@ class WalletHome extends React.Component {
                                     console.error(err);
                                 }
                                 try {
-                                    return <tr key={key}>
-                                        <td className="title-row" data-tip data-for={`offerTitle${key}`}>
+                                    return (
+                                        <Row className="staking-table-row" key={key}>
+                                            <p data-tip data-for={`offerTitle${key}`}>
+                                                {listing.title}
+                                            </p>
 
-                                            {listing.title}
-                                            <ReactTooltip className="offer-tooltip" id={`offerTitle${key}`} type='light'
-                                                          effect='float'>
+                                            <p>{listing.price}</p>
 
-                                                {data.main_image ?
-                                                    <div className="d-flex flex-row justify-content-around p-3">
-                                                        <Image className="border border-dark"
-                                                               src={data.main_image}></Image>
+                                            <p>{listing.quantity}</p>
 
-                                                        <div className="d-flex flex-column justify-content-center">
-                                                            <h3>{listing.title}</h3>
-                                                            <hr class="border border-dark w-100"></hr>
-                                                            <ul>
-                                                                <li>Price: {listing.price} SFX</li>
-                                                                <li>Seller: {listing.seller}</li>
-                                                            </ul>
-                                                            <hr class="border border-primary w-100"></hr>
-                                                            <p>{data.description}</p>
-                                                        </div>
+                                            <p>{listing.username}</p>
 
-                                                    </div>
+                                            <p data-tip data-for={`offerID${key}`}>
+                                                {this.to_ellipsis(listing.offer_id, 10, 10)}
+
+                                                <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
+                                                    <span>{listing.offer_id}</span>
+                                                </ReactTooltip>
+                                            </p>
+
+                                            <p>
+                                                <select id="quantity">
+                                                    <option value="1">1</option>
+                                                </select>
+                                            </p>
+
+                                            <p>
+                                                {listing.quantity <= 0 ?
+                                                    (<button disabled>
+                                                        SOLD OUT
+                                                    </button>)
                                                     :
-                                                    <div>
-                                                        <Image src={require("./../../img/sails-logo.png")}></Image>
-                                                        <h3>{listing.title}</h3>
-                                                    </div>
+                                                    (<button onClick={() => this.handleShowPurchaseForm(listing, data)}>
+                                                        BUY
+                                                    </button>)
                                                 }
-                                                <hr class="border border-dark w-100"></hr>
-                                                <p className="my-3">{listing.offerID}</p>
-                                            </ReactTooltip>
-
-                                        </td>
-                                        <td className="quantity-row">{listing.price}</td>
-                                        <td className="quantity-row">{listing.quantity}</td>
-                                        <td className="quantity-row">{listing.seller}</td>
-                                        <td className="title-row" data-tip data-for={`offerID${key}`}>
-                                            {this.to_ellipsis(listing.offerID, 10, 10)}
-
-                                            <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
-                                                <span>{listing.offerID}</span>
-                                            </ReactTooltip>
-                                        </td>
-                                        <td className="quantity-row"><select className="light-blue-back" id="quantity">
-                                            <option value="1">1</option>
-                                        </select></td>
-                                        <td className="quantity-row">
-                                            {listing.quantity <= 0 ?
-                                                (<Button size="lg" variant="secondary" disabled>
-                                                    SOLD OUT
-                                                </Button>)
-                                                :
-                                                (<Button size="lg" variant="success"
-                                                         onClick={() => this.handleShowPurchaseForm(listing, data)}>
-                                                    BUY
-                                                </Button>)
-                                            }
 
 
-                                        </td>
-                                        <td className="quantity-row">
-                                            <Button size="lg" variant="info">CONTACT</Button>
-                                        </td>
-                                    </tr>
+                                            </p>
 
-
+                                            <p>
+                                                <button >CONTACT</button>
+                                            </p>
+                                        </Row>
+                                    )
                                 } catch (err) {
                                     console.error(`failed to properly parse the user data formatting`);
                                     console.error(err);
@@ -2268,73 +2245,51 @@ class WalletHome extends React.Component {
 
 
                                 try {
-                                    return <tr key={key}>
-                                        <td className="title-row" data-tip data-for={`offerTitle${key}`}>
+                                    return (
+                                        <Row className="staking-table-row" key={key}>
+                                            <p data-tip data-for={`offerTitle${key}`}>
+                                                {listing.title}
+                                            </p>
 
-                                            {listing.title}
-                                            <ReactTooltip className="offer-tooltip" id={`offerTitle${key}`} type='light'
-                                                          effect='float'>
+                                            <p>{listing.price}</p>
 
-                                                {data.main_image ?
-                                                    <div className="d-flex flex-row justify-content-around p-3">
-                                                        <Image className="border border-dark"
-                                                               src={data.main_image}></Image>
+                                            <p>{listing.quantity}</p>
 
-                                                        <div className="d-flex flex-column justify-content-center">
-                                                            <h3>{listing.title}</h3>
-                                                            <hr class="border border-dark w-100"></hr>
-                                                            <ul>
-                                                                <li>Price: {listing.price} SFX</li>
-                                                                <li>Seller: {listing.username}</li>
-                                                            </ul>
-                                                            <hr class="border border-primary w-100"></hr>
-                                                            <p>{data.description}</p>
-                                                        </div>
+                                            <p>{listing.username}</p>
 
-                                                    </div>
+                                            <p data-tip data-for={`offerID${key}`}>
+                                                {this.to_ellipsis(listing.offer_id, 10, 10)}
+
+                                                <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
+                                                    <span>{listing.offer_id}</span>
+                                                </ReactTooltip>
+                                            </p>
+
+                                            <p>
+                                                <select id="quantity">
+                                                    <option value="1">1</option>
+                                                </select>
+                                            </p>
+
+                                            <p>
+                                                {listing.quantity <= 0 ?
+                                                    (<button disabled>
+                                                        SOLD OUT
+                                                    </button>)
                                                     :
-                                                    <div>
-                                                        <Image src={require("./../../img/sails-logo.png")}></Image>
-                                                        <h3>{listing.title}</h3>
-                                                    </div>
+                                                    (<button onClick={() => this.handleShowPurchaseForm(listing, data)}>
+                                                        BUY
+                                                    </button>)
                                                 }
-                                                <hr class="border border-dark w-100"></hr>
-                                                <p className="my-3">{listing.offer_id}</p>
-                                            </ReactTooltip>
-
-                                        </td>
-                                        <td className="quantity-row">{listing.price}</td>
-                                        <td className="quantity-row">{listing.quantity}</td>
-                                        <td className="quantity-row">{listing.username}</td>
-                                        <td className="title-row" data-tip data-for={`offerID${key}`}>
-                                            {this.to_ellipsis(listing.offer_id, 10, 10)}
-
-                                            <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
-                                                <span>{listing.offer_id}</span>
-                                            </ReactTooltip>
-                                        </td>
-                                        <td className="quantity-row"><select className="light-blue-back" id="quantity">
-                                            <option value="1">1</option>
-                                        </select></td>
-                                        <td className="quantity-row">
-                                            {listing.quantity <= 0 ?
-                                                (<Button size="lg" variant="secondary" disabled>
-                                                    SOLD OUT
-                                                </Button>)
-                                                :
-                                                (<Button size="lg" variant="success"
-                                                         onClick={() => this.handleShowPurchaseForm(listing, data)}>
-                                                    BUY
-                                                </Button>)
-                                            }
 
 
-                                        </td>
-                                        <td className="quantity-row">
-                                            <Button size="lg" variant="info">CONTACT</Button>
-                                        </td>
-                                    </tr>
+                                            </p>
 
+                                            <p>
+                                                <button >CONTACT</button>
+                                            </p>
+                                        </Row>
+                                    )
 
                                 } catch (err) {
                                     console.error(`failed to properly parse the user data formatting`);
@@ -2353,533 +2308,389 @@ class WalletHome extends React.Component {
 
 
                     return (
-                        <div className="overflow-y">
-                            <Container
-                                fluid
-                                id="header"
-                                className="no-gutters mt-5 p-2 border border-light b-r10 black-back h-25 sticky"
-                                style={{height: "200px"}}
-                            >
-                                <Modal className="purchase-offer-modal text-align-center" animation={false}
-                                       size="lg"
-                                       centered
-                                       show={this.state.show_purchase_form}
-                                       onHide={this.handleClosePurchaseForm}>
-                                    <Modal.Header closeButton>
-                                        <Modal.Title>
-                                            PURCHASE {this.state.show_purchase_offer.title.toUpperCase()}
-                                        </Modal.Title>
-                                    </Modal.Header>
-                                    <Modal.Body>
+                        <div className="">
 
-                                        <Form id="purchase_item"
-                                              onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
+                            <Modal className="purchase-offer-modal text-align-center" animation={false}
+                                    size="lg"
+                                    centered
+                                    show={this.state.show_purchase_form}
+                                    onHide={this.handleClosePurchaseForm}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>
+                                        PURCHASE {this.state.show_purchase_offer.title.toUpperCase()}
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+
+                                    <Form id="purchase_item"
+                                            onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
 
 
-                                            <h2>{this.state.show_purchase_offer.title.toUpperCase()}</h2>
-                                            {this.state.show_purchase_offer_data.main_image ?
-                                                <div className="d-flex flex-row justify-content-around p-3">
-                                                    <Image className="border border-dark"
-                                                           src={this.state.show_purchase_offer_data.main_image}></Image>
+                                        <h2>{this.state.show_purchase_offer.title.toUpperCase()}</h2>
+                                        {this.state.show_purchase_offer_data.main_image ?
+                                            <div className="d-flex flex-row justify-content-around p-3">
+                                                <Image className="border border-dark"
+                                                        src={this.state.show_purchase_offer_data.main_image}></Image>
 
-                                                    <div className="p-5 d-flex flex-column justify-content-center">
-                                                        <h3>{this.state.show_purchase_offer.title.toUpperCase()}</h3>
-                                                        <hr class="border border-dark w-100"></hr>
-                                                        <ul>
-                                                            <li>Price: {this.state.show_purchase_offer.price} SFX</li>
-                                                            <li>Seller: {this.state.show_purchase_offer.seller}</li>
-                                                            <li data-tip data-for='offerID'>
-                                                                Offer
-                                                                ID: {this.to_ellipsis(this.state.show_purchase_offer.offer_id, 10, 10)}
-                                                                <ReactTooltip id='offerID' type='light' effect='solid'>
-                                                                    {this.state.show_purchase_offer.offer_id}
-                                                                </ReactTooltip>
-                                                                <FaCopy
-                                                                    className="ml-4"
-                                                                    data-tip data-for='copyIDInfo'
-                                                                    onClick={this.copyOfferToClipboard}
-                                                                />
-
-                                                                <ReactTooltip id='copyIDInfo' type='info'
-                                                                              effect='solid'>
-                                                                            <span>
-                                                                                Copy Offer ID
-                                                                            </span>
-                                                                </ReactTooltip>
-                                                            </li>
-                                                        </ul>
-                                                        <hr class="border border-primary w-100"></hr>
-                                                        <div className="h-25 oflow-y-auto">
-                                                            <p>{this.state.show_purchase_offer_data.description.toUpperCase()}</p>
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-                                                :
-                                                <div>
-                                                    <Image src={require("./../../img/sails-logo.png")}></Image>
-
-                                                    <h3>{this.state.show_purchase_offer.title}</h3>
-
+                                                <div className="p-5 d-flex flex-column justify-content-center">
+                                                    <h3>{this.state.show_purchase_offer.title.toUpperCase()}</h3>
                                                     <hr class="border border-dark w-100"></hr>
-
                                                     <ul>
                                                         <li>Price: {this.state.show_purchase_offer.price} SFX</li>
                                                         <li>Seller: {this.state.show_purchase_offer.seller}</li>
-                                                        <li>
-                                                            Offer ID: {this.state.show_purchase_offer.offerID}
+                                                        <li data-tip data-for='offerID'>
+                                                            Offer
+                                                            ID: {this.to_ellipsis(this.state.show_purchase_offer.offer_id, 10, 10)}
+                                                            <ReactTooltip id='offerID' type='light' effect='solid'>
+                                                                {this.state.show_purchase_offer.offer_id}
+                                                            </ReactTooltip>
+                                                            <FaCopy
+                                                                className="ml-4"
+                                                                data-tip data-for='copyIDInfo'
+                                                                onClick={this.copyOfferToClipboard}
+                                                            />
 
-                                                            <IconContext.Provider
-                                                                value={{color: 'black', size: '20px'}}>
-                                                                <FaCopy
-                                                                    className="ml-4"
-                                                                    data-tip data-for='copyIDInfo'
-                                                                    onClick={this.copyOfferToClipboard}
-                                                                />
-
-                                                                <ReactTooltip id='copyIDInfo' type='info'
-                                                                              effect='solid'>
-                                                                            <span>
-                                                                                Copy Offer ID
-                                                                            </span>
-                                                                </ReactTooltip>
-                                                            </IconContext.Provider>
+                                                            <ReactTooltip id='copyIDInfo' type='info'
+                                                                            effect='solid'>
+                                                                        <span>
+                                                                            Copy Offer ID
+                                                                        </span>
+                                                            </ReactTooltip>
                                                         </li>
                                                     </ul>
+                                                    <hr class="border border-primary w-100"></hr>
+                                                    <div className="h-25 oflow-y-auto">
+                                                        <p>{this.state.show_purchase_offer_data.description.toUpperCase()}</p>
+                                                    </div>
                                                 </div>
-                                            }
 
-
-                                            <Form.Group as={Row}>
-                                                <Form.Label column sm={3}>
-                                                    {this.state.show_purchase_offer.quantity} available
-                                                </Form.Label>
-                                                <Col sm={9}>
-                                                    <Form.Control
-                                                        className="light-blue-back"
-                                                        id="quantity"
-                                                        name="quantity"
-                                                        max={this.state.show_purchase_offer.quantity}
-                                                    />
-                                                </Col>
-                                            </Form.Group>
-                                            {this.state.show_purchase_offer_data.nft ? (<Form.Group as={Row}>
-                                                <Form.Label column sm={3}>
-                                                    NFT Ethereum Address
-                                                </Form.Label>
-                                                <Col sm={9}>
-                                                    <Form.Control name="eth_address" rows="3"/>
-                                                </Col>
-                                            </Form.Group>) : ''}
-                                            {this.state.show_purchase_offer_data.shipping ? (<Form.Group as={Row}>
-                                                <Form.Label column sm={3}>
-                                                    first name
-                                                </Form.Label>
-                                                <Col sm={4}>
-                                                    <Form.Control name="first_name" rows="3"/>
-                                                </Col>
-                                                <Form.Label column sm={3}>
-                                                    last name
-                                                </Form.Label>
-                                                <Col sm={4}>
-                                                    <Form.Control name="last_name" rows="3"/>
-                                                </Col>
-                                            </Form.Group>) : ''}
-                                            {this.state.show_purchase_offer_data.open_message ? (<Form.Group as={Row}>
-                                                <Form.Label column sm={3}>
-                                                    NFT Ethereum Address
-                                                </Form.Label>
-                                                <Col sm={9}>
-                                                    <Form.Control name="message" rows="3"/>
-                                                </Col>
-                                            </Form.Group>) : ''}
-
-                                            <Form.Group as={Row}>
-                                                <Form.Label column sm={3}>
-                                                    Mixins
-                                                    <IconContext.Provider value={{color: 'black', size: '20px'}}>
-                                                        <FaInfoCircle data-tip data-for='apiInfo'
-                                                                      className="blockchain-icon mx-4"/>
-
-                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                                    <span>
-                                                                        Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                        They are combined with yours for private transactions.<br/>
-                                                                        Changing this from the default could hurt your privacy.<br/>
-                                                                    </span>
-                                                        </ReactTooltip>
-                                                    </IconContext.Provider>
-                                                </Form.Label>
-                                                <Col sm={9}>
-                                                    <Form.Control
-                                                        name="mixins"
-                                                        as="select"
-                                                        defaultValue="7"
-                                                    >
-                                                        <option>1</option>
-                                                        <option>2</option>
-                                                        <option>3</option>
-                                                        <option>4</option>
-                                                        <option>5</option>
-                                                        <option>6</option>
-                                                        <option>7</option>
-                                                    </Form.Control>
-                                                </Col>
-                                            </Form.Group>
-
-                                            {this.state.showLoader ?
-                                                (<Loader
-                                                    className="justify-content-center align-content-center"
-                                                    type="Bars"
-                                                    color="#00BFFF"
-                                                    height={50}
-                                                    width={50}
-                                                />)
-                                                :
-                                                (<Button
-                                                    size="lg"
-                                                    className="mt-2"
-                                                    type="submit"
-                                                    variant="success"
-                                                >
-                                                    Confirm Payment
-                                                </Button>)
-                                            }
-                                        </Form>
-                                    </Modal.Body>
-                                    <Modal.Footer className="align-self-start">
-
-                                        <Button size="lg" variant="danger" onClick={this.handleClosePurchaseForm}>
-                                            Close
-                                        </Button>
-                                    </Modal.Footer>
-                                </Modal>
-
-                                <Modal className="purchase-offer-modal text-align-center" animation={false}
-                                       centered
-                                       show={this.state.show_purchase_confirm_modal}
-                                       onHide={this.handleConfirmationModal}>
-                                    <Modal.Header closeButton>
-                                        <Modal.Title>
-                                            Purchase Confirmed: {this.state.show_purchase_offer.title.toUpperCase()}
-                                        </Modal.Title>
-                                    </Modal.Header>
-                                    <Modal.Body>
-                                            <ul>
-                                                <li>Purchase transaction committed.</li>
-                                                <li>Transaction ID: {this.state.purchase_txn_id}</li>
-                                                <li>Amount: {this.state.purchase_txn_quantity} X {this.state.purchase_txn_title}</li>
-                                                <li>Price: {this.state.purchase_txn_price} SFX</li>
-                                                <li>
-                                                    Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
-                                                    <IconContext.Provider  value={{color: 'black', size: '20px'}}>
-                                                        <FaCopy
-                                                            className="ml-4"
-                                                            data-tip data-for='copyIDInfo1'
-                                                            onClick={this.copyOrderToClipboard}
-                                                        />
-
-                                                        <ReactTooltip id='copyIDInfo1' type='info' effect='solid'>
-                                                            <span>
-                                                                Copy Offer ID
-                                                            </span>
-                                                        </ReactTooltip>
-                                                    </IconContext.Provider>
-                                                </li>
-                                            </ul>
-                                    </Modal.Body>
-
-                                </Modal>
-
-                        <Row className="justify-content-between align-items-center">
-
-                                    <Col sm={2} className="p-1 white-text align-self-center b-r10 light-blue-back">
-
-                                        <div className="d-flex flex-row justify-content-center align-items-end">
-                                            <IconContext.Provider value={{color: 'white', size: '20px'}}>
-                                                <div>
-                                                    <GrCubes className="blockchain-icon m-1 white-text"/>
-                                                </div>
-                                            </IconContext.Provider>
-                                            <p className="mb-2"><b>{this.state.blockchain_height.toLocaleString()}</b>
-                                            </p>
-                                        </div>
-
-                                        {this.state.wallet_height < this.state.blockchain_height ?
-                                            (<p className="mb-2">
-                                                {this.state.wallet_height} / {this.state.blockchain_height}
-                                            </p>) : ''}
-                                        <p className="mb-2 text-align-center">{this.state.connection_status}</p>
-
-                                    </Col>
-
-                                    {/*<div className="menu-logo">
-                                <Image className=" align-content-center"
-                                    src={require("./../../img/sails-logo.png")}/>
-                                </div>*/}
-
-                                    <Col sm={6} className="menu">
-                                        <ul className="menu__list">
-                                            <li className={this.state.interface_view === 'home' ? "menu-link-active" : "menu__list-item"}>
-                                                <a className="menu__link" href="javascript:void(0)"
-                                                   onClick={this.go_home}>Home</a>
-                                            </li>
-                                            <li className={this.state.interface_view === 'market' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                                <a className="menu__link" href="javascript:void(0)"
-                                                   onClick={this.show_market}>Market</a>
-                                            </li>
-                                            <li className={this.state.interface_view === 'merchant' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                                <a className="menu__link" href="javascript:void(0)"
-                                                   onClick={this.show_merchant}>Merchant</a>
-                                            </li>
-                                            <li className={this.state.interface_view === 'tokens' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                                <a className="menu__link" href="javascript:void(0)"
-                                                   onClick={this.show_tokens}>Tokens</a>
-                                            </li>
-
-
-                                        </ul>
-
-                                    </Col>
-                                    <div className="d-flex flex-column">
-                                        <a className="menu__link" href="javascript:void(0)"
-                                           onClick={this.show_settings}><FaCogs size={20} className="m-3"/></a>
-
-
-                                        <a className="menu__link" href="javascript:void(0)"
-                                           onClick={this.logout}><GiExitDoor className="m-3"/></a>
-                                    </div>
-                                </Row>
-
-
-                                <Row
-                                    className="no-gutters p-2 justify-content-between align-items-center b-r10 white-text">
-                                    <Col id="balances" sm={3}>
-                                        <li className="d-flex flex-row">
-                                            SFX: {this.state.first_refresh === true ?
-                                            (this.state.cash.toLocaleString()) :
-                                            (<Loader className="ml-5" type="ThreeDots" color="#00BFFF" height={20}
-                                                     width={20}/>)
-                                        }
-
-                                            {this.state.pending_cash > 0 ?
-                                                ` - (${this.state.pending_cash.toLocaleString()} SFX Pending)` :
-                                                ''
-                                            }
-                                        </li>
-
-                                        <li className="d-flex flex-row">
-                                            SFT: {this.state.first_refresh === true ?
-                                            (this.state.tokens.toLocaleString()) :
-                                            (<Loader className="ml-5" type="ThreeDots" color="#00BFFF" height={20}
-                                                     width={20}/>)
-                                        }
-
-                                            {this.state.pending_tokens > 0 ?
-                                                ` - (${this.state.pending_tokens.toLocaleString()} SFT Pending)` :
-                                                ''
-                                            }
-                                        </li>
-                                    </Col>
-                                    <Col className="text-align-center" sm={8}>
-                                        <p>SFX + SFT Public Address:<br/>
-                                            <br/>
-                                            <b>{this.state.address}</b>
-                                        </p>
-                                        <Row className="justify-content-center">
-
-                                            <div id="header-buttons" className="d-flex flex-row" sm={1}>
-
-                                                {this.state.synced === false ? (
-                                                    <Button variant="warning" onClick={this.check}>
-                                                        Check
-                                                    </Button>) : ''}
-
-                                                <Button variant="danger" onClick={this.rescan}>
-                                                    Hard Rescan
-                                                </Button>
-
-                                                <Button variant="primary" onClick={this.handleShow}>
-                                                    Show Keys
-                                                </Button>
-
-                                                <Modal
-                                                    className="width100 black-text"
-                                                    animation={false}
-                                                    show={this.state.show_keys}
-                                                    onHide={this.handleClose}
-                                                >
-                                                    <Modal.Header closeButton>
-                                                        <Modal.Title>Your Private Keys</Modal.Title>
-                                                    </Modal.Header>
-                                                    <Modal.Body>
-                                                        <ul>
-                                                            <li>
-                                                                <b>Address:</b> <br/> {this.props.wallet.address()}
-                                                            </li>
-                                                            <li>
-                                                                <b>Secret Spend Key:</b>
-                                                                <br/> {this.props.wallet.secretSpendKey()}
-                                                            </li>
-                                                            <li>
-                                                                <b>Secret View Key:</b>
-                                                                <br/> {this.props.wallet.secretViewKey()}
-                                                            </li>
-                                                            <li>
-                                                                <b>Mnemonic Seed:</b>
-                                                                <br/> {this.props.wallet.seed().toUpperCase()}
-                                                            </li>
-                                                        </ul>
-                                                    </Modal.Body>
-                                                    <Modal.Footer>
-                                                        <Button variant="secondary" onClick={this.handleClose}>
-                                                            Close
-                                                        </Button>
-                                                    </Modal.Footer>
-                                                </Modal>
-                                                <Button className="ml-3" onClick={this.copyAddressToClipboard}>
-                                                    Copy Address
-                                                </Button>
                                             </div>
-                                        </Row>
-                                    </Col>
+                                            :
+                                            <div>
+                                                <Image src={require("./../../img/sails-logo.png")}></Image>
 
-                                </Row>
-                            </Container>
+                                                <h3>{this.state.show_purchase_offer.title}</h3>
 
-                            <Row>
-                                <Col className="market-table white-text overflow-y" md={12}>
-                                    <div
-                                        className="
-                                        search-box d-flex flex-column
-                                        align-items-center border
-                                        border-white safex-blue
-                                        "
-                                    >
+                                                <hr class="border border-dark w-100"></hr>
 
-                                        <div class="row width100 border-bottom border-white" id="search">
-                                            <form className="width100 no-gutters p-2 d-flex justify-content-center"
-                                                  id="search-form" action=""
-                                                  method="" enctype="multipart/form-data">
-                                                <div class="form-group col-sm-9 mr-5">
-                                                    <input class="form-control" type="text"
-                                                           onChange={this.handle_change_api_fetch_url} placeholder="eg. api.theworldmarketplace.com"/>
-                                                </div>
-                                                <div class="form-group col-sm-2">
-                                                    <button onClick={this.load_offers_from_api} class="btn btn-primary mx-3">
-                                                        Set Market API
+                                                <ul>
+                                                    <li>Price: {this.state.show_purchase_offer.price} SFX</li>
+                                                    <li>Seller: {this.state.show_purchase_offer.seller}</li>
+                                                    <li>
+                                                        Offer ID: {this.state.show_purchase_offer.offerID}
 
-                                                    </button>
-                                                    <button onClick={this.load_offers_from_blockchain} class="btn btn-primary mx-3">
-                                                        Load from Blockchain
+                                                        <IconContext.Provider
+                                                            value={{color: 'black', size: '20px'}}>
+                                                            <FaCopy
+                                                                className="ml-4"
+                                                                data-tip data-for='copyIDInfo'
+                                                                onClick={this.copyOfferToClipboard}
+                                                            />
 
-                                                    </button>
-                                                    <IconContext.Provider value={{color: 'white', size: '20px'}}>
-
-                                                        <FaInfoCircle data-tip data-for='apiInfo'
-                                                                      className="blockchain-icon mx-4 white-text"/>
-
-                                                        <ReactTooltip id='apiInfo' type='light' effect='solid'>
-                                                            <span>This is info about setting a market API. Lorem Ipsum.</span>
-                                                        </ReactTooltip>
-                                                    </IconContext.Provider>
+                                                            <ReactTooltip id='copyIDInfo' type='info'
+                                                                            effect='solid'>
+                                                                        <span>
+                                                                            Copy Offer ID
+                                                                        </span>
+                                                            </ReactTooltip>
+                                                        </IconContext.Provider>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        }
 
 
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <div class="row" id="search">
-                                            <form className="no-gutters p-2" id="search-form" action=""
+                                        <Form.Group as={Row}>
+                                            <Form.Label column sm={3}>
+                                                {this.state.show_purchase_offer.quantity} available
+                                            </Form.Label>
+                                            <Col sm={9}>
+                                                <Form.Control
+                                                    className="light-blue-back"
+                                                    id="quantity"
+                                                    name="quantity"
+                                                    max={this.state.show_purchase_offer.quantity}
+                                                />
+                                            </Col>
+                                        </Form.Group>
+                                        {this.state.show_purchase_offer_data.nft ? (<Form.Group as={Row}>
+                                            <Form.Label column sm={3}>
+                                                NFT Ethereum Address
+                                            </Form.Label>
+                                            <Col sm={9}>
+                                                <Form.Control name="eth_address" rows="3"/>
+                                            </Col>
+                                        </Form.Group>) : ''}
+                                        {this.state.show_purchase_offer_data.shipping ? (<Form.Group as={Row}>
+                                            <Form.Label column sm={3}>
+                                                first name
+                                            </Form.Label>
+                                            <Col sm={4}>
+                                                <Form.Control name="first_name" rows="3"/>
+                                            </Col>
+                                            <Form.Label column sm={3}>
+                                                last name
+                                            </Form.Label>
+                                            <Col sm={4}>
+                                                <Form.Control name="last_name" rows="3"/>
+                                            </Col>
+                                        </Form.Group>) : ''}
+                                        {this.state.show_purchase_offer_data.open_message ? (<Form.Group as={Row}>
+                                            <Form.Label column sm={3}>
+                                                NFT Ethereum Address
+                                            </Form.Label>
+                                            <Col sm={9}>
+                                                <Form.Control name="message" rows="3"/>
+                                            </Col>
+                                        </Form.Group>) : ''}
 
-                                                  enctype="multipart/form-data">
-                                                <div class="form-group col-sm-9">
-                                                    <input class="form-control" type="text" placeholder="Search"/>
-                                                </div>
-                                                <div class="form-group col-sm-3">
-                                                    <button
-                                                        onClick={() => (alert("We are wokring on getting this feature up and running as soon as possible. Please be patient!"))}
-                                                        class="btn btn-block btn-primary">Search
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <div class="row" id="filter">
-                                            <form>
-                                                <div class="form-group col-sm-3 col-xs-6">
-                                                    <select data-filter="category"
-                                                            class="filter-make filter form-control">
-                                                        <option value="">Category</option>
-                                                        <option value="">Any</option>
-                                                        <option value="">Category</option>
-                                                        <option value="">Books</option>
-                                                        <option value="">Clothes</option>
-                                                        <option value="">Digital</option>
-                                                        <option value="">Toys</option>
-                                                    </select>
-                                                </div>
-                                                <div class="form-group col-sm-3 col-xs-6">
-                                                    <select data-filter="location"
-                                                            class="filter-model filter form-control">
-                                                        <option value="">Location</option>
-                                                        <option value="">Any</option>
-                                                        <option value="">Africa</option>
-                                                        <option value="">Asia</option>
-                                                        <option value="">Africa</option>
-                                                        <option value="">Europe</option>
-                                                        <option value="">North America</option>
-                                                        <option value="">South America</option>
-                                                    </select>
-                                                </div>
-                                                <div class="form-group col-sm-3 col-xs-6">
-                                                    <select data-filter="price"
-                                                            class="filter-type filter form-control">
-                                                        <option value="">Price Range</option>
-                                                        <option value="">$0 - $24.99</option>
-                                                        <option value="">$25 - $49.99</option>
-                                                        <option value="">$50 - $199.99</option>
-                                                        <option value="">$200 - $499.99</option>
-                                                        <option value="">$500 - $999.99</option>
-                                                        <option value="">$1000+</option>
-                                                    </select>
-                                                </div>
-                                                <div class="form-group col-sm-3 col-xs-6">
-                                                    <select data-filter="sort"
-                                                            class="filter-price filter form-control">
-                                                        <option value="">Sort by...</option>
-                                                        <option value="">$$$ Asc</option>
-                                                        <option value="">$$$ Dec</option>
-                                                        <option value="">Rating Asc</option>
-                                                        <option value="">Rating Dec</option>
-                                                    </select>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <thead className="opaque-black text-align-center">
+                                        <Form.Group as={Row}>
+                                            <Form.Label column sm={3}>
+                                                Mixins
+                                                <IconContext.Provider value={{color: 'black', size: '20px'}}>
+                                                    <FaInfoCircle data-tip data-for='apiInfo'
+                                                                    className="blockchain-icon mx-4"/>
 
-                                        <tr>
-                                            <th className="title-row">Title</th>
-                                            <th className="quantity-row">Price (SFX)</th>
-                                            <th className="quantity-row">Quantity</th>
-                                            <th className="quantity-row">Seller</th>
-                                            <th className="title-row">Offer ID</th>
-                                            <th className="actions-row">Actions</th>
+                                                    <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                                <span>
+                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                    They are combined with yours for private transactions.<br/>
+                                                                    Changing this from the default could hurt your privacy.<br/>
+                                                                </span>
+                                                    </ReactTooltip>
+                                                </IconContext.Provider>
+                                            </Form.Label>
+                                            <Col sm={9}>
+                                                <Form.Control
+                                                    name="mixins"
+                                                    as="select"
+                                                    defaultValue="7"
+                                                >
+                                                    <option>1</option>
+                                                    <option>2</option>
+                                                    <option>3</option>
+                                                    <option>4</option>
+                                                    <option>5</option>
+                                                    <option>6</option>
+                                                    <option>7</option>
+                                                </Form.Control>
+                                            </Col>
+                                        </Form.Group>
 
-                                        </tr>
-                                        </thead>
+                                        {this.state.showLoader ?
+                                            (<Loader
+                                                className="justify-content-center align-content-center"
+                                                type="Bars"
+                                                color="#00BFFF"
+                                                height={50}
+                                                width={50}
+                                            />)
+                                            :
+                                            (<Button
+                                                size="lg"
+                                                className="mt-2"
+                                                type="submit"
+                                                variant="success"
+                                            >
+                                                Confirm Payment
+                                            </Button>)
+                                        }
+                                    </Form>
+                                </Modal.Body>
+                                <Modal.Footer className="align-self-start">
 
+                                    <Button size="lg" variant="danger" onClick={this.handleClosePurchaseForm}>
+                                        Close
+                                    </Button>
+                                </Modal.Footer>
+                            </Modal>
+
+                            <Modal className="purchase-offer-modal text-align-center" animation={false}
+                                    centered
+                                    show={this.state.show_purchase_confirm_modal}
+                                    onHide={this.handleConfirmationModal}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>
+                                        Purchase Confirmed: {this.state.show_purchase_offer.title.toUpperCase()}
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                        <ul>
+                                            <li>Purchase transaction committed.</li>
+                                            <li>Transaction ID: {this.state.purchase_txn_id}</li>
+                                            <li>Amount: {this.state.purchase_txn_quantity} X {this.state.purchase_txn_title}</li>
+                                            <li>Price: {this.state.purchase_txn_price} SFX</li>
+                                            <li>
+                                                Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
+                                                <IconContext.Provider  value={{color: 'black', size: '20px'}}>
+                                                    <FaCopy
+                                                        className="ml-4"
+                                                        data-tip data-for='copyIDInfo1'
+                                                        onClick={this.copyOrderToClipboard}
+                                                    />
+
+                                                    <ReactTooltip id='copyIDInfo1' type='info' effect='solid'>
+                                                        <span>
+                                                            Copy Offer ID
+                                                        </span>
+                                                    </ReactTooltip>
+                                                </IconContext.Provider>
+                                            </li>
+                                        </ul>
+                                </Modal.Body>
+
+                            </Modal>
+                        
+                            <Col sm={4} className="no-padding d-flex flex-column align-items-center justify-content-between">
+                                <HomeInfo
+                                    blockHeight={this.state.blockchain_height}
+                                    connection={this.state.connection_status}
+                                    firstRefresh={this.state.first_refresh}
+                                    cashBalance={this.state.cash}
+                                    tokenBalance={this.state.tokens}
+                                    pendingCash={this.state.pending_cash}
+                                    pendingTokens={this.state.pending_tokens}
+                                />
+                            </Col>
+
+                            <Col sm={7} className="no-padding d-flex flex-column  justify-content-between">
+                                <AccountInfo
+                                    rescan={this.rescan}
+                                    handleShow={this.handleShow}
+                                    show={this.state.show_keys}
+                                    handleKeyRequest={() => {this.setState({keyRequest: !this.state.keyRequest})}}
+                                    keyRequest={this.state.keyRequest}
+                                    address={this.props.wallet.address()}
+                                    spendKey={this.props.wallet.secretSpendKey()}
+                                    viewKey={this.props.wallet.secretViewKey()}
+                                    seed={this.props.wallet.seed()}
+                                    toEllipsis={this.to_ellipsis}
+                                />
+                            </Col>
+
+                            <Col sm={11}>
+                                <div
+                                    className="search-box d-flex flex-column align-items-center"
+                                >
+
+                                    <div class="row width100 border-bottom border-white" id="search">
+                                        <form className="width100 no-gutters p-2 d-flex justify-content-center"
+                                                id="search-form" action=""
+                                                method="" enctype="multipart/form-data">
+                                            <div class="form-group col-sm-9 mr-5">
+                                                <input class="form-control" type="text"
+                                                        onChange={this.handle_change_api_fetch_url} placeholder="eg. api.theworldmarketplace.com"/>
+                                            </div>
+                                            <div class="form-group col-sm-2">
+                                                <button onClick={this.load_offers_from_api} class="btn btn-primary mx-3">
+                                                    Set Market API
+
+                                                </button>
+                                                <button onClick={this.load_offers_from_blockchain} class="btn btn-primary mx-3">
+                                                    Load from Blockchain
+
+                                                </button>
+                                                <IconContext.Provider value={{color: 'white', size: '20px'}}>
+
+                                                    <FaInfoCircle data-tip data-for='apiInfo'
+                                                                    className="blockchain-icon mx-4 white-text"/>
+
+                                                    <ReactTooltip id='apiInfo' type='light' effect='solid'>
+                                                        <span>This is info about setting a market API. Lorem Ipsum.</span>
+                                                    </ReactTooltip>
+                                                </IconContext.Provider>
+
+
+                                            </div>
+                                        </form>
                                     </div>
+                                    <div class="row" id="search">
+                                        <form className="no-gutters p-2" id="search-form" action=""
 
+                                                enctype="multipart/form-data">
+                                            <div class="form-group col-sm-9">
+                                                <input class="form-control" type="text" placeholder="Search"/>
+                                            </div>
+                                            <div class="form-group col-sm-3">
+                                                <button
+                                                    onClick={() => (alert("We are wokring on getting this feature up and running as soon as possible. Please be patient!"))}
+                                                    class="btn btn-block btn-primary">Search
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="row" id="filter">
+                                        <form>
+                                            <div class="form-group col-sm-3 col-xs-6">
+                                                <select data-filter="category"
+                                                        class="filter-make filter form-control">
+                                                    <option value="">Category</option>
+                                                    <option value="">Any</option>
+                                                    <option value="">Category</option>
+                                                    <option value="">Books</option>
+                                                    <option value="">Clothes</option>
+                                                    <option value="">Digital</option>
+                                                    <option value="">Toys</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-sm-3 col-xs-6">
+                                                <select data-filter="location"
+                                                        class="filter-model filter form-control">
+                                                    <option value="">Location</option>
+                                                    <option value="">Any</option>
+                                                    <option value="">Africa</option>
+                                                    <option value="">Asia</option>
+                                                    <option value="">Africa</option>
+                                                    <option value="">Europe</option>
+                                                    <option value="">North America</option>
+                                                    <option value="">South America</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-sm-3 col-xs-6">
+                                                <select data-filter="price"
+                                                        class="filter-type filter form-control">
+                                                    <option value="">Price Range</option>
+                                                    <option value="">$0 - $24.99</option>
+                                                    <option value="">$25 - $49.99</option>
+                                                    <option value="">$50 - $199.99</option>
+                                                    <option value="">$200 - $499.99</option>
+                                                    <option value="">$500 - $999.99</option>
+                                                    <option value="">$1000+</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-sm-3 col-xs-6">
+                                                <select data-filter="sort"
+                                                        class="filter-price filter form-control">
+                                                    <option value="">Sort by...</option>
+                                                    <option value="">$$$ Asc</option>
+                                                    <option value="">$$$ Dec</option>
+                                                    <option value="">Rating Asc</option>
+                                                    <option value="">Rating Dec</option>
+                                                </select>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    
+                                    <Row className="staking-table-row">
+                                        <p>Title</p>
+                                        <p>Price (SFX)</p>
+                                        <p>Quantity</p>
+                                        <p>Seller</p>
+                                        <p>Offer ID</p>
+                                        <p>Actions</p>
+                                    </Row>
 
+                                </div>
+                            </Col>
 
+                                <Col className="market-table white-text overflow-y" md={12}>
+                                    
                                     <Table>
-
-
                                         <tbody>
-                                        {table_of_listings}
+                                            {table_of_listings}
                                         </tbody>
                                     </Table>
                                 </Col>
-                            </Row>
                         </div>
                     );
                 case "merchant": {
@@ -3465,7 +3276,7 @@ class WalletHome extends React.Component {
                                 className="align-content-center"
                                 src={require("./../../img/panda.png")}
                             />
-                            <h1 className="white-text">Bear with us... we're just loading the market...</h1>
+                            <h1 className="black-text">Bear with us... we're just loading the correct info...</h1>
                         </Container>
                     );
 
@@ -3479,20 +3290,16 @@ class WalletHome extends React.Component {
                 <Image className="entry-scene" src={require("./../../img/loading-scene.svg")}/>
                 <Image className="plant3" src={require("./../../img/plant2.svg")}/>
                 
-                {this.state.interface_view === "market" ? "" :
-
-                    <MainHeader 
-                        view={this.state.interface_view} 
-                        goHome={this.go_home} 
-                        goToTokens={this.show_tokens}
-                        goToMarket={this.show_market}
-                        goToMerchant={this.show_merchant}
-                        goToSettings={this.show_settings}
-                        logout={this.logout}
-                    />
+                <MainHeader 
+                    view={this.state.interface_view} 
+                    goHome={this.go_home} 
+                    goToTokens={this.show_tokens}
+                    goToMarket={this.show_market}
+                    goToMerchant={this.show_merchant}
+                    goToSettings={this.show_settings}
+                    logout={this.logout}
+                />
                     
-                }
-
                 {twmwallet()}
             </div>
         );
