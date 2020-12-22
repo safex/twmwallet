@@ -15,8 +15,6 @@ export default function HomeInfo(props) {
 
                 <p>{props.connection}</p>
 
-                <h1>YOU HAVE:</h1>
-
                 <h2>
                     SAFEX CASH: &nbsp;{ props.firstRefresh === true ?
                                     (props.cashBalance.toLocaleString()) 

@@ -53,6 +53,7 @@ import StakeInfo from '../customComponents/StakeInfo';
 import StakingTable from '../customComponents/StakingTable';
 import MerchantAccounts from '../customComponents/MerchantAccounts';
 import MerchantTabs from '../customComponents/MerchantTabs';
+import MerchantOffers from '../customComponents/MerchantOffers';
 
 const openpgp = window.require('openpgp');
 
@@ -103,7 +104,8 @@ class WalletHome extends React.Component {
             show_purchase_offer_data: {main_image: false},
             show_edit_offer: {},
             show_orders: false,
-            new_account_image: require('./../../img/NewAccountPanda.svg'), 
+            new_account_image: '',
+            newAccountImage: require('./../../img/NewAccountPanda.svg'),
             accountsImage: require('./../../img/accountsImage.svg'),
             newOfferImage: require('./../../img/newOfferImage.svg'),
             offersImage: require('./../../img/offersImage.svg'),
@@ -405,6 +407,8 @@ class WalletHome extends React.Component {
                 d_obj.twm_version = 1;
                 if (vees.new_account_image.value.length > 0) {
                     d_obj.avatar = vees.new_account_image.value;
+                } else {
+                    d_obj.avatar = this.state.newAccountsImage;
                 }
                 if (vees.twitter.value.length > 0) {
                     d_obj.twitter = vees.twitter.value;
@@ -1111,8 +1115,8 @@ class WalletHome extends React.Component {
     };
 
     //show modal of Edit Account Form
-    handleShowEditAccountForm = (account) => {
-        this.setState({show_edit_account_form: true, show_edit_account: account});
+    handleEditAccountForm = (account) => {
+        this.setState({show_edit_account_form: !this.state.show_edit_account_form, show_edit_account: account});
     };
 
     //close modal of Edit Account Form
@@ -3235,9 +3239,9 @@ class WalletHome extends React.Component {
                             <Row
                                 className={
                                     this.state.selected_user.username === user.username ?
-                                        "border border-white no-gutters account-element opaque-black"
+                                        "no-gutters account-element selected-account"
                                     : 
-                                        "border border-dark no-gutters account-element"}
+                                        "no-gutters account-element"}
                                 key={key}
                                 onClick={() => this.load_offers(user.username, key)}
                             >
@@ -3257,12 +3261,12 @@ class WalletHome extends React.Component {
                                 </Col>
 
                                 {user.status == 0 ? 
-                                    <Button 
-                                        variant="danger"
+                                    <button 
+                                        className="merchant-mini-buttons"
                                         onClick={() => this.remove_account(user.username, key)}
                                     >
                                         Remove
-                                    </Button>
+                                    </button>
 
                                 : 
                                     ''
@@ -3307,12 +3311,17 @@ class WalletHome extends React.Component {
                                     />
 
                                     <MerchantTabs
-                                        newAccountImage={this.state.new_account_image}
+                                        newAccountImage={this.state.newAccountImage}
                                         handleNewAccountForm={this.handleNewAccountForm}
                                         handleChange={this.handleChange}
+
                                         accountsImage={this.state.accountsImage}
+                                        showAccounts={() => this.setState({merchantTabs: 'accounts'})}
+
                                         newOfferImage={this.state.newOfferImage}
+
                                         offersImage={this.state.offersImage}
+                                        showOffers={() => this.setState({merchantTabs: 'offers'})}
                                     />
                                 </Col>
 
@@ -3330,12 +3339,28 @@ class WalletHome extends React.Component {
                                         toEllipsis={this.to_ellipsis}
                                     />
                                     
-                                    <MerchantAccounts
-                                        handleNewAccountForm={this.handleNewAccountForm}
-                                        showNewAccountForm={this.state.show_new_account_form}
-                                        newAccountImage={this.state.new_account_image}
-                                        registerAccount={this.register_account}
-                                    />  
+                                    {this.state.merchantTabs === "accounts" ?
+
+                                        <MerchantAccounts
+                                            handleChange={this.handleChange}
+                                            handleNewAccountForm={this.handleNewAccountForm}
+                                            showNewAccountForm={this.state.show_new_account_form}
+                                            handleEditAccountForm={this.handleEditAccountForm}
+                                            showEditAccountForm={this.state.show_edit_account_form}
+                                            submitEdit={this.edit_account_top}
+                                            registerApi={this.register_twmapi}
+                                            newAccountImage={this.state.new_account_image}
+                                            registerAccount={this.register_account}
+                                            accounts={accounts_table}
+                                            merchantTabs={this.state.merchantTabs}
+                                            data={data}
+                                            selected={selected}
+                                        />  
+                                    :
+                                        <MerchantOffers
+                                            
+                                        />
+                                    }
                                 </Col>
                             </div>);
 

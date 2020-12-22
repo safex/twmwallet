@@ -10,7 +10,6 @@ import ProgressIcon from "../customComponents/ProgressIcon"
 
 import Loader from 'react-loader-spinner' 
 
-
 import { AiOutlineInfoCircle } from 'react-icons/ai'
 import { IoIosArrowBack } from 'react-icons/io'
 import { IconContext } from 'react-icons'

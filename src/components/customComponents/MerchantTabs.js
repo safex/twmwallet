@@ -14,10 +14,8 @@ import './ComponentCSS/MerchantTabs.css'
 export default function MerchantTabs(props) {
 
     return (
-       
-
             <div className="merchant-tabs-box">
-                <div onClick={props.handleNewAccountForm} className="merchant-tab">
+                <div onClick={() => props.handleNewAccountForm} className="merchant-tab">
                     <Image
                     onClick={props.handleNewAccountForm} 
                         width={75}
@@ -30,7 +28,7 @@ export default function MerchantTabs(props) {
                     
                 </div>
                 
-                <div onClick={props.newAccount} className="merchant-tab">
+                <div onClick={props.showAccounts} className="merchant-tab">
                     <Image
                         width={75}
                         height={75}
@@ -54,7 +52,7 @@ export default function MerchantTabs(props) {
                     
                 </div>
                 
-                <div onClick={props.offersImage} className="merchant-tab">
+                <div onClick={props.showOffers} className="merchant-tab">
                     <Image
                         width={75}
                         height={75}
