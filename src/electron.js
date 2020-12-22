@@ -32,7 +32,7 @@ function createWindow() {
         },
         useContentSize: true
     });
-    //mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 
     // and load the index.html of the app.
     const startUrl =
@@ -45,7 +45,7 @@ function createWindow() {
     mainWindow.loadURL(startUrl);
 
     if (process.env.NODE_ENV === "development")
-        mainWindow.webContents.openDevTools();
+        //mainWindow.webContents.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on("closed", function() {
@@ -61,7 +61,7 @@ function createWindow() {
                 label: "TWM Wallet",
                 submenu: [
                     {
-                        label: "About TWM Wallet v0.1.1",
+                        label: "About TWM Wallet v0.1.2",
                         selector: "orderFrontStandardAboutPanel:"
                     },
                     { type: "separator" },
