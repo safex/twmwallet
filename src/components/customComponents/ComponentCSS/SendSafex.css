@@ -45,18 +45,33 @@
     font-weight: 500!important;
 }
 
-.send-safex-box input, select {
+.send-safex-box > input {
     height: 4rem;
 
     border-radius: 10px;
     background: white;
 }
 
-.send-safex-box.cash input, select {
+.send-safex-box > select {
+    height: 4rem;
+
+    border-radius: 10px;
+    background: white;
+}
+
+.send-safex-box.cash select {
     border: 3px solid #54E9B7;
 }
 
-.send-safex-box.token select, input {
+.send-safex-box.cash input {
+    border: 3px solid #54E9B7;
+}
+
+.send-safex-box.token input {
+    border: 3px solid #3698F3;
+}
+
+.send-safex-box.token select {
     border: 3px solid #3698F3;
 }
 

@@ -26,19 +26,16 @@ import keccak256 from 'keccak256';
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
 
 // Icon Imports
-import {FaCogs, FaSearch, FaInfoCircle, FaCopy} from 'react-icons/fa'
-import {GiExitDoor} from 'react-icons/gi'
-import {GrCubes} from 'react-icons/gr'
-import {MdPeople, MdReceipt} from 'react-icons/md'
-import {TiMessages} from 'react-icons/ti'
+import { FaInfoCircle, FaCopy} from 'react-icons/fa'
 import {IconContext} from 'react-icons'
+import { CgCloseR } from 'react-icons/cg'
 
 import copy from "copy-to-clipboard"
 import ReactTooltip from "react-tooltip";
+import ReactModal from 'react-modal';
+import Loader from 'react-loader-spinner'
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
-
-import Loader from 'react-loader-spinner'
 
 import {open_twm_file, save_twm_file, register_api, get_offers_url, get_seller_pubkey} from "../../utils/twm_actions";
 
@@ -54,6 +51,8 @@ import StakingTable from '../customComponents/StakingTable';
 import MerchantAccounts from '../customComponents/MerchantAccounts';
 import MerchantTabs from '../customComponents/MerchantTabs';
 import MerchantOffers from '../customComponents/MerchantOffers';
+import MyOrders from '../customComponents/MyOrders';
+import OrderTableRow from '../customComponents/OrderTableRow';
 
 const openpgp = window.require('openpgp');
 
@@ -104,6 +103,7 @@ class WalletHome extends React.Component {
             show_purchase_offer_data: {main_image: false},
             show_edit_offer: {},
             show_orders: false,
+            showMyOrders: false,
             new_account_image: '',
             newAccountImage: require('./../../img/NewAccountPanda.svg'),
             accountsImage: require('./../../img/accountsImage.svg'),
@@ -113,7 +113,9 @@ class WalletHome extends React.Component {
             showLoader: false,
             nft_switch: false,
             shipping_switch: false,
-            open_message_switch: false
+            open_message_switch: false,
+            showMessages: false,
+            currentMessage: {},
         };
     }
 
@@ -702,8 +704,8 @@ class WalletHome extends React.Component {
         }
     };
 
-    handleMerchantTabChange = (tab) => {
-        this.setState({merchantTabs: tab})
+    handleMyOrders = () => {
+        this.setState({showMyOrders: !this.state.showMyOrders})
     };
 
     //basic send transactions
@@ -2141,6 +2143,19 @@ class WalletHome extends React.Component {
         });
     };
 
+    displayMessages = () => {
+        this.setState({showMessages: true, showMyOrders: true, 
+            //currentMessage: messageObject
+        })
+        alert(this.state)
+    }
+
+    hideMessages = () => {
+        this.setState({showMessages: false, 
+            //currentMessage: {}
+        })
+    }
+
     render() {
         const twmwallet = () => {
             switch (this.state.interface_view) {
@@ -2195,13 +2210,15 @@ class WalletHome extends React.Component {
                             listing.offer_id = listing.offerID;
                             listing.price = listing.price  / 10000000000;
                             try {
-                                return <tr className="white-text" key={key}>
-                                    <td>{listing.title}</td>
-                                    <td>{listing.price}</td>
-                                    <td>{listing.quantity}</td>
-                                    <td>{listing.seller}</td>
-                                    <td>{listing.offerID}</td>
-                                </tr>
+                                return (
+                                    <Row className="staking-table-row" key={key}>
+                                        <p>{listing.title}</p>
+                                        <p>{listing.price}</p>
+                                        <p>{listing.quantity}</p>
+                                        <p>{listing.seller}</p>
+                                        <p>{listing.offerID}</p>
+                                    </Row>
+                                )
 
                             } catch (err) {
                                 console.error(`failed to properly parse the user data formatting`);
@@ -2364,28 +2381,22 @@ class WalletHome extends React.Component {
                                                 </ReactTooltip>
                                             </p>
 
-                                            <p>
+                                            <p style={{width: '24rem'}}>
                                                 <select id="quantity">
                                                     <option value="1">1</option>
                                                 </select>
-                                            </p>
-
-                                            <p>
+                                            
                                                 {listing.quantity <= 0 ?
-                                                    (<button disabled>
+                                                    (<button className="search-button" disabled>
                                                         SOLD OUT
                                                     </button>)
                                                     :
-                                                    (<button onClick={() => this.handleShowPurchaseForm(listing, data)}>
+                                                    (<button className="search-button" onClick={() => this.handleShowPurchaseForm(listing, data)}>
                                                         BUY
                                                     </button>)
                                                 }
 
-
-                                            </p>
-
-                                            <p>
-                                                <button >CONTACT</button>
+                                                <button className="search-button">CONTACT</button>
                                             </p>
                                         </Row>
                                     )
@@ -2400,6 +2411,30 @@ class WalletHome extends React.Component {
 
                         });
                     }
+
+                    var tableOfOrders;
+                        tableOfOrders = this.state.twm_offers.map((order, key) => {
+                            console.log(key);
+                            try {
+                                return (
+                                    <OrderTableRow 
+                                        key={key}
+                                        title={'placeholder'}
+                                        price={'placeholder'}
+                                        quantity={'placeholder'}
+                                        id={'placeholder'}
+                                        showMessages={this.showMessages}
+                                        messageObject={'placeholder'}
+                                    />
+                                        
+                                )
+
+                            } catch (err) {
+                                console.error(`failed to properly parse the user data formatting`);
+                                console.error(err);
+                            }
+
+                        });
 
 
 
@@ -2433,7 +2468,7 @@ class WalletHome extends React.Component {
 
                                                 <div className="p-5 d-flex flex-column justify-content-center">
                                                     <h3>{this.state.show_purchase_offer.title.toUpperCase()}</h3>
-                                                    <hr class="border border-dark w-100"></hr>
+                                                    <hr className="border border-dark w-100"></hr>
                                                     <ul>
                                                         <li>Price: {this.state.show_purchase_offer.price} SFX</li>
                                                         <li>Seller: {this.state.show_purchase_offer.seller}</li>
@@ -2457,7 +2492,7 @@ class WalletHome extends React.Component {
                                                             </ReactTooltip>
                                                         </li>
                                                     </ul>
-                                                    <hr class="border border-primary w-100"></hr>
+                                                    <hr className="border border-primary w-100"></hr>
                                                     <div className="h-25 oflow-y-auto">
                                                         <p>{this.state.show_purchase_offer_data.description.toUpperCase()}</p>
                                                     </div>
@@ -2470,7 +2505,7 @@ class WalletHome extends React.Component {
 
                                                 <h3>{this.state.show_purchase_offer.title}</h3>
 
-                                                <hr class="border border-dark w-100"></hr>
+                                                <hr className="border border-dark w-100"></hr>
 
                                                 <ul>
                                                     <li>Price: {this.state.show_purchase_offer.price} SFX</li>
@@ -2667,129 +2702,206 @@ class WalletHome extends React.Component {
                                 />
                             </Col>
 
-                            <Col sm={11}>
+                            <Col sm={12}>
                                 <div
                                     className="search-box d-flex flex-column align-items-center"
                                 >
 
-                                    <div class="row width100 border-bottom border-white" id="search">
-                                        <form className="width100 no-gutters p-2 d-flex justify-content-center"
-                                                id="search-form" action=""
-                                                method="" enctype="multipart/form-data">
-                                            <div class="form-group col-sm-9 mr-5">
-                                                <input class="form-control" type="text"
+                                    <div className="row width100 border-bottom border-white" id="search">
+                                        <form 
+                                            className="w-100 no-gutters p-2 align-items-baseline d-flex justify-content-center"
+                                            id="search-form" action=""
+                                            method="" enctype="multipart/form-data"
+                                        >
+                                            <div className="col-sm-6">
+                                                <input className="w-100" type="text"
                                                         onChange={this.handle_change_api_fetch_url} placeholder="eg. api.theworldmarketplace.com"/>
                                             </div>
-                                            <div class="form-group col-sm-2">
-                                                <button onClick={this.load_offers_from_api} class="btn btn-primary mx-3">
+
+                                            <div className="col-sm-4 justify-content-around d-flex">
+                                                <button onClick={this.load_offers_from_api} className="search-button">
                                                     Set Market API
-
                                                 </button>
-                                                <button onClick={this.load_offers_from_blockchain} class="btn btn-primary mx-3">
-                                                    Load from Blockchain
 
+                                                <button onClick={this.load_offers_from_blockchain} className="search-button">
+                                                    Load From Blockchain
                                                 </button>
-                                                <IconContext.Provider value={{color: 'white', size: '20px'}}>
+
+                                                <IconContext.Provider value={{color: '#13d3fd', size: '20px'}}>
 
                                                     <FaInfoCircle data-tip data-for='apiInfo'
-                                                                    className="blockchain-icon mx-4 white-text"/>
+                                                                    className=""/>
 
                                                     <ReactTooltip id='apiInfo' type='light' effect='solid'>
                                                         <span>This is info about setting a market API. Lorem Ipsum.</span>
                                                     </ReactTooltip>
                                                 </IconContext.Provider>
-
-
                                             </div>
                                         </form>
                                     </div>
-                                    <div class="row" id="search">
-                                        <form className="no-gutters p-2" id="search-form" action=""
 
-                                                enctype="multipart/form-data">
-                                            <div class="form-group col-sm-9">
-                                                <input class="form-control" type="text" placeholder="Search"/>
+                                    <Row className="w-100 justify-content-center">
+                                        
+                                    { !this.state.showMyOrders ?
+                                        <Col sm={6}>
+                                            <div className="row" id="search">
+                                                <form className="w-75 no-gutters p-2" id="search-form"
+
+                                                        enctype="multipart/form-data">
+                                                    <div className="form-group col-sm-9">
+                                                        <input className="" type="text" placeholder="Search"/>
+                                                    </div>
+                                                    <div className="form-group col-sm-3">
+                                                        <button
+                                                            onClick={() => (alert("We are wokring on getting this feature up and running as soon as possible. Thank you for your patience!"))}
+                                                            className="search-button"
+                                                        >
+                                                            Search
+                                                        </button>
+                                                    </div>
+                                                </form>
                                             </div>
-                                            <div class="form-group col-sm-3">
-                                                <button
-                                                    onClick={() => (alert("We are wokring on getting this feature up and running as soon as possible. Please be patient!"))}
-                                                    class="btn btn-block btn-primary">Search
-                                                </button>
+                                            
+                                            <div className="row" id="filter">
+                                                <form>
+                                                    
+                                                        <select data-filter="category"
+                                                                className="">
+                                                            <option value="">Category</option>
+                                                            <option value="">Any</option>
+                                                            <option value="">Category</option>
+                                                            <option value="">Books</option>
+                                                            <option value="">Clothes</option>
+                                                            <option value="">Digital</option>
+                                                            <option value="">Toys</option>
+                                                        </select>
+                                                        
+                                                    
+                                                        <select data-filter="location"
+                                                                className="">
+                                                            <option value="">Location</option>
+                                                            <option value="">Any</option>
+                                                            <option value="">Africa</option>
+                                                            <option value="">Asia</option>
+                                                            <option value="">Africa</option>
+                                                            <option value="">Europe</option>
+                                                            <option value="">North America</option>
+                                                            <option value="">South America</option>
+                                                        </select>
+                                                        
+                                                        <select data-filter="price"
+                                                                className="">
+                                                            <option value="">Price Range</option>
+                                                            <option value="">$0 - $24.99</option>
+                                                            <option value="">$25 - $49.99</option>
+                                                            <option value="">$50 - $199.99</option>
+                                                            <option value="">$200 - $499.99</option>
+                                                            <option value="">$500 - $999.99</option>
+                                                            <option value="">$1000+</option>
+                                                        </select>
+                                                        
+                                                        <select data-filter="sort"
+                                                                className="">
+                                                            <option value="">Sort by...</option>
+                                                            <option value="">$$$ Asc</option>
+                                                            <option value="">$$$ Dec</option>
+                                                            <option value="">Rating Asc</option>
+                                                            <option value="">Rating Dec</option>
+                                                        </select>
+                                                        
+                                                </form>
                                             </div>
-                                        </form>
-                                    </div>
-                                    <div class="row" id="filter">
-                                        <form>
-                                            <div class="form-group col-sm-3 col-xs-6">
-                                                <select data-filter="category"
-                                                        class="filter-make filter form-control">
-                                                    <option value="">Category</option>
-                                                    <option value="">Any</option>
-                                                    <option value="">Category</option>
-                                                    <option value="">Books</option>
-                                                    <option value="">Clothes</option>
-                                                    <option value="">Digital</option>
-                                                    <option value="">Toys</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group col-sm-3 col-xs-6">
-                                                <select data-filter="location"
-                                                        class="filter-model filter form-control">
-                                                    <option value="">Location</option>
-                                                    <option value="">Any</option>
-                                                    <option value="">Africa</option>
-                                                    <option value="">Asia</option>
-                                                    <option value="">Africa</option>
-                                                    <option value="">Europe</option>
-                                                    <option value="">North America</option>
-                                                    <option value="">South America</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group col-sm-3 col-xs-6">
-                                                <select data-filter="price"
-                                                        class="filter-type filter form-control">
-                                                    <option value="">Price Range</option>
-                                                    <option value="">$0 - $24.99</option>
-                                                    <option value="">$25 - $49.99</option>
-                                                    <option value="">$50 - $199.99</option>
-                                                    <option value="">$200 - $499.99</option>
-                                                    <option value="">$500 - $999.99</option>
-                                                    <option value="">$1000+</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group col-sm-3 col-xs-6">
-                                                <select data-filter="sort"
-                                                        class="filter-price filter form-control">
-                                                    <option value="">Sort by...</option>
-                                                    <option value="">$$$ Asc</option>
-                                                    <option value="">$$$ Dec</option>
-                                                    <option value="">Rating Asc</option>
-                                                    <option value="">Rating Dec</option>
-                                                </select>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    
+                                        </Col>
+                                    :
+                                        ''
+                                    }
+                                        <Col className="d-flex" sm={2}>
+                                            <button onClick={this.handleMyOrders} className="search-button">
+                                                My Orders
+                                            </button>
+                                        </Col>
+                                       
+                                        { this.state.showMyOrders ?
+                                            <Col sm={12}>
+                                                <Row>
+                                                    <Col sm={10}>
+                                                        <h1>My Orders</h1>
+                                                    </Col>
+
+                                                    <Col sm={2}>
+                                                        <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
+                                                            <CgCloseR
+                                                                className="mx-auto"
+                                                                onClick={this.handleMyOrders}
+                                                            />
+                                                        </IconContext.Provider>
+                                                    </Col>
+                                                </Row>
+                                            
+                                                
+                                                <Row className="h-100">
+                                                    <Col className="h-100" sm={12}>
+                                                        <MyOrders
+                                                            rows={tableOfOrders}
+                                                            messages={this.state.currentMessage}
+                                                            showMessages={this.state.showMessages}
+                                                            displayMessages={() => this.setState({showMessages: true})}
+                                                            hideMessages={() => this.hideMessages}
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+                                        :
+                                            ''
+                                        }
+
+                                        <ReactModal
+                                            isOpen={this.state.showMessages}
+                                            className="keys-modal"
+                                            onRequestClose={this.hideMessages}
+                                        >   
+                                            <Row>
+                                                <Col sm={10}>
+                                                    <h1>
+                                                        Messages
+                                                    </h1>
+
+
+                                                </Col>
+                                                <Col sm={2}>
+                                                    <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
+                                                        <CgCloseR
+                                                            className="mx-auto"
+                                                            onClick={this.hideMessages}
+                                                        />
+                                                    </IconContext.Provider>
+                                                </Col>
+                                            </Row>
+                                        
+                                            
+                                            <Row>
+                                                <Col sm={12}>
+                                                    PUT MESSAGE HERE
+                                                </Col>
+                                            </Row>
+                                        </ReactModal>  
+                                        
+                                    </Row>
+
                                     <Row className="staking-table-row">
                                         <p>Title</p>
                                         <p>Price (SFX)</p>
                                         <p>Quantity</p>
                                         <p>Seller</p>
                                         <p>Offer ID</p>
-                                        <p>Actions</p>
+                                        <p style={{width: '24rem'}}>Actions</p>
                                     </Row>
-
                                 </div>
                             </Col>
 
-                                <Col className="market-table white-text overflow-y" md={12}>
-                                    
-                                    <Table>
-                                        <tbody>
-                                            {table_of_listings}
-                                        </tbody>
-                                    </Table>
-                                </Col>
+                            <Col className="market-table white-text overflow-y" md={12}>
+                                {table_of_listings}
+                            </Col>
                         </div>
                     );
                 case "merchant": {
@@ -3385,7 +3497,7 @@ class WalletHome extends React.Component {
         };
 
         return (
-            <div className="h-100 w-100" >
+            <div className="" >
                 <Image className="entry-scene" src={require("./../../img/loading-scene.svg")}/>
                 <Image className="plant3" src={require("./../../img/plant2.svg")}/>
                 

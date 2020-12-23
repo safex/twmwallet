@@ -155,17 +155,68 @@
     
 
     .search-box {
-        position: -webkit-sticky;
-        position: sticky;
-        top: 200px;
-        z-index: 1;
-
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
+        padding: 1rem;
+        background: white;
+        border-radius: 50px 50px 0 0;
+        box-shadow: var(--blue-box-shadow);
     }
     
-    .market-table tbody tr td {
+    .search-box form {
+        flex-direction: row;
+    }
+
+    .search-button {
+        height: 3rem;
+        margin-left: 1rem;
+        background: linear-gradient(90deg, #13D3FD 0%, #3698F3 100%);
+        border-radius: 10px;
+        color: #fff;
+        border: 0;
+        font-family: 'Inter';
+        font-size: 2rem;
+        font-style: normal;
+        font-weight: 600;
         text-align: center;
+
+    }
+
+    .search-box select {
+        height: 4rem!important;
+        border-radius: 10px!important;
+        background: white!important;
+        border: 3px solid #13D3FD!important;
+        
+        font-family: 'Inter'!important;
+        font-size: 2rem!important;
+        font-style: normal!important;
+        font-weight: 500!important;
+        text-align: left!important;
+        color: #BDBDBD!important;
+        padding: .5rem;
+        margin: 0 1rem;
+
+    }
+
+    .search-box input {
+        height: 4rem!important;
+        border-radius: 10px!important;
+        background: white!important;
+        border: 3px solid #13D3FD!important;
+        
+        font-family: 'Inter'!important;
+        font-size: 2rem!important;
+        font-style: normal!important;
+        font-weight: 500!important;
+        text-align: left!important;
+        color: #BDBDBD!important;
+        padding: .5rem;
+        margin: 0 1rem;
+
+    }
+
+    .market-table {
+        max-height: 42vh;
+        overflow: auto;
     }
 
     .quantity-row {

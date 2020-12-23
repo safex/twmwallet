@@ -233,7 +233,7 @@ export default class OpenWallet extends React.Component {
                 {this.state.wallet_made && 
                 this.state.loading === false ?
                 
-                    <div className="height100 w-100">
+                    <div className="">
                         <WalletHome
                             wallet={this.state.wallet}
                             daemon_host={this.state.daemon_host}
