@@ -1419,7 +1419,7 @@ class WalletHome extends React.Component {
             }
         } catch (err) {
             console.error(err);
-            if (err.toString().startsWith('not enough outputs')) {
+            if (err.toString().startsWith('not enoughR outputs')) {
                 alert(`choose fewer mixins`);
             }
             console.error(`error at the token unstake transaction`);
@@ -1499,7 +1499,7 @@ class WalletHome extends React.Component {
                         const crypto  = window.require('crypto');
 
                         const { privateKey, publicKey } = await crypto.generateKeyPairSync('rsa', {
-                            modulusLength: 4096,
+                            modulusLength: 2048,
                             publicKeyEncoding: {
                                 type: 'pkcs1',
                                 format: 'pem'
@@ -1527,11 +1527,11 @@ class WalletHome extends React.Component {
                         f_obj.signature = signature;
                         f_obj.pub_key = user.publicKey;
                         let r_obj_string = JSON.stringify(r_obj);
-                        /*console.log(`string length ${r_obj_string.length}`);
+                        console.log(`string length ${r_obj_string.length}`);
                         console.log(r_obj_string);
-                        f_obj.msg_hash = sfxjs.cn_fast_hash(r_obj_string, r_obj_string.length);*/
+                        f_obj.msg_hash = sfxjs.cn_fast_hash_safex(r_obj_string, r_obj_string.length);
 
-                        f_obj.msg_hash = keccak256(r_obj_string).toString('hex');
+                        //f_obj.msg_hash = keccak256(r_obj_string).toString('hex');
 
                         try {
                             let register_msgg = await register_api(twm_api_url, f_obj);
@@ -1682,13 +1682,49 @@ class WalletHome extends React.Component {
                     if (mixins >= 0) {
                         let confirmed;
 
+                        let confirm_message = '';
+                        let open_message = '';
+                        let nft_address = '';
+                        let shipping = {};
+
+                        shipping.first_name = '';
+                        shipping.last_name = '';
+                        shipping.address1 = '';
+                        shipping.address2 = '';
+                        shipping.city = '';
+                        shipping.state = '';
+                        shipping.zipcode = '';
+                        shipping.country = '';
+                        shipping.email_address = '';
+                        shipping.phone_number = '';
+                        confirm_message = `Are you sure you want to purchase ${quant} X ${listing.title} for a total of ${total_cost} SFX?`;
                         if (listing.nft === true) {
 
-                            confirmed = window.confirm(`Are you sure you want to purchase ${quant} X ${listing.title} for a total of ${total_cost} SFX? sent to ${e.target.eth_address.value}`);
-                        } else {
-                            confirmed = window.confirm(`Are you sure you want to purchase ${quant} X ${listing.title} for a total of ${total_cost} SFX?`);
-
+                            confirm_message += ` sent to eth address ${e.target.eth_address.value}`;
+                            nft_address = e.target.eth_address.value;
                         }
+                        if (listing.shipping === true) {
+                            //complete confirm message for all fields
+                            confirm_message += ` delivered physical property to ${e.target.first_name.value}`;
+                            shipping.first_name = e.target.first_name.value;
+                            shipping.last_name = e.target.last_name.value;
+                            shipping.address1 = e.target.address1.value;
+                            shipping.address2 = e.target.address2.value;
+                            shipping.city = e.target.city.value;
+                            shipping.state = e.target.state.value;
+                            shipping.zipcode = e.target.zipcode.value;
+                            shipping.country = e.target.country.value;
+                            shipping.email_address = e.target.email_address.value;
+                            shipping.phone_number = e.target.phone_number.value;
+                        }
+                        if (listing.open_message === true) {
+                            confirm_message += ` ${e.target.open_message.value}`;
+                            open_message = e.target.open_message.value;
+                        }
+
+                        confirmed = window.confirm(confirm_message);
+
+
                         console.log(confirmed);
                         if (confirmed) {
                             try {
@@ -1732,17 +1768,10 @@ class WalletHome extends React.Component {
 
                                                 console.log(seller_pubkey);
 
-                                                //generate pgp key
-
-                                                let purchase_obj = {};
-                                                purchase_obj.api_url = this.state.api_url;
-                                                purchase_obj.offer_id = listing.offer_id;
-                                                purchase_obj.title = listing.title;
-
                                                 const crypto  = window.require('crypto');
 
                                                 const { privateKey, publicKey } = await crypto.generateKeyPairSync('rsa', {
-                                                    modulusLength: 4096,
+                                                    modulusLength: 2048,
                                                     publicKeyEncoding: {
                                                         type: 'pkcs1',
                                                         format: 'pem'
@@ -1757,34 +1786,104 @@ class WalletHome extends React.Component {
 
                                                 console.log(`RSA PUB KEY`);
 
+                                                let api_file_url_offer_id;
 
-                                                if (twm_file.api.url.hasOwnProperty(this.state.api_url)) {
-                                                    if (twm_file.api.url[this.state.api_url].hasOwnProperty(listing.offer_id)) {
+                                                if (twm_file.api.urls.hasOwnProperty(this.state.api_url)) {
+                                                    if (twm_file.api.urls[this.state.api_url].hasOwnProperty(listing.offer_id)) {
                                                         //generate a new pgp key
 
-                                                        let api_file_url = twm_file.api.url[this.state.api_url];
-                                                        let api_file_url_offer_id = api_file_url[listing.offer_id];
-                                                        api_file_url_offer_id['keccak256ofsomething'] = {};
-
-
+                                                        let api_file_url = twm_file.api.urls[this.state.api_url];
+                                                        api_file_url_offer_id = api_file_url[listing.offer_id];
 
                                                     } else {
-                                                        let api_file_url = twm_file.api.url[this.state.api_url];
+                                                        let api_file_url = twm_file.api.urls[this.state.api_url];
                                                         api_file_url[listing.offer_id] = {};
-                                                        let api_file_url_offer_id = api_file_url[listing.offer_id];
-                                                        api_file_url_offer_id['keccak256ofsomething'] = {};
-
+                                                        api_file_url_offer_id = api_file_url[listing.offer_id];
                                                     }
-
                                                 } else {
                                                     //if the api was never yet before saved
-                                                    twm_file.api.url[this.state.api_url] = {};
-                                                    let api_file_url = twm_file.api.url[this.state.api_url];
+                                                    twm_file.api.urls[this.state.api_url] = {};
+                                                    let api_file_url = twm_file.api.urls[this.state.api_url];
                                                     api_file_url[listing.offer_id] = {};
-                                                    let api_file_url_offer_id = api_file_url[listing.offer_id];
-                                                    api_file_url_offer_id['keccak256ofsomething'] = {};
+                                                    api_file_url_offer_id = api_file_url[listing.offer_id];
 
                                                 }
+
+                                                let order_id_string = publicKey + listing.offer_id + this.state.blockchain_height;
+                                                let order_id_hash = keccak256(order_id_string).toString('hex');
+                                                api_file_url_offer_id[order_id_hash] = {};
+                                                console.log(api_file_url_offer_id);
+
+
+                                                let message_header_obj = {};
+                                                message_header_obj.order_id = '';
+                                                message_header_obj.sender_pgp_pub_key = publicKey;
+                                                message_header_obj.to = listing.seller;
+                                                message_header_obj.from = publicKey;
+                                                message_header_obj.order_id = order_id_hash;
+                                                message_header_obj.purchase_proof = txid;
+
+
+                                                let message_obj = {};
+                                                message_obj.subject = '';
+                                                message_obj.offer_id = listing.offer_id;
+                                                message_obj.message = open_message;
+                                                message_obj.nft = nft_address;
+                                                message_obj.shipping = JSON.stringify(shipping);
+                                                message_header_obj.message_hash = keccak256(JSON.stringify(message_obj));
+
+                                                let message_obj_string_pre_sign = JSON.stringify(message_obj);
+                                                message_header_obj.message_signature = '';
+
+                                                const signature = crypto.sign("sha256", Buffer.from(message_obj_string_pre_sign), {
+                                                    key: privateKey,
+                                                    padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                                                });
+
+                                                message_obj.signature = signature.toString("base64");
+
+                                                console.log(seller_pubkey.user.pgp_key);
+                                                let found_key = crypto.createPublicKey(seller_pubkey.user.pgp_key);
+                                                console.log(found_key);
+                                                console.log(": " + JSON.stringify(message_obj).length + " characters, " +
+                                                    Buffer.byteLength(JSON.stringify(message_obj), 'utf8') + " bytes");
+
+                                                alert(`what`);
+                                                let encrypted_message = crypto.publicEncrypt(
+                                                    {
+                                                        key: found_key,
+                                                        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+                                                        oaepHash: "sha256",
+                                                    },
+                                                    Buffer.from(JSON.stringify(message_obj))
+                                                );
+
+                                                console.log(encrypted_message);
+
+
+                                                const enc_signature = crypto.sign("sha256", Buffer.from(encrypted_message), {
+                                                    key: privateKey,
+                                                    padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                                                });
+                                                message_header_obj.message_signature = enc_signature;
+
+                                                let purchase_obj = {};
+                                                purchase_obj.api_url = this.state.api_url;
+                                                purchase_obj.offer_id = listing.offer_id;
+                                                purchase_obj.title = listing.title;
+                                                purchase_obj.price = listing.price;
+                                                purchase_obj.quantity = quant;
+                                                purchase_obj.messages = {};
+                                                api_file_url_offer_id[order_id_hash].pgp_keys = {private_key: privateKey, public_key: publicKey};
+                                                api_file_url_offer_id[order_id_hash].messages = {};
+                                                //api_file_url_offer_id[order_id_hash].messages
+                                                //send it to the server
+                                                //save it to the twm_file
+
+
+                                                console.log(`payments from twm_url`);
+                                                alert(`what`);
+
 
                                         } catch (err) {
                                                 alert(`error at getting the sellers public key from the api server`);
