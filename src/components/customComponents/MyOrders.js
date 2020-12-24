@@ -13,6 +13,10 @@ export default function MyOrders(props) {
 
     return (
         <div className="h-100">
+
+            <button onClick={props.handleOrders}>
+                Back
+            </button>
             <Col 
                 className="pt-3 staking-table-table"
                 style={{maxHeight: 300}}

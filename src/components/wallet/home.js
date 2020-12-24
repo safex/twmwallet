@@ -1036,14 +1036,6 @@ class WalletHome extends React.Component {
         }, 500);
     };
 
-    //Show Merchant Orders
-
-    show_orders = () => {
-        this.setState({show_orders: !this.state.show_orders});
-        console.log(this.state.show_orders)
-    };
-
-
     //open staking view from navigation
     show_tokens = () => {
         this.setState({interface_view: 'tokens'})
@@ -2968,22 +2960,20 @@ class WalletHome extends React.Component {
                                 } catch (err) {
                                     console.error(err);
                                 }
-                                return <tr key={key}>
-                                    <td className="title-row text-align-center"><h4>{listing.title}</h4></td>
-                                    <td className="quantity-row text-align-center">{listing.price / 10000000000}</td>
-                                    <td className="quantity-row text-align-center">{listing.quantity}</td>
-                                    <td className="quantity-row text-align-center">{listing.seller}</td>
-                                    <td className="actions-row text-align-center">{listing.offerID}</td>
-                                    <td className="title-row text-align-center">
+                                return <Row key={key}>
+                                    <p>{listing.title}</p>
+                                    <p>{listing.price / 10000000000}</p>
+                                    <p>{listing.quantity}</p>
+                                    <p>{listing.seller}</p>
+                                    <p>{listing.offerID}</p>
+                                    <p>
 
-                                        <Button
-                                            size="lg"
-                                            variant="success"
+                                        <button
                                             onClick={() => this.handleShowEditOfferForm(listing)}
                                             className="mx-2"
                                         >
                                             Edit
-                                        </Button>
+                                        </button>
 
                                         <Modal
                                             size="lg"
@@ -3226,16 +3216,14 @@ class WalletHome extends React.Component {
                                             </Modal.Footer>
                                         </Modal>
 
-                                        <Button
-                                            size="lg"
-                                            variant="success"
-                                            onClick={this.show_orders}
+                                        <button
+                                            onClick={this.handleMyOrders}
                                             className="mx-2"
                                         >
                                             Show Orders
-                                        </Button>
-                                    </td>
-                                </tr>
+                                        </button> 
+                                    </p>
+                                </Row>
                             }
                         } catch (err) {
                             console.error(`failed to properly parse the user data formatting`);
@@ -3379,10 +3367,60 @@ class WalletHome extends React.Component {
                                             selected={selected}
                                         />  
                                     :
-                                        <MerchantOffers
-                                            
-                                        />
+                                        <Row className="merchant-accounts-box">
+                                            ({this.state.showMyOrders ? 
+                                                <Row className="h-100">
+                                                    <div style={{width: 800}} className="h-100" sm={12}>
+                                                        <MyOrders
+                                                            rows={tableOfOrders}
+                                                            showMessages={this.state.showMessages}
+                                                            handleShowMessages={this.handleShowMessages}
+                                                            handleHideMessages={this.handleHideMessages}
+                                                            handleOrders={this.handleMyOrders}
+                                                        />
+                                                    </div>
+                                                </Row>
+                                                
+                                            :
+                                                <MerchantOffers
+                                                    handleOrders={this.handleMyOrders}
+                                                />
+                                            }
+                                        </Row >
                                     }
+                                    <ReactModal
+                                            isOpen={this.state.showMessages}
+                                            closeTimeoutMS={500}
+                                            className="keys-modal"
+                                            onRequestClose={this.hideMessages}
+                                        >   
+                                            <Row>
+                                                <Col sm={10}>
+                                                    <h1>
+                                                        Messages
+                                                    </h1>
+
+
+                                                </Col>
+                                                <Col sm={2}>
+                                                    <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
+                                                        <CgCloseR
+                                                            className="mx-auto"
+                                                            onClick={this.hideMessages}
+                                                        />
+                                                    </IconContext.Provider>
+                                                </Col>
+                                            </Row>
+                                            
+                                            <Row className="m-auto">
+                                                <Col sm={12}>
+                                                    <h1>PUT MESSAGE HERE</h1>
+                                                    {
+                                                    //  this.state.currentMessage
+                                                    }
+                                                </Col>
+                                            </Row>
+                                        </ReactModal>  
                                 </Col>
                             </div>);
 

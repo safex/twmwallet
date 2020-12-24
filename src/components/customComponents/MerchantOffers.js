@@ -51,10 +51,11 @@ export default function MerchantOffers(props) {
                 
                     <p>
                         <button className="edit-button">Edit</button>
-                        <button className="orders-button">Orders</button>
+                        <button onClick={props.handleOrders} className="orders-button">Orders</button>
                     </p>
                 </Row>
             </Col>
+
         </Row>
     )
 }
