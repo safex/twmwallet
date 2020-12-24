@@ -95,7 +95,7 @@ export default function MerchantAccounts(props) {
             </Row>
         }
             <ReactModal
-            closeTimeoutMS={1000}
+            closeTimeoutMS={500}
             isOpen={props.showNewAccountForm}
             onRequestClose={props.handleNewAccountForm}
             className="new-account-modal"
@@ -290,7 +290,7 @@ export default function MerchantAccounts(props) {
 
         {props.selected ? 
             <ReactModal
-                closeTimeoutMS={1000}
+                closeTimeoutMS={500}
                 isOpen={props.showEditAccountForm}
                 onRequestClose={props.handleEditAccountForm}
                 className="new-account-modal"

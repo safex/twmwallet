@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Row, Col, Container, Button, Table, Form, Image, Modal, Carousel, CarouselItem} from 'react-bootstrap';
+import {Row, Col, Container, Button, Table, Form, Image, Modal} from 'react-bootstrap';
 
 import {withRouter} from 'react-router-dom';
 
@@ -34,6 +34,7 @@ import copy from "copy-to-clipboard"
 import ReactTooltip from "react-tooltip";
 import ReactModal from 'react-modal';
 import Loader from 'react-loader-spinner'
+import Fade from 'react-reveal/Fade';
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 
@@ -704,9 +705,6 @@ class WalletHome extends React.Component {
         }
     };
 
-    handleMyOrders = () => {
-        this.setState({showMyOrders: !this.state.showMyOrders})
-    };
 
     //basic send transactions
     token_send = async (e) => {
@@ -2143,18 +2141,18 @@ class WalletHome extends React.Component {
         });
     };
 
-    displayMessages = () => {
-        this.setState({showMessages: true, showMyOrders: true, 
-            //currentMessage: messageObject
-        })
-        alert(this.state)
+    handleShowMessages = (messageObject) => {
+        this.setState({showMessages: true, showMyOrders: true, currentMessage: messageObject})
     }
 
     hideMessages = () => {
-        this.setState({showMessages: false, 
-            //currentMessage: {}
-        })
+        this.setState({showMessages: false, currentMessage: {}})
     }
+
+
+    handleMyOrders = () => {
+        this.setState({showMyOrders: !this.state.showMyOrders})
+    };
 
     render() {
         const twmwallet = () => {
@@ -2706,39 +2704,42 @@ class WalletHome extends React.Component {
                                 <div
                                     className="search-box d-flex flex-column align-items-center"
                                 >
+                                    { !this.state.showMyOrders ?
+                                        <div className="row width100 border-bottom border-white" id="search">
+                                            <form 
+                                                className="w-100 no-gutters p-2 align-items-baseline d-flex justify-content-center"
+                                                id="search-form" action=""
+                                                method="" enctype="multipart/form-data"
+                                            >
+                                                <div className="col-sm-6">
+                                                    <input className="w-100" type="text"
+                                                            onChange={this.handle_change_api_fetch_url} placeholder="eg. api.theworldmarketplace.com"/>
+                                                </div>
 
-                                    <div className="row width100 border-bottom border-white" id="search">
-                                        <form 
-                                            className="w-100 no-gutters p-2 align-items-baseline d-flex justify-content-center"
-                                            id="search-form" action=""
-                                            method="" enctype="multipart/form-data"
-                                        >
-                                            <div className="col-sm-6">
-                                                <input className="w-100" type="text"
-                                                        onChange={this.handle_change_api_fetch_url} placeholder="eg. api.theworldmarketplace.com"/>
-                                            </div>
+                                                <div className="col-sm-4 justify-content-around d-flex">
+                                                    <button onClick={this.load_offers_from_api} className="search-button">
+                                                        Set Market API
+                                                    </button>
 
-                                            <div className="col-sm-4 justify-content-around d-flex">
-                                                <button onClick={this.load_offers_from_api} className="search-button">
-                                                    Set Market API
-                                                </button>
+                                                    <button onClick={this.load_offers_from_blockchain} className="search-button">
+                                                        Load From Blockchain
+                                                    </button>
 
-                                                <button onClick={this.load_offers_from_blockchain} className="search-button">
-                                                    Load From Blockchain
-                                                </button>
+                                                    <IconContext.Provider value={{color: '#13d3fd', size: '20px'}}>
 
-                                                <IconContext.Provider value={{color: '#13d3fd', size: '20px'}}>
+                                                        <FaInfoCircle data-tip data-for='apiInfo'
+                                                                        className=""/>
 
-                                                    <FaInfoCircle data-tip data-for='apiInfo'
-                                                                    className=""/>
-
-                                                    <ReactTooltip id='apiInfo' type='light' effect='solid'>
-                                                        <span>This is info about setting a market API. Lorem Ipsum.</span>
-                                                    </ReactTooltip>
-                                                </IconContext.Provider>
-                                            </div>
-                                        </form>
-                                    </div>
+                                                        <ReactTooltip id='apiInfo' type='light' effect='solid'>
+                                                            <span>This is info about setting a market API. Lorem Ipsum.</span>
+                                                        </ReactTooltip>
+                                                    </IconContext.Provider>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    :
+                                        ''
+                                    }
 
                                     <Row className="w-100 justify-content-center">
                                         
@@ -2764,60 +2765,58 @@ class WalletHome extends React.Component {
                                             
                                             <div className="row" id="filter">
                                                 <form>
+                                                    <select data-filter="category"
+                                                            className="">
+                                                        <option value="">Category</option>
+                                                        <option value="">Any</option>
+                                                        <option value="">Category</option>
+                                                        <option value="">Books</option>
+                                                        <option value="">Clothes</option>
+                                                        <option value="">Digital</option>
+                                                        <option value="">Toys</option>
+                                                    </select>
+                                                
+                                                    <select data-filter="location"
+                                                            className="">
+                                                        <option value="">Location</option>
+                                                        <option value="">Any</option>
+                                                        <option value="">Africa</option>
+                                                        <option value="">Asia</option>
+                                                        <option value="">Africa</option>
+                                                        <option value="">Europe</option>
+                                                        <option value="">North America</option>
+                                                        <option value="">South America</option>
+                                                    </select>
                                                     
-                                                        <select data-filter="category"
-                                                                className="">
-                                                            <option value="">Category</option>
-                                                            <option value="">Any</option>
-                                                            <option value="">Category</option>
-                                                            <option value="">Books</option>
-                                                            <option value="">Clothes</option>
-                                                            <option value="">Digital</option>
-                                                            <option value="">Toys</option>
-                                                        </select>
-                                                        
+                                                    <select data-filter="price"
+                                                            className="">
+                                                        <option value="">Price Range</option>
+                                                        <option value="">$0 - $24.99</option>
+                                                        <option value="">$25 - $49.99</option>
+                                                        <option value="">$50 - $199.99</option>
+                                                        <option value="">$200 - $499.99</option>
+                                                        <option value="">$500 - $999.99</option>
+                                                        <option value="">$1000+</option>
+                                                    </select>
                                                     
-                                                        <select data-filter="location"
-                                                                className="">
-                                                            <option value="">Location</option>
-                                                            <option value="">Any</option>
-                                                            <option value="">Africa</option>
-                                                            <option value="">Asia</option>
-                                                            <option value="">Africa</option>
-                                                            <option value="">Europe</option>
-                                                            <option value="">North America</option>
-                                                            <option value="">South America</option>
-                                                        </select>
-                                                        
-                                                        <select data-filter="price"
-                                                                className="">
-                                                            <option value="">Price Range</option>
-                                                            <option value="">$0 - $24.99</option>
-                                                            <option value="">$25 - $49.99</option>
-                                                            <option value="">$50 - $199.99</option>
-                                                            <option value="">$200 - $499.99</option>
-                                                            <option value="">$500 - $999.99</option>
-                                                            <option value="">$1000+</option>
-                                                        </select>
-                                                        
-                                                        <select data-filter="sort"
-                                                                className="">
-                                                            <option value="">Sort by...</option>
-                                                            <option value="">$$$ Asc</option>
-                                                            <option value="">$$$ Dec</option>
-                                                            <option value="">Rating Asc</option>
-                                                            <option value="">Rating Dec</option>
-                                                        </select>
-                                                        
+                                                    <select data-filter="sort"
+                                                            className="">
+                                                        <option value="">Sort by...</option>
+                                                        <option value="">$$$ Asc</option>
+                                                        <option value="">$$$ Dec</option>
+                                                        <option value="">Rating Asc</option>
+                                                        <option value="">Rating Dec</option>
+                                                    </select>
                                                 </form>
                                             </div>
                                         </Col>
                                     :
                                         ''
                                     }
+                                    
                                         <Col className="d-flex" sm={2}>
                                             <button onClick={this.handleMyOrders} className="search-button">
-                                                My Orders
+                                                {this.state.showMyOrders ? 'Close' : 'My Orders'}
                                             </button>
                                         </Col>
                                        
@@ -2843,10 +2842,9 @@ class WalletHome extends React.Component {
                                                     <Col className="h-100" sm={12}>
                                                         <MyOrders
                                                             rows={tableOfOrders}
-                                                            messages={this.state.currentMessage}
                                                             showMessages={this.state.showMessages}
-                                                            displayMessages={() => this.setState({showMessages: true})}
-                                                            hideMessages={() => this.hideMessages}
+                                                            handleShowMessages={this.handleShowMessages}
+                                                            handleHideMessages={this.handleHideMessages}
                                                         />
                                                     </Col>
                                                 </Row>
@@ -2854,9 +2852,11 @@ class WalletHome extends React.Component {
                                         :
                                             ''
                                         }
+                                    </Row>
 
                                         <ReactModal
                                             isOpen={this.state.showMessages}
+                                            closeTimeoutMS={500}
                                             className="keys-modal"
                                             onRequestClose={this.hideMessages}
                                         >   
@@ -2877,16 +2877,16 @@ class WalletHome extends React.Component {
                                                     </IconContext.Provider>
                                                 </Col>
                                             </Row>
-                                        
                                             
-                                            <Row>
+                                            <Row className="m-auto">
                                                 <Col sm={12}>
-                                                    PUT MESSAGE HERE
+                                                    <h1>PUT MESSAGE HERE</h1>
+                                                    {
+                                                    //  this.state.currentMessage
+                                                    }
                                                 </Col>
                                             </Row>
                                         </ReactModal>  
-                                        
-                                    </Row>
 
                                     <Row className="staking-table-row">
                                         <p>Title</p>
