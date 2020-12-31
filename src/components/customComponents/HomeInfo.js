@@ -16,19 +16,17 @@ export default function HomeInfo(props) {
                 <p>{props.connection}</p>
 
                 <h2>
-                    SAFEX CASH: &nbsp;{ props.firstRefresh === true ?
+                    SAFEX CASH: &nbsp;
                                     (props.cashBalance.toLocaleString()) 
-                                    :
-                                    (<Loader className="ml-5" type="ThreeDots" color="#00BFFF" width={10} height={10}/>)
-                                }<br/>
+                                   
+                                <br/>
 
                     {props.penndingCash > 0 ? `(${props.pendingCash.toLocaleString()} SFX Pending)` : ''}
 
-                    SAFEX TOKENS: &nbsp;{ props.firstRefresh === true ?
+                    SAFEX TOKENS: &nbsp;
                                     (props.tokenBalance.toLocaleString()) 
-                                    :
-                                    (<Loader className="ml-5" type="ThreeDots" color="#00BFFF" width={10} height={10}/>)
-                                }<br/>
+                                    
+                                <br/>
 
                     {props.pendingTokens > 0 ? `(${props.pendingTokens.toLocaleString()} SFT Pending)` : ''}
                 </h2>

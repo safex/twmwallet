@@ -38,8 +38,6 @@ import Fade from 'react-reveal/Fade';
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 
-import {open_twm_file, save_twm_file, register_api, get_offers_url, get_seller_pubkey} from "../../utils/twm_actions";
-
 // Custom Components
 import MainHeader from '../customComponents/MainHeader';
 import SendSafex from '../customComponents/SendSafex';
@@ -55,7 +53,19 @@ import MerchantOffers from '../customComponents/MerchantOffers';
 import MyOrders from '../customComponents/MyOrders';
 import OrderTableRow from '../customComponents/OrderTableRow';
 
+import {
+    open_twm_file,
+    save_twm_file,
+    register_api,
+    get_offers_url,
+    get_seller_pubkey,
+    dispatch_purchase_message
+} from "../../utils/twm_actions";
+
+import zlib from 'zlib';
+
 const openpgp = window.require('openpgp');
+
 
 const sfxjs = window.require('safex-addressjs');
 
@@ -400,6 +410,8 @@ class WalletHome extends React.Component {
 
     register_account = async (e) => {
         e.preventDefault();
+        alert(this.state.tokens);
+        alert(this.state.first_refresh);
         if (this.state.tokens >= 300 && this.state.first_refresh === true) {
             try {
                 let vees = e.target;
@@ -1504,7 +1516,7 @@ class WalletHome extends React.Component {
                         const crypto  = window.require('crypto');
 
                         const { privateKey, publicKey } = await crypto.generateKeyPairSync('rsa', {
-                            modulusLength: 2048,
+                            modulusLength: 4096,
                             publicKeyEncoding: {
                                 type: 'pkcs1',
                                 format: 'pem'
@@ -1535,8 +1547,6 @@ class WalletHome extends React.Component {
                         console.log(`string length ${r_obj_string.length}`);
                         console.log(r_obj_string);
                         f_obj.msg_hash = sfxjs.cn_fast_hash_safex(r_obj_string, r_obj_string.length);
-
-                        //f_obj.msg_hash = keccak256(r_obj_string).toString('hex');
 
                         try {
                             let register_msgg = await register_api(twm_api_url, f_obj);
@@ -1581,46 +1591,15 @@ class WalletHome extends React.Component {
                             console.error(`error at the register_api function`);
                         }
 
-                        /*
-
-                                            var enc_msg = `this is my message`;
-
-                                            const buffer = Buffer.from(enc_msg, 'utf8')
-                                            const encrypted = crypto.publicEncrypt(publicKey, buffer)
-                                            console.log(encrypted.toString('base64'));
-                                            console.log(encrypted);
-
-                                            //const dec_buf = Buffer.from(encrypted)
-
-                                            const decrypted = crypto.privateDecrypt(privateKey, encrypted);
-                                            console.log(decrypted.toString('utf8'));
-
-                                            let keys = nacl.sign.keyPair.fromSecretKey(Buffer.from(this.state.usernames[0].privateKey));
-
-                                            console.log(keys);
-                                            console.log(this.state.usernames[0].privateKey);
-                                            console.log(this.state.usernames[0].publicKey);
-
-                                            let sig = sfxjs.sign_message(this.state.usernames[0].privateKey, 'heyheyhey', this.state.usernames[0].publicKey);
-                                            console.log(sig);
-                                            console.log(String.fromCharCode.apply(null, keys.secretKey));*/
-
-
-
                     } catch (err) {
                         console.error(err);
                     }
                 }
-
             }
-
         } catch(err) {
             console.error(err);
             console.error(`error at the twm_file at register api`);
         }
-
-
-
     };
 
     to_ellipsis = (text, firstHalf, secondHalf) => {
@@ -1628,6 +1607,20 @@ class WalletHome extends React.Component {
 
         return (ellipse)
     };
+
+    fetch_messages_seller = async (username) => {
+        try {
+            //here fetch the messages from the seller
+
+
+        } catch(err) {
+            console.error(err);
+            console.error(`error at the fetch_messages_seller`);
+        }
+
+
+    };
+
 
     purchase_item = async (e, listing) => {
         e.preventDefault();
@@ -1644,8 +1637,6 @@ class WalletHome extends React.Component {
             console.log(`mixins`);
             console.log(e.target.mixins.value);
             console.log(listing.username);
-
-
 
             let total_cost = quant * (listing.price);
             console.log(`TOTAL COST!!!!!!!!`);
@@ -1683,21 +1674,13 @@ class WalletHome extends React.Component {
                     if (mixins >= 0) {
                         let confirmed;
 
+                        //basically first validate the messaging will work out before submitting the transaction.
+                        //remember this the TWM API in play if these elements are in play.
                         let confirm_message = '';
                         let open_message = '';
                         let nft_address = '';
                         let shipping = {};
 
-                        shipping.first_name = '';
-                        shipping.last_name = '';
-                        shipping.address1 = '';
-                        shipping.address2 = '';
-                        shipping.city = '';
-                        shipping.state = '';
-                        shipping.zipcode = '';
-                        shipping.country = '';
-                        shipping.email_address = '';
-                        shipping.phone_number = '';
                         confirm_message = `Are you sure you want to purchase ${quant} X ${listing.title} for a total of ${total_cost} SFX?`;
                         if (listing.nft === true) {
 
@@ -1706,21 +1689,73 @@ class WalletHome extends React.Component {
                         }
                         if (listing.shipping === true) {
                             //complete confirm message for all fields
+
+                            let va = e.target;
+                            if (va.first_name.value.length > 0) {
+                                shipping.fn = e.target.first_name.value;
+                            } else {
+                                //figure out how to break out of this channel
+                            }
+                            if (va.last_name.value.length > 0) {
+                                shipping.ln = e.target.last_name.value;
+                            } else {
+                                //figure out how to break out of this channel
+                            }
+                            if (va.address1.value.length > 0) {
+                                shipping.a1 = e.target.address1.value;
+                            } else {
+                                //figure out how to break out of this channel
+                            }
+                            if (va.address2.value.length > 0) {
+                                shipping.a2 = e.target.address2.value;
+                            } else {
+                                //figure out how to break out of this channel
+                            }
+                            if (va.city.value.length > 0) {
+                                shipping.city = e.target.city.value;
+                            } else {
+                                //figure out how to break out of this channel
+                            }
+                            if (va.state.value.length > 0) {
+                                shipping.s = e.target.state.value;
+                            } else {
+                                //figure out how to break out of this channel
+                            }
+                            if (va.zipcode.value.length > 0) {
+                                shipping.z = e.target.zipcode.value;
+                            } else {
+                                //figure out how to break out of this channel
+                            }
+                            if (va.country.value.length > 0) {
+                                shipping.c = e.target.country.value;
+                            } else {
+                                //figure out how to break out of this channel
+                            }
+                            if (va.email_address.value.length > 0) {
+                                shipping.ea = e.target.email_address.value;
+                            } else {
+                                //figure out how to break out of this channel
+                            }
+                            if (va.phone_number.value.length > 0) {
+                                shipping.ph = e.target.phone_number.value;
+                            } else {
+                                //figure out how to break out of this channel
+                            }
+
                             confirm_message += ` delivered physical property to ${e.target.first_name.value}`;
-                            shipping.first_name = e.target.first_name.value;
-                            shipping.last_name = e.target.last_name.value;
-                            shipping.address1 = e.target.address1.value;
-                            shipping.address2 = e.target.address2.value;
-                            shipping.city = e.target.city.value;
-                            shipping.state = e.target.state.value;
-                            shipping.zipcode = e.target.zipcode.value;
-                            shipping.country = e.target.country.value;
-                            shipping.email_address = e.target.email_address.value;
-                            shipping.phone_number = e.target.phone_number.value;
                         }
                         if (listing.open_message === true) {
-                            confirm_message += ` ${e.target.open_message.value}`;
-                            open_message = e.target.open_message.value;
+                            let o_m = e.target.open_message.value;
+                            if (o_m.length > 0 && o_m < 400) {
+
+                                confirm_message += ` ${e.target.open_message.value}`;
+                                open_message = e.target.open_message.value;
+
+                            } else {
+                                //too many characters
+                            }
+
+
                         }
 
                         confirmed = window.confirm(confirm_message);
@@ -1772,7 +1807,7 @@ class WalletHome extends React.Component {
                                                 const crypto  = window.require('crypto');
 
                                                 const { privateKey, publicKey } = await crypto.generateKeyPairSync('rsa', {
-                                                    modulusLength: 2048,
+                                                    modulusLength: 4096,
                                                     publicKeyEncoding: {
                                                         type: 'pkcs1',
                                                         format: 'pem'
@@ -1782,10 +1817,6 @@ class WalletHome extends React.Component {
                                                         format: 'pem',
                                                     }
                                                 });
-                                                console.log(publicKey);
-                                                console.log(privateKey);
-
-                                                console.log(`RSA PUB KEY`);
 
                                                 let api_file_url_offer_id;
 
@@ -1813,60 +1844,67 @@ class WalletHome extends React.Component {
                                                 let order_id_string = publicKey + listing.offer_id + this.state.blockchain_height;
                                                 let order_id_hash = keccak256(order_id_string).toString('hex');
                                                 api_file_url_offer_id[order_id_hash] = {};
-                                                console.log(api_file_url_offer_id);
-
 
                                                 let message_header_obj = {};
-                                                message_header_obj.order_id = '';
                                                 message_header_obj.sender_pgp_pub_key = publicKey;
-                                                message_header_obj.to = listing.seller;
+                                                message_header_obj.to = listing.username;
                                                 message_header_obj.from = publicKey;
                                                 message_header_obj.order_id = order_id_hash;
                                                 message_header_obj.purchase_proof = txid;
+                                                message_header_obj.bc_height = this.state.blockchain_height;
 
+                                                let pre_sign_message_obj = {};
+                                                pre_sign_message_obj.s = ''; //subject
+                                                pre_sign_message_obj.o = listing.offer_id; //offer_id
+                                                pre_sign_message_obj.m = open_message; //open_message contents
+                                                pre_sign_message_obj.n = nft_address; //nft address
+                                                pre_sign_message_obj.so = JSON.stringify(shipping); //shipping object
 
-                                                let message_obj = {};
-                                                message_obj.subject = '';
-                                                message_obj.offer_id = listing.offer_id;
-                                                message_obj.message = open_message;
-                                                message_obj.nft = nft_address;
-                                                message_obj.shipping = JSON.stringify(shipping);
-                                                message_header_obj.message_hash = keccak256(JSON.stringify(message_obj));
+                                                message_header_obj.message_hash = keccak256(JSON.stringify(pre_sign_message_obj));
 
-                                                let message_obj_string_pre_sign = JSON.stringify(message_obj);
                                                 message_header_obj.message_signature = '';
 
-                                                const signature = crypto.sign("sha256", Buffer.from(message_obj_string_pre_sign), {
+                                                let pres_sign_string = JSON.stringify(pre_sign_message_obj);
+
+                                                const signature = crypto.sign("sha256", Buffer.from(pres_sign_string), {
                                                     key: privateKey,
                                                     padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
                                                 });
 
-                                                message_obj.signature = signature.toString("base64");
 
-                                                console.log(seller_pubkey.user.pgp_key);
+                                                message_header_obj.message_signature = signature;
+
+                                                let compressed_message_obj = zlib.deflateSync(Buffer.from(JSON.stringify(pre_sign_message_obj)));
+
+                                                console.log(": " + compressed_message_obj.length + " characters, " +
+                                                    Buffer.byteLength((compressed_message_obj), 'utf8') + " bytes");
+
                                                 let found_key = crypto.createPublicKey(seller_pubkey.user.pgp_key);
-                                                console.log(found_key);
-                                                console.log(": " + JSON.stringify(message_obj).length + " characters, " +
-                                                    Buffer.byteLength(JSON.stringify(message_obj), 'utf8') + " bytes");
 
-                                                alert(`what`);
                                                 let encrypted_message = crypto.publicEncrypt(
                                                     {
                                                         key: found_key,
                                                         padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
                                                         oaepHash: "sha256",
                                                     },
-                                                    Buffer.from(JSON.stringify(message_obj))
+                                                    compressed_message_obj
                                                 );
 
-                                                console.log(encrypted_message);
+                                                alert(`what`);
 
+                                                console.log(encrypted_message);
 
                                                 const enc_signature = crypto.sign("sha256", Buffer.from(encrypted_message), {
                                                     key: privateKey,
                                                     padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
                                                 });
-                                                message_header_obj.message_signature = enc_signature;
+                                                message_header_obj.encrypted_message_signature = enc_signature;
+
+                                                message_header_obj.encrypted_message = encrypted_message;
+
+                                                let tdispatched = await dispatch_purchase_message(message_header_obj);
+
+                                                console.log(tdispatched);
 
                                                 let purchase_obj = {};
                                                 purchase_obj.api_url = this.state.api_url;
@@ -1877,6 +1915,7 @@ class WalletHome extends React.Component {
                                                 purchase_obj.messages = {};
                                                 api_file_url_offer_id[order_id_hash].pgp_keys = {private_key: privateKey, public_key: publicKey};
                                                 api_file_url_offer_id[order_id_hash].messages = {};
+                                                api_file_url_offer_id[order_id_hash].purchase_obj = {};
                                                 //api_file_url_offer_id[order_id_hash].messages
                                                 //send it to the server
                                                 //save it to the twm_file
@@ -1884,6 +1923,23 @@ class WalletHome extends React.Component {
 
                                                 console.log(`payments from twm_url`);
                                                 alert(`what`);
+/*
+                                                const decryptedData = crypto.privateDecrypt(
+                                                    {
+                                                        key: privateKey,
+                                                        // In order to decrypt the data, we need to specify the
+                                                        // same hashing function and padding scheme that we used to
+                                                        // encrypt the data in the previous step
+                                                        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+                                                        oaepHash: "sha256",
+                                                    },
+                                                    encrypted_message
+                                                )
+
+                                                console.log(decryptedData.toString());
+                                                let decomped = zlib.inflateSync(Buffer.from(decryptedData));
+                                                console.log(decomped.toString());
+                                                alert(`what`);*/
 
 
                                         } catch (err) {
@@ -2426,11 +2482,6 @@ class WalletHome extends React.Component {
 
                         });
 
-
-
-
-
-
                     return (
                         <div className="">
 
@@ -2494,6 +2545,105 @@ class WalletHome extends React.Component {
                                                 <Image src={require("./../../img/sails-logo.png")}></Image>
 
                                                 <h3>{this.state.show_purchase_offer.title}</h3>
+                                            <Form.Group as={Row}>
+                                                <Form.Label column sm={3}>
+                                                    {this.state.show_purchase_offer.quantity} available
+                                                </Form.Label>
+                                                <Col sm={9}>
+                                                    <Form.Control
+                                                        className="light-blue-back"
+                                                        id="quantity"
+                                                        name="quantity"
+                                                        max={this.state.show_purchase_offer.quantity}
+                                                    />
+                                                </Col>
+                                            </Form.Group>
+                                            {this.state.show_purchase_offer_data.nft ? (<Form.Group as={Row}>
+                                                <Form.Label column sm={3}>
+                                                    NFT Ethereum Address
+                                                </Form.Label>
+                                                <Col sm={9}>
+                                                    <Form.Control name="eth_address" rows="3"/>
+                                                </Col>
+                                            </Form.Group>) : ''}
+                                            {this.state.show_purchase_offer_data.shipping ? (<div><Form.Group name="names" as={Row}>
+                                                <Form.Label column sm={3}>
+                                                    first name
+                                                </Form.Label>
+                                                <Col sm={4}>
+                                                    <Form.Control name="first_name" rows="3"/>
+                                                </Col>
+                                                <Form.Label column sm={3}>
+                                                    last name
+                                                </Form.Label>
+                                                <Col sm={4}>
+                                                    <Form.Control name="last_name" rows="3"/>
+                                                </Col>
+                                            </Form.Group>
+                                                <Form.Group name="streets" as={Row}>
+                                                    <Form.Label column sm={3}>
+                                                       address 1
+                                                    </Form.Label>
+                                                    <Col sm={4}>
+                                                        <Form.Control name="address1" rows="3"/>
+                                                    </Col>
+                                                    <Form.Label column sm={3}>
+                                                        address 2
+                                                    </Form.Label>
+                                                    <Col sm={4}>
+                                                        <Form.Control name="address2" rows="3"/>
+                                                    </Col>
+                                                </Form.Group>
+                                                <Form.Group name="place" as={Row}>
+                                                    <Form.Label column sm={3}>
+                                                    city
+                                                    </Form.Label>
+                                                    <Col sm={4}>
+                                                        <Form.Control name="city" rows="3"/>
+                                                    </Col>
+                                                    <Form.Label column sm={3}>
+                                                    state
+                                                    </Form.Label>
+                                                    <Col sm={4}>
+                                                        <Form.Control name="state" rows="3"/>
+                                                    </Col>
+                                                </Form.Group>
+                                                <Form.Group name="countrycodes" as={Row}>
+                                                    <Form.Label column sm={3}>
+                                                    zip code
+                                                    </Form.Label>
+                                                    <Col sm={4}>
+                                                        <Form.Control name="zipcode" rows="3"/>
+                                                    </Col>
+                                                    <Form.Label column sm={3}>
+                                                    country
+                                                    </Form.Label>
+                                                    <Col sm={4}>
+                                                        <Form.Control name="country" rows="3"/>
+                                                    </Col>
+                                                </Form.Group>
+                                                <Form.Group as={Row}>
+                                                    <Form.Label column sm={3}>
+                                                        email address
+                                                    </Form.Label>
+                                                    <Col sm={4}>
+                                                        <Form.Control name="email_address" rows="3"/>
+                                                    </Col>
+                                                    <Form.Label column sm={3}>
+                                                        phone number
+                                                    </Form.Label>
+                                                    <Col sm={4}>
+                                                        <Form.Control name="phone_number" rows="3"/>
+                                                    </Col>
+                                                </Form.Group></div>) : ''}
+                                            {this.state.show_purchase_offer_data.open_message ? (<Form.Group as={Row}>
+                                                <Form.Label column sm={3}>
+                                                    NFT Ethereum Address
+                                                </Form.Label>
+                                                <Col sm={9}>
+                                                    <Form.Control name="message" rows="3"/>
+                                                </Col>
+                                            </Form.Group>) : ''}
 
                                                 <hr className="border border-dark w-100"></hr>
 
@@ -3325,6 +3475,8 @@ class WalletHome extends React.Component {
                                         handleNewAccountForm={this.handleNewAccountForm}
                                         handleChange={this.handleChange}
 
+                                        handleNewOfferForm={this.handleShowNewOfferForm}
+                                        closeNewOfferForm={this.handleCloseEditOfferForm}
                                         accountsImage={this.state.accountsImage}
                                         showAccounts={() => this.setState({merchantTabs: 'accounts'})}
 
@@ -3388,39 +3540,465 @@ class WalletHome extends React.Component {
                                             }
                                         </Row >
                                     }
+
                                     <ReactModal
-                                            isOpen={this.state.showMessages}
-                                            closeTimeoutMS={500}
-                                            className="keys-modal"
-                                            onRequestClose={this.hideMessages}
-                                        >   
-                                            <Row>
-                                                <Col sm={10}>
-                                                    <h1>
-                                                        Messages
-                                                    </h1>
+                                        closeTimeoutMS={500}
+                                        isOpen={this.state.show_new_offer_form}
+                                        onRequestClose={this.handleCloseNewOfferForm}
+                                        className="new-account-modal"
 
+                                        style={{
+                                            overlay: {
+                                            position: 'fixed',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                            },
+                                            content: {
+                                            position: 'absolute',
+                                            top: '40px',
+                                            left: '40px',
+                                            right: '40px',
+                                            bottom: '40px',
+                                            overflow: 'auto',
+                                            }
+                                        }}
+                                    >
+                                            <h1>Create New Offer</h1>
+                                    
 
-                                                </Col>
-                                                <Col sm={2}>
-                                                    <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
-                                                        <CgCloseR
-                                                            className="mx-auto"
-                                                            onClick={this.hideMessages}
+                                            <Form
+                                                id="list_new_offer"
+                                                onSubmit={this.list_new_offer}
+                                            >
+                                                <Form.Row>
+                                                <Col md="8">
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Username</Form.Label>
+
+                                                        <Form.Control
+                                                            disabled
+                                                            name="username"
+                                                            value={''}
                                                         />
-                                                    </IconContext.Provider>
+                                                    </Form.Group>
+                                                    <Form.Group  as={Col}>
+                                                        <Form.Label>Image URL</Form.Label>
+
+                                                        <Form.Control
+                                                            name="new_account_image"
+                                                            defaultValue={data.main_image}
+                                                            onChange={this.handleChange}
+                                                        />
+                                                    </Form.Group>
+                                                </Col>
+
+                                                <Col md="4">
+                                                    <Image
+                                                        className="border border-white grey-back"
+                                                        width={150}
+                                                        height={150}
+                                                        src={this.state.new_account_image}
+                                                        roundedCircle
+                                                    />
+                                                </Col>
+                                            </Form.Row>
+
+                                            <Form.Row  md="8">
+                                                <Form.Group as={Col}>
+                                                    <Form.Label>Title</Form.Label>
+
+                                                    <Form.Control name="title"
+                                                                    defaultValue={this.state.show_edit_offer.title}/>
+                                                </Form.Group>
+
+                                                <Form.Group as={Col}>
+                                                    <Form.Label>Description</Form.Label>
+
+                                                    <Form.Control maxLength="2000" as="textarea"
+                                                                        name="description"
+                                                                        defaultValue={data.description}/>
+                                                </Form.Group>
+                                            </Form.Row>
+
+                                            <Form.Row>
+
+                                                <Form.Group  md="6" as={Col}>
+                                                    <Form.Label>Price (SFX)</Form.Label>
+
+                                                    <Form.Control
+                                                        name="price"
+                                                        defaultValue={1}
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group  md="6" as={Col}>
+                                                    <Form.Label>Available Quantity</Form.Label>
+
+                                                    <Form.Control
+                                                        name="quantity"
+                                                        defaultValue={1}
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group  md="6" as={Col}>
+                                                    <Form.Label>SKU</Form.Label>
+
+                                                    <Form.Control
+                                                        name="sku"
+                                                        defaultValue={data.sku}
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group  md="6" as={Col}>
+                                                    <Form.Label>Barcode (ISBN, UPC, GTIN, etc)</Form.Label>
+
+                                                    <Form.Control
+                                                        name="barcode"
+                                                        defaultValue={data.barcode}
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group  md="6" as={Col}>
+                                                    <Form.Label>Weight</Form.Label>
+
+                                                    <Form.Control
+                                                        name="weight"
+                                                        defaultValue={data.weight}
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group  md="6" as={Col}>
+                                                    <Form.Label>Physical Item?</Form.Label>
+
+                                                    <Form.Control
+                                                        name="physical"
+                                                        defaultValue="true"
+                                                    />
+                                                </Form.Group>
+
+
+                                            </Form.Row>
+
+                                            <Form.Row>
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Message Types</Form.Label>
+
+                                                    <Form.Control
+                                                        name="shipping_type"
+                                                        defaultValue="Shipping"
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Country of Origin</Form.Label>
+
+                                                    <Form.Control
+                                                        name="country"
+                                                        defaultValue={data.country}
+                                                        placedholder="your location"
+                                                    />
+                                                </Form.Group>
+
+
+
+                                            </Form.Row>
+
+                                                <Form.Row md="8">
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>shipping</Form.Label>
+
+                                                        <Form.Check
+                                                            onChange={this.change_shipping_switch} type="switch" id="shipping-switch" name="shipping" />
+                                                    </Form.Group>
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>nft</Form.Label>
+
+                                                        <Form.Check
+                                                            onChange={this.change_nft_switch} type="switch" id="nft-switch" name="nft" />
+                                                    </Form.Group>
+
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>open messages</Form.Label>
+
+                                                        <Form.Check
+                                                            onChange={this.change_open_message_switch} type="switch" id="open-switch" name="open_message" />
+                                                    </Form.Group>
+                                                </Form.Row>
+
+
+                                                <Form.Group>
+                                                    <Form.Label>
+                                                        Mixins
+                                                        <IconContext.Provider  value={{color: 'black', size: '20px'}}>
+                                                            <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon mx-4 white-text"/>
+
+                                                            <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                                <span>
+                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                    They are combined with yours for private transactions.<br/>
+                                                                    Changing this from the default could hurt your privacy.<br/>
+                                                                </span>
+                                                            </ReactTooltip>
+                                                        </IconContext.Provider>
+                                                    </Form.Label>
+
+                                                    <Form.Control
+                                                        name="mixins"
+                                                        as="select"
+                                                        defaultValue="7"
+                                                    >
+                                                        <option>1</option>
+                                                        <option>2</option>
+                                                        <option>3</option>
+                                                        <option>4</option>
+                                                        <option>5</option>
+                                                        <option>6</option>
+                                                        <option>7</option>
+                                                    </Form.Control>
+                                                </Form.Group>
+
+                                                <Button block size="lg" variant="success" type="submit">
+                                                    List Offer
+                                                </Button>
+                                            </Form>
+                                        
+                                            <Button size="lg" variant="danger"
+                                                    onClick={this.handleCloseNewOfferForm}>
+                                                Close
+                                            </Button>
+                                    </ReactModal>
+
+                                    <ReactModal
+                                        closeTimeoutMS={500}
+                                        isOpen={this.state.show_new_account_form}
+                                        onRequestClose={this.handleCloseEditOfferForm}
+                                        className="new-account-modal"
+
+                                        style={{
+                                            overlay: {
+                                            position: 'fixed',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                            },
+                                            content: {
+                                            position: 'absolute',
+                                            top: '40px',
+                                            left: '40px',
+                                            right: '40px',
+                                            bottom: '40px',
+                                            overflow: 'auto',
+                                            }
+                                        }}
+                                    >
+                                        
+                                        <h1>Make New Account</h1>
+                                
+                                        <Form id="create_account" onSubmit={this.register_account}>
+                                            <Row className="no-gutters justify-content-between w-100">
+                                                <Col md="8">
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Username</Form.Label>
+
+                                                        <Form.Control name="username"
+                                                                        placedholder="enter your desired username"/>
+                                                    </Form.Group>
+
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Avatar URL</Form.Label>
+                                                        <Form.Control
+                                                            onChange={this.handleChange}
+                                                            value={this.state.newAccountImage}
+                                                            name="new_account_image"
+                                                            placedholder="Enter the URL of your avatar"
+                                                        />
+                                                    </Form.Group>
+                                                </Col>
+
+                                                <Col md="4">
+                                                    <Image
+                                                        width={125}
+                                                        height={125}
+                                                        src={this.state.newAccountImage}
+                                                        roundedCircle
+                                                    />
                                                 </Col>
                                             </Row>
+
+                                            <Row>
+                                                <Col>
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Biography</Form.Label>
+                                                        <Form.Control
+                                                            maxLength="500"
+                                                            as="textarea"
+                                                            name="biography"
+                                                            placedholder="type up your biography"
+                                                            style={{maxHeight: 150}}
+                                                        />
+                                                    </Form.Group>
+
+
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Location</Form.Label>
+                                                        <Form.Control
+                                                            name="location"
+                                                            defaultValue="Earth"
+                                                            placedholder="your location"
+                                                        />
+                                                    </Form.Group>
+
+                                                    <Form.Group as={Col}>
+
+                                                        <Form.Label>Email</Form.Label>
+                                                        <Form.Control
+                                                            name="email"
+                                                            defaultValue="xyz@example.com"
+                                                            placedholder="your location"
+                                                        />
+                                                    </Form.Group>
+
+                                                    <Form.Group>
+                                                        <Form.Group md="6" as={Col}>
+                                                            <Form.Label>Twitter Link</Form.Label>
+                                                            <Form.Control
+                                                                name="twitter"
+                                                                defaultValue="twitter.com"
+                                                                placedholder="enter the link to your twitter handle"
+                                                            />
+
+                                                        </Form.Group>
+
+                                                        <Form.Group md="6" as={Col}>
+                                                            <Form.Label>Facebook Link</Form.Label>
+                                                            <Form.Control
+                                                                name="facebook"
+                                                                defaultValue="facebook.com"
+                                                                placedholder="enter the to of your facebook page"
+                                                            />
+
+                                                        </Form.Group>
+
+                                                        <Form.Group md="6" as={Col}>
+                                                            <Form.Label>LinkedIn Link</Form.Label>
+                                                            <Form.Control
+                                                                name="linkedin"
+                                                                defaultValue="linkedin.com"
+                                                                placedholder="enter the link to your linkedin handle"
+                                                            />
+                                                        </Form.Group>
+
+                                                        <Form.Group md="6" as={Col}>
+
+                                                            <Form.Label>Website</Form.Label>
+                                                            <Form.Control
+                                                                name="website"
+                                                                defaultValue="safex.org"
+                                                                placedholder="if you have your own website: paste your link here"
+                                                            />
+                                                        </Form.Group>
+
+                                                    </Form.Group>
+
+
+                                                    <Form.Group as={Col}>
+
+                                                        <Form.Label>Mixins</Form.Label>
+                                                        <IconContext.Provider
+                                                            value={{color: 'white', size: '20px'}}>
+                                                            <FaInfoCircle data-tip data-for='apiInfo'
+                                                                            className="blockchain-icon mx-4 white-text"/>
+
+                                                            <ReactTooltip id='apiInfo' type='info'
+                                                                            effect='solid'>
+                                                                <span>
+                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                    They are combined with yours for private transactions.<br/>
+                                                                    Changing props from the default could hurt your privacy.<br/>
+                                                                </span>
+                                                            </ReactTooltip>
+                                                        </IconContext.Provider>
+
+
+                                                        <Form.Control
+                                                            name="mixins"
+                                                            as="select"
+                                                            defaultValue="7"
+                                                        >
+                                                            <option>1</option>
+                                                            <option>2</option>
+                                                            <option>3</option>
+                                                            <option>4</option>
+                                                            <option>5</option>
+                                                            <option>6</option>
+                                                            <option>7</option>
+                                                        </Form.Control>
+
+                                                    </Form.Group>
+                                                </Col>
+
+
+                                            </Row>
+
+                                            <button
+                                                block
+                                                size="lg"
+                                                variant="success"
+                                                type="submit"
+                                                className="my-5"
+                                            >
+
+                                                Create Account
+                                            </button>
                                             
-                                            <Row className="m-auto">
-                                                <Col sm={12}>
-                                                    <h1>PUT MESSAGE HERE</h1>
-                                                    {
-                                                    //  this.state.currentMessage
-                                                    }
-                                                </Col>
-                                            </Row>
-                                        </ReactModal>  
+                                            <button className="close-button"
+                                                    onClick={this.handleNewAccountForm}>
+                                                Close
+                                            </button>
+                                        </Form>
+
+                                        
+                                    </ReactModal>
+
+
+                                    <ReactModal
+                                        isOpen={this.state.showMessages}
+                                        closeTimeoutMS={500}
+                                        className="keys-modal"
+                                        onRequestClose={this.hideMessages}
+                                    >   
+                                        <Row>
+                                            <Col sm={10}>
+                                                <h1>
+                                                    Messages
+                                                </h1>
+
+
+                                            </Col>
+                                            <Col sm={2}>
+                                                <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
+                                                    <CgCloseR
+                                                        className="mx-auto"
+                                                        onClick={this.hideMessages}
+                                                    />
+                                                </IconContext.Provider>
+                                            </Col>
+                                        </Row>
+                                        
+                                        <Row className="m-auto">
+                                            <Col sm={12}>
+                                                <h1>PUT MESSAGE HERE</h1>
+                                                {
+                                                //  this.state.currentMessage
+                                                }
+                                            </Col>
+                                        </Row>
+                                    </ReactModal>  
                                 </Col>
                             </div>);
 

@@ -15,7 +15,7 @@ export default function MerchantTabs(props) {
 
     return (
             <div className="merchant-tabs-box">
-                <div onClick={() => props.handleNewAccountForm} className="merchant-tab">
+                <div onClick={props.handleNewAccountForm} className="merchant-tab">
                     <Image
                     onClick={props.handleNewAccountForm} 
                         width={75}
@@ -40,7 +40,7 @@ export default function MerchantTabs(props) {
                     
                 </div>
                 
-                <div onClick={props.newAccount} className="merchant-tab">
+                <div onClick={props.handleNewOfferForm} className="merchant-tab">
                     <Image
                         width={75}
                         height={75}
