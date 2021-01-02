@@ -3,6 +3,7 @@ import React from 'react';
 import Loader from 'react-loader-spinner'
 
 // Icon Imports
+import { FaCubes } from 'react-icons/fa'
 
 import './ComponentCSS/HomeInfo.css'
 
@@ -11,7 +12,7 @@ export default function HomeInfo(props) {
     return (
        
             <div className="home-info-box">
-                <h3>{props.blockHeight}</h3>
+                <h3><FaCubes/>{props.blockHeight}</h3>
 
                 <p>{props.connection}</p>
 
@@ -26,9 +27,9 @@ export default function HomeInfo(props) {
                     {props.penndingCash > 0 ? `(${props.pendingCash.toLocaleString()} SFX Pending)` : ''}
 
                     SAFEX TOKENS: &nbsp;{ props.firstRefresh === true ?
-                                    (props.tokenBalance.toLocaleString())
-                                    :
-                                    ('∞')
+                                (props.tokenBalance.toLocaleString())
+                                :
+                                ('∞')
                     }
                     <br/>
 
