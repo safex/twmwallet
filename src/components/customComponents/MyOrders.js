@@ -14,9 +14,13 @@ export default function MyOrders(props) {
     return (
         <div className="h-100">
 
-            <button onClick={props.handleOrders}>
-                Back
-            </button>
+            <IconContext.Provider value={{color: '#FEB056', size: '20px'}}>
+                <CgCloseR
+                    className="ml-5"
+                    onClick={props.handleOrders}
+                />
+            </IconContext.Provider>
+
             <Col 
                 className="pt-3 staking-table-table"
                 style={{maxHeight: 300}}

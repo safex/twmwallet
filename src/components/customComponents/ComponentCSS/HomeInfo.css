@@ -1,5 +1,5 @@
 .home-info-box {
-    height: 20vh;
+    height: 25vh;
     max-height: 400px;
     padding: 2rem;
     width: 20vw;
@@ -45,4 +45,18 @@
     text-align: center;
     color: #13D3FD;
     word-break: break-word;
+
+  
+}
+
+.infinity {
+    animation: loading 2s infinite;
+  }
+
+
+  @keyframes loading /* Firefox */
+{
+0%   {color:#13D3FD;}
+50%  {color: #54E9B7; -webkit-text-stroke: .1px black;}
+100%   {color: #13D3FD;}
 }

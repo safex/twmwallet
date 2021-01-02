@@ -19,7 +19,7 @@ import './ComponentCSS/StakingTable.css'
 export default function MerchantOffers(props) {
 
     return (
-        <Row className="merchant-accounts-box">
+        <Row >
             
             <h1>Offers</h1>
             

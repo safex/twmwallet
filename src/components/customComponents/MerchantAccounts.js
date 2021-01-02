@@ -132,15 +132,20 @@ export default function MerchantAccounts(props) {
                                 <Form.Group as={Col}>
                                     <Form.Label>Username</Form.Label>
 
-                                    <Form.Control name="username"
-                                                    defaultValue={props.selected.username}/>
+                                    <Form.Control 
+                                        name="username"
+                                        defaultValue={props.selected.username}
+                                    />
                                 </Form.Group>
 
                                 <Form.Group as={Col}>
                                     <Form.Label>Avatar URL</Form.Label>
 
-                                    <Form.Control name="avatar"
-                                                    defaultValue={props.data.avatar}/>
+                                    <Form.Control 
+                                        name="avatar"
+                                        defaultValue={props.data.avatar}
+                                        onChange={props.handleChange}
+                                    />
                                 </Form.Group>
                             </Col>
 

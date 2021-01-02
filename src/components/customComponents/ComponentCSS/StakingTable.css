@@ -75,6 +75,7 @@
     background-color:rgba(255, 255, 255, 0.9);
     border: 2px solid #13D3FD;
     text-align: center;
+    font-family: 'Inter';
 }
 
 .staking-table-row > p {
