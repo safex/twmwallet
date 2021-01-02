@@ -1609,10 +1609,37 @@ class WalletHome extends React.Component {
         return (ellipse)
     };
 
-    fetch_messages_seller = async (username) => {
+    fetch_messages_seller = async (username, twmapi_url) => {
         try {
             //here fetch the messages from the seller
 
+            //form a message, sign it
+
+            if (this.state.twm_file.accounts.hasOwnProperty('merchant')) {
+                if (this.state.twm_file.accounts['merchant'].urls.hasOwnProperty('http://127.0.0.1:17700')) {
+                    console.log(`it has the twmapi in it's file for the fetch messages_seller`);
+                }
+
+            }
+
+
+            /*
+                                                            const decryptedData = crypto.privateDecrypt(
+                                                                {
+                                                                    key: privateKey,
+                                                                    // In order to decrypt the data, we need to specify the
+                                                                    // same hashing function and padding scheme that we used to
+                                                                    // encrypt the data in the previous step
+                                                                    padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+                                                                    oaepHash: "sha256",
+                                                                },
+                                                                encrypted_message
+                                                            )
+
+                                                            console.log(decryptedData.toString());
+                                                            let decomped = zlib.inflateSync(Buffer.from(decryptedData));
+                                                            console.log(decomped.toString());
+                                                            alert(`what`);*/
 
         } catch(err) {
             console.error(err);
@@ -1793,7 +1820,6 @@ class WalletHome extends React.Component {
                                 if (confirmed_fee) {
                                     try {
                                         this.setState({purchase_txn_id: txid, purchase_txn_fee: fee});
-                                        let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
 
                                         if (this.state.offer_loading_flag === 'twmurl') {
 
@@ -1872,7 +1898,6 @@ class WalletHome extends React.Component {
                                                     padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
                                                 });
 
-
                                                 message_header_obj.message_signature = signature;
 
                                                 let compressed_message_obj = zlib.deflateSync(Buffer.from(JSON.stringify(pre_sign_message_obj)));
@@ -1890,10 +1915,6 @@ class WalletHome extends React.Component {
                                                     },
                                                     compressed_message_obj
                                                 );
-
-                                                alert(`what`);
-
-                                                console.log(encrypted_message);
 
                                                 const enc_signature = crypto.sign("sha256", Buffer.from(encrypted_message), {
                                                     key: privateKey,
@@ -1913,10 +1934,10 @@ class WalletHome extends React.Component {
                                                 purchase_obj.title = listing.title;
                                                 purchase_obj.price = listing.price;
                                                 purchase_obj.quantity = quant;
-                                                purchase_obj.messages = {};
+                                                purchase_obj.bc_height = message_header_obj.bc_height;
                                                 api_file_url_offer_id[order_id_hash].pgp_keys = {private_key: privateKey, public_key: publicKey};
                                                 api_file_url_offer_id[order_id_hash].messages = {};
-                                                api_file_url_offer_id[order_id_hash].purchase_obj = {};
+                                                api_file_url_offer_id[order_id_hash].purchase_obj = purchase_obj;
                                                 //api_file_url_offer_id[order_id_hash].messages
                                                 //send it to the server
                                                 //save it to the twm_file
@@ -1924,23 +1945,7 @@ class WalletHome extends React.Component {
 
                                                 console.log(`payments from twm_url`);
                                                 alert(`what`);
-/*
-                                                const decryptedData = crypto.privateDecrypt(
-                                                    {
-                                                        key: privateKey,
-                                                        // In order to decrypt the data, we need to specify the
-                                                        // same hashing function and padding scheme that we used to
-                                                        // encrypt the data in the previous step
-                                                        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-                                                        oaepHash: "sha256",
-                                                    },
-                                                    encrypted_message
-                                                )
 
-                                                console.log(decryptedData.toString());
-                                                let decomped = zlib.inflateSync(Buffer.from(decryptedData));
-                                                console.log(decomped.toString());
-                                                alert(`what`);*/
 
 
                                         } catch (err) {
@@ -1951,6 +1956,7 @@ class WalletHome extends React.Component {
                                         }
 
 
+                                        let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
 
                                         console.log(`purchase transaction committed`);
                                     } catch (err) {
@@ -2204,6 +2210,7 @@ class WalletHome extends React.Component {
     };
 
     render() {
+
         const twmwallet = () => {
             switch (this.state.interface_view) {
 
@@ -3052,6 +3059,8 @@ class WalletHome extends React.Component {
                         </div>
                     );
                 case "merchant": {
+
+                    this.fetch_messages_seller();
                     var twm_listings_table = this.state.twm_offers.map((listing, key) => {
                         console.log(key);
                         try {
