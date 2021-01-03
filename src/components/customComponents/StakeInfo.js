@@ -21,7 +21,7 @@ export default function StakeInfo(props) {
                     <li>Total Token Balance: {props.tokenBalance} SFT</li>
                     <li>Pending Stake: {props.pendingStakeBalance} SFT</li>
                     <li>Staked Safex Token: {props.stakedBalance} SFT</li>
-                    <li>Interest Accrued: {props.interest} SFX per SFT</li>
+                    <li>Interest Accrued: {props.interest.toLocaleString()} SFX per SFT</li>
                     <li>Current Block: {props.blockHeight}</li>
                     <li>Next Interval: {props.nextInterval}</li>
                     <li>Total SFT Staked on the Network: {props.totalNetworkStake}</li>

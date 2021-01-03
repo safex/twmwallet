@@ -12,7 +12,7 @@ export default function HomeInfo(props) {
     return (
        
             <div className="home-info-box">
-                <h3><FaCubes/>{props.blockHeight}</h3>
+                <h3><FaCubes className="mr-3"/>{props.blockHeight}</h3>
 
                 <p>{props.connection}</p>
 

@@ -20,25 +20,19 @@ export default function Stake(props) {
                     { props.style.toUpperCase() } TOKENS
 
                     <IconContext.Provider  value={{color: '#767676', size: '25px'}}>
-                        <AiOutlineInfoCircle className="ml-2 mb-2" data-tip data-for='sendSafexInfo' />
+                        <AiOutlineInfoCircle className="ml-2 mb-2" data-tip data-for='sendSafexInfoTokensStake' />
                         
                         <ReactTooltip 
                             className="entry-tooltip-container" 
-                            id='sendSafexInfo' 
+                            id='sendSafexInfoTokensStake' 
                             effect='solid'
-                            place="right"
+                            place="left"
                         >
                             <span>
-                                How to send?
+                                How to unstake?
                                 <br/>
-                                <br/>
-                                1. The address that you are sending safex to should start with 
-                                "Safex" and contain 95-105 characters.<br/>
-                                Example: Safex5zHGtYQYE41yEzLTRQWiajC5keyJHVwQamarNyp9ssouD87bbGhobVnYAtUEQa4me79ybZev2AmLUnbds4PRYv3P1KmW6j2F
-                                <br/>
-                                <br/>
-                                2. The amount that you are staking has to be grater than 10,000.
-                                The transaction fee will be added on to the amount you are sending.
+                                The amount that you are unstaking has to be grater than the amount you have staked.
+                                The transaction fee will be added on to the amount you are unstaking.
                             </span>
                         </ReactTooltip>
                     </IconContext.Provider>
@@ -57,14 +51,9 @@ export default function Stake(props) {
                 :
                     <div className="stake-label-div">
                         <h5>Staked: {props.stakedBalance}</h5>
-                        <select
-                            name=""
-                        >
+                        
+                        <select name="">
                             <option>Choose Stake ID</option>
-                            <option>376S6B7OUWQ131Z8Y26XPISU1LVCHVWAJ9M3CPGV9QFS59CPMJFK7W2WDKUSBZCA</option>
-                            <option>UMAELCBVH7KKU5TL3D34Q7EVSK4QDIGQXCH1Y4COL1QWHPN1ZBTA8NCUCYG2NRHC</option>
-                            <option>ZP36FH4PK4P7WYXRELYZQZZ4HGFGM7GDMJT195CQBCZD2UC59WH2WC041DL540YS</option>
-                            <option>EMWPA4T2SC2KYDDUS2ORVTUO8JCWKYLN0VF40YNTXAAP365TXH3CFAKS80ORYCRR</option>
                         </select>
                     </div>
                 }
@@ -76,7 +65,7 @@ export default function Stake(props) {
                             <AiOutlineInfoCircle data-tip data-for='mixinInfo'
                                         className=""/>
 
-                            <ReactTooltip id='mixinInfo' type='info' effect='solid' place="right">
+                            <ReactTooltip id='mixinInfo' type='info' effect='solid' place="left">
                                 <span>
                                     Mixins are transactions that have also been sent on the Safex blockchain. <br/>
                                     They are combined with yours for private transactions.<br/>

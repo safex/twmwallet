@@ -57,6 +57,7 @@
     "mdbreact": "^4.27.0",
     "openpgp": "^4.10.4",
     "os": "^0.1.1",
+    "print-js": "^1.5.0",
     "qrcode.react": "^1.0.0",
     "react": "^16.12.0",
     "react-bootstrap": "^1.0.0-beta.14",

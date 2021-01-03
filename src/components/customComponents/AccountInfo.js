@@ -12,7 +12,7 @@ import { CgCloseR } from 'react-icons/cg'
 
 import './ComponentCSS/AccountInfo.css'
 
-
+import print from 'print-js'
 import copy from "copy-to-clipboard"
 
 export default function AccountInfo(props) {
@@ -20,7 +20,7 @@ export default function AccountInfo(props) {
     return (
         props.keyRequest === false ?
             <div className="account-info-box">
-                    <h1>This is your safex and safex token address:</h1>
+                    <h1>This is your SAFEX Cash and SAFEX Token address:</h1>
 
                     <h1>{ props.toEllipsis(props.address, 20, 20) }</h1>
                     {/*this.state.synced === false ? (
@@ -55,7 +55,8 @@ export default function AccountInfo(props) {
                 <div className="show-keys-password-box">
                     <h1 className="password-header">To see your <b>Private Keys</b> please enter your password:</h1>
                     
-                    <input className="show-keys-password"/>
+                    <input type="password" className="show-keys-password"/>
+
                     <button onClick={props.handleShow}>click</button>
                 </div>
                     
@@ -65,7 +66,9 @@ export default function AccountInfo(props) {
                     isOpen={props.show}
                     className="keys-modal"
                     onRequestClose={props.handleShow}
-                >   
+                >  
+
+                <button onClick={() => print('seedsAndKeysDiv', 'html')}>Print</button> 
                     <Row>
                         <Col sm={10}>
                             <h1>
@@ -231,7 +234,28 @@ export default function AccountInfo(props) {
                             <button onClick={() => copy(props.seed)}>Copy</button>
                         </Col>
                     </Row>
-                </ReactModal>                    
+                </ReactModal> 
+
+                <div 
+                    
+                    style={{display: 'none'}}
+                >
+                    <h1 id="seedsAndKeysDiv" style={{textAlign: 'center'}}>
+                        This is a copy of your <u>SAFEX KEYS + SEED PHRASE</u>. 
+                        <br/><br/>
+                        This is <u>SENSITIVE + IMPORTANT</u> information and should <u>BE KEPT PRIVATE + SAFE</u>. 
+                        <br/><br/>
+                        You will need this information to <u>RECOVER YOUR WALLET</u>.
+                        <br/><br/>
+                        Public Address: {props.address}
+                        <br/><br/>
+                        Private Spend Key: {props.spendKey}
+                        <br/><br/>
+                        Private View Key: {props.viewKey}
+                        <br/><br/>
+                        Private Seed Phrase: {props.seed}
+                    </h1>
+                </div>                   
             </div>
     )
 }

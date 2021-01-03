@@ -978,12 +978,13 @@ class WalletHome extends React.Component {
 
     //view shifting
     go_home = () => {
-        this.setState({interface_view: 'home'});
+        this.setState({interface_view: 'home', keyRequest: false});
+
     };
 
     //Show loading screen
     show_loading = () => {
-        this.setState({interface_view: 'loading'})
+        this.setState({interface_view: 'loading', keyRequest: false})
     };
 
     //open market view from navigation
@@ -993,7 +994,8 @@ class WalletHome extends React.Component {
         setTimeout(() => {
 
             this.setState({
-                interface_view: 'market'
+                interface_view: 'market',
+                keyRequest: false
             });
         }, 500);
     };
@@ -1002,6 +1004,8 @@ class WalletHome extends React.Component {
     show_merchant = () => {
 
         this.show_loading()
+
+        this.setState({keyRequest: false})
 
         setTimeout(() => {
 
@@ -1050,12 +1054,12 @@ class WalletHome extends React.Component {
 
     //open staking view from navigation
     show_tokens = () => {
-        this.setState({interface_view: 'tokens'})
+        this.setState({interface_view: 'tokens', keyRequest: false})
     };
 
     //open settings view from navigation
     show_settings = () => {
-        this.setState({interface_view: 'settings'})
+        this.setState({interface_view: 'settings', keyRequest: false})
     };
 
     logout = () => {
@@ -1075,14 +1079,9 @@ class WalletHome extends React.Component {
         }
     };
 
-    //close modal of private keys
-    handleClose = () => {
-        this.setState({show_keys: false});
-    };
-
     //show modal of private keys
-    handleShow = () => {
-        this.setState({show_keys: !this.state.show_keys});
+    handleKeys = () => {
+        this.setState({show_keys: !this.state.show_keys, keyRequest: false});
     };
 
     //close modal of New Offer
@@ -2349,7 +2348,7 @@ class WalletHome extends React.Component {
                             <Col sm={7} className="no-padding d-flex flex-column  justify-content-between">
                                 <AccountInfo
                                     rescan={this.rescan}
-                                    handleShow={this.handleShow}
+                                    handleShow={this.handleKeys}
                                     show={this.state.show_keys}
                                     handleKeyRequest={() => {this.setState({keyRequest: !this.state.keyRequest})}}
                                     keyRequest={this.state.keyRequest}
@@ -2464,20 +2463,15 @@ class WalletHome extends React.Component {
                                             <p>{listing.username}</p>
 
                                             <p data-tip data-for={`offerID${key}`}>
-                                                {this.to_ellipsis(listing.offer_id, 10, 10)}
+                                                {this.to_ellipsis(listing.offer_id, 5, 5)}
 
                                                 <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
                                                     <span>{listing.offer_id}</span>
                                                 </ReactTooltip>
                                             </p>
 
-                                            <p>
-                                                <select id="quantity">
-                                                    <option value="1">1</option>
-                                                </select>
-                                            </p>
-
-                                            <p>
+                                            <p style={{width: '24rem'}}>
+                                           
                                                 {listing.quantity <= 0 ?
                                                     (<button disabled>
                                                         SOLD OUT
@@ -2488,11 +2482,7 @@ class WalletHome extends React.Component {
                                                     </button>)
                                                 }
 
-
-                                            </p>
-
-                                            <p>
-                                                <button >CONTACT</button>
+                                                <button className="ml-2">CHAT</button>
                                             </p>
                                         </Row>
                                     )
@@ -2538,7 +2528,7 @@ class WalletHome extends React.Component {
                                             <p>{listing.username}</p>
 
                                             <p data-tip data-for={`offerID${key}`}>
-                                                {this.to_ellipsis(listing.offer_id, 10, 10)}
+                                                {this.to_ellipsis(listing.offer_id, 5, 5)}
 
                                                 <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
                                                     <span>{listing.offer_id}</span>
@@ -2546,9 +2536,6 @@ class WalletHome extends React.Component {
                                             </p>
 
                                             <p style={{width: '24rem'}}>
-                                                <select id="quantity">
-                                                    <option value="1">1</option>
-                                                </select>
                                             
                                                 {listing.quantity <= 0 ?
                                                     (<button className="search-button" disabled>
@@ -2560,7 +2547,7 @@ class WalletHome extends React.Component {
                                                     </button>)
                                                 }
 
-                                                <button className="search-button">CONTACT</button>
+                                                <button className="ml-2 search-button">CHAT</button>
                                             </p>
                                         </Row>
                                     )
@@ -2952,7 +2939,7 @@ class WalletHome extends React.Component {
                             <Col sm={7} className="no-padding d-flex flex-column  justify-content-between">
                                 <AccountInfo
                                     rescan={this.rescan}
-                                    handleShow={this.handleShow}
+                                    handleShow={this.handleKeys}
                                     show={this.state.show_keys}
                                     handleKeyRequest={() => {this.setState({keyRequest: !this.state.keyRequest})}}
                                     keyRequest={this.state.keyRequest}
@@ -3018,6 +3005,7 @@ class WalletHome extends React.Component {
                                                     </div>
                                                     <div className="form-group col-sm-3">
                                                         <button
+                                                            type="button"
                                                             onClick={() => (alert("We are wokring on getting this feature up and running as soon as possible. Thank you for your patience!"))}
                                                             className="search-button"
                                                         >
@@ -3538,7 +3526,8 @@ class WalletHome extends React.Component {
                                         "no-gutters account-element"
                                 }
                                 key={key}
-                                onClick={() => this.load_offers(user.username, key)}
+                                onClick={
+                                this.load_offers(user.username, key)}
                             >
 
                                 <Col>
@@ -3558,7 +3547,7 @@ class WalletHome extends React.Component {
                                 {user.status == 0 ? 
                                     <button 
                                         className="merchant-mini-buttons"
-                                        onClick={() => this.remove_account(user.username, key)}
+                                        onClick={this.remove_account(user.username, key)}
                                     >
                                         Remove
                                     </button>
@@ -3625,7 +3614,7 @@ class WalletHome extends React.Component {
                                 <Col sm={7} className="no-padding d-flex flex-column  justify-content-between">
                                     <AccountInfo
                                         rescan={this.rescan}
-                                        handleShow={this.handleShow}
+                                        handleShow={this.handleKeys}
                                         show={this.state.show_keys}
                                         handleKeyRequest={() => {this.setState({keyRequest: !this.state.keyRequest})}}
                                         keyRequest={this.state.keyRequest}
