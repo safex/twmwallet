@@ -21,7 +21,6 @@ const crypto = window.require('crypto');
 
 let {dialog} = window.require("electron").remote;
 
-let ipath = '';
 
 export default class OpenWallet extends React.Component {
     constructor(props) {
@@ -52,10 +51,25 @@ export default class OpenWallet extends React.Component {
 
         let sails_path = dialog.showOpenDialogSync();
         console.log(sails_path);
+        sails_path = sails_path[0];
 
         try {
             if (sails_path.length > 0) {
-                this.setState({new_path: sails_path[0]});
+
+                let ipath;
+                if (sails_path.includes('.keys')) {
+                    ipath = sails_path.substring(0, sails_path.length - 5);
+                } else if (sails_path.includes('.safex_account_keys')) {
+                    ipath = sails_path.substring(0, sails_path.length - 19);
+                } else if (sails_path.includes('.address.txt')) {
+                    ipath = sails_path.substring(0, sails_path.length - 12);
+                } else if (sails_path.includes('.twm')) {
+                    ipath = sails_path.substring(0, sails_path.length - 4);
+                } else {
+                    ipath = this.state.new_path;
+                }
+                console.log(ipath);
+                this.setState({new_path: ipath});
             }
         } catch (err) {
             console.log("cancelled, no path set");
@@ -81,8 +95,8 @@ export default class OpenWallet extends React.Component {
 
                 try {
 
-                    console.log(`the path ${ipath}`);
-                    let twm_file = await open_twm_file(ipath + '.twm', this.state.password);
+                    console.log(`the path ${this.state.new_path}`);
+                    let twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
                     if (twm_file.success) {
                         //parse the json and pack it into the local storage for usages
                         console.log(`success`);
@@ -138,10 +152,10 @@ export default class OpenWallet extends React.Component {
                             console.log(`password ${this.state.password}`);
                             console.log(JSON.stringify(twm_obj));
 
-                            let twm_save = await save_twm_file(ipath + '.twm', crypted, this.state.password, hash1.digest('hex'));
+                            let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
 
                             try {
-                                let twm_file = await open_twm_file(ipath + '.twm', this.state.password);
+                                let twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
                                 console.log(twm_file);
                                 localStorage.setItem('twm_file', JSON.stringify(twm_file.contents));
                             } catch (err) {
@@ -174,28 +188,20 @@ export default class OpenWallet extends React.Component {
         let the_password = e.target.password.value;
         this.setState({password: the_password, error: 'checking'});
 
-        if (this.state.new_path.includes('.keys')) {
-            ipath = this.state.new_path.substring(0, this.state.new_path.length - 5);
-        } else if (this.state.new_path.includes('.safex_account_keys')) {
-            ipath = this.state.new_path.substring(0, this.state.new_path.length - 19);
-        } else if (this.state.new_path.includes('.address.txt')) {
-            ipath = this.state.new_path.substring(0, this.state.new_path.length - 12);
-        } else if (this.state.new_path.includes('.twm')) {
-            ipath = this.state.new_path.substring(0, this.state.new_path.length - 4);
-        } else {
-            ipath = this.state.new_path;
-        }
 
         //now check if you can load the .twm file if not you have to make it
 
 
         let daemon_string = `${this.state.daemon_host}:${this.state.daemon_port}`;
 
-        open_wallet_util(ipath,
+        open_wallet_util(
+            this.state.new_path,
             e.target.password.value,
             0,
             this.state.network,
-            daemon_string, this.open_wallet_result)
+            daemon_string,
+            this.open_wallet_result
+        );
     };
 
 

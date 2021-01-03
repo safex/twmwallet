@@ -59,7 +59,8 @@ import {
     register_api,
     get_offers_url,
     get_seller_pubkey,
-    dispatch_purchase_message
+    dispatch_purchase_message,
+    merchant_get_messages
 } from "../../utils/twm_actions";
 
 import zlib from 'zlib';
@@ -69,7 +70,6 @@ const openpgp = window.require('openpgp');
 
 const sfxjs = window.require('safex-addressjs');
 
-var nacl = window.require('tweetnacl');
 
 var wallet;
 
@@ -1569,12 +1569,15 @@ class WalletHome extends React.Component {
                             console.log(`password ${this.state.password}`);
                             console.log(JSON.stringify(twm_file));
 
-                            let twm_save = await save_twm_file(this.state.new_path, crypted, this.state.password, hash1.digest('hex'));
+                            let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
 
+                            console.log(twm_save);
+                            alert(`i think we saved the twm file on registration`);
                             try {
 
-                                let twm_file2 = await open_twm_file(this.state.new_path, this.state.password);
+                                let twm_file2 = await open_twm_file(this.state.new_path + '.twm', this.state.password);
                                 console.log(twm_file2);
+
 
                                 localStorage.setItem('twm_file', JSON.stringify(twm_file2.contents));
                                 this.setState({twm_file: twm_file2.contents});
@@ -1609,15 +1612,84 @@ class WalletHome extends React.Component {
         return (ellipse)
     };
 
-    fetch_messages_seller = async (username, twmapi_url) => {
+    hexStringToByte = (str) => {
+        if (!str) {
+            return new Uint8Array();
+        }
+
+        var a = [];
+        for (var i = 0, len = str.length; i < len; i+=2) {
+            a.push(parseInt(str.substr(i,2),16));
+        }
+
+        return new Uint8Array(a);
+    }
+
+    fetch_messages_seller = async () => {
         try {
             //here fetch the messages from the seller
 
             //form a message, sign it
 
-            if (this.state.twm_file.accounts.hasOwnProperty('merchant')) {
-                if (this.state.twm_file.accounts['merchant'].urls.hasOwnProperty('http://127.0.0.1:17700')) {
+            console.log(this.state.twm_file);
+            if (this.state.twm_file.accounts.hasOwnProperty('final')) {
+                if (this.state.twm_file.accounts['final'].urls.hasOwnProperty('http://127.0.0.1:17700')) {
                     console.log(`it has the twmapi in it's file for the fetch messages_seller`);
+                    let date = new Date(new Date().toUTCString());
+                    console.log(date);
+                    console.log(date.toString());
+
+                    const crypto  = window.require('crypto');
+                    let our_key = crypto.createPrivateKey(this.state.twm_file.accounts['final'].urls['http://127.0.0.1:17700'].pgp_key.sec_key)
+                    console.log(our_key);
+                   const signature = crypto.sign("sha256", Buffer.from(date.toString()), {
+                        key: our_key,
+                        padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                    });
+                   console.log(signature);
+
+                   let req_payload = {};
+                    req_payload.signature = signature;
+                    req_payload.username = 'final';
+                    req_payload.msg = date;
+
+                    let req_msgs = await merchant_get_messages(req_payload);
+                    console.log(req_msgs.msgs);
+
+
+
+                    for (const order in req_msgs.msgs) {
+                        console.log(req_msgs.msgs[order]);
+                        for (const msg of req_msgs.msgs[order]) {
+                            console.log(msg);
+                            console.log(msg.message);
+                            try {
+                                const decryptedData = crypto.privateDecrypt(
+                                    {
+                                        key: our_key,
+                                        // In order to decrypt the data, we need to specify the
+                                        // same hashing function and padding scheme that we used to
+                                        // encrypt the data in the previous step
+                                        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+                                        oaepHash: "sha256",
+                                    },
+                                    this.hexStringToByte(msg.message)
+                                );
+
+                                console.log(decryptedData.toString());
+                                let decomped = zlib.inflateSync(Buffer.from(decryptedData));
+                                console.log(decomped.toString());
+                                alert(`what`);
+                            } catch(err) {
+                                console.error(err);
+                            }
+
+
+
+                        }
+
+                    }
+
                 }
 
             }
@@ -1649,6 +1721,20 @@ class WalletHome extends React.Component {
 
     };
 
+    byteToHexString = (uint8arr) => {
+        if (!uint8arr) {
+            return '';
+        }
+
+        var hexStr = '';
+        for (var i = 0; i < uint8arr.length; i++) {
+            var hex = (uint8arr[i] & 0xff).toString(16);
+            hex = (hex.length === 1) ? '0' + hex : hex;
+            hexStr += hex;
+        }
+
+        return hexStr.toUpperCase();
+    }
 
     purchase_item = async (e, listing) => {
         e.preventDefault();
@@ -1887,7 +1973,7 @@ class WalletHome extends React.Component {
                                                 pre_sign_message_obj.n = nft_address; //nft address
                                                 pre_sign_message_obj.so = JSON.stringify(shipping); //shipping object
 
-                                                message_header_obj.message_hash = keccak256(JSON.stringify(pre_sign_message_obj));
+                                                message_header_obj.message_hash = keccak256(JSON.stringify(pre_sign_message_obj)).toString('hex');
 
                                                 message_header_obj.message_signature = '';
 
@@ -1916,13 +2002,20 @@ class WalletHome extends React.Component {
                                                     compressed_message_obj
                                                 );
 
+
+
+                                                let hex_enc_msg = this.byteToHexString(encrypted_message);
+
                                                 const enc_signature = crypto.sign("sha256", Buffer.from(encrypted_message), {
                                                     key: privateKey,
                                                     padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
                                                 });
-                                                message_header_obj.encrypted_message_signature = enc_signature;
 
-                                                message_header_obj.encrypted_message = encrypted_message;
+                                                let hex_enc_sig = this.byteToHexString(enc_signature);
+
+                                                message_header_obj.encrypted_message_signature = hex_enc_sig;
+
+                                                message_header_obj.encrypted_message = hex_enc_msg;
 
                                                 let tdispatched = await dispatch_purchase_message(message_header_obj);
 
@@ -1941,7 +2034,24 @@ class WalletHome extends React.Component {
                                                 //api_file_url_offer_id[order_id_hash].messages
                                                 //send it to the server
                                                 //save it to the twm_file
+/*
+                                                const decryptedData = crypto.privateDecrypt(
+                                                    {
+                                                        key: privateKey,
+                                                        // In order to decrypt the data, we need to specify the
+                                                        // same hashing function and padding scheme that we used to
+                                                        // encrypt the data in the previous step
+                                                        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+                                                        oaepHash: "sha256",
+                                                    },
+                                                    encrypted_message
+                                                );
+                                                console.log(encrypted_message);
 
+                                                console.log(decryptedData.toString());
+                                                let decomped = zlib.inflateSync(Buffer.from(decryptedData));
+                                                console.log(decomped.toString());*/
+                                                alert(`what`);
 
                                                 console.log(`payments from twm_url`);
                                                 alert(`what`);

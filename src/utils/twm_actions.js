@@ -25,6 +25,7 @@ export async function save_twm_file(filepath, content, password, hash1) {
 
             if (hash_two === hash1) {
                 console.log(`all good hashes confirmed`);
+                console.log(dec);
                 return {success: `saved file to ${filepath}`}
             } else {
                 return {error: `fatal error saving to ${filepath}, ${hash_two}, does not match supplied ${hash1}`}
@@ -136,6 +137,19 @@ export async function dispatch_purchase_message(message_obj, twm_api_url = 'http
         method: 'post',
         url: twm_api_url + '/messages/send_purchase_message',
         data: message_obj,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then((resp) => {
+        return resp.data;
+    });
+}
+
+export async function merchant_get_messages(req_payload, twm_api_url = 'http://127.0.0.1:17700') {
+    return axios({
+        method: 'post',
+        url: twm_api_url + '/messages/merchant_get_messages',
+        data: req_payload,
         headers: {
             'Content-Type': 'application/json'
         }
