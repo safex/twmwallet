@@ -3014,7 +3014,6 @@ class WalletHome extends React.Component {
                                                             className="">
                                                         <option value="">Category</option>
                                                         <option value="">Any</option>
-                                                        <option value="">Category</option>
                                                         <option value="">Books</option>
                                                         <option value="">Clothes</option>
                                                         <option value="">Digital</option>
@@ -3027,7 +3026,7 @@ class WalletHome extends React.Component {
                                                         <option value="">Any</option>
                                                         <option value="">Africa</option>
                                                         <option value="">Asia</option>
-                                                        <option value="">Africa</option>
+                                                        <option value="">Australia</option>
                                                         <option value="">Europe</option>
                                                         <option value="">North America</option>
                                                         <option value="">South America</option>
@@ -3049,8 +3048,6 @@ class WalletHome extends React.Component {
                                                         <option value="">Sort by...</option>
                                                         <option value="">$$$ Asc</option>
                                                         <option value="">$$$ Dec</option>
-                                                        <option value="">Rating Asc</option>
-                                                        <option value="">Rating Dec</option>
                                                     </select>
                                                 </form>
                                             </div>
@@ -4182,6 +4179,7 @@ class WalletHome extends React.Component {
                                             style="stake"
                                             send={this.make_token_stake}
                                             id="stake_token"
+                                            tokenBalance={this.state.tokens.toLocaleString()}
                                         />
 
                                         <StakeInfo
