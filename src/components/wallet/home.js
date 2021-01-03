@@ -3700,7 +3700,7 @@ class WalletHome extends React.Component {
                                                             <Form.Control
                                                                 disabled
                                                                 name="username"
-                                                                value={user.username}
+                                                                value={selected.username}
                                                             />
                                                         </Form.Group>
 
