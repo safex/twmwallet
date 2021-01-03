@@ -65,7 +65,6 @@ import {
 
 import zlib from 'zlib';
 
-const openpgp = window.require('openpgp');
 
 
 const sfxjs = window.require('safex-addressjs');
