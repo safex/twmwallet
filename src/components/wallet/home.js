@@ -3526,8 +3526,7 @@ class WalletHome extends React.Component {
                                         "no-gutters account-element"
                                 }
                                 key={key}
-                                onClick={
-                                this.load_offers(user.username, key)}
+                                onClick={() => this.load_offers(user.username, key)}
                             >
 
                                 <Col>
