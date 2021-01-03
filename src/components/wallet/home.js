@@ -56,7 +56,6 @@ import zlib from 'zlib';
 
 const sfxjs = window.require('safex-addressjs');
 
-var nacl = window.require('tweetnacl');
 
 var wallet;
 
