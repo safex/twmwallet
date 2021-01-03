@@ -242,6 +242,7 @@ class WalletHome extends React.Component {
                 this.setState({timer: timer});
                 this.setState({synced: false});
             }
+            this.refresh_action();
             wallet.on('newBlock', (height) => {
                 console.log("blockchain updated, height: " + height);
                 this.setState({
@@ -1655,7 +1656,7 @@ class WalletHome extends React.Component {
                     console.log(req_msgs.msgs);
 
 
-
+/*
                     for (const order in req_msgs.msgs) {
                         console.log(req_msgs.msgs[order]);
                         for (const msg of req_msgs.msgs[order]) {
@@ -1677,19 +1678,12 @@ class WalletHome extends React.Component {
                                 console.log(decryptedData.toString());
                                 let decomped = zlib.inflateSync(Buffer.from(decryptedData));
                                 console.log(decomped.toString());
-                                alert(`what`);
                             } catch(err) {
                                 console.error(err);
                             }
-
-
-
                         }
-
-                    }
-
+                    }*/
                 }
-
             }
 
 
@@ -3157,7 +3151,6 @@ class WalletHome extends React.Component {
                     );
                 case "merchant": {
 
-                    this.fetch_messages_seller();
                     var twm_listings_table = this.state.twm_offers.map((listing, key) => {
                         console.log(key);
                         try {
@@ -3501,6 +3494,7 @@ class WalletHome extends React.Component {
                             console.error(err);
                         }
                     });
+                    this.fetch_messages_seller();
                     var accounts_table = this.state.usernames.map((user, key) => {
                         let avatar = '';
                         try {
@@ -3525,7 +3519,7 @@ class WalletHome extends React.Component {
                                         "no-gutters account-element"
                                 }
                                 key={key}
-                                onClick={
+                                onClick={() =>
                                 this.load_offers(user.username, key)}
                             >
 
@@ -3574,6 +3568,8 @@ class WalletHome extends React.Component {
                             }
                         } else {
                             console.log(`no user selected`);
+                            selected = {};
+                            selected.username = '';
                         }
                     } catch (err) {
                         console.error(err);
@@ -3704,7 +3700,7 @@ class WalletHome extends React.Component {
                                                             <Form.Control
                                                                 disabled
                                                                 name="username"
-                                                                value={''}
+                                                                value={user.username}
                                                             />
                                                         </Form.Group>
 
