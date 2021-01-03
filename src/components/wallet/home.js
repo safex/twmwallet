@@ -48,7 +48,8 @@ import {
     register_api,
     get_offers_url,
     get_seller_pubkey,
-    dispatch_purchase_message
+    dispatch_purchase_message,
+    merchant_get_messages
 } from "../../utils/twm_actions";
 
 import zlib from 'zlib';
@@ -1605,15 +1606,37 @@ class WalletHome extends React.Component {
         )
     };
 
-    fetch_messages_seller = async (username, twmapi_url) => {
+    fetch_messages_seller = async () => {
         try {
             //here fetch the messages from the seller
 
             //form a message, sign it
 
-            if (this.state.twm_file.accounts.hasOwnProperty('merchant')) {
-                if (this.state.twm_file.accounts['merchant'].urls.hasOwnProperty('http://127.0.0.1:17700')) {
+            console.log(this.state.twm_file);
+            if (this.state.twm_file.accounts.hasOwnProperty('final')) {
+                if (this.state.twm_file.accounts['final'].urls.hasOwnProperty('http://127.0.0.1:17700')) {
                     console.log(`it has the twmapi in it's file for the fetch messages_seller`);
+                    let date = new Date(new Date().toUTCString());
+                    console.log(date);
+                    console.log(date.toString());
+
+                    const crypto  = window.require('crypto');
+                    let our_key = crypto.createPrivateKey(this.state.twm_file.accounts['final'].urls['http://127.0.0.1:17700'].pgp_key.sec_key)
+                    console.log(our_key);
+                   const signature = crypto.sign("sha256", Buffer.from(date.toString()), {
+                        key: our_key,
+                        padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                    });
+                   console.log(signature);
+
+                   let req_payload = {};
+                    req_payload.signature = signature;
+                    req_payload.username = 'final';
+                    req_payload.msg = date;
+
+                    let req_msgs = await merchant_get_messages(req_payload);
+                    console.log(req_msgs);
+
                 }
 
             }
