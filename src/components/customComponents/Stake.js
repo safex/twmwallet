@@ -19,6 +19,8 @@ export default function Stake(props) {
                 <p > 
                     { props.style.toUpperCase() } TOKENS
 
+                   
+                </p>
                     <IconContext.Provider  value={{color: '#767676', size: '25px'}}>
                         <AiOutlineInfoCircle className="ml-2 mb-2" data-tip data-for='sendSafexInfoTokensStake' />
                         
@@ -36,8 +38,6 @@ export default function Stake(props) {
                             </span>
                         </ReactTooltip>
                     </IconContext.Provider>
-                </p>
-
                 {props.style === 'stake' ?
                     <div className="stake-label-div">
                         <h5>Available: {props.tokenBalance} SFT</h5>    
