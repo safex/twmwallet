@@ -21,6 +21,8 @@ export default function OfferTableRow(props) {
         
             <p data-tip data-for='offerID'>
                 {props.toEllipsis(props.id, 5, 5)}
+                
+            </p>
                 <ReactTooltip 
                     className="entry-tooltip-container" 
                     id='offerID' 
@@ -31,8 +33,6 @@ export default function OfferTableRow(props) {
                         {props.id}
                     </span>
                 </ReactTooltip>
-            </p>
-        
             <p>
                 <button 
                     onClick={props.handleEditOfferForm} 
