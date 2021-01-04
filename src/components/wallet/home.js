@@ -52,6 +52,7 @@ import MerchantTabs from '../customComponents/MerchantTabs';
 import MerchantOffers from '../customComponents/MerchantOffers';
 import MyOrders from '../customComponents/MyOrders';
 import OrderTableRow from '../customComponents/OrderTableRow';
+import OfferTableRow from '../customComponents/OfferTableRow';
 
 import {
     open_twm_file,
@@ -2151,18 +2152,6 @@ class WalletHome extends React.Component {
         });
     };
 
-    copyOfferToClipboard = () => {
-        copy(this.state.show_purchase_offer.offer_id);
-        alert('Copied offer ID!');
-    };
-
-    copyOrderToClipboard = () => {
-        copy(this.state.this.state.purchase_txn_id);
-        alert('Copied offer ID!');
-    };
-
-
-
     make_edit_offer = async (e) => {
         e.preventDefault();
         e.persist();
@@ -2620,7 +2609,7 @@ class WalletHome extends React.Component {
                                                             <FaCopy
                                                                 className="ml-4"
                                                                 data-tip data-for='copyIDInfo'
-                                                                onClick={this.copyOfferToClipboard}
+                                                                onClick={() => copy(this.state.show_purchase_offer.offer_id)}
                                                             />
 
                                                             <ReactTooltip id='copyIDInfo' type='info'
@@ -2760,7 +2749,7 @@ class WalletHome extends React.Component {
                                                             <FaCopy
                                                                 className="ml-4"
                                                                 data-tip data-for='copyIDInfo'
-                                                                onClick={this.copyOfferToClipboard}
+                                                                onClick={() => copy(this.state.show_purchase_offer.offerID)}
                                                             />
 
                                                             <ReactTooltip id='copyIDInfo' type='info'
@@ -2902,7 +2891,7 @@ class WalletHome extends React.Component {
                                                     <FaCopy
                                                         className="ml-4"
                                                         data-tip data-for='copyIDInfo1'
-                                                        onClick={this.copyOrderToClipboard}
+                                                        onClick={() => copy(this.state.purchase_txn_id)}
                                                     />
 
                                                     <ReactTooltip id='copyIDInfo1' type='info' effect='solid'>
@@ -3035,19 +3024,19 @@ class WalletHome extends React.Component {
                                                     <select data-filter="price"
                                                             className="">
                                                         <option value="">Price Range</option>
-                                                        <option value="">$0 - $24.99</option>
-                                                        <option value="">$25 - $49.99</option>
-                                                        <option value="">$50 - $199.99</option>
-                                                        <option value="">$200 - $499.99</option>
-                                                        <option value="">$500 - $999.99</option>
-                                                        <option value="">$1000+</option>
+                                                        <option value="">SFX 0 - SFX 24.99</option>
+                                                        <option value="">SFX 25 - SFX 49.99</option>
+                                                        <option value="">SFX 50 - SFX 199.99</option>
+                                                        <option value="">SFX 200 - SFX 499.99</option>
+                                                        <option value="">SFX 500 - SFX 999.99</option>
+                                                        <option value="">SFX 1000+</option>
                                                     </select>
                                                     
                                                     <select data-filter="sort"
                                                             className="">
                                                         <option value="">Sort by...</option>
-                                                        <option value="">$$$ Asc</option>
-                                                        <option value="">$$$ Dec</option>
+                                                        <option value="">SFX Asc</option>
+                                                        <option value="">SFX Dec</option>
                                                     </select>
                                                 </form>
                                             </div>
@@ -3167,7 +3156,10 @@ class WalletHome extends React.Component {
 
                     });
 
-                    var non_listings_table = this.state.non_offers.map((listing, key) => {
+                    var call_non_listings_table = () => this.state.non_offers.map((listing, key) => {
+                        
+                        
+                        
                         try {
                             if (listing.seller === this.state.selected_user.username) {
                                 var data = {};
@@ -3211,21 +3203,17 @@ class WalletHome extends React.Component {
                                 } catch (err) {
                                     console.error(err);
                                 }
-                                return <Row key={key}>
-                                    <p>{listing.title}</p>
-                                    <p>{listing.price / 10000000000}</p>
-                                    <p>{listing.quantity}</p>
-                                    <p>{listing.seller}</p>
-                                    <p>{listing.offerID}</p>
-                                    <p>
-
-                                        <button
-                                            onClick={() => this.handleShowEditOfferForm(listing)}
-                                            className="mx-2"
-                                        >
-                                            Edit
-                                        </button>
-
+                                return (
+                                    <OfferTableRow
+                                        key={key}
+                                        title={listing.title}
+                                        price={listing.price / 10000000000}
+                                        quantity={listing.quantity}
+                                        seller={listing.seller}
+                                        id={listing.offerID}
+                                        handleEditOfferForm={this.handleShowEditOfferForm(listing)}
+                                        handleShowOrders={this.handleMyOrders}
+                                    >
                                         <ReactModal
                                             closeTimeoutMS={500}
                                             isOpen={this.state.show_new_offer_form}
@@ -3476,15 +3464,33 @@ class WalletHome extends React.Component {
                                                 Close
                                             </button>
                                         </ReactModal>
+{/*
+                                    <p>{listing.title}</p>
+                                    <p>{listing.price / 10000000000}</p>
+                                    <p>{listing.quantity}</p>
+                                    <p>{listing.seller}</p>
+                                    <p>{listing.offerID}</p>
+                                    <p>
+
+                                        <button
+                                            onClick={() => this.handleShowEditOfferForm(listing)}
+                                            className="mx-2"
+                                        >
+                                            Edit
+                                        </button>
+
+                                        
 
                                         <button
                                             onClick={this.handleMyOrders}
                                             className="mx-2"
                                         >
-                                            Show Orders
+                                            Orders
                                         </button> 
                                     </p>
-                                </Row>
+                                */}
+                                    </OfferTableRow>
+                                )
                             }
                         } catch (err) {
                             console.error(`failed to properly parse the user data formatting`);
@@ -3651,8 +3657,10 @@ class WalletHome extends React.Component {
                                             :
                                                 <MerchantOffers
                                                     handleOrders={this.handleMyOrders}
+                                                    tableOfOffers={call_non_listings_table()}
                                                 />
                                             }
+
                                         </Row >
                                     }
 

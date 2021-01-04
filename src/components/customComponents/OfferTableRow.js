@@ -8,25 +8,27 @@ import './ComponentCSS/StakingTable.css'
 export default function OfferTableRow(props) {
 
     return (
-        <Row className="staking-table-row">
+        <Row key={props.key} className="staking-table-row">
             <p>{props.title}</p>
         
             <p>{props.price}</p>
         
             <p>{props.quantity}</p>
+
+            <p>{props.seller}</p>
         
             <p>{props.id}</p>
         
             <p>
                 <button 
-                    onClick={() => props.handleEditOfferForm(props.selected)} 
+                    onClick={props.handleEditOfferForm} 
                     className="edit-button"
                 >
                     Edit
                 </button>
                 
                 <button 
-                    onClick={() => props.handleShowOrders(props.selected)} 
+                    onClick={props.handleShowOrders} 
                     className="orders-button"
                 >
                     Orders

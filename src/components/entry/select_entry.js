@@ -1,13 +1,6 @@
 import React from 'react';
 import {Button, Col, Container, Row, Image, Tabs, Tab, Alert, Collapse} from 'react-bootstrap'
-import { FaHistory, FaAlignLeft, FaKey, FaFolderPlus, FaFolderOpen } from 'react-icons/fa'
 
-
-import {open_wallet_util} from "../../utils/wallet_creation";
-import {purchase_offer} from "../../utils/wallet_actions";
-
-import {save_twm_file, open_twm_file} from "../../utils/twm_actions";
-import copy from "copy-to-clipboard";
 const os = window.require('os');
 const fs = window.require('fs').promises;
 const libPath = window.require('path');

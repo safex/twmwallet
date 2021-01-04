@@ -35,25 +35,8 @@ export default function MerchantOffers(props) {
 
                     <p>Actions</p>
                 </Row>
-            
-            {
-                //Below should be replaced with prop which is array of OfferTableRow.js
-                //eg. { offerTableRows }
-            }
-                <Row className="staking-table-row">
-                    <p>erse...4e43</p>
-                
-                    <p>7-12-2020</p>
-                
-                    <p>42,000</p>
-                
-                    <p>42.69</p>
-                
-                    <p>
-                        <button className="edit-button">Edit</button>
-                        <button onClick={props.handleOrders} className="orders-button">Orders</button>
-                    </p>
-                </Row>
+                {props.tableOfOffers}
+
             </Col>
 
         </Row>
