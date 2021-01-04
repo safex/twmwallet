@@ -73,6 +73,7 @@ const sfxjs = window.require('safex-addressjs');
 
 var wallet;
 
+let offerRows;
 
 class WalletHome extends React.Component {
     constructor(props) {
@@ -2300,6 +2301,352 @@ class WalletHome extends React.Component {
         this.setState({showMyOrders: !this.state.showMyOrders})
     };
 
+
+
+    call_non_listings_table = () => offerRows = this.state.non_offers.map((listing, key) => {
+                               
+                        
+        try {
+            if (listing.seller === this.state.selected_user.username) {
+                var data = {};
+                data.description = '';
+                data.main_image = '';
+                data.sku = '';
+                data.barcode = '';
+                data.weight = '';
+                data.country = '';
+                data.message_type = '';
+                data.physical = '';
+                try {
+                    let parsed_data = JSON.parse(listing.description);
+                    console.log(parsed_data);
+                    if (parsed_data.twm_version === 1) {
+                        if (parsed_data.hasOwnProperty('main_image')) {
+                            data.main_image = parsed_data.main_image;
+                        }
+                        if (parsed_data.hasOwnProperty('description')) {
+                            data.description = parsed_data.description;
+                        }
+                        if (parsed_data.hasOwnProperty('sku')) {
+                            data.sku = parsed_data.sku;
+                        }
+                        if (parsed_data.hasOwnProperty('barcode')) {
+                            data.barcode = parsed_data.barcode;
+                        }
+                        if (parsed_data.hasOwnProperty('weight')) {
+                            data.weight = parsed_data.weight;
+                        }
+                        if (parsed_data.hasOwnProperty('country')) {
+                            data.country = parsed_data.country;
+                        }
+                        if (parsed_data.hasOwnProperty('message_type')) {
+                            data.message_type = parsed_data.message_type;
+                        }
+                        if (parsed_data.hasOwnProperty('physical')) {
+                            data.physical = parsed_data.physical;
+                        }
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+                return (
+                    <OfferTableRow
+                        key={key}
+                        title={listing.title}
+                        price={listing.price / 10000000000}
+                        quantity={listing.quantity}
+                        seller={listing.seller}
+                        id={listing.offerID}
+                        handleEditOfferForm={this.handleShowEditOfferForm(listing)}
+                        handleShowOrders={this.handleMyOrders}
+                        toEllipsis={this.to_ellipsis}
+                    >
+                        <ReactModal
+                            closeTimeoutMS={500}
+                            isOpen={this.state.show_new_offer_form}
+                            onRequestClose={this.handleCloseNewOfferForm}
+                            className="new-account-modal"
+
+                            style={{
+                                overlay: {
+                                position: 'fixed',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                },
+                                content: {
+                                position: 'absolute',
+                                top: '40px',
+                                left: '40px',
+                                right: '40px',
+                                bottom: '40px',
+                                overflow: 'auto',
+                                }
+                            }}
+                        >
+                                
+                            <h1>Edit Offer {this.state.show_edit_offer.title}</h1>
+
+                            <Form
+                                id="edit_offer"
+                                onSubmit={(e) => this.make_edit_offer(e, this.state.show_edit_offer)}
+                            >
+                                <Form.Row>
+                                    <Col md="8">
+                                        <Form.Group as={Col}>
+                                            <Form.Label>Offer ID</Form.Label>
+
+                                            <Form.Control
+                                                disabled
+                                                name="offerid"
+                                                value={this.state.show_edit_offer.offerID}
+                                            />
+                                        </Form.Group>
+
+                                        <Form.Group as={Col}>
+                                            <Form.Label>Username</Form.Label>
+
+                                            <Form.Control
+                                                disabled
+                                                name="username"
+                                                value={this.state.show_edit_offer.seller}
+                                            />
+                                        </Form.Group>
+                                        <Form.Group as={Col}>
+                                            <Form.Label>Image URL</Form.Label>
+
+                                            <Form.Control
+                                                name="main_image"
+                                                defaultValue={data.main_image}
+                                                onChange={this.handleChange}
+                                            />
+                                        </Form.Group>
+                                    </Col>
+
+                                    <Col md="4">
+                                        <Image
+                                            className="border border-white grey-back"
+                                            width={150}
+                                            height={150}
+                                            src={this.state.new_offer_image ? this.state.new_offer_image : data.main_image}
+                                            roundedCircle
+                                        />
+                                    </Col>
+                                </Form.Row>
+
+                                <Form.Row md="8">
+                                    <Form.Group as={Col}>
+                                        <Form.Label>Title</Form.Label>
+
+                                        <Form.Control name="title"
+                                                        defaultValue={this.state.show_edit_offer.title}/>
+                                    </Form.Group>
+
+                                    <Form.Group as={Col}>
+                                        <Form.Label>Description</Form.Label>
+
+                                        <Form.Control maxLength="2000" as="textarea"
+                                                        name="description"
+                                                        defaultValue={data.description}/>
+                                    </Form.Group>
+                                </Form.Row>
+
+                                <Form.Row>
+
+                                    <Form.Group md="6" as={Col}>
+                                        <Form.Label>Price (SFX)</Form.Label>
+
+                                        <Form.Control
+                                            name="price"
+                                            defaultValue={this.state.show_edit_offer.price / 10000000000}
+                                        />
+                                    </Form.Group>
+
+                                    <Form.Group md="6" as={Col}>
+                                        <Form.Label>Available Quantity</Form.Label>
+
+                                        <Form.Control
+                                            name="quantity"
+                                            defaultValue={this.state.show_edit_offer.quantity}
+                                        />
+                                    </Form.Group>
+
+                                    <Form.Group md="6" as={Col}>
+                                        <Form.Label>SKU</Form.Label>
+
+                                        <Form.Control
+                                            name="sku"
+                                            defaultValue={data.sku}
+                                        />
+                                    </Form.Group>
+
+                                    <Form.Group md="6" as={Col}>
+                                        <Form.Label>Barcode (ISBN, UPC, GTIN, etc)</Form.Label>
+
+                                        <Form.Control
+                                            name="barcode"
+                                            defaultValue={data.barcode}
+                                        />
+                                    </Form.Group>
+
+                                    <Form.Group md="6" as={Col}>
+                                        <Form.Label>Weight</Form.Label>
+
+                                        <Form.Control
+                                            name="weight"
+                                            defaultValue={data.weight}
+                                        />
+                                    </Form.Group>
+
+                                    <Form.Group md="6" as={Col}>
+                                        <Form.Label>Physical Item?</Form.Label>
+
+                                        <Form.Control
+                                            name="physical"
+                                            defaultValue={data.physical}
+                                        />
+                                    </Form.Group>
+
+
+                                </Form.Row>
+
+                                <Form.Row>
+
+                                    <Form.Group md="6" as={Col}>
+                                        <Form.Label>Country of Origin</Form.Label>
+
+                                        <Form.Control
+                                            name="country"
+                                            defaultValue={data.country}
+                                            placedholder="your location"
+                                        />
+                                    </Form.Group>
+
+                                    <Form.Row md="8">
+                                        <Form.Group as={Col}>
+                                            <Form.Label>Shipping</Form.Label>
+
+                                            <Form.Check
+                                                checked={this.state.shipping_switch}
+                                                onChange={this.change_shipping_switch} type="switch" id="shipping-switch2" name="shipping" />
+                                        </Form.Group>
+                                        <Form.Group as={Col}>
+                                            <Form.Label>NFT</Form.Label>
+
+                                            <Form.Check
+                                                checked={this.state.nft_switch}
+                                                onChange={this.change_nft_switch} type="switch" id="nft-switch2" name="nft" />
+                                        </Form.Group>
+
+                                        <Form.Group as={Col}>
+                                            <Form.Label>open messages</Form.Label>
+
+                                            <Form.Check
+                                                checked={this.state.open_message_switch}
+                                                onChange={this.change_open_message_switch} type="switch" id="open-switch2" name="open_message" />
+                                        </Form.Group>
+                                    </Form.Row>
+
+
+                                </Form.Row>
+
+
+                                <Form.Row>
+                                    <Form.Group md="4" as={Col}>
+                                        <Form.Label>Set Active?</Form.Label>
+
+                                        <Form.Control
+                                            name="active"
+                                            defaultValue={this.state.show_edit_offer.active}
+                                        />
+                                    </Form.Group>
+
+                                    <Form.Group md="8" as={Col}>
+                                        <Form.Label>
+                                            Mixins
+                                            <IconContext.Provider
+                                                value={{color: 'black', size: '20px'}}>
+                                                <FaInfoCircle data-tip data-for='apiInfo'
+                                                                className="blockchain-icon mx-4 white-text"/>
+
+                                                <ReactTooltip id='apiInfo' type='info'
+                                                                effect='solid'>
+                                                        <span>
+                                                            Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                            They are combined with yours for private transactions.<br/>
+                                                            Changing this from the default could hurt your privacy.<br/>
+                                                        </span>
+                                                </ReactTooltip>
+                                            </IconContext.Provider>
+                                        </Form.Label>
+
+                                        <Form.Control
+                                            name="mixins"
+                                            as="select"
+                                            defaultValue="7"
+                                        >
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                            <option>6</option>
+                                            <option>7</option>
+                                        </Form.Control>
+                                    </Form.Group>
+                                </Form.Row>
+
+
+                                <button type="submit">
+                                    Submit Edit
+                                </button>
+                            </Form>
+
+                            <button 
+                                className="close-button"
+                                onClick={this.handleCloseEditOfferForm}
+                            >
+                                Close
+                            </button>
+                        </ReactModal>
+{/*
+                    <p>{listing.title}</p>
+                    <p>{listing.price / 10000000000}</p>
+                    <p>{listing.quantity}</p>
+                    <p>{listing.seller}</p>
+                    <p>{listing.offerID}</p>
+                    <p>
+
+                        <button
+                            onClick={() => this.handleShowEditOfferForm(listing)}
+                            className="mx-2"
+                        >
+                            Edit
+                        </button>
+
+                        
+
+                        <button
+                            onClick={this.handleMyOrders}
+                            className="mx-2"
+                        >
+                            Orders
+                        </button> 
+                    </p>
+                */}
+                    </OfferTableRow>
+                )
+
+            }
+        } catch (err) {
+            console.error(`failed to properly parse the user data formatting`);
+            console.error(err);
+        }
+        
+    });
+
     render() {
 
         const twmwallet = () => {
@@ -3137,6 +3484,8 @@ class WalletHome extends React.Component {
                     );
                 case "merchant": {
 
+                    
+
                     var twm_listings_table = this.state.twm_offers.map((listing, key) => {
                         console.log(key);
                         try {
@@ -3156,347 +3505,7 @@ class WalletHome extends React.Component {
 
                     });
 
-                    var call_non_listings_table = () => this.state.non_offers.map((listing, key) => {
-                        
-                        
-                        
-                        try {
-                            if (listing.seller === this.state.selected_user.username) {
-                                var data = {};
-                                data.description = '';
-                                data.main_image = '';
-                                data.sku = '';
-                                data.barcode = '';
-                                data.weight = '';
-                                data.country = '';
-                                data.message_type = '';
-                                data.physical = '';
-                                try {
-                                    let parsed_data = JSON.parse(listing.description);
-                                    console.log(parsed_data);
-                                    if (parsed_data.twm_version === 1) {
-                                        if (parsed_data.hasOwnProperty('main_image')) {
-                                            data.main_image = parsed_data.main_image;
-                                        }
-                                        if (parsed_data.hasOwnProperty('description')) {
-                                            data.description = parsed_data.description;
-                                        }
-                                        if (parsed_data.hasOwnProperty('sku')) {
-                                            data.sku = parsed_data.sku;
-                                        }
-                                        if (parsed_data.hasOwnProperty('barcode')) {
-                                            data.barcode = parsed_data.barcode;
-                                        }
-                                        if (parsed_data.hasOwnProperty('weight')) {
-                                            data.weight = parsed_data.weight;
-                                        }
-                                        if (parsed_data.hasOwnProperty('country')) {
-                                            data.country = parsed_data.country;
-                                        }
-                                        if (parsed_data.hasOwnProperty('message_type')) {
-                                            data.message_type = parsed_data.message_type;
-                                        }
-                                        if (parsed_data.hasOwnProperty('physical')) {
-                                            data.physical = parsed_data.physical;
-                                        }
-                                    }
-                                } catch (err) {
-                                    console.error(err);
-                                }
-                                return (
-                                    <OfferTableRow
-                                        key={key}
-                                        title={listing.title}
-                                        price={listing.price / 10000000000}
-                                        quantity={listing.quantity}
-                                        seller={listing.seller}
-                                        id={listing.offerID}
-                                        handleEditOfferForm={this.handleShowEditOfferForm(listing)}
-                                        handleShowOrders={this.handleMyOrders}
-                                    >
-                                        <ReactModal
-                                            closeTimeoutMS={500}
-                                            isOpen={this.state.show_new_offer_form}
-                                            onRequestClose={this.handleCloseNewOfferForm}
-                                            className="new-account-modal"
-
-                                            style={{
-                                                overlay: {
-                                                position: 'fixed',
-                                                top: 0,
-                                                left: 0,
-                                                right: 0,
-                                                bottom: 0,
-                                                backgroundColor: 'rgba(255, 255, 255, 0.75)'
-                                                },
-                                                content: {
-                                                position: 'absolute',
-                                                top: '40px',
-                                                left: '40px',
-                                                right: '40px',
-                                                bottom: '40px',
-                                                overflow: 'auto',
-                                                }
-                                            }}
-                                        >
-                                                
-                                            <h1>Edit Offer {this.state.show_edit_offer.title}</h1>
-
-                                            <Form
-                                                id="edit_offer"
-                                                onSubmit={(e) => this.make_edit_offer(e, this.state.show_edit_offer)}
-                                            >
-                                                <Form.Row>
-                                                    <Col md="8">
-                                                        <Form.Group as={Col}>
-                                                            <Form.Label>Offer ID</Form.Label>
-
-                                                            <Form.Control
-                                                                disabled
-                                                                name="offerid"
-                                                                value={this.state.show_edit_offer.offerID}
-                                                            />
-                                                        </Form.Group>
-
-                                                        <Form.Group as={Col}>
-                                                            <Form.Label>Username</Form.Label>
-
-                                                            <Form.Control
-                                                                disabled
-                                                                name="username"
-                                                                value={this.state.show_edit_offer.seller}
-                                                            />
-                                                        </Form.Group>
-                                                        <Form.Group as={Col}>
-                                                            <Form.Label>Image URL</Form.Label>
-
-                                                            <Form.Control
-                                                                name="main_image"
-                                                                defaultValue={data.main_image}
-                                                                onChange={this.handleChange}
-                                                            />
-                                                        </Form.Group>
-                                                    </Col>
-
-                                                    <Col md="4">
-                                                        <Image
-                                                            className="border border-white grey-back"
-                                                            width={150}
-                                                            height={150}
-                                                            src={this.state.new_offer_image ? this.state.new_offer_image : data.main_image}
-                                                            roundedCircle
-                                                        />
-                                                    </Col>
-                                                </Form.Row>
-
-                                                <Form.Row md="8">
-                                                    <Form.Group as={Col}>
-                                                        <Form.Label>Title</Form.Label>
-
-                                                        <Form.Control name="title"
-                                                                        defaultValue={this.state.show_edit_offer.title}/>
-                                                    </Form.Group>
-
-                                                    <Form.Group as={Col}>
-                                                        <Form.Label>Description</Form.Label>
-
-                                                        <Form.Control maxLength="2000" as="textarea"
-                                                                        name="description"
-                                                                        defaultValue={data.description}/>
-                                                    </Form.Group>
-                                                </Form.Row>
-
-                                                <Form.Row>
-
-                                                    <Form.Group md="6" as={Col}>
-                                                        <Form.Label>Price (SFX)</Form.Label>
-
-                                                        <Form.Control
-                                                            name="price"
-                                                            defaultValue={this.state.show_edit_offer.price / 10000000000}
-                                                        />
-                                                    </Form.Group>
-
-                                                    <Form.Group md="6" as={Col}>
-                                                        <Form.Label>Available Quantity</Form.Label>
-
-                                                        <Form.Control
-                                                            name="quantity"
-                                                            defaultValue={this.state.show_edit_offer.quantity}
-                                                        />
-                                                    </Form.Group>
-
-                                                    <Form.Group md="6" as={Col}>
-                                                        <Form.Label>SKU</Form.Label>
-
-                                                        <Form.Control
-                                                            name="sku"
-                                                            defaultValue={data.sku}
-                                                        />
-                                                    </Form.Group>
-
-                                                    <Form.Group md="6" as={Col}>
-                                                        <Form.Label>Barcode (ISBN, UPC, GTIN, etc)</Form.Label>
-
-                                                        <Form.Control
-                                                            name="barcode"
-                                                            defaultValue={data.barcode}
-                                                        />
-                                                    </Form.Group>
-
-                                                    <Form.Group md="6" as={Col}>
-                                                        <Form.Label>Weight</Form.Label>
-
-                                                        <Form.Control
-                                                            name="weight"
-                                                            defaultValue={data.weight}
-                                                        />
-                                                    </Form.Group>
-
-                                                    <Form.Group md="6" as={Col}>
-                                                        <Form.Label>Physical Item?</Form.Label>
-
-                                                        <Form.Control
-                                                            name="physical"
-                                                            defaultValue={data.physical}
-                                                        />
-                                                    </Form.Group>
-
-
-                                                </Form.Row>
-
-                                                <Form.Row>
-
-                                                    <Form.Group md="6" as={Col}>
-                                                        <Form.Label>Country of Origin</Form.Label>
-
-                                                        <Form.Control
-                                                            name="country"
-                                                            defaultValue={data.country}
-                                                            placedholder="your location"
-                                                        />
-                                                    </Form.Group>
-
-                                                    <Form.Row md="8">
-                                                        <Form.Group as={Col}>
-                                                            <Form.Label>Shipping</Form.Label>
-
-                                                            <Form.Check
-                                                                checked={this.state.shipping_switch}
-                                                                onChange={this.change_shipping_switch} type="switch" id="shipping-switch2" name="shipping" />
-                                                        </Form.Group>
-                                                        <Form.Group as={Col}>
-                                                            <Form.Label>NFT</Form.Label>
-
-                                                            <Form.Check
-                                                                checked={this.state.nft_switch}
-                                                                onChange={this.change_nft_switch} type="switch" id="nft-switch2" name="nft" />
-                                                        </Form.Group>
-
-                                                        <Form.Group as={Col}>
-                                                            <Form.Label>open messages</Form.Label>
-
-                                                            <Form.Check
-                                                                checked={this.state.open_message_switch}
-                                                                onChange={this.change_open_message_switch} type="switch" id="open-switch2" name="open_message" />
-                                                        </Form.Group>
-                                                    </Form.Row>
-
-
-                                                </Form.Row>
-
-
-                                                <Form.Row>
-                                                    <Form.Group md="4" as={Col}>
-                                                        <Form.Label>Set Active?</Form.Label>
-
-                                                        <Form.Control
-                                                            name="active"
-                                                            defaultValue={this.state.show_edit_offer.active}
-                                                        />
-                                                    </Form.Group>
-
-                                                    <Form.Group md="8" as={Col}>
-                                                        <Form.Label>
-                                                            Mixins
-                                                            <IconContext.Provider
-                                                                value={{color: 'black', size: '20px'}}>
-                                                                <FaInfoCircle data-tip data-for='apiInfo'
-                                                                                className="blockchain-icon mx-4 white-text"/>
-
-                                                                <ReactTooltip id='apiInfo' type='info'
-                                                                                effect='solid'>
-                                                                        <span>
-                                                                            Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                            They are combined with yours for private transactions.<br/>
-                                                                            Changing this from the default could hurt your privacy.<br/>
-                                                                        </span>
-                                                                </ReactTooltip>
-                                                            </IconContext.Provider>
-                                                        </Form.Label>
-
-                                                        <Form.Control
-                                                            name="mixins"
-                                                            as="select"
-                                                            defaultValue="7"
-                                                        >
-                                                            <option>1</option>
-                                                            <option>2</option>
-                                                            <option>3</option>
-                                                            <option>4</option>
-                                                            <option>5</option>
-                                                            <option>6</option>
-                                                            <option>7</option>
-                                                        </Form.Control>
-                                                    </Form.Group>
-                                                </Form.Row>
-
-
-                                                <button type="submit">
-                                                    Submit Edit
-                                                </button>
-                                            </Form>
-
-                                            <button 
-                                                className="close-button"
-                                                onClick={this.handleCloseEditOfferForm}
-                                            >
-                                                Close
-                                            </button>
-                                        </ReactModal>
-{/*
-                                    <p>{listing.title}</p>
-                                    <p>{listing.price / 10000000000}</p>
-                                    <p>{listing.quantity}</p>
-                                    <p>{listing.seller}</p>
-                                    <p>{listing.offerID}</p>
-                                    <p>
-
-                                        <button
-                                            onClick={() => this.handleShowEditOfferForm(listing)}
-                                            className="mx-2"
-                                        >
-                                            Edit
-                                        </button>
-
-                                        
-
-                                        <button
-                                            onClick={this.handleMyOrders}
-                                            className="mx-2"
-                                        >
-                                            Orders
-                                        </button> 
-                                    </p>
-                                */}
-                                    </OfferTableRow>
-                                )
-                            }
-                        } catch (err) {
-                            console.error(`failed to properly parse the user data formatting`);
-                            console.error(err);
-                        }
-                    });
+                    
                     this.fetch_messages_seller();
                     var accounts_table = this.state.usernames.map((user, key) => {
                         let avatar = '';
@@ -3657,7 +3666,8 @@ class WalletHome extends React.Component {
                                             :
                                                 <MerchantOffers
                                                     handleOrders={this.handleMyOrders}
-                                                    tableOfOffers={call_non_listings_table()}
+                                                    offerRows={offerRows}
+                                                    loadOffers={this.call_non_listings_table}
                                                 />
                                             }
 

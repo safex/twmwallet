@@ -31,12 +31,19 @@ export default function MerchantOffers(props) {
 
                     <p>Quantity</p>
 
+                    <p>Seller</p>
+
                     <p>Offer ID</p>
 
                     <p>Actions</p>
                 </Row>
-                {props.tableOfOffers}
-
+                
+                <button className="my-2 " onClick={props.loadOffers}>
+                    Load Offers
+                </button>
+                
+                {props.offerRows}
+                
             </Col>
 
         </Row>

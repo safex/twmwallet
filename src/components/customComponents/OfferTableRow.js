@@ -5,6 +5,8 @@ import { Row } from 'react-bootstrap';
 import './ComponentCSS/MerchantAccounts.css'
 import './ComponentCSS/StakingTable.css'
 
+import ReactTooltip from "react-tooltip";
+
 export default function OfferTableRow(props) {
 
     return (
@@ -17,7 +19,19 @@ export default function OfferTableRow(props) {
 
             <p>{props.seller}</p>
         
-            <p>{props.id}</p>
+            <p data-tip data-for='offerID'>
+                {props.toEllipsis(props.id, 5, 5)}
+                <ReactTooltip 
+                    className="entry-tooltip-container" 
+                    id='offerID' 
+                    effect='solid'
+                    place="top"
+                >
+                    <span>
+                        {props.id}
+                    </span>
+                </ReactTooltip>
+            </p>
         
             <p>
                 <button 
