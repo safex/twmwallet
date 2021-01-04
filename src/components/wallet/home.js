@@ -1625,7 +1625,7 @@ class WalletHome extends React.Component {
         try {
             //here fetch the messages from the seller
 
-            //form a message, sign it
+            //form a message, sign it http://stageapi.theworldmarketplace.com:17700
 
             console.log(this.state.twm_file);
             if (this.state.twm_file.accounts.hasOwnProperty('final')) {
@@ -1638,25 +1638,40 @@ class WalletHome extends React.Component {
                     const crypto  = window.require('crypto');
                     let our_key = crypto.createPrivateKey(this.state.twm_file.accounts['final'].urls['http://127.0.0.1:17700'].pgp_key.sec_key)
                     console.log(our_key);
-                   const signature = crypto.sign("sha256", Buffer.from(date.toString()), {
+                    let date_msg = Buffer.from(date.toString());
+                    console.log(date_msg);
+
+                    let msg_hex = this.byteToHexString(date_msg);
+                   const signature = crypto.sign("sha256", date_msg, {
                         key: our_key,
                         padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
                     });
                    console.log(signature);
-
+                    let verified_sig = crypto.verify(
+                        "sha256",
+                        date_msg,
+                        {
+                            key: our_key,
+                            padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                        },
+                        signature
+                    );
+                    console.log(`is verified :::  ${verified_sig}`);
                    let req_payload = {};
-                    req_payload.signature = signature;
+                    req_payload.signature = this.byteToHexString(signature);
                     req_payload.username = 'final';
-                    req_payload.msg = date;
+                    req_payload.msg = date.toString();
+                    req_payload.msg_hex = msg_hex;
 
                     let req_msgs = await merchant_get_messages(req_payload);
-                    console.log(req_msgs.msgs);
+                    console.log(req_msgs.to);
+                    console.log(req_msgs.from);
 
 
 
-                    for (const order in req_msgs.msgs) {
-                        console.log(req_msgs.msgs[order]);
-                        for (const msg of req_msgs.msgs[order]) {
+                    for (const order in req_msgs.to) {
+                        console.log(req_msgs.to[order]);
+                        for (const msg of req_msgs.to[order]) {
                             console.log(msg);
                             console.log(msg.message);
                             try {
@@ -1734,11 +1749,12 @@ class WalletHome extends React.Component {
 
     purchase_item = async (e, listing) => {
         e.preventDefault();
-
+        e.persist();
         console.log(this.state.show_purchase_offer);
 
         let quant = e.target.quantity.value;
 
+        var va = e.target;
         let mixins = e.target.mixins.value - 1;
         if (e.target.quantity.value > 0) {
 
@@ -1792,81 +1808,6 @@ class WalletHome extends React.Component {
                         let shipping = {};
 
                         confirm_message = `Are you sure you want to purchase ${quant} X ${listing.title} for a total of ${total_cost} SFX?`;
-                        if (listing.nft === true) {
-
-                            confirm_message += ` sent to eth address ${e.target.eth_address.value}`;
-                            nft_address = e.target.eth_address.value;
-                        }
-                        if (listing.shipping === true) {
-                            //complete confirm message for all fields
-
-                            let va = e.target;
-                            if (va.first_name.value.length > 0) {
-                                shipping.fn = e.target.first_name.value;
-                            } else {
-                                //figure out how to break out of this channel
-                            }
-                            if (va.last_name.value.length > 0) {
-                                shipping.ln = e.target.last_name.value;
-                            } else {
-                                //figure out how to break out of this channel
-                            }
-                            if (va.address1.value.length > 0) {
-                                shipping.a1 = e.target.address1.value;
-                            } else {
-                                //figure out how to break out of this channel
-                            }
-                            if (va.address2.value.length > 0) {
-                                shipping.a2 = e.target.address2.value;
-                            } else {
-                                //figure out how to break out of this channel
-                            }
-                            if (va.city.value.length > 0) {
-                                shipping.city = e.target.city.value;
-                            } else {
-                                //figure out how to break out of this channel
-                            }
-                            if (va.state.value.length > 0) {
-                                shipping.s = e.target.state.value;
-                            } else {
-                                //figure out how to break out of this channel
-                            }
-                            if (va.zipcode.value.length > 0) {
-                                shipping.z = e.target.zipcode.value;
-                            } else {
-                                //figure out how to break out of this channel
-                            }
-                            if (va.country.value.length > 0) {
-                                shipping.c = e.target.country.value;
-                            } else {
-                                //figure out how to break out of this channel
-                            }
-                            if (va.email_address.value.length > 0) {
-                                shipping.ea = e.target.email_address.value;
-                            } else {
-                                //figure out how to break out of this channel
-                            }
-                            if (va.phone_number.value.length > 0) {
-                                shipping.ph = e.target.phone_number.value;
-                            } else {
-                                //figure out how to break out of this channel
-                            }
-
-                            confirm_message += ` delivered physical property to ${e.target.first_name.value}`;
-                        }
-                        if (listing.open_message === true) {
-                            let o_m = e.target.open_message.value;
-                            if (o_m.length > 0 && o_m < 400) {
-
-                                confirm_message += ` ${e.target.open_message.value}`;
-                                open_message = e.target.open_message.value;
-
-                            } else {
-                                //too many characters
-                            }
-
-
-                        }
 
                         confirmed = window.confirm(confirm_message);
 
@@ -1901,156 +1842,273 @@ class WalletHome extends React.Component {
                                 let txid = purchase_txn.transactionsIds();
                                 if (confirmed_fee) {
                                     try {
+
+
                                         this.setState({purchase_txn_id: txid, purchase_txn_fee: fee});
 
                                         if (this.state.offer_loading_flag === 'twmurl') {
 
                                             try {
 
-                                                let twm_file = this.state.twm_file;
 
-                                                let seller_pubkey = await get_seller_pubkey(listing.username);
+                                                if (listing.nft === true) {
 
-                                                console.log(seller_pubkey);
+                                                    confirm_message += ` sent to eth address ${e.target.eth_address.value}`;
+                                                    nft_address = va.eth_address.value;
+                                                }
+                                                if (listing.shipping === true) {
+                                                    //complete confirm message for all fields
 
-                                                const crypto  = window.require('crypto');
-
-                                                const { privateKey, publicKey } = await crypto.generateKeyPairSync('rsa', {
-                                                    modulusLength: 4096,
-                                                    publicKeyEncoding: {
-                                                        type: 'pkcs1',
-                                                        format: 'pem'
-                                                    },
-                                                    privateKeyEncoding: {
-                                                        type: 'pkcs8',
-                                                        format: 'pem',
+                                                    if (va.first_name.value.length > 0) {
+                                                        shipping.fn = e.target.first_name.value;
+                                                    } else {
+                                                        //figure out how to break out of this channel
                                                     }
-                                                });
+                                                    if (va.last_name.value.length > 0) {
+                                                        shipping.ln = e.target.last_name.value;
+                                                    } else {
+                                                        //figure out how to break out of this channel
+                                                    }
+                                                    if (va.address1.value.length > 0) {
+                                                        shipping.a1 = e.target.address1.value;
+                                                    } else {
+                                                        //figure out how to break out of this channel
+                                                    }
+                                                    if (va.address2.value.length > 0) {
+                                                        shipping.a2 = e.target.address2.value;
+                                                    } else {
+                                                        //figure out how to break out of this channel
+                                                    }
+                                                    if (va.city.value.length > 0) {
+                                                        shipping.city = e.target.city.value;
+                                                    } else {
+                                                        //figure out how to break out of this channel
+                                                    }
+                                                    if (va.state.value.length > 0) {
+                                                        shipping.s = e.target.state.value;
+                                                    } else {
+                                                        //figure out how to break out of this channel
+                                                    }
+                                                    if (va.zipcode.value.length > 0) {
+                                                        shipping.z = e.target.zipcode.value;
+                                                    } else {
+                                                        //figure out how to break out of this channel
+                                                    }
+                                                    if (va.country.value.length > 0) {
+                                                        shipping.c = e.target.country.value;
+                                                    } else {
+                                                        //figure out how to break out of this channel
+                                                    }
+                                                    if (va.email_address.value.length > 0) {
+                                                        shipping.ea = e.target.email_address.value;
+                                                    } else {
+                                                        //figure out how to break out of this channel
+                                                    }
+                                                    if (va.phone_number.value.length > 0) {
+                                                        shipping.ph = e.target.phone_number.value;
+                                                    } else {
+                                                        //figure out how to break out of this channel
+                                                    }
 
-                                                let api_file_url_offer_id;
+                                                    confirm_message += ` delivered physical property to ${e.target.first_name.value}`;
+                                                }
+                                                if (listing.open_message === true) {
+                                                    let o_m = e.target.open_message.value;
+                                                    if (o_m.length > 0 && o_m < 400) {
 
-                                                if (twm_file.api.urls.hasOwnProperty(this.state.api_url)) {
-                                                    if (twm_file.api.urls[this.state.api_url].hasOwnProperty(listing.offer_id)) {
-                                                        //generate a new pgp key
-
-                                                        let api_file_url = twm_file.api.urls[this.state.api_url];
-                                                        api_file_url_offer_id = api_file_url[listing.offer_id];
+                                                        confirm_message += ` ${e.target.open_message.value}`;
+                                                        open_message = e.target.open_message.value;
 
                                                     } else {
-                                                        let api_file_url = twm_file.api.urls[this.state.api_url];
-                                                        api_file_url[listing.offer_id] = {};
-                                                        api_file_url_offer_id = api_file_url[listing.offer_id];
+                                                        //too many characters
                                                     }
-                                                } else {
-                                                    //if the api was never yet before saved
-                                                    twm_file.api.urls[this.state.api_url] = {};
-                                                    let api_file_url = twm_file.api.urls[this.state.api_url];
-                                                    api_file_url[listing.offer_id] = {};
-                                                    api_file_url_offer_id = api_file_url[listing.offer_id];
+
 
                                                 }
 
-                                                let order_id_string = publicKey + listing.offer_id + this.state.blockchain_height;
-                                                let order_id_hash = keccak256(order_id_string).toString('hex');
-                                                api_file_url_offer_id[order_id_hash] = {};
+                                                let twm_confirm = window.confirm(confirm_message);
 
-                                                let message_header_obj = {};
-                                                message_header_obj.sender_pgp_pub_key = publicKey;
-                                                message_header_obj.to = listing.username;
-                                                message_header_obj.from = publicKey;
-                                                message_header_obj.order_id = order_id_hash;
-                                                message_header_obj.purchase_proof = txid;
-                                                message_header_obj.bc_height = this.state.blockchain_height;
+                                                if (twm_confirm) {
+                                                    let twm_file = this.state.twm_file;
 
-                                                let pre_sign_message_obj = {};
-                                                pre_sign_message_obj.s = ''; //subject
-                                                pre_sign_message_obj.o = listing.offer_id; //offer_id
-                                                pre_sign_message_obj.m = open_message; //open_message contents
-                                                pre_sign_message_obj.n = nft_address; //nft address
-                                                pre_sign_message_obj.so = JSON.stringify(shipping); //shipping object
+                                                    let seller_pubkey = await get_seller_pubkey(listing.username);
 
-                                                message_header_obj.message_hash = keccak256(JSON.stringify(pre_sign_message_obj)).toString('hex');
+                                                    console.log(seller_pubkey);
 
-                                                message_header_obj.message_signature = '';
+                                                    const crypto  = window.require('crypto');
 
-                                                let pres_sign_string = JSON.stringify(pre_sign_message_obj);
+                                                    const { privateKey, publicKey } = await crypto.generateKeyPairSync('rsa', {
+                                                        modulusLength: 4096,
+                                                        publicKeyEncoding: {
+                                                            type: 'pkcs1',
+                                                            format: 'pem'
+                                                        },
+                                                        privateKeyEncoding: {
+                                                            type: 'pkcs8',
+                                                            format: 'pem',
+                                                        }
+                                                    });
 
-                                                const signature = crypto.sign("sha256", Buffer.from(pres_sign_string), {
-                                                    key: privateKey,
-                                                    padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-                                                });
+                                                    let api_file_url_offer_id;
 
-                                                message_header_obj.message_signature = signature;
+                                                    if (twm_file.api.urls.hasOwnProperty(this.state.api_url)) {
+                                                        if (twm_file.api.urls[this.state.api_url].hasOwnProperty(listing.offer_id)) {
+                                                            //generate a new pgp key
 
-                                                let compressed_message_obj = zlib.deflateSync(Buffer.from(JSON.stringify(pre_sign_message_obj)));
+                                                            let api_file_url = twm_file.api.urls[this.state.api_url];
+                                                            api_file_url_offer_id = api_file_url[listing.offer_id];
 
-                                                console.log(": " + compressed_message_obj.length + " characters, " +
-                                                    Buffer.byteLength((compressed_message_obj), 'utf8') + " bytes");
+                                                        } else {
+                                                            let api_file_url = twm_file.api.urls[this.state.api_url];
+                                                            api_file_url[listing.offer_id] = {};
+                                                            api_file_url_offer_id = api_file_url[listing.offer_id];
+                                                        }
+                                                    } else {
+                                                        //if the api was never yet before saved
+                                                        twm_file.api.urls[this.state.api_url] = {};
+                                                        let api_file_url = twm_file.api.urls[this.state.api_url];
+                                                        api_file_url[listing.offer_id] = {};
+                                                        api_file_url_offer_id = api_file_url[listing.offer_id];
 
-                                                let found_key = crypto.createPublicKey(seller_pubkey.user.pgp_key);
+                                                    }
 
-                                                let encrypted_message = crypto.publicEncrypt(
-                                                    {
-                                                        key: found_key,
-                                                        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-                                                        oaepHash: "sha256",
-                                                    },
-                                                    compressed_message_obj
-                                                );
+                                                    let order_id_string = publicKey + listing.offer_id + this.state.blockchain_height;
+                                                    let order_id_hash = keccak256(order_id_string).toString('hex');
+                                                    api_file_url_offer_id[order_id_hash] = {};
 
+                                                    let message_header_obj = {};
+                                                    message_header_obj.sender_pgp_pub_key = publicKey;
+                                                    message_header_obj.to = listing.username;
+                                                    message_header_obj.from = publicKey;
+                                                    message_header_obj.order_id = order_id_hash;
+                                                    message_header_obj.purchase_proof = txid;
+                                                    message_header_obj.bc_height = this.state.blockchain_height;
 
+                                                    let pre_sign_message_obj = {};
+                                                    pre_sign_message_obj.s = ''; //subject
+                                                    pre_sign_message_obj.o = listing.offer_id; //offer_id
+                                                    pre_sign_message_obj.m = open_message; //open_message contents
+                                                    pre_sign_message_obj.n = nft_address; //nft address
+                                                    pre_sign_message_obj.so = JSON.stringify(shipping); //shipping object
 
-                                                let hex_enc_msg = this.byteToHexString(encrypted_message);
+                                                    message_header_obj.message_hash = keccak256(JSON.stringify(pre_sign_message_obj)).toString('hex');
 
-                                                const enc_signature = crypto.sign("sha256", Buffer.from(encrypted_message), {
-                                                    key: privateKey,
-                                                    padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-                                                });
+                                                    message_header_obj.message_signature = '';
 
-                                                let hex_enc_sig = this.byteToHexString(enc_signature);
+                                                    let pres_sign_string = JSON.stringify(pre_sign_message_obj);
 
-                                                message_header_obj.encrypted_message_signature = hex_enc_sig;
-
-                                                message_header_obj.encrypted_message = hex_enc_msg;
-
-                                                let tdispatched = await dispatch_purchase_message(message_header_obj);
-
-                                                console.log(tdispatched);
-
-                                                let purchase_obj = {};
-                                                purchase_obj.api_url = this.state.api_url;
-                                                purchase_obj.offer_id = listing.offer_id;
-                                                purchase_obj.title = listing.title;
-                                                purchase_obj.price = listing.price;
-                                                purchase_obj.quantity = quant;
-                                                purchase_obj.bc_height = message_header_obj.bc_height;
-                                                api_file_url_offer_id[order_id_hash].pgp_keys = {private_key: privateKey, public_key: publicKey};
-                                                api_file_url_offer_id[order_id_hash].messages = {};
-                                                api_file_url_offer_id[order_id_hash].purchase_obj = purchase_obj;
-                                                //api_file_url_offer_id[order_id_hash].messages
-                                                //send it to the server
-                                                //save it to the twm_file
-/*
-                                                const decryptedData = crypto.privateDecrypt(
-                                                    {
+                                                    const signature = crypto.sign("sha256", Buffer.from(pres_sign_string), {
                                                         key: privateKey,
-                                                        // In order to decrypt the data, we need to specify the
-                                                        // same hashing function and padding scheme that we used to
-                                                        // encrypt the data in the previous step
-                                                        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-                                                        oaepHash: "sha256",
-                                                    },
-                                                    encrypted_message
-                                                );
-                                                console.log(encrypted_message);
+                                                        padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                                                    });
 
-                                                console.log(decryptedData.toString());
-                                                let decomped = zlib.inflateSync(Buffer.from(decryptedData));
-                                                console.log(decomped.toString());*/
-                                                alert(`what`);
+                                                    message_header_obj.message_signature = signature;
 
-                                                console.log(`payments from twm_url`);
-                                                alert(`what`);
+                                                    let compressed_message_obj = zlib.deflateSync(Buffer.from(JSON.stringify(pre_sign_message_obj)));
+
+                                                    console.log(": " + compressed_message_obj.length + " characters, " +
+                                                        Buffer.byteLength((compressed_message_obj), 'utf8') + " bytes");
+
+                                                    let found_key = crypto.createPublicKey(seller_pubkey.user.pgp_key);
+
+                                                    let encrypted_message = crypto.publicEncrypt(
+                                                        {
+                                                            key: found_key,
+                                                            padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+                                                            oaepHash: "sha256",
+                                                        },
+                                                        compressed_message_obj
+                                                    );
+
+
+
+                                                    let hex_enc_msg = this.byteToHexString(encrypted_message);
+
+                                                    const enc_signature = crypto.sign("sha256", Buffer.from(encrypted_message), {
+                                                        key: privateKey,
+                                                        padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                                                    });
+
+                                                    let hex_enc_sig = this.byteToHexString(enc_signature);
+
+                                                    message_header_obj.encrypted_message_signature = hex_enc_sig;
+
+                                                    message_header_obj.encrypted_message = hex_enc_msg;
+
+                                                    let tdispatched = await dispatch_purchase_message(message_header_obj);
+
+                                                    console.log(tdispatched);
+
+                                                    message_header_obj.message = pre_sign_message_obj;
+
+                                                    let purchase_obj = {};
+                                                    purchase_obj.api_url = this.state.api_url;
+                                                    purchase_obj.offer_id = listing.offer_id;
+                                                    purchase_obj.title = listing.title;
+                                                    purchase_obj.price = listing.price;
+                                                    purchase_obj.quantity = quant;
+                                                    purchase_obj.bc_height = message_header_obj.bc_height;
+                                                    api_file_url_offer_id[order_id_hash].pgp_keys = {private_key: privateKey, public_key: publicKey};
+                                                    api_file_url_offer_id[order_id_hash].messages = [];
+                                                    api_file_url_offer_id[order_id_hash].purchase_obj = purchase_obj;
+                                                    api_file_url_offer_id[order_id_hash].messages.push(message_header_obj);
+
+                                                    console.log(twm_file);
+                                                   try {
+
+                                                        const crypto = window.require('crypto');
+                                                        const algorithm = 'aes-256-ctr';
+                                                        console.log(this.state.password);
+                                                        const cipher = crypto.createCipher(algorithm, this.state.password.toString());
+                                                        let crypted = cipher.update(JSON.stringify(twm_file), 'utf8', 'hex');
+                                                        crypted += cipher.final('hex');
+
+                                                        const hash1 = crypto.createHash('sha256');
+                                                        hash1.update(JSON.stringify(twm_file));
+                                                        console.log(`password ${this.state.password}`);
+                                                        console.log(JSON.stringify(twm_file));
+
+                                                        let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
+
+                                                        try {
+
+                                                            let opened_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
+                                                            console.log(opened_twm_file);
+
+                                                            localStorage.setItem('twm_file', twm_file);
+
+
+                                                            this.setState({twm_file: twm_file});
+
+
+
+                                                        } catch (err) {
+                                                            console.error(err);
+                                                            console.error(`error opening twm file after save to verify`);
+                                                            alert(`error at saving to the twm file during account creation verification stage`);
+                                                        }
+                                                        console.log(twm_save);
+
+                                                    } catch (err) {
+                                                        console.error(err);
+                                                        console.error(`error at initial save of the twm file`);
+                                                        alert(`error at saving to the twm file during account creation initialization stage`);
+                                                    }
+                                                    //api_file_url_offer_id[order_id_hash].messages
+                                                    //send it to the server
+                                                    //save it to the twm_file
+                                                    console.log(`payments from twm_url`);
+                                                    alert(`what`);
+
+                                                    let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
+
+                                                    console.log(`purchase transaction committed`);
+                                                    alert(`the purchase has been submitted`);
+
+
+                                                }
+
+
 
 
 
@@ -2058,13 +2116,18 @@ class WalletHome extends React.Component {
                                                 alert(`error at getting the sellers public key from the api server`);
                                                 console.error(err);
                                                 console.error(`error at getting the sellers public key from the api server`);
+
                                             }
+                                        } else {
+
+                                            let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
+
+                                            console.log(`purchase transaction committed`);
+
                                         }
 
 
-                                        let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
 
-                                        console.log(`purchase transaction committed`);
                                     } catch (err) {
                                         this.setState({showLoader: false});
                                         console.error(err);
