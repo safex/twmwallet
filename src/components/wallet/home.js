@@ -3114,50 +3114,6 @@ class WalletHome extends React.Component {
 
                                         <Form.Group as={Row}>
                                             <Form.Label column sm={3}>
-                                                {this.state.show_purchase_offer.quantity} available
-                                            </Form.Label>
-                                            <Col sm={9}>
-                                                <Form.Control
-                                                    className="light-blue-back"
-                                                    id="quantity"
-                                                    name="quantity"
-                                                    max={this.state.show_purchase_offer.quantity}
-                                                />
-                                            </Col>
-                                        </Form.Group>
-                                        {this.state.show_purchase_offer_data.nft ? (<Form.Group as={Row}>
-                                            <Form.Label column sm={3}>
-                                                NFT Ethereum Address
-                                            </Form.Label>
-                                            <Col sm={9}>
-                                                <Form.Control name="eth_address" rows="3"/>
-                                            </Col>
-                                        </Form.Group>) : ''}
-                                        {this.state.show_purchase_offer_data.shipping ? (<Form.Group as={Row}>
-                                            <Form.Label column sm={3}>
-                                                first name
-                                            </Form.Label>
-                                            <Col sm={4}>
-                                                <Form.Control name="first_name" rows="3"/>
-                                            </Col>
-                                            <Form.Label column sm={3}>
-                                                last name
-                                            </Form.Label>
-                                            <Col sm={4}>
-                                                <Form.Control name="last_name" rows="3"/>
-                                            </Col>
-                                        </Form.Group>) : ''}
-                                        {this.state.show_purchase_offer_data.open_message ? (<Form.Group as={Row}>
-                                            <Form.Label column sm={3}>
-                                                NFT Ethereum Address
-                                            </Form.Label>
-                                            <Col sm={9}>
-                                                <Form.Control name="message" rows="3"/>
-                                            </Col>
-                                        </Form.Group>) : ''}
-
-                                        <Form.Group as={Row}>
-                                            <Form.Label column sm={3}>
                                                 Mixins
                                                 <IconContext.Provider value={{color: 'black', size: '20px'}}>
                                                     <FaInfoCircle data-tip data-for='apiInfo'
