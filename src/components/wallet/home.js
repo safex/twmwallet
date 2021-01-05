@@ -1241,9 +1241,11 @@ class WalletHome extends React.Component {
                 this.setState({create_offer_txn_fee: fee, create_offer_txn_id: txid});
                 try {
                     let commit_create_offer = await this.commit_list_offer_txn_async(create_offer_tx);
+                    alert(`your new offer ${this.state.create_offer_txn_title} has been successfully committed`);
                 } catch (error) {
                     console.error(error);
                     console.error(`error at committing the offer listing`);
+                    alert(`there was an error committing the new offer`);
                 }
             } else {
                 alert(`Your transaction was cancelled, the listing for ${this.state.create_offer_txn_title.toUpperCase()} was cancelled`);
