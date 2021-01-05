@@ -128,6 +128,7 @@ class WalletHome extends React.Component {
             open_message_switch: false,
             showMessages: false,
             currentMessage: {},
+            offersLoaded: false,
         };
     }
 
@@ -402,8 +403,9 @@ class WalletHome extends React.Component {
 
 
         e.preventDefault();
-        let confirm = window.confirm(`are you sure you want to remove ${user} you should only do this if you
-        think that the transaction to register the account did not go through, keep in mind this is irreversible`)
+        let confirm = window.confirm(`Are you sure you want to remove ${user}? 
+        You should only do this if you think that the transaction to register the account did not go through. 
+        Keep in mind this is IRREVERSABLE!`)
         if (confirm) {
             try {
                 let removed = wallet.removeSafexAccount(user);
@@ -423,8 +425,7 @@ class WalletHome extends React.Component {
 
     register_account = async (e) => {
         e.preventDefault();
-        alert(this.state.tokens);
-        alert(this.state.first_refresh);
+
         if (this.state.tokens >= 300 && this.state.first_refresh === true) {
             try {
                 let vees = e.target;
@@ -737,7 +738,7 @@ class WalletHome extends React.Component {
         try {
             let mixins = e.target.mixins.value - 1;
             if (mixins >= 0) {
-                let confirmed = window.confirm(`are you sure you want to send ${e.target.amount.value} SFT Safex Tokens, to ${e.target.destination.value}`);
+                let confirmed = window.confirm(`Are you sure you want to send ${e.target.amount.value} SFT (Safex Tokens), to ${e.target.destination.value}`);
                 console.log(confirmed);
                 if (confirmed) {
                     try {
@@ -761,7 +762,7 @@ class WalletHome extends React.Component {
                                 } catch (err) {
                                     console.error(err);
                                     console.error(`error when trying to commit the token transaction to the blockchain`);
-                                    alert(`error when trying to commit the token transaction to the blockchain`);
+                                    alert(`Error when trying to commit the token transaction to the blockchain`);
                                 }
                             } else {
                                 console.log(`token transaction cancelled`);
@@ -773,14 +774,14 @@ class WalletHome extends React.Component {
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the token transaction formation it was not committed`);
-                        alert(`error at the token transaction formation it was not committed`);
+                        alert(`Error at the token transaction formation it was not committed`);
                     }
                 }
             }
         } catch (err) {
             console.error(err);
             if (err.toString().startsWith('not enough outputs')) {
-                alert(`choose fewer mixins`);
+                alert(`Choose fewer mixins`);
             }
             console.error(`error at the token transaction`);
         }
@@ -793,7 +794,7 @@ class WalletHome extends React.Component {
                     if (err) {
                         console.error(err);
                         console.error(`error at the token transaction send`);
-                        alert(`error at the token transaction send`);
+                        alert(`Error at the token transaction send`);
                         alert(err);
                         reject(err);
                     } else {
@@ -817,10 +818,10 @@ class WalletHome extends React.Component {
                         alert(err);
                         reject(err);
                     } else {
-                        alert(`token transaction successfully submitted 
-                                        transaction id: ${this.state.token_txn_id}
-                                        amount: ${this.state.token_txn_amount} SFT
-                                        fee: ${this.state.token_txn_fee / 10000000000} SFX`);
+                        alert(`Token transaction successfully submitted 
+                                        Transaction id: ${this.state.token_txn_id}
+                                        Amount: ${this.state.token_txn_amount} SFT
+                                        Fee: ${this.state.token_txn_fee / 10000000000} SFX`);
                         resolve(res);
                     }
                 });
@@ -836,7 +837,7 @@ class WalletHome extends React.Component {
         try {
             let mixins = e.target.mixins.value - 1;
             if (mixins >= 0) {
-                let confirmed = window.confirm(`are you sure you want to send ${e.target.amount.value} SFX Safex Cash, ` +
+                let confirmed = window.confirm(`Are you sure you want to send ${e.target.amount.value} SFX (Safex Cash), ` +
                     `to ${e.target.destination.value}`);
                 console.log(confirmed);
                 if (confirmed) {
@@ -847,7 +848,7 @@ class WalletHome extends React.Component {
                         });
                         let s_cash = await this.send_cash_async(wallet, e.target.destination.value.trim(), e.target.amount.value, mixins);
                         console.log(s_cash);
-                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${s_cash.fee() / 10000000000} SFX Safex Cash 
+                        let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${s_cash.fee() / 10000000000} SFX (Safex Cash) 
             sending ${this.state.cash_txn_amount} SFX to ${this.state.cash_txn_destination}`);
                         let fee = s_cash.fee();
                         let txid = s_cash.transactionsIds();
@@ -867,15 +868,15 @@ class WalletHome extends React.Component {
                         }
                     } catch (err) {
                         console.error(err);
-                        console.error(`error at the cash transaction formation it was not committed`);
-                        alert(`error at the cash transaction formation it was not committed`);
+                        console.error(`Error at the cash transaction formation it was not committed`);
+                        alert(`Error at the cash transaction formation it was not committed`);
                     }
                 }
             }
         } catch (err) {
             console.error(err);
-            if (err.toString().startsWith('not enough outputs')) {
-                alert(`choose fewer mixins`);
+            if (err.toString().startsWith('ot enough outputs')) {
+                alert(`Choose fewer mixins`);
             }
             console.error(`error at the cash transaction`);
         }
@@ -974,7 +975,8 @@ class WalletHome extends React.Component {
             this.setState({
                 twm_offers: twm_offers,
                 interface_view: 'market',
-                offer_loading_flag: 'blockchaintwmoffers'
+                offer_loading_flag: 'blockchaintwmoffers',
+                offersLoaded: true,
 
             });
         }, 500);
@@ -1093,7 +1095,10 @@ class WalletHome extends React.Component {
 
     //show modal of private keys
     handleKeys = () => {
-        this.setState({show_keys: !this.state.show_keys, keyRequest: false});
+        this.setState({show_keys: !this.state.show_keys});
+        if (this.state.show_keys === false) {
+            this.setState({keyRequest: true})
+        }
     };
 
     //close modal of New Offer
@@ -1324,14 +1329,14 @@ class WalletHome extends React.Component {
         try {
             let mixins = e.target.mixins.value - 1;
             if (mixins >= 0) {
-                let confirmed = window.confirm(`are you sure you want to stake ${e.target.amount.value} SFT Safex Tokens?`);
+                let confirmed = window.confirm(`Are you sure you want to stake ${e.target.amount.value} SFT Safex Tokens?`);
                 console.log(confirmed);
                 if (confirmed) {
                     try {
                         this.setState({stake_txn_amount: e.target.amount.value});
 
                         let staked_token = await this.token_stake_async(wallet, e.target.amount.value, mixins);
-                        let confirmed_fee = window.confirm(`the network fee to stake ${this.state.stake_txn_amount} SFT will be:  ${staked_token.fee() / 10000000000} SFX Safex Cash`);
+                        let confirmed_fee = window.confirm(`The network fee to stake ${this.state.stake_txn_amount} SFT will be:  ${staked_token.fee() / 10000000000} SFX (Safex Cash)`);
                         let fee = staked_token.fee();
                         let txid = staked_token.transactionsIds();
                         this.setState({stake_txn_id: txid, stake_txn_fee: fee});
@@ -1417,13 +1422,13 @@ class WalletHome extends React.Component {
         try {
             let mixins = e.target.mixins.value - 1;
             if (mixins >= 0) {
-                let confirmed = window.confirm(`are you sure you want to stake ${e.target.amount.value} SFT Safex Tokens?`);
+                let confirmed = window.confirm(`Are you sure you want to stake ${e.target.amount.value} SFT Safex Tokens?`);
                 console.log(confirmed);
                 if (confirmed) {
                     try {
                         this.setState({unstake_txn_amount: e.target.amount.value});
                         let unstaked = await this.token_unstake_async(wallet, e.target.amount.value, mixins);
-                        let confirmed_fee = window.confirm(`the network fee to unstake ${this.state.unstake_txn_amount} SFT will be:  ${unstaked.fee() / 10000000000} SFX Safex Cash`);
+                        let confirmed_fee = window.confirm(`The network fee to unstake ${this.state.unstake_txn_amount} SFT will be:  ${unstaked.fee() / 10000000000} SFX Safex Cash`);
                         let fee = unstaked.fee();
                         let txid = unstaked.transactionsIds();
                         if (confirmed_fee) {
@@ -1435,8 +1440,8 @@ class WalletHome extends React.Component {
 
                             } catch (err) {
                                 console.error(err);
-                                console.error(`error when trying to commit the token unstaking transaction to the blockchain`);
-                                alert(`error when trying to commit the token unstaking transaction to the blockchain`);
+                                console.error(`Error when trying to commit the token unstaking transaction to the blockchain`);
+                                alert(`Error when trying to commit the token unstaking transaction to the blockchain`);
                             }
                         } else {
                             console.log("token staking transaction cancelled");
@@ -2417,33 +2422,7 @@ class WalletHome extends React.Component {
                         handleEditOfferForm={() => this.handleShowEditOfferForm(listing)}
                         handleShowOrders={this.handleMyOrders}
                         toEllipsis={this.to_ellipsis}
-                    >
-{/*
-                    <p>{listing.title}</p>
-                    <p>{listing.price / 10000000000}</p>
-                    <p>{listing.quantity}</p>
-                    <p>{listing.seller}</p>
-                    <p>{listing.offerID}</p>
-                    <p>
-
-                        <button
-                            onClick={() => this.handleShowEditOfferForm(listing)}
-                            className="mx-2"
-                        >
-                            Edit
-                        </button>
-
-                        
-
-                        <button
-                            onClick={this.handleMyOrders}
-                            className="mx-2"
-                        >
-                            Orders
-                        </button> 
-                    </p>
-                */}
-                    </OfferTableRow>
+                    />
                 )
 
             }
@@ -2597,7 +2576,7 @@ class WalletHome extends React.Component {
 
                                             <p>{listing.quantity}</p>
 
-                                            <p>{listing.username}</p>
+                                            <p>{listing.seller}</p>
 
                                             <p data-tip data-for={`offerID${key}`}>
                                                 {this.to_ellipsis(listing.offer_id, 5, 5)}
@@ -2662,7 +2641,7 @@ class WalletHome extends React.Component {
 
                                             <p>{listing.quantity}</p>
 
-                                            <p>{listing.username}</p>
+                                            <p>{listing.seller}</p>
 
                                             <p data-tip data-for={`offerID${key}`}>
                                                 {this.to_ellipsis(listing.offer_id, 5, 5)}
@@ -2727,259 +2706,242 @@ class WalletHome extends React.Component {
                     return (
                         <div className="">
 
-                            <Modal className="purchase-offer-modal text-align-center" animation={false}
-                                    size="lg"
-                                    centered
-                                    show={this.state.show_purchase_form}
-                                    onHide={this.handleClosePurchaseForm}>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>
-                                        PURCHASE {this.state.show_purchase_offer.title.toUpperCase()}
-                                    </Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body>
+                            {this.state.show_purchase_form ?
+                                <ReactModal 
+                                isOpen={this.state.show_purchase_form}
+                                closeTimeoutMS={500}
+                                className="keys-modal"
+                                onRequestClose={this.handleClosePurchaseForm}
 
-                                    <Form id="purchase_item"
-                                            onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
+                                style={{
+                                    overlay: {
+                                    position: 'fixed',
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 0,
+                                    backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                    },
+                                    content: {
+                                    position: 'absolute',
+                                    top: '40px',
+                                    left: '40px',
+                                    right: '40px',
+                                    bottom: '40px',
+                                    overflow: 'auto',
+                                    }
+                                }}
+                            >  
+                                <h1>PURCHASE {this.state.show_purchase_offer.title.toUpperCase()}</h1>
+                                
 
+                                <Form id="purchase_item"
+                                        onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
 
-                                        <h2>{this.state.show_purchase_offer.title.toUpperCase()}</h2>
-                                        {this.state.show_purchase_offer_data.main_image ?
-                                            <div className="d-flex flex-row justify-content-around p-3">
-                                                <Image className="border border-dark"
-                                                        src={this.state.show_purchase_offer_data.main_image}></Image>
+                                        <div className="d-flex flex-column justify-content-around p-3">
+                                            <Image className="border border-dark"
+                                                    src={this.state.show_purchase_offer_data.main_image}></Image>
 
-                                                <div className="p-5 d-flex flex-column justify-content-center">
-                                                    <h3>{this.state.show_purchase_offer.title.toUpperCase()}</h3>
-                                                    <hr className="border border-dark w-100"></hr>
-                                                    <ul>
-                                                        <li>Price: {this.state.show_purchase_offer.price} SFX</li>
-                                                        <li>Seller: {this.state.show_purchase_offer.seller}</li>
-                                                        <li data-tip data-for='offerID'>
-                                                            Offer
-                                                            ID: {this.to_ellipsis(this.state.show_purchase_offer.offer_id, 10, 10)}
-                                                            <ReactTooltip id='offerID' type='light' effect='solid'>
-                                                                {this.state.show_purchase_offer.offer_id}
-                                                            </ReactTooltip>
-                                                            <FaCopy
-                                                                className="ml-4"
-                                                                data-tip data-for='copyIDInfo'
-                                                                onClick={() => copy(this.state.show_purchase_offer.offer_id)}
-                                                            />
-
-                                                            <ReactTooltip id='copyIDInfo' type='info'
-                                                                            effect='solid'>
-                                                                        <span>
-                                                                            Copy Offer ID
-                                                                        </span>
-                                                            </ReactTooltip>
-                                                        </li>
-                                                    </ul>
-                                                    <hr className="border border-primary w-100"></hr>
-                                                    <div className="h-25 oflow-y-auto">
-                                                        <p>{this.state.show_purchase_offer_data.description.toUpperCase()}</p>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                            :
-                                            <div>
-                                                <Image src={require("./../../img/sails-logo.png")}></Image>
-
-                                                <h3>{this.state.show_purchase_offer.title}</h3>
-                                            <Form.Group as={Row}>
-                                                <Form.Label column sm={3}>
-                                                    {this.state.show_purchase_offer.quantity} available
-                                                </Form.Label>
-                                                <Col sm={9}>
-                                                    <Form.Control
-                                                        className="light-blue-back"
-                                                        id="quantity"
-                                                        name="quantity"
-                                                        max={this.state.show_purchase_offer.quantity}
-                                                    />
-                                                </Col>
-                                            </Form.Group>
-                                            {this.state.show_purchase_offer_data.nft ? (<Form.Group as={Row}>
-                                                <Form.Label column sm={3}>
-                                                    NFT Ethereum Address
-                                                </Form.Label>
-                                                <Col sm={9}>
-                                                    <Form.Control name="eth_address" rows="3"/>
-                                                </Col>
-                                            </Form.Group>) : ''}
-                                            {this.state.show_purchase_offer_data.shipping ? (<div><Form.Group name="names" as={Row}>
-                                                <Form.Label column sm={3}>
-                                                    first name
-                                                </Form.Label>
-                                                <Col sm={4}>
-                                                    <Form.Control name="first_name" rows="3"/>
-                                                </Col>
-                                                <Form.Label column sm={3}>
-                                                    last name
-                                                </Form.Label>
-                                                <Col sm={4}>
-                                                    <Form.Control name="last_name" rows="3"/>
-                                                </Col>
-                                            </Form.Group>
-                                                <Form.Group name="streets" as={Row}>
-                                                    <Form.Label column sm={3}>
-                                                       Address Line 1
-                                                    </Form.Label>
-                                                    <Col sm={4}>
-                                                        <Form.Control name="address1" rows="3"/>
-                                                    </Col>
-                                                    <Form.Label column sm={3}>
-                                                        Address Line 2
-                                                    </Form.Label>
-                                                    <Col sm={4}>
-                                                        <Form.Control name="address2" rows="3"/>
-                                                    </Col>
-                                                </Form.Group>
-                                                <Form.Group name="place" as={Row}>
-                                                    <Form.Label column sm={3}>
-                                                        City
-                                                    </Form.Label>
-                                                    <Col sm={4}>
-                                                        <Form.Control name="city" rows="3"/>
-                                                    </Col>
-                                                    <Form.Label column sm={3}>
-                                                        State/County
-                                                    </Form.Label>
-                                                    <Col sm={4}>
-                                                        <Form.Control name="state" rows="3"/>
-                                                    </Col>
-                                                </Form.Group>
-                                                <Form.Group name="countrycodes" as={Row}>
-                                                    <Form.Label column sm={3}>
-                                                        Zip/Area Code
-                                                    </Form.Label>
-                                                    <Col sm={4}>
-                                                        <Form.Control name="zipcode" rows="3"/>
-                                                    </Col>
-                                                    <Form.Label column sm={3}>
-                                                        Country
-                                                    </Form.Label>
-                                                    <Col sm={4}>
-                                                        <Form.Control name="country" rows="3"/>
-                                                    </Col>
-                                                </Form.Group>
-                                                <Form.Group as={Row}>
-                                                    <Form.Label column sm={3}>
-                                                        Email
-                                                    </Form.Label>
-                                                    <Col sm={4}>
-                                                        <Form.Control name="email_address" rows="3"/>
-                                                    </Col>
-                                                    <Form.Label column sm={3}>
-                                                        Phone
-                                                    </Form.Label>
-                                                    <Col sm={4}>
-                                                        <Form.Control name="phone_number" rows="3"/>
-                                                    </Col>
-                                                </Form.Group></div>) : ''}
-                                            {this.state.show_purchase_offer_data.open_message ? 
-                                                <Form.Group as={Row}>
-                                                    <Form.Label column sm={3}>
-                                                        NFT Ethereum Address
-                                                    </Form.Label>
-                                                    <Col sm={9}>
-                                                        <Form.Control name="message" rows="3"/>
-                                                    </Col>
-                                                </Form.Group> 
-                                            : 
-                                                ''
-                                            }
-
+                                            <div className="p-5 d-flex flex-column justify-content-center"></div>
                                                 <hr className="border border-dark w-100"></hr>
+                                                    <h2>Price: {this.state.show_purchase_offer.price} SFX</h2>
+                                                    <h2>Seller: {this.state.show_purchase_offer.seller}</h2>
+                                                    <h2 data-tip data-for='offerID'>
+                                                        Offer
+                                                        ID: {this.to_ellipsis(this.state.show_purchase_offer.offer_id, 10, 10)}
+                                                        <ReactTooltip id='offerID' type='light' effect='solid'>
+                                                            {this.state.show_purchase_offer.offer_id}
+                                                        </ReactTooltip>
+                                                        <FaCopy
+                                                            className="ml-4"
+                                                            data-tip data-for='copyIDInfo'
+                                                            onClick={() => copy(this.state.show_purchase_offer.offer_id)}
+                                                        />
 
-                                                <ul>
-                                                    <li>Price: {this.state.show_purchase_offer.price} SFX</li>
-                                                    <li>Seller: {this.state.show_purchase_offer.seller}</li>
-                                                    <li>
-                                                        Offer ID: {this.state.show_purchase_offer.offerID}
-
-                                                        <IconContext.Provider
-                                                            value={{color: 'black', size: '20px'}}>
-                                                            <FaCopy
-                                                                className="ml-4"
-                                                                data-tip data-for='copyIDInfo'
-                                                                onClick={() => copy(this.state.show_purchase_offer.offerID)}
-                                                            />
-
-                                                            <ReactTooltip id='copyIDInfo' type='info'
-                                                                            effect='solid'>
-                                                                        <span>
-                                                                            Copy Offer ID
-                                                                        </span>
-                                                            </ReactTooltip>
-                                                        </IconContext.Provider>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        }
-
+                                                        <ReactTooltip id='copyIDInfo' type='info'
+                                                                        effect='solid'>
+                                                                    <span>
+                                                                        Copy Offer ID
+                                                                    </span>
+                                                        </ReactTooltip>
+                                                    </h2>
+                                                <hr className="border border-primary w-100"></hr>
+                                                <div className="h-25 oflow-y-auto">
+                                                    <p>{this.state.show_purchase_offer_data.description.toUpperCase()}</p>
+                                                </div>
 
                                         <Form.Group as={Row}>
                                             <Form.Label column sm={3}>
-                                                Mixins
-                                                <IconContext.Provider value={{color: 'black', size: '20px'}}>
-                                                    <FaInfoCircle data-tip data-for='apiInfo'
-                                                                    className="blockchain-icon mx-4"/>
-
-                                                    <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                                <span>
-                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                    They are combined with yours for private transactions.<br/>
-                                                                    Changing this from the default could hurt your privacy.<br/>
-                                                                </span>
-                                                    </ReactTooltip>
-                                                </IconContext.Provider>
+                                                {this.state.show_purchase_offer.quantity} available
                                             </Form.Label>
                                             <Col sm={9}>
                                                 <Form.Control
-                                                    name="mixins"
-                                                    as="select"
-                                                    defaultValue="7"
-                                                >
-                                                    <option>1</option>
-                                                    <option>2</option>
-                                                    <option>3</option>
-                                                    <option>4</option>
-                                                    <option>5</option>
-                                                    <option>6</option>
-                                                    <option>7</option>
-                                                </Form.Control>
+                                                    className="light-blue-back"
+                                                    id="quantity"
+                                                    name="quantity"
+                                                    max={this.state.show_purchase_offer.quantity}
+                                                />
                                             </Col>
                                         </Form.Group>
-
-                                        {this.state.showLoader ?
-                                            (<Loader
-                                                className="justify-content-center align-content-center"
-                                                type="Bars"
-                                                color="#00BFFF"
-                                                height={50}
-                                                width={50}
-                                            />)
-                                            :
-                                            (<Button
-                                                size="lg"
-                                                className="mt-2"
-                                                type="submit"
-                                                variant="success"
-                                            >
-                                                Confirm Payment
-                                            </Button>)
+                                        {this.state.show_purchase_offer_data.nft ? 
+                                            (<Form.Group as={Row}>   
+                                                <Form.Label column sm={4}>
+                                                    NFT Ethereum Address
+                                                </Form.Label>
+                                                <Col sm={6}>
+                                                    <Form.Control name="eth_address" rows="3"/>
+                                                </Col>
+                                            </Form.Group>) 
+                                        : 
+                                            ''}
+                                        {this.state.show_purchase_offer_data.shipping ? 
+                                        (<div>
+                                            <Form.Group name="names" as={Row}>
+                                        
+                                            <Form.Label column sm={4}>
+                                                First Name
+                                            </Form.Label>
+                                            <Col sm={6}>
+                                                <Form.Control name="first_name" rows="3"/>
+                                            </Col>
+                                       
+                                            <Form.Label column sm={4}>
+                                                Last Name
+                                            </Form.Label>
+                                            <Col sm={6}>
+                                                <Form.Control name="last_name" rows="3"/>
+                                            </Col>
+                                            
+                                        
+                                            
+                                        </Form.Group>
+                                            <Form.Group name="streets" as={Row}>
+                                                <Form.Label column sm={4}>
+                                                Address Line 1
+                                                </Form.Label>
+                                                <Col sm={6}>
+                                                    <Form.Control name="address1" rows="3"/>
+                                                </Col>
+                                                <Form.Label column sm={4}>
+                                                    Address Line 2
+                                                </Form.Label>
+                                                <Col sm={6}>
+                                                    <Form.Control name="address2" rows="3"/>
+                                                </Col>
+                                            </Form.Group>
+                                            <Form.Group name="place" as={Row}>
+                                                <Form.Label column sm={4}>
+                                                    City
+                                                </Form.Label>
+                                                <Col sm={6}>
+                                                    <Form.Control name="city" rows="3"/>
+                                                </Col>
+                                                <Form.Label column sm={4}>
+                                                    State/County
+                                                </Form.Label>
+                                                <Col sm={6}>
+                                                    <Form.Control name="state" rows="3"/>
+                                                </Col>
+                                            </Form.Group>
+                                            <Form.Group name="countrycodes" as={Row}>
+                                                <Form.Label column sm={4}>
+                                                    Zip/Area Code
+                                                </Form.Label>
+                                                <Col sm={6}>
+                                                    <Form.Control name="zipcode" rows="3"/>
+                                                </Col>
+                                                <Form.Label column sm={4}>
+                                                    Country
+                                                </Form.Label>
+                                                <Col sm={6}>
+                                                    <Form.Control name="country" rows="3"/>
+                                                </Col>
+                                            </Form.Group>
+                                            <Form.Group as={Row}>
+                                                <Form.Label column sm={4}>
+                                                    Email
+                                                </Form.Label>
+                                                <Col sm={6}>
+                                                    <Form.Control name="email_address" rows="3"/>
+                                                </Col>
+                                                <Form.Label column sm={4}>
+                                                    Phone
+                                                </Form.Label>
+                                                <Col sm={6}>
+                                                    <Form.Control name="phone_number" rows="3"/>
+                                                </Col>
+                                            </Form.Group></div>) : ''}
+                                        {this.state.show_purchase_offer_data.open_message ? 
+                                            <Form.Group as={Row}>
+                                                <Form.Label column sm={4}>
+                                                    NFT Ethereum Address
+                                                </Form.Label>
+                                                <Col sm={6}>
+                                                    <Form.Control name="message" rows="3"/>
+                                                </Col>
+                                            </Form.Group> 
+                                        : 
+                                            ''
                                         }
-                                    </Form>
-                                </Modal.Body>
-                                <Modal.Footer className="align-self-start">
+                                        </div>
+                                    
 
-                                    <Button size="lg" variant="danger" onClick={this.handleClosePurchaseForm}>
-                                        Close
-                                    </Button>
-                                </Modal.Footer>
-                            </Modal>
+
+                                    <Form.Group as={Row} className="w-50">
+                                        <Form.Label column sm={3}>
+                                            Mixins
+                                            <IconContext.Provider value={{color: 'black', size: '20px'}}>
+                                                <FaInfoCircle data-tip data-for='apiInfo'
+                                                                className="blockchain-icon mx-4"/>
+
+                                                <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                            <span>
+                                                                Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                They are combined with yours for private transactions.<br/>
+                                                                Changing this from the default could hurt your privacy.<br/>
+                                                            </span>
+                                                </ReactTooltip>
+                                            </IconContext.Provider>
+                                        </Form.Label>
+                                        <Col sm={9}>
+                                            <Form.Control
+                                                name="mixins"
+                                                as="select"
+                                                defaultValue="7"
+                                            >
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                                <option>5</option>
+                                                <option>6</option>
+                                                <option>7</option>
+                                            </Form.Control>
+                                        </Col>
+                                    </Form.Group>
+
+                                    {this.state.showLoader ?
+                                        <Loader
+                                            className="justify-content-center align-content-center"
+                                            type="Bars"
+                                            color="#00BFFF"
+                                            height={50}
+                                            width={50}
+                                        />
+                                        :
+                                        <button>
+                                            Buy
+                                        </button>
+                                    }
+                                </Form>
+
+                                <Button className="close-button" onClick={this.handleClosePurchaseForm}>
+                                    Close
+                                </Button>
+                            </ReactModal>
+                                    :
+                                    ''
+                                    } 
 
                             <Modal className="purchase-offer-modal text-align-center" animation={false}
                                     centered
@@ -3229,7 +3191,7 @@ class WalletHome extends React.Component {
                                                     }
                                                 </Col>
                                             </Row>
-                                        </ReactModal>  
+                                        </ReactModal> 
 
                                     <Row className="staking-table-row">
                                         <p>Title</p>
@@ -4065,32 +4027,34 @@ class WalletHome extends React.Component {
                                                     />
                                                 </Form.Group>
 
-                                                <Form.Row md="8">
-                                                    <Form.Group as={Col}>
-                                                        <Form.Label>Shipping</Form.Label>
+                                                <Row className="w-100 justify-content-around my-3">
+                                                    <Form.Check
+                                                        label="Shipping"
+                                                        checked={this.state.shipping_switch}
+                                                        onChange={this.change_shipping_switch} 
+                                                        type="switch" 
+                                                        id="shipping-switch" 
+                                                        name="shipping" 
+                                                    />
 
-                                                        <Form.Check
-                                                            checked={this.state.shipping_switch}
-                                                            onChange={this.change_shipping_switch} type="switch" id="shipping-switch2" name="shipping" />
-                                                    </Form.Group>
-                                                    <Form.Group as={Col}>
-                                                        <Form.Label>NFT</Form.Label>
-
-                                                        <Form.Check
-                                                            checked={this.state.nft_switch}
-                                                            onChange={this.change_nft_switch} type="switch" id="nft-switch2" name="nft" />
-                                                    </Form.Group>
-
-                                                    <Form.Group as={Col}>
-                                                        <Form.Label>open messages</Form.Label>
-
-                                                        <Form.Check
-                                                            checked={this.state.open_message_switch}
-                                                            onChange={this.change_open_message_switch} type="switch" id="open-switch2" name="open_message" />
-                                                    </Form.Group>
-                                                </Form.Row>
-
-
+                                                    <Form.Check
+                                                        label="NFT"
+                                                        checked={this.state.nft_switch}
+                                                        onChange={this.change_nft_switch} 
+                                                        type="switch" 
+                                                        id="nft-switch" 
+                                                        name="nft" 
+                                                    />
+                                                    
+                                                    <Form.Check
+                                                        label="Open Messages"
+                                                        checked={this.state.open_message_switch}
+                                                        onChange={this.change_open_message_switch} 
+                                                        type="switch" 
+                                                        id="open-switch" 
+                                                        name="open_message" 
+                                                    />
+                                                </Row>
                                             </Form.Row>
 
 

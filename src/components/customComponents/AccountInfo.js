@@ -53,11 +53,14 @@ export default function AccountInfo(props) {
                 </IconContext.Provider>
 
                 <div className="show-keys-password-box">
-                    <h1 className="password-header">To see your <b>Private Keys</b> please enter your password:</h1>
+                   {/* <h1 className="password-header">To see your <b>Private Keys</b> please enter your password:</h1>
                     
                     <input type="password" className="show-keys-password"/>
+                */}
+                    <button className="m-5" onClick={props.handleShow}>Open</button>
 
-                    <button onClick={props.handleShow}>click</button>
+                    <button className="m-5" onClick={props.handleKeyRequest}>Close</button>
+                    
                 </div>
                     
 
