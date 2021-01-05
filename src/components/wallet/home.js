@@ -2458,6 +2458,7 @@ class WalletHome extends React.Component {
                                     tokenBalance={this.state.tokens}
                                     pendingCash={this.state.pending_cash}
                                     pendingTokens={this.state.pending_tokens}
+                                    walletHeight={this.state.wallet_height}
                                 />
 
                                 <SendSafex 
@@ -3012,6 +3013,7 @@ class WalletHome extends React.Component {
                                     tokenBalance={this.state.tokens}
                                     pendingCash={this.state.pending_cash}
                                     pendingTokens={this.state.pending_tokens}
+                                    walletHeight={this.state.wallet_height}
                                 />
                             </Col>
 
@@ -3348,6 +3350,7 @@ class WalletHome extends React.Component {
                                         tokenBalance={this.state.tokens}
                                         pendingCash={this.state.pending_cash}
                                         pendingTokens={this.state.pending_tokens}
+                                        walletHeight={this.state.wallet_height}
                                     />
 
                                     <MerchantTabs
@@ -4176,6 +4179,7 @@ class WalletHome extends React.Component {
                                     tokenBalance={this.state.tokens}
                                     pendingCash={this.state.pending_cash}
                                     pendingTokens={this.state.pending_tokens}
+                                    walletHeight={this.state.wallet_height}
                                 />
 
                                 <SendSafex 
