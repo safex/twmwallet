@@ -23,16 +23,15 @@ export default function HomeInfo(props) {
                                     ('∞')
                     }
                     <br/>
-
                     {props.pendingCash > 0 ? `(${props.pendingCash.toLocaleString()} SFX Pending)` : ''}
-
+                    <br/>
+                    <br/>
                     SAFEX TOKENS: &nbsp;{ props.firstRefresh === true ?
                                 (props.tokenBalance.toLocaleString() + ' SFT')
                                 :
                                 ('∞')
                     }
                     <br/>
-
                     {props.pendingTokens > 0 ? `(${props.pendingTokens.toLocaleString()} SFT Pending)` : ''}
                 </h2>
                 
