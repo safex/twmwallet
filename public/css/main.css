@@ -198,3 +198,9 @@
     }
 
 /* Custom Components End */
+
+
+
+.tx-row:nth-of-type(even){
+    background: lightblue;
+  }

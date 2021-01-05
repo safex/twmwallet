@@ -28,11 +28,11 @@ export default class Settings extends React.Component {
         let txn_history_table_data = this.props.history.map((txn, key) => {
             console.log(txn);
             return (
-                <tr key={key}>
+                <tr className="tx-row" key={key}>
                     <td>{txn.id}</td>
                     <td>{txn.direction}</td>
                     <td>{txn.pending}</td>
-                    <td>{txn.tokenAmount > 0 ? (`${txn.tokenAmount / 10000000000} sft`) : (`${txn.amount / 10000000000} sfx`)}</td>
+                    <td>{txn.tokenAmount > 0 ? (`${txn.tokenAmount / 10000000000} SFT`) : (`${txn.amount / 10000000000} SFX`)}</td>
                     <td>{txn.fee / 10000000000}</td>
                     <td>{txn.blockHeight}</td>
                     <td>{txn.confirmations}</td>
@@ -41,7 +41,15 @@ export default class Settings extends React.Component {
         });
         console.log(txn_history_table_data);
         return (
-            <div style={{position: 'relative'}}>
+            <div  
+                style={{
+                    position: 'relative', 
+                    fontFamily: 'Inter', 
+                    fontSize: '1.5rem', 
+                    whiteSpace: 'nowrap',
+                    maxHeight: '90vh',
+                    overflowY: 'auto'
+                }}>
                 <Container>
 
                     <Row>
@@ -49,7 +57,6 @@ export default class Settings extends React.Component {
                         </Col>
                         <Col>
                         </Col>
-
                     </Row>
 
 
@@ -57,13 +64,13 @@ export default class Settings extends React.Component {
                         <Table>
                             <thead>
                             <tr>
-                                <th>txid</th>
-                                <th>in/out</th>
-                                <th>pending?</th>
-                                <th>amount</th>
-                                <th>fee (sfx)</th>
-                                <th>blockheight</th>
-                                <th>confirmations</th>
+                                <th>TXID</th>
+                                <th>In/Out</th>
+                                <th>Pending?</th>
+                                <th>Amount</th>
+                                <th>Fee (SFX)</th>
+                                <th>Blockheight</th>
+                                <th>Confirmations</th>
                             </tr>
                             </thead>
 

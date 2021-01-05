@@ -403,8 +403,9 @@ class WalletHome extends React.Component {
 
 
         e.preventDefault();
-        let confirm = window.confirm(`are you sure you want to remove ${user} you should only do this if you
-        think that the transaction to register the account did not go through, keep in mind this is irreversible`)
+        let confirm = window.confirm(`Are you sure you want to remove ${user}? 
+        You should only do this if you think that the transaction to register the account did not go through. 
+        Keep in mind this is IRREVERSABLE!`)
         if (confirm) {
             try {
                 let removed = wallet.removeSafexAccount(user);
@@ -737,7 +738,7 @@ class WalletHome extends React.Component {
         try {
             let mixins = e.target.mixins.value - 1;
             if (mixins >= 0) {
-                let confirmed = window.confirm(`are you sure you want to send ${e.target.amount.value} SFT Safex Tokens, to ${e.target.destination.value}`);
+                let confirmed = window.confirm(`Are you sure you want to send ${e.target.amount.value} SFT (Safex Tokens), to ${e.target.destination.value}`);
                 console.log(confirmed);
                 if (confirmed) {
                     try {
@@ -761,7 +762,7 @@ class WalletHome extends React.Component {
                                 } catch (err) {
                                     console.error(err);
                                     console.error(`error when trying to commit the token transaction to the blockchain`);
-                                    alert(`error when trying to commit the token transaction to the blockchain`);
+                                    alert(`Error when trying to commit the token transaction to the blockchain`);
                                 }
                             } else {
                                 console.log(`token transaction cancelled`);
@@ -773,14 +774,14 @@ class WalletHome extends React.Component {
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the token transaction formation it was not committed`);
-                        alert(`error at the token transaction formation it was not committed`);
+                        alert(`Error at the token transaction formation it was not committed`);
                     }
                 }
             }
         } catch (err) {
             console.error(err);
             if (err.toString().startsWith('not enough outputs')) {
-                alert(`choose fewer mixins`);
+                alert(`Choose fewer mixins`);
             }
             console.error(`error at the token transaction`);
         }
@@ -793,7 +794,7 @@ class WalletHome extends React.Component {
                     if (err) {
                         console.error(err);
                         console.error(`error at the token transaction send`);
-                        alert(`error at the token transaction send`);
+                        alert(`Error at the token transaction send`);
                         alert(err);
                         reject(err);
                     } else {
@@ -817,10 +818,10 @@ class WalletHome extends React.Component {
                         alert(err);
                         reject(err);
                     } else {
-                        alert(`token transaction successfully submitted 
-                                        transaction id: ${this.state.token_txn_id}
-                                        amount: ${this.state.token_txn_amount} SFT
-                                        fee: ${this.state.token_txn_fee / 10000000000} SFX`);
+                        alert(`Token transaction successfully submitted 
+                                        Transaction id: ${this.state.token_txn_id}
+                                        Amount: ${this.state.token_txn_amount} SFT
+                                        Fee: ${this.state.token_txn_fee / 10000000000} SFX`);
                         resolve(res);
                     }
                 });
@@ -836,7 +837,7 @@ class WalletHome extends React.Component {
         try {
             let mixins = e.target.mixins.value - 1;
             if (mixins >= 0) {
-                let confirmed = window.confirm(`are you sure you want to send ${e.target.amount.value} SFX Safex Cash, ` +
+                let confirmed = window.confirm(`Are you sure you want to send ${e.target.amount.value} SFX (Safex Cash), ` +
                     `to ${e.target.destination.value}`);
                 console.log(confirmed);
                 if (confirmed) {
@@ -847,7 +848,7 @@ class WalletHome extends React.Component {
                         });
                         let s_cash = await this.send_cash_async(wallet, e.target.destination.value.trim(), e.target.amount.value, mixins);
                         console.log(s_cash);
-                        let confirmed_fee = window.confirm(`the fee to send this transaction will be:  ${s_cash.fee() / 10000000000} SFX Safex Cash 
+                        let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${s_cash.fee() / 10000000000} SFX (Safex Cash) 
             sending ${this.state.cash_txn_amount} SFX to ${this.state.cash_txn_destination}`);
                         let fee = s_cash.fee();
                         let txid = s_cash.transactionsIds();
@@ -867,15 +868,15 @@ class WalletHome extends React.Component {
                         }
                     } catch (err) {
                         console.error(err);
-                        console.error(`error at the cash transaction formation it was not committed`);
-                        alert(`error at the cash transaction formation it was not committed`);
+                        console.error(`Error at the cash transaction formation it was not committed`);
+                        alert(`Error at the cash transaction formation it was not committed`);
                     }
                 }
             }
         } catch (err) {
             console.error(err);
-            if (err.toString().startsWith('not enough outputs')) {
-                alert(`choose fewer mixins`);
+            if (err.toString().startsWith('ot enough outputs')) {
+                alert(`Choose fewer mixins`);
             }
             console.error(`error at the cash transaction`);
         }
@@ -1325,14 +1326,14 @@ class WalletHome extends React.Component {
         try {
             let mixins = e.target.mixins.value - 1;
             if (mixins >= 0) {
-                let confirmed = window.confirm(`are you sure you want to stake ${e.target.amount.value} SFT Safex Tokens?`);
+                let confirmed = window.confirm(`Are you sure you want to stake ${e.target.amount.value} SFT Safex Tokens?`);
                 console.log(confirmed);
                 if (confirmed) {
                     try {
                         this.setState({stake_txn_amount: e.target.amount.value});
 
                         let staked_token = await this.token_stake_async(wallet, e.target.amount.value, mixins);
-                        let confirmed_fee = window.confirm(`the network fee to stake ${this.state.stake_txn_amount} SFT will be:  ${staked_token.fee() / 10000000000} SFX Safex Cash`);
+                        let confirmed_fee = window.confirm(`The network fee to stake ${this.state.stake_txn_amount} SFT will be:  ${staked_token.fee() / 10000000000} SFX (Safex Cash)`);
                         let fee = staked_token.fee();
                         let txid = staked_token.transactionsIds();
                         this.setState({stake_txn_id: txid, stake_txn_fee: fee});
@@ -1418,13 +1419,13 @@ class WalletHome extends React.Component {
         try {
             let mixins = e.target.mixins.value - 1;
             if (mixins >= 0) {
-                let confirmed = window.confirm(`are you sure you want to stake ${e.target.amount.value} SFT Safex Tokens?`);
+                let confirmed = window.confirm(`Are you sure you want to stake ${e.target.amount.value} SFT Safex Tokens?`);
                 console.log(confirmed);
                 if (confirmed) {
                     try {
                         this.setState({unstake_txn_amount: e.target.amount.value});
                         let unstaked = await this.token_unstake_async(wallet, e.target.amount.value, mixins);
-                        let confirmed_fee = window.confirm(`the network fee to unstake ${this.state.unstake_txn_amount} SFT will be:  ${unstaked.fee() / 10000000000} SFX Safex Cash`);
+                        let confirmed_fee = window.confirm(`The network fee to unstake ${this.state.unstake_txn_amount} SFT will be:  ${unstaked.fee() / 10000000000} SFX Safex Cash`);
                         let fee = unstaked.fee();
                         let txid = unstaked.transactionsIds();
                         if (confirmed_fee) {
@@ -1436,8 +1437,8 @@ class WalletHome extends React.Component {
 
                             } catch (err) {
                                 console.error(err);
-                                console.error(`error when trying to commit the token unstaking transaction to the blockchain`);
-                                alert(`error when trying to commit the token unstaking transaction to the blockchain`);
+                                console.error(`Error when trying to commit the token unstaking transaction to the blockchain`);
+                                alert(`Error when trying to commit the token unstaking transaction to the blockchain`);
                             }
                         } else {
                             console.log("token staking transaction cancelled");
@@ -2728,7 +2729,7 @@ class WalletHome extends React.Component {
                                     }
                                 }}
                             >  
-                                <h1>Purchase {this.state.show_purchase_offer.title.toUpperCase()}</h1>
+                                <h1>PURCHASE {this.state.show_purchase_offer.title.toUpperCase()}</h1>
                                 
 
                                 <Form id="purchase_item"
@@ -2779,126 +2780,111 @@ class WalletHome extends React.Component {
                                                 />
                                             </Col>
                                         </Form.Group>
-                                        {this.state.show_purchase_offer_data.nft ? (<Form.Group as={Row}>
-                                            <Form.Label column sm={3}>
-                                                NFT Ethereum Address
+                                        {this.state.show_purchase_offer_data.nft ? 
+                                            (<Form.Group as={Row}>   
+                                                <Form.Label column sm={4}>
+                                                    NFT Ethereum Address
+                                                </Form.Label>
+                                                <Col sm={6}>
+                                                    <Form.Control name="eth_address" rows="3"/>
+                                                </Col>
+                                            </Form.Group>) 
+                                        : 
+                                            ''}
+                                        {this.state.show_purchase_offer_data.shipping ? 
+                                        (<div>
+                                            <Form.Group name="names" as={Row}>
+                                        
+                                            <Form.Label column sm={4}>
+                                                First Name
                                             </Form.Label>
-                                            <Col sm={9}>
-                                                <Form.Control name="eth_address" rows="3"/>
-                                            </Col>
-                                        </Form.Group>) : ''}
-                                        {this.state.show_purchase_offer_data.shipping ? (<div><Form.Group name="names" as={Row}>
-                                            <Form.Label column sm={3}>
-                                                first name
-                                            </Form.Label>
-                                            <Col sm={4}>
+                                            <Col sm={6}>
                                                 <Form.Control name="first_name" rows="3"/>
                                             </Col>
-                                            <Form.Label column sm={3}>
-                                                last name
+                                       
+                                            <Form.Label column sm={4}>
+                                                Last Name
                                             </Form.Label>
-                                            <Col sm={4}>
+                                            <Col sm={6}>
                                                 <Form.Control name="last_name" rows="3"/>
                                             </Col>
+                                            
+                                        
+                                            
                                         </Form.Group>
                                             <Form.Group name="streets" as={Row}>
-                                                <Form.Label column sm={3}>
+                                                <Form.Label column sm={4}>
                                                 Address Line 1
                                                 </Form.Label>
-                                                <Col sm={4}>
+                                                <Col sm={6}>
                                                     <Form.Control name="address1" rows="3"/>
                                                 </Col>
-                                                <Form.Label column sm={3}>
+                                                <Form.Label column sm={4}>
                                                     Address Line 2
                                                 </Form.Label>
-                                                <Col sm={4}>
+                                                <Col sm={6}>
                                                     <Form.Control name="address2" rows="3"/>
                                                 </Col>
                                             </Form.Group>
                                             <Form.Group name="place" as={Row}>
-                                                <Form.Label column sm={3}>
+                                                <Form.Label column sm={4}>
                                                     City
                                                 </Form.Label>
-                                                <Col sm={4}>
+                                                <Col sm={6}>
                                                     <Form.Control name="city" rows="3"/>
                                                 </Col>
-                                                <Form.Label column sm={3}>
+                                                <Form.Label column sm={4}>
                                                     State/County
                                                 </Form.Label>
-                                                <Col sm={4}>
+                                                <Col sm={6}>
                                                     <Form.Control name="state" rows="3"/>
                                                 </Col>
                                             </Form.Group>
                                             <Form.Group name="countrycodes" as={Row}>
-                                                <Form.Label column sm={3}>
+                                                <Form.Label column sm={4}>
                                                     Zip/Area Code
                                                 </Form.Label>
-                                                <Col sm={4}>
+                                                <Col sm={6}>
                                                     <Form.Control name="zipcode" rows="3"/>
                                                 </Col>
-                                                <Form.Label column sm={3}>
+                                                <Form.Label column sm={4}>
                                                     Country
                                                 </Form.Label>
-                                                <Col sm={4}>
+                                                <Col sm={6}>
                                                     <Form.Control name="country" rows="3"/>
                                                 </Col>
                                             </Form.Group>
                                             <Form.Group as={Row}>
-                                                <Form.Label column sm={3}>
+                                                <Form.Label column sm={4}>
                                                     Email
                                                 </Form.Label>
-                                                <Col sm={4}>
+                                                <Col sm={6}>
                                                     <Form.Control name="email_address" rows="3"/>
                                                 </Col>
-                                                <Form.Label column sm={3}>
+                                                <Form.Label column sm={4}>
                                                     Phone
                                                 </Form.Label>
-                                                <Col sm={4}>
+                                                <Col sm={6}>
                                                     <Form.Control name="phone_number" rows="3"/>
                                                 </Col>
                                             </Form.Group></div>) : ''}
                                         {this.state.show_purchase_offer_data.open_message ? 
                                             <Form.Group as={Row}>
-                                                <Form.Label column sm={3}>
+                                                <Form.Label column sm={4}>
                                                     NFT Ethereum Address
                                                 </Form.Label>
-                                                <Col sm={9}>
+                                                <Col sm={6}>
                                                     <Form.Control name="message" rows="3"/>
                                                 </Col>
                                             </Form.Group> 
                                         : 
                                             ''
                                         }
-
-
-                                            <ul>
-                                                <li>Price: {this.state.show_purchase_offer.price} SFX</li>
-                                                <li>Seller: {this.state.show_purchase_offer.seller}</li>
-                                                <li>
-                                                    Offer ID: {this.state.show_purchase_offer.offerID}
-
-                                                    <IconContext.Provider
-                                                        value={{color: 'black', size: '20px'}}>
-                                                        <FaCopy
-                                                            className="ml-4"
-                                                            data-tip data-for='copyIDInfo'
-                                                            onClick={() => copy(this.state.show_purchase_offer.offerID)}
-                                                        />
-
-                                                        <ReactTooltip id='copyIDInfo' type='info'
-                                                                        effect='solid'>
-                                                                    <span>
-                                                                        Copy Offer ID
-                                                                    </span>
-                                                        </ReactTooltip>
-                                                    </IconContext.Provider>
-                                                </li>
-                                            </ul>
                                         </div>
                                     
 
 
-                                    <Form.Group as={Row}>
+                                    <Form.Group as={Row} className="w-50">
                                         <Form.Label column sm={3}>
                                             Mixins
                                             <IconContext.Provider value={{color: 'black', size: '20px'}}>
