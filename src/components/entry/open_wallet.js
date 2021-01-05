@@ -66,8 +66,9 @@ export default class OpenWallet extends React.Component {
                 } else if (sails_path.includes('.twm')) {
                     ipath = sails_path.substring(0, sails_path.length - 4);
                 } else {
-                    ipath = this.state.new_path;
+                    ipath = sails_path;
                 }
+                console.log(sails_path);
                 console.log(ipath);
                 this.setState({new_path: ipath});
             }
