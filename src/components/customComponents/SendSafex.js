@@ -18,7 +18,8 @@ export default function SendSafex(props) {
 
             <form className={`send-safex-box ${props.style}`} id={props.id} onSubmit={props.send}>
 
-                <p className> 
+                <div className>
+
                     { props.title }
 
                     <IconContext.Provider  value={{color: '#767676', size: '25px'}}>
@@ -44,7 +45,8 @@ export default function SendSafex(props) {
                             </span>
                         </ReactTooltip>
                     </IconContext.Provider>
-                </p>
+
+                </div>
                     
                 <input
                     name="destination"
