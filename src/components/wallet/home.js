@@ -2418,33 +2418,7 @@ class WalletHome extends React.Component {
                         handleEditOfferForm={() => this.handleShowEditOfferForm(listing)}
                         handleShowOrders={this.handleMyOrders}
                         toEllipsis={this.to_ellipsis}
-                    >
-{/*
-                    <p>{listing.title}</p>
-                    <p>{listing.price / 10000000000}</p>
-                    <p>{listing.quantity}</p>
-                    <p>{listing.seller}</p>
-                    <p>{listing.offerID}</p>
-                    <p>
-
-                        <button
-                            onClick={() => this.handleShowEditOfferForm(listing)}
-                            className="mx-2"
-                        >
-                            Edit
-                        </button>
-
-                        
-
-                        <button
-                            onClick={this.handleMyOrders}
-                            className="mx-2"
-                        >
-                            Orders
-                        </button> 
-                    </p>
-                */}
-                    </OfferTableRow>
+                    />
                 )
 
             }
