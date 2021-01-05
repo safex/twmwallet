@@ -128,6 +128,7 @@ class WalletHome extends React.Component {
             open_message_switch: false,
             showMessages: false,
             currentMessage: {},
+            offersLoaded: false,
         };
     }
 
@@ -973,7 +974,8 @@ class WalletHome extends React.Component {
             this.setState({
                 twm_offers: twm_offers,
                 interface_view: 'market',
-                offer_loading_flag: 'blockchaintwmoffers'
+                offer_loading_flag: 'blockchaintwmoffers',
+                offersLoaded: true,
 
             });
         }, 500);
@@ -2726,7 +2728,8 @@ class WalletHome extends React.Component {
                     return (
                         <div className="">
 
-                            <ReactModal 
+                            {this.state.show_purchase_form ?
+                                <ReactModal 
                                 isOpen={this.state.show_purchase_form}
                                 closeTimeoutMS={500}
                                 className="keys-modal"
@@ -2757,7 +2760,7 @@ class WalletHome extends React.Component {
                                 <Form id="purchase_item"
                                         onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
 
-                                        <div className="d-flex flex-row justify-content-around p-3">
+                                        <div className="d-flex flex-column justify-content-around p-3">
                                             <Image className="border border-dark"
                                                     src={this.state.show_purchase_offer_data.main_image}></Image>
 
@@ -2789,7 +2792,6 @@ class WalletHome extends React.Component {
                                                     <p>{this.state.show_purchase_offer_data.description.toUpperCase()}</p>
                                                 </div>
 
-                                            <h3>{this.state.show_purchase_offer.title}</h3>
                                         <Form.Group as={Row}>
                                             <Form.Label column sm={3}>
                                                 {this.state.show_purchase_offer.quantity} available
@@ -2894,7 +2896,6 @@ class WalletHome extends React.Component {
                                             ''
                                         }
 
-                                            <hr className="border border-dark w-100"></hr>
 
                                             <ul>
                                                 <li>Price: {this.state.show_purchase_offer.price} SFX</li>
@@ -2920,7 +2921,7 @@ class WalletHome extends React.Component {
                                                 </li>
                                             </ul>
                                         </div>
-                                    }
+                                    
 
 
                                     <Form.Group as={Row}>
@@ -2957,22 +2958,17 @@ class WalletHome extends React.Component {
                                     </Form.Group>
 
                                     {this.state.showLoader ?
-                                        (<Loader
+                                        <Loader
                                             className="justify-content-center align-content-center"
                                             type="Bars"
                                             color="#00BFFF"
                                             height={50}
                                             width={50}
-                                        />)
+                                        />
                                         :
-                                        (<Button
-                                            size="lg"
-                                            className="mt-2"
-                                            type="submit"
-                                            variant="success"
-                                        >
-                                            Confirm Payment
-                                        </Button>)
+                                        <button>
+                                            Buy
+                                        </button>
                                     }
                                 </Form>
 
@@ -2980,6 +2976,9 @@ class WalletHome extends React.Component {
                                     Close
                                 </Button>
                             </ReactModal>
+                                    :
+                                    ''
+                                    } 
 
                             <Modal className="purchase-offer-modal text-align-center" animation={false}
                                     centered
@@ -3229,7 +3228,7 @@ class WalletHome extends React.Component {
                                                     }
                                                 </Col>
                                             </Row>
-                                        </ReactModal>  
+                                        </ReactModal> 
 
                                     <Row className="staking-table-row">
                                         <p>Title</p>

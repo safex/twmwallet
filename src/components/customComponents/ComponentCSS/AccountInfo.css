@@ -95,6 +95,11 @@
     color: #767667;
     font-family: 'Inter';
 
+
+}
+
+.keys-modal::-webkit-scrollbar {
+    display: none;
 }
 
 .keys-modal h1 {
