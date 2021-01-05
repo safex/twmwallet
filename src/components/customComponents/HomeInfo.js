@@ -24,7 +24,7 @@ export default function HomeInfo(props) {
                     }
                     <br/>
 
-                    {props.penndingCash > 0 ? `(${props.pendingCash.toLocaleString()} SFX Pending)` : ''}
+                    {props.pendingCash > 0 ? `(${props.pendingCash.toLocaleString()} SFX Pending)` : ''}
 
                     SAFEX TOKENS: &nbsp;{ props.firstRefresh === true ?
                                 (props.tokenBalance.toLocaleString() + ' SFT')
