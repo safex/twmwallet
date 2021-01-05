@@ -1095,7 +1095,10 @@ class WalletHome extends React.Component {
 
     //show modal of private keys
     handleKeys = () => {
-        this.setState({show_keys: !this.state.show_keys, keyRequest: false});
+        this.setState({show_keys: !this.state.show_keys});
+        if (this.state.show_keys === false) {
+            this.setState({keyRequest: true})
+        }
     };
 
     //close modal of New Offer

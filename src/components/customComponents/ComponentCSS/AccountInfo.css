@@ -51,7 +51,7 @@
 .show-keys-password-box {
     display: flex;
     flex-direction: column;
-    width: fit-content;
+    width: 50%;
     margin: auto;
 }
 
