@@ -1,0 +1,120 @@
+.stake-token-box {
+    height: 50vh;
+    max-height: 600px;
+    width: 18vw;
+    border-radius: 50px;
+    padding: 2rem .5rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    background-color: white;
+    font-family: 'Inter';
+    font-size: 2rem;
+    font-style: normal;
+    font-weight: 500;
+    color: #767676;
+    box-shadow: var(--blue-box-shadow);
+}
+
+
+.stake-token-box input {
+    text-align: center!important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.stake-token-box p {
+    font-family: 'Inter';
+    font-size: 2rem;
+    font-style: normal;
+    font-weight: 700;
+    text-align: center;
+    color: #767676;
+    margin: 0;
+}
+
+.stake-token-box h5 {
+    font-family: 'Inter';
+    font-size: 1.8rem;
+    font-style: normal;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.stake-label-div {
+    width: 90%;
+    
+}
+
+.stake-token-box label {
+    margin: 0!important;
+    font-weight: 500!important;
+}
+
+.stake-token-box input, select {
+    height: 4rem;
+
+    border-radius: 10px;
+    background: white;
+}
+
+
+.stake-token-box select, input {
+    border: 3px solid #3698F3;
+}
+
+h5 + select {
+    width: 100%;
+}
+
+.mixins-label {
+    width: 70%;
+    border: 3px solid #3698F3;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.mixins-label + select {
+    padding-left: 1rem;
+}
+
+.stake-token-box input {
+    width: 100%;
+}
+
+.stake-token-box .row {
+    width: 90%;
+    justify-content: space-between;
+}
+
+.custom-button-send {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: 'Inter', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 10px;
+
+    color:#fff;
+    padding: .5rem;
+    border: .5rem solid #3698F3;
+    border-radius: 10px;
+    background: linear-gradient(270deg, #3698F3 0%, #13D0FD 100%);
+}
+
+.custom-button-send:hover {
+    background: linear-gradient(270deg, #13D0FD 0%, #3698F3 100%);
+    border: .5rem solid #3698F3;
+}
+
+
+.stake-token-box > * {
+    margin-bottom: 3rem;
+} 

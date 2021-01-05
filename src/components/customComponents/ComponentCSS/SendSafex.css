@@ -1,0 +1,144 @@
+.send-safex-box {
+    height: 50vh;
+    max-height: 600px;
+    width: 18vw;
+    border-radius: 50px;
+    padding: 2rem .5rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    background-color: white;
+    font-family: 'Inter';
+    font-size: 2rem;
+    font-style: normal;
+    font-weight: 500;
+    color: #767676;
+}
+
+.send-safex-box.token {
+    box-shadow: var(--blue-box-shadow);
+}
+
+.cash {
+    box-shadow: var(--green-box-shadow);
+}
+
+.send-safex-box input {
+
+    text-align: center!important;
+}
+
+.send-safex-box p {
+    font-family: 'Inter';
+    font-size: 3rem;
+    font-style: normal;
+    font-weight: 700;
+    text-align: center;
+    color: #767676;
+    margin: 0;
+}
+
+.send-safex-box label {
+    margin: 0!important;
+    font-weight: 500!important;
+}
+
+.send-safex-box > input {
+    height: 4rem;
+
+    border-radius: 10px;
+    background: white;
+}
+
+.send-safex-box > select {
+    height: 4rem;
+
+    border-radius: 10px;
+    background: white;
+}
+
+.send-safex-box.cash select {
+    border: 3px solid #54E9B7;
+}
+
+.send-safex-box.cash input {
+    border: 3px solid #54E9B7;
+}
+
+.send-safex-box.token input {
+    border: 3px solid #3698F3;
+}
+
+.send-safex-box.token select {
+    border: 3px solid #3698F3;
+}
+
+.mixins-label.cash {
+    width: 70%;
+    border: 3px solid #54E9B7;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.mixins-label.token {
+    width: 70%;
+    border: 3px solid #3698F3;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.send-safex-box input {
+    width: 90%;
+}
+
+.send-safex-box .row {
+    width: 90%;
+    justify-content: space-between;
+}
+
+.custom-button-send {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: 'Inter', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 10px;
+
+    color:#fff;
+    padding: .5rem;
+}
+
+.custom-button-send.cash {
+    border: .5rem solid #93EB93;
+    border-radius: 10px;
+    background: linear-gradient(270deg, #54E9B7 0%, #93EB93 100%);
+}
+
+.custom-button-send.cash:hover {
+    background: linear-gradient(270deg, #93EB93 0%, #54E9B7 100%);
+    border: .5rem solid #54E9B7;
+}
+
+.custom-button-send.token {
+    border: .5rem solid #3698F3;
+    border-radius: 10px;
+    background: linear-gradient(270deg, #3698F3 0%, #13D0FD 100%);
+}
+
+.custom-button-send.token:hover {
+    background: linear-gradient(270deg, #13D0FD 0%, #3698F3 100%);
+    border: .5rem solid #3698F3;
+}
+
+
+.send-safex-box > * {
+    margin-bottom: 3rem;
+} 

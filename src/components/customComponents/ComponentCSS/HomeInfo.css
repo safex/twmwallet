@@ -1,0 +1,62 @@
+.home-info-box {
+    height: 25vh;
+    max-height: 400px;
+    padding: 2rem;
+    width: 20vw;
+    margin-bottom: 1rem;
+    overflow: auto;
+}
+
+.home-info-box h3 {
+    font-family: 'Inter';
+    font-size: 1.8rem;
+    font-style: normal;
+    font-weight: 600;
+    text-align: center;
+    color: #13D3FD;
+}
+
+.home-info-box p {
+    width: 75%;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: 'Inter';
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 500;
+    text-align: center;
+    color: #13D3FD;
+}
+
+.home-info-box h1 {
+    font-family: 'Inter';
+    font-size: 2rem;
+    font-style: normal;
+    font-weight: 700;
+    text-align: center;
+    color: #767676;
+}
+
+.home-info-box h2 {
+    font-family: 'Inter';
+    font-size: 1.8rem;
+    font-style: normal;
+    font-weight: 700;
+    text-align: center;
+    color: #13D3FD;
+    word-break: break-word;
+
+  
+}
+
+.infinity {
+    animation: loading 2s infinite;
+  }
+
+
+  @keyframes loading /* Firefox */
+{
+0%   {color:#13D3FD;}
+50%  {color: #54E9B7; -webkit-text-stroke: .1px black;}
+100%   {color: #13D3FD;}
+}

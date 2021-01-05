@@ -1,8 +1,6 @@
 import React from 'react';
 
-import {Row, Col, Container, Button, Table, Form, Image, Modal, Carousel, CarouselItem} from 'react-bootstrap';
-
-import {MDBDataTable} from 'mdbreact'
+import {Row, Col, Container, Button, Table, Form, Image, Modal} from 'react-bootstrap';
 
 import {withRouter} from 'react-router-dom';
 
@@ -28,19 +26,33 @@ import keccak256 from 'keccak256';
 import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
 
 // Icon Imports
-import {FaCogs, FaSearch, FaInfoCircle, FaCopy} from 'react-icons/fa'
-import {GiExitDoor} from 'react-icons/gi'
-import {GrCubes} from 'react-icons/gr'
-import {MdPeople, MdReceipt} from 'react-icons/md'
-import {TiMessages} from 'react-icons/ti'
+import { FaInfoCircle, FaCopy} from 'react-icons/fa'
 import {IconContext} from 'react-icons'
+import { CgCloseR } from 'react-icons/cg'
 
 import copy from "copy-to-clipboard"
 import ReactTooltip from "react-tooltip";
+import ReactModal from 'react-modal';
+import Loader from 'react-loader-spinner'
+import Fade from 'react-reveal/Fade';
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 
-import Loader from 'react-loader-spinner'
+// Custom Components
+import MainHeader from '../customComponents/MainHeader';
+import SendSafex from '../customComponents/SendSafex';
+import HomeInfo from '../customComponents/HomeInfo';
+import HomeCarousel from '../customComponents/HomeCarousel';
+import AccountInfo from '../customComponents/AccountInfo';
+import Stake from '../customComponents/Stake';
+import StakeInfo from '../customComponents/StakeInfo';
+import StakingTable from '../customComponents/StakingTable';
+import MerchantAccounts from '../customComponents/MerchantAccounts';
+import MerchantTabs from '../customComponents/MerchantTabs';
+import MerchantOffers from '../customComponents/MerchantOffers';
+import MyOrders from '../customComponents/MyOrders';
+import OrderTableRow from '../customComponents/OrderTableRow';
+import OfferTableRow from '../customComponents/OfferTableRow';
 
 import {
     open_twm_file,
@@ -54,11 +66,14 @@ import {
 
 import zlib from 'zlib';
 
+
+
 const sfxjs = window.require('safex-addressjs');
 
 
 var wallet;
 
+let offerRows;
 
 class WalletHome extends React.Component {
     constructor(props) {
@@ -79,6 +94,7 @@ class WalletHome extends React.Component {
             timer: '',
             first_refresh: false,
             show_keys: false,
+            keyRequest: false,
             twm_offers: [],
             non_offers: [],
             api_offers: [],
@@ -99,13 +115,19 @@ class WalletHome extends React.Component {
             show_purchase_offer_data: {main_image: false},
             show_edit_offer: {},
             show_orders: false,
-            new_account_image: require('./../../img/sails-logo.png'),
-            new_offer_image: '',
+            showMyOrders: false,
+            new_account_image: require('./../../img/NewAccountPanda.svg'),
+            newAccountImage: require('./../../img/NewAccountPanda.svg'),
+            accountsImage: require('./../../img/accountsImage.svg'),
+            newOfferImage: require('./../../img/newOfferImage.svg'),
+            offersImage: require('./../../img/offersImage.svg'),
             merchantTabs: 'accounts',
             showLoader: false,
             nft_switch: false,
             shipping_switch: false,
-            open_message_switch: false
+            open_message_switch: false,
+            showMessages: false,
+            currentMessage: {},
         };
     }
 
@@ -222,6 +244,7 @@ class WalletHome extends React.Component {
                 this.setState({timer: timer});
                 this.setState({synced: false});
             }
+            this.refresh_action();
             wallet.on('newBlock', (height) => {
                 console.log("blockchain updated, height: " + height);
                 this.setState({
@@ -401,6 +424,8 @@ class WalletHome extends React.Component {
                 d_obj.twm_version = 1;
                 if (vees.new_account_image.value.length > 0) {
                     d_obj.avatar = vees.new_account_image.value;
+                } else {
+                    d_obj.avatar = this.state.newAccountsImage;
                 }
                 if (vees.twitter.value.length > 0) {
                     d_obj.twitter = vees.twitter.value;
@@ -694,9 +719,6 @@ class WalletHome extends React.Component {
         }
     };
 
-    handleMerchantTabChange = (tab) => {
-        this.setState({merchantTabs: tab})
-    };
 
     //basic send transactions
     token_send = async (e) => {
@@ -958,12 +980,13 @@ class WalletHome extends React.Component {
 
     //view shifting
     go_home = () => {
-        this.setState({interface_view: 'home'});
+        this.setState({interface_view: 'home', keyRequest: false});
+
     };
 
     //Show loading screen
     show_loading = () => {
-        this.setState({interface_view: 'loading'})
+        this.setState({interface_view: 'loading', keyRequest: false})
     };
 
     //open market view from navigation
@@ -973,7 +996,8 @@ class WalletHome extends React.Component {
         setTimeout(() => {
 
             this.setState({
-                interface_view: 'market'
+                interface_view: 'market',
+                keyRequest: false
             });
         }, 500);
     };
@@ -982,6 +1006,8 @@ class WalletHome extends React.Component {
     show_merchant = () => {
 
         this.show_loading()
+
+        this.setState({keyRequest: false})
 
         setTimeout(() => {
 
@@ -1028,22 +1054,14 @@ class WalletHome extends React.Component {
         }, 500);
     };
 
-    //Show Merchant Orders
-
-    show_orders = () => {
-        this.setState({show_orders: !this.state.show_orders});
-        console.log(this.state.show_orders)
-    };
-
-
     //open staking view from navigation
     show_tokens = () => {
-        this.setState({interface_view: 'tokens'})
+        this.setState({interface_view: 'tokens', keyRequest: false})
     };
 
     //open settings view from navigation
     show_settings = () => {
-        this.setState({interface_view: 'settings'})
+        this.setState({interface_view: 'settings', keyRequest: false})
     };
 
     logout = () => {
@@ -1063,14 +1081,9 @@ class WalletHome extends React.Component {
         }
     };
 
-    //close modal of private keys
-    handleClose = () => {
-        this.setState({show_keys: false});
-    };
-
     //show modal of private keys
-    handleShow = () => {
-        this.setState({show_keys: true});
+    handleKeys = () => {
+        this.setState({show_keys: !this.state.show_keys, keyRequest: false});
     };
 
     //close modal of New Offer
@@ -1081,11 +1094,6 @@ class WalletHome extends React.Component {
     //show modal of New Offer
     handleShowNewOfferForm = () => {
         this.setState({show_new_offer_form: true, nft_switch: false, shipping_switch: false, open_message_switch: false});
-    };
-
-    //close modal of new account
-    handleCloseNewAccountForm = () => {
-        this.setState({show_new_account_form: false});
     };
 
     //close modal of Purchase Form
@@ -1107,13 +1115,13 @@ class WalletHome extends React.Component {
     };
 
     //show modal of new account
-    handleShowNewAccountForm = () => {
-        this.setState({show_new_account_form: true});
+    handleNewAccountForm = () => {
+        this.setState({show_new_account_form: !this.state.show_new_account_form});
     };
 
     //show modal of Edit Account Form
-    handleShowEditAccountForm = (account) => {
-        this.setState({show_edit_account_form: true, show_edit_account: account});
+    handleEditAccountForm = (account) => {
+        this.setState({show_edit_account_form: !this.state.show_edit_account_form, show_edit_account: account});
     };
 
     //close modal of Edit Account Form
@@ -1244,6 +1252,7 @@ class WalletHome extends React.Component {
     change_nft_switch = () => {
         this.setState({nft_switch: !this.state.nft_switch});
     };
+    
     change_open_message_switch = () => {
         this.setState({open_message_switch: !this.state.open_message_switch});
     };
@@ -1599,13 +1608,9 @@ class WalletHome extends React.Component {
     };
 
     to_ellipsis = (text, firstHalf, secondHalf) => {
-        const text_to_ellipse = text;
+        const ellipse = `${text.substring(0, firstHalf)}.....${text.substring(text.length - secondHalf, text.length)}`
 
-        const ellipse = `${text_to_ellipse.substring(0, firstHalf)}.....${text_to_ellipse.substring(text_to_ellipse.length - secondHalf, text_to_ellipse.length)}`
-
-        return (
-            ellipse
-        )
+        return (ellipse)
     };
 
     hexStringToByte = (str) => {
@@ -1668,10 +1673,10 @@ class WalletHome extends React.Component {
                     console.log(req_msgs.from);
 
 
-
                     for (const order in req_msgs.to) {
                         console.log(req_msgs.to[order]);
                         for (const msg of req_msgs.to[order]) {
+
                             console.log(msg);
                             console.log(msg.message);
                             try {
@@ -1690,19 +1695,12 @@ class WalletHome extends React.Component {
                                 console.log(decryptedData.toString());
                                 let decomped = zlib.inflateSync(Buffer.from(decryptedData));
                                 console.log(decomped.toString());
-                                alert(`what`);
                             } catch(err) {
                                 console.error(err);
                             }
-
-
-
                         }
-
-                    }
-
+                    }*/
                 }
-
             }
 
 
@@ -2197,7 +2195,7 @@ class WalletHome extends React.Component {
                         reject(err);
                     } else {
                         this.setState({showLoader: false, show_purchase_confirm_modal: true});
-                        copy(`https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`);
+                        
                         /*alert(
                             `Purchase transaction committed.
                             Transaction ID: ${this.state.purchase_txn_id}
@@ -2217,23 +2215,6 @@ class WalletHome extends React.Component {
             }
         });
     };
-
-    copyAddressToClipboard = () => {
-        copy(this.state.address);
-        alert('Copied address!');
-    };
-
-    copyOfferToClipboard = () => {
-        copy(this.state.show_purchase_offer.offer_id);
-        alert('Copied offer ID!');
-    };
-
-    copyOrderToClipboard = () => {
-        copy(this.state.this.state.purchase_txn_id);
-        alert('Copied offer ID!');
-    };
-
-
 
     make_edit_offer = async (e) => {
         e.preventDefault();
@@ -2370,6 +2351,115 @@ class WalletHome extends React.Component {
         });
     };
 
+    handleShowMessages = (messageObject) => {
+        this.setState({showMessages: true, showMyOrders: true, currentMessage: messageObject})
+    }
+
+    hideMessages = () => {
+        this.setState({showMessages: false, currentMessage: {}})
+    }
+
+
+    handleMyOrders = () => {
+        this.setState({showMyOrders: !this.state.showMyOrders})
+    };
+
+
+
+    call_non_listings_table = () => offerRows = this.state.non_offers.map((listing, key) => {
+                               
+                        
+        try {
+            if (listing.seller === this.state.selected_user.username) {
+                var data = {};
+                data.description = '';
+                data.main_image = '';
+                data.sku = '';
+                data.barcode = '';
+                data.weight = '';
+                data.country = '';
+                data.message_type = '';
+                data.physical = '';
+                try {
+                    let parsed_data = JSON.parse(listing.description);
+                    console.log(parsed_data);
+                    if (parsed_data.twm_version === 1) {
+                        if (parsed_data.hasOwnProperty('main_image')) {
+                            data.main_image = parsed_data.main_image;
+                        }
+                        if (parsed_data.hasOwnProperty('description')) {
+                            data.description = parsed_data.description;
+                        }
+                        if (parsed_data.hasOwnProperty('sku')) {
+                            data.sku = parsed_data.sku;
+                        }
+                        if (parsed_data.hasOwnProperty('barcode')) {
+                            data.barcode = parsed_data.barcode;
+                        }
+                        if (parsed_data.hasOwnProperty('weight')) {
+                            data.weight = parsed_data.weight;
+                        }
+                        if (parsed_data.hasOwnProperty('country')) {
+                            data.country = parsed_data.country;
+                        }
+                        if (parsed_data.hasOwnProperty('message_type')) {
+                            data.message_type = parsed_data.message_type;
+                        }
+                        if (parsed_data.hasOwnProperty('physical')) {
+                            data.physical = parsed_data.physical;
+                        }
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+                return (
+                    <OfferTableRow
+                        key={key}
+                        title={listing.title}
+                        price={listing.price / 10000000000}
+                        quantity={listing.quantity}
+                        seller={listing.seller}
+                        id={listing.offerID}
+                        handleEditOfferForm={() => this.handleShowEditOfferForm(listing)}
+                        handleShowOrders={this.handleMyOrders}
+                        toEllipsis={this.to_ellipsis}
+                    >
+{/*
+                    <p>{listing.title}</p>
+                    <p>{listing.price / 10000000000}</p>
+                    <p>{listing.quantity}</p>
+                    <p>{listing.seller}</p>
+                    <p>{listing.offerID}</p>
+                    <p>
+
+                        <button
+                            onClick={() => this.handleShowEditOfferForm(listing)}
+                            className="mx-2"
+                        >
+                            Edit
+                        </button>
+
+                        
+
+                        <button
+                            onClick={this.handleMyOrders}
+                            className="mx-2"
+                        >
+                            Orders
+                        </button> 
+                    </p>
+                */}
+                    </OfferTableRow>
+                )
+
+            }
+        } catch (err) {
+            console.error(`failed to properly parse the user data formatting`);
+            console.error(err);
+        }
+        
+    });
+
     render() {
 
         const twmwallet = () => {
@@ -2377,170 +2467,46 @@ class WalletHome extends React.Component {
 
                 case "home": {
                     return (
-                        <Row lg className="justify-content-around">
+                        <div className="home-main-div">
+                            <Col sm={4} className="no-padding d-flex flex-column align-items-center justify-content-between">
+                                <HomeInfo
+                                    blockHeight={this.state.blockchain_height}
+                                    connection={this.state.connection_status}
+                                    firstRefresh={this.state.first_refresh}
+                                    cashBalance={this.state.cash}
+                                    tokenBalance={this.state.tokens}
+                                    pendingCash={this.state.pending_cash}
+                                    pendingTokens={this.state.pending_tokens}
+                                />
 
-                            <Col sm={2}>
-                                <div className="cash-box p-2 font-size-small">
-                                    <h3> Send Safex </h3>
-
-                                    <hr className="border border-light w-100"></hr>
-
-                                    <ul>
-                                        <Col>
-                                            <li id="wallet-balance" className="d-flex flex-row">
-                                                {this.state.first_refresh === true ?
-                                                    (this.state.cash.toLocaleString()) :
-                                                    (<Loader className="mr-3" type="ThreeDots" color="#00BFFF"
-                                                             height={20} width={20}/>)
-                                                } SFX
-                                            </li>
-
-                                            {this.state.pending_cash > 0 ?
-                                                (
-                                                    <li className="border border-warning p-1"> {this.state.pending_cash.toLocaleString()} SFX
-                                                        Pending</li>) : ''}
-                                        </Col>
-                                        {/*
-                                            this.state.pending_cash > 0 ?
-                                                (<li>{this.state.cash + this.state.pending_cash} NET</li>) : ''
-                                                */}
-                                    </ul>
-
-                                    <hr class="border border-light w-100"></hr>
-
-                                    <Form id="send_cash" onSubmit={this.cash_send}>
-                                        <Form.Group>
-                                            <Form.Label>Destination Address</Form.Label>
-
-                                            <Form.Control
-                                                name="destination"
-                                                defaultValue="Safex5..."
-                                                placedholder="the destination address"
-                                            />
-                                        </Form.Group>
-
-                                        <Form.Group>
-                                            <Form.Label>Amount (SFX)</Form.Label>
-
-                                            <Form.Control
-                                                name="amount"
-                                                defaultValue="0"
-                                                placedholder="the amount to send"
-                                            />
-                                        </Form.Group>
-
-                                        <Form.Group>
-                                            <Form.Label>Mixins</Form.Label>
-                                            <IconContext.Provider value={{color: 'white', size: '20px'}}>
-                                                <FaInfoCircle data-tip data-for='apiInfo'
-                                                              className="blockchain-icon mx-4 white-text"/>
-
-                                                <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                    <span>
-                                                        Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                        They are combined with yours for private transactions.<br/>
-                                                        Changing this from the default could hurt your privacy.<br/>
-                                                    </span>
-                                                </ReactTooltip>
-                                            </IconContext.Provider>
-
-
-                                            <Form.Control
-                                                name="mixins"
-                                                as="select"
-                                                defaultValue="7"
-                                            >
-                                                <option>1</option>
-                                                <option>2</option>
-                                                <option>3</option>
-                                                <option>4</option>
-                                                <option>5</option>
-                                                <option>6</option>
-                                                <option>7</option>
-                                            </Form.Control>
-
-                                        </Form.Group>
-
-                                        <Button className="mt-2 safex-cash-green" type="submit" size="lg" block>
-                                            Send Safex
-                                        </Button>
-                                    </Form>
-
-                                </div>
+                                <SendSafex 
+                                    title="SEND SAFEX"
+                                    style="cash"
+                                    send={this.cash_send}
+                                    id="send_cash"
+                                />
                             </Col>
 
-                            <Col sm={9}>
-                                <Row className="my-4">
-                                    <Carousel sm={12} className="home-carousel mx-auto">
-                                        <Carousel.Item>
-                                            <img
-                                                className="d-block w-100"
-                                                src={require("./../../img/camera.jpg")}
-                                                alt="First slide"
-                                            />
-                                            <Carousel.Caption>
-                                                <h3>Vintage Camera</h3>
-                                                <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
-                                            </Carousel.Caption>
-                                        </Carousel.Item>
-                                        <Carousel.Item>
-                                            <img
-                                                className="d-block w-100"
-                                                src={require("./../../img/headphones.jpg")}
-                                                alt="Third slide"
-                                            />
+                            <Col sm={7} className="no-padding d-flex flex-column  justify-content-between">
+                                <AccountInfo
+                                    rescan={this.rescan}
+                                    handleShow={this.handleKeys}
+                                    show={this.state.show_keys}
+                                    handleKeyRequest={() => {this.setState({keyRequest: !this.state.keyRequest})}}
+                                    keyRequest={this.state.keyRequest}
+                                    address={this.props.wallet.address()}
+                                    spendKey={this.props.wallet.secretSpendKey()}
+                                    viewKey={this.props.wallet.secretViewKey()}
+                                    seed={this.props.wallet.seed()}
+                                    toEllipsis={this.to_ellipsis}
+                                />
 
-                                            <Carousel.Caption>
-                                                <h3>Premium Headphones</h3>
-                                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                                            </Carousel.Caption>
-                                        </Carousel.Item>
-                                        <Carousel.Item>
-                                            <img
-                                                className="d-block w-100"
-                                                src={require("./../../img/watch.jpg")}
-                                                alt="Third slide"
-                                            />
-
-                                            <Carousel.Caption>
-                                                <h3>A Pull Watch</h3>
-                                                <p>Better than an Apple watch; a watch you pull.</p>
-                                            </Carousel.Caption>
-                                        </Carousel.Item>
-                                        <Carousel.Item>
-                                            <img
-                                                className="d-block w-100"
-                                                src={require("./../../img/bike.jpg")}
-                                                alt="Fourth slide"
-                                            />
-
-                                            <Carousel.Caption>
-                                                <h3>Racing Bike</h3>
-                                                <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
-                                            </Carousel.Caption>
-                                        </Carousel.Item>
-                                    </Carousel>
-                                </Row>
-
-                                <Col
-                                    className="white-text d-flex flex-column justify-content-center align-items-center border border-light b-r10">
-                                    <h2>Purchases</h2>
-
-                                    <hr class="border border-light w-100"></hr>
-
-                                    <Image
-                                        src={require("./../../img/sleeping-panda.png")}
-                                        width={100}
-                                        height={100}
-                                    />
-
-                                    <h3>You don't have any purchases to protect so Panda fell asleep... <a
-                                        href="javascript:void(0)" onClick={this.show_market}>go to the market!</a></h3>
-                                </Col>
+                                <HomeCarousel/> 
                             </Col>
-                        </Row>
+                        </div>
                     );
                 }
+                
                 case "market":
                     var table_of_listings;
                     if (this.state.offer_loading_flag === 'all') {
@@ -2549,13 +2515,15 @@ class WalletHome extends React.Component {
                             listing.offer_id = listing.offerID;
                             listing.price = listing.price  / 10000000000;
                             try {
-                                return <tr className="white-text" key={key}>
-                                    <td>{listing.title}</td>
-                                    <td>{listing.price}</td>
-                                    <td>{listing.quantity}</td>
-                                    <td>{listing.seller}</td>
-                                    <td>{listing.offerID}</td>
-                                </tr>
+                                return (
+                                    <Row className="staking-table-row" key={key}>
+                                        <p>{listing.title}</p>
+                                        <p>{listing.price}</p>
+                                        <p>{listing.quantity}</p>
+                                        <p>{listing.seller}</p>
+                                        <p>{listing.offerID}</p>
+                                    </Row>
+                                )
 
                             } catch (err) {
                                 console.error(`failed to properly parse the user data formatting`);
@@ -2624,74 +2592,42 @@ class WalletHome extends React.Component {
                                     console.error(err);
                                 }
                                 try {
-                                    return <tr key={key}>
-                                        <td className="title-row" data-tip data-for={`offerTitle${key}`}>
+                                    return (
+                                        <Row className="staking-table-row" key={key}>
+                                            <p data-tip data-for={`offerTitle${key}`}>
+                                                {listing.title}
+                                            </p>
 
-                                            {listing.title}
-                                            <ReactTooltip className="offer-tooltip" id={`offerTitle${key}`} type='light'
-                                                          effect='float'>
+                                            <p>{listing.price}</p>
 
-                                                {data.main_image ?
-                                                    <div className="d-flex flex-row justify-content-around p-3">
-                                                        <Image className="border border-dark"
-                                                               src={data.main_image}></Image>
+                                            <p>{listing.quantity}</p>
 
-                                                        <div className="d-flex flex-column justify-content-center">
-                                                            <h3>{listing.title}</h3>
-                                                            <hr class="border border-dark w-100"></hr>
-                                                            <ul>
-                                                                <li>Price: {listing.price} SFX</li>
-                                                                <li>Seller: {listing.seller}</li>
-                                                            </ul>
-                                                            <hr class="border border-primary w-100"></hr>
-                                                            <p>{data.description}</p>
-                                                        </div>
+                                            <p>{listing.username}</p>
 
-                                                    </div>
+                                            <p data-tip data-for={`offerID${key}`}>
+                                                {this.to_ellipsis(listing.offer_id, 5, 5)}
+
+                                                <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
+                                                    <span>{listing.offer_id}</span>
+                                                </ReactTooltip>
+                                            </p>
+
+                                            <p style={{width: '24rem'}}>
+                                           
+                                                {listing.quantity <= 0 ?
+                                                    (<button disabled>
+                                                        SOLD OUT
+                                                    </button>)
                                                     :
-                                                    <div>
-                                                        <Image src={require("./../../img/sails-logo.png")}></Image>
-                                                        <h3>{listing.title}</h3>
-                                                    </div>
+                                                    (<button onClick={() => this.handleShowPurchaseForm(listing, data)}>
+                                                        BUY
+                                                    </button>)
                                                 }
-                                                <hr class="border border-dark w-100"></hr>
-                                                <p className="my-3">{listing.offerID}</p>
-                                            </ReactTooltip>
 
-                                        </td>
-                                        <td className="quantity-row">{listing.price}</td>
-                                        <td className="quantity-row">{listing.quantity}</td>
-                                        <td className="quantity-row">{listing.seller}</td>
-                                        <td className="title-row" data-tip data-for={`offerID${key}`}>
-                                            {this.to_ellipsis(listing.offerID, 10, 10)}
-
-                                            <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
-                                                <span>{listing.offerID}</span>
-                                            </ReactTooltip>
-                                        </td>
-                                        <td className="quantity-row"><select className="light-blue-back" id="quantity">
-                                            <option value="1">1</option>
-                                        </select></td>
-                                        <td className="quantity-row">
-                                            {listing.quantity <= 0 ?
-                                                (<Button size="lg" variant="secondary" disabled>
-                                                    SOLD OUT
-                                                </Button>)
-                                                :
-                                                (<Button size="lg" variant="success"
-                                                         onClick={() => this.handleShowPurchaseForm(listing, data)}>
-                                                    BUY
-                                                </Button>)
-                                            }
-
-
-                                        </td>
-                                        <td className="quantity-row">
-                                            <Button size="lg" variant="info">CONTACT</Button>
-                                        </td>
-                                    </tr>
-
-
+                                                <button className="ml-2">CHAT</button>
+                                            </p>
+                                        </Row>
+                                    )
                                 } catch (err) {
                                     console.error(`failed to properly parse the user data formatting`);
                                     console.error(err);
@@ -2721,73 +2657,42 @@ class WalletHome extends React.Component {
 
 
                                 try {
-                                    return <tr key={key}>
-                                        <td className="title-row" data-tip data-for={`offerTitle${key}`}>
+                                    return (
+                                        <Row className="staking-table-row" key={key}>
+                                            <p data-tip data-for={`offerTitle${key}`}>
+                                                {listing.title}
+                                            </p>
 
-                                            {listing.title}
-                                            <ReactTooltip className="offer-tooltip" id={`offerTitle${key}`} type='light'
-                                                          effect='float'>
+                                            <p>{listing.price}</p>
 
-                                                {data.main_image ?
-                                                    <div className="d-flex flex-row justify-content-around p-3">
-                                                        <Image className="border border-dark"
-                                                               src={data.main_image}></Image>
+                                            <p>{listing.quantity}</p>
 
-                                                        <div className="d-flex flex-column justify-content-center">
-                                                            <h3>{listing.title}</h3>
-                                                            <hr class="border border-dark w-100"></hr>
-                                                            <ul>
-                                                                <li>Price: {listing.price} SFX</li>
-                                                                <li>Seller: {listing.username}</li>
-                                                            </ul>
-                                                            <hr class="border border-primary w-100"></hr>
-                                                            <p>{data.description}</p>
-                                                        </div>
+                                            <p>{listing.username}</p>
 
-                                                    </div>
+                                            <p data-tip data-for={`offerID${key}`}>
+                                                {this.to_ellipsis(listing.offer_id, 5, 5)}
+
+                                                <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
+                                                    <span>{listing.offer_id}</span>
+                                                </ReactTooltip>
+                                            </p>
+
+                                            <p style={{width: '24rem'}}>
+                                            
+                                                {listing.quantity <= 0 ?
+                                                    (<button className="search-button" disabled>
+                                                        SOLD OUT
+                                                    </button>)
                                                     :
-                                                    <div>
-                                                        <Image src={require("./../../img/sails-logo.png")}></Image>
-                                                        <h3>{listing.title}</h3>
-                                                    </div>
+                                                    (<button className="search-button" onClick={() => this.handleShowPurchaseForm(listing, data)}>
+                                                        BUY
+                                                    </button>)
                                                 }
-                                                <hr class="border border-dark w-100"></hr>
-                                                <p className="my-3">{listing.offer_id}</p>
-                                            </ReactTooltip>
 
-                                        </td>
-                                        <td className="quantity-row">{listing.price}</td>
-                                        <td className="quantity-row">{listing.quantity}</td>
-                                        <td className="quantity-row">{listing.username}</td>
-                                        <td className="title-row" data-tip data-for={`offerID${key}`}>
-                                            {this.to_ellipsis(listing.offer_id, 10, 10)}
-
-                                            <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
-                                                <span>{listing.offer_id}</span>
-                                            </ReactTooltip>
-                                        </td>
-                                        <td className="quantity-row"><select className="light-blue-back" id="quantity">
-                                            <option value="1">1</option>
-                                        </select></td>
-                                        <td className="quantity-row">
-                                            {listing.quantity <= 0 ?
-                                                (<Button size="lg" variant="secondary" disabled>
-                                                    SOLD OUT
-                                                </Button>)
-                                                :
-                                                (<Button size="lg" variant="success"
-                                                         onClick={() => this.handleShowPurchaseForm(listing, data)}>
-                                                    BUY
-                                                </Button>)
-                                            }
-
-
-                                        </td>
-                                        <td className="quantity-row">
-                                            <Button size="lg" variant="info">CONTACT</Button>
-                                        </td>
-                                    </tr>
-
+                                                <button className="ml-2 search-button">CHAT</button>
+                                            </p>
+                                        </Row>
+                                    )
 
                                 } catch (err) {
                                     console.error(`failed to properly parse the user data formatting`);
@@ -2800,109 +2705,93 @@ class WalletHome extends React.Component {
                         });
                     }
 
+                    var tableOfOrders;
+                        tableOfOrders = this.state.twm_offers.map((order, key) => {
+                            console.log(key);
+                            try {
+                                return (
+                                    <OrderTableRow 
+                                        key={key}
+                                        title={'placeholder'}
+                                        price={'placeholder'}
+                                        quantity={'placeholder'}
+                                        id={'placeholder'}
+                                        showMessages={this.showMessages}
+                                        messageObject={'placeholder'}
+                                    />
+                                        
+                                )
 
+                            } catch (err) {
+                                console.error(`failed to properly parse the user data formatting`);
+                                console.error(err);
+                            }
 
-
-
+                        });
 
                     return (
-                        <div className="overflow-y">
-                            <Container
-                                fluid
-                                id="header"
-                                className="no-gutters mt-5 p-2 border border-light b-r10 black-back h-25 sticky"
-                                style={{height: "200px"}}
-                            >
-                                <Modal className="purchase-offer-modal text-align-center" animation={false}
-                                       size="lg"
-                                       centered
-                                       show={this.state.show_purchase_form}
-                                       onHide={this.handleClosePurchaseForm}>
-                                    <Modal.Header closeButton>
-                                        <Modal.Title>
-                                            PURCHASE {this.state.show_purchase_offer.title.toUpperCase()}
-                                        </Modal.Title>
-                                    </Modal.Header>
-                                    <Modal.Body>
+                        <div className="">
 
-                                        <Form id="purchase_item"
-                                              onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
+                            <Modal className="purchase-offer-modal text-align-center" animation={false}
+                                    size="lg"
+                                    centered
+                                    show={this.state.show_purchase_form}
+                                    onHide={this.handleClosePurchaseForm}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>
+                                        PURCHASE {this.state.show_purchase_offer.title.toUpperCase()}
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+
+                                    <Form id="purchase_item"
+                                            onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
 
 
-                                            <h2>{this.state.show_purchase_offer.title.toUpperCase()}</h2>
-                                            {this.state.show_purchase_offer_data.main_image ?
-                                                <div className="d-flex flex-row justify-content-around p-3">
-                                                    <Image className="border border-dark"
-                                                           src={this.state.show_purchase_offer_data.main_image}></Image>
+                                        <h2>{this.state.show_purchase_offer.title.toUpperCase()}</h2>
+                                        {this.state.show_purchase_offer_data.main_image ?
+                                            <div className="d-flex flex-row justify-content-around p-3">
+                                                <Image className="border border-dark"
+                                                        src={this.state.show_purchase_offer_data.main_image}></Image>
 
-                                                    <div className="p-5 d-flex flex-column justify-content-center">
-                                                        <h3>{this.state.show_purchase_offer.title.toUpperCase()}</h3>
-                                                        <hr class="border border-dark w-100"></hr>
-                                                        <ul>
-                                                            <li>Price: {this.state.show_purchase_offer.price} SFX</li>
-                                                            <li>Seller: {this.state.show_purchase_offer.seller}</li>
-                                                            <li data-tip data-for='offerID'>
-                                                                Offer
-                                                                ID: {this.to_ellipsis(this.state.show_purchase_offer.offer_id, 10, 10)}
-                                                                <ReactTooltip id='offerID' type='light' effect='solid'>
-                                                                    {this.state.show_purchase_offer.offer_id}
-                                                                </ReactTooltip>
-                                                                <FaCopy
-                                                                    className="ml-4"
-                                                                    data-tip data-for='copyIDInfo'
-                                                                    onClick={this.copyOfferToClipboard}
-                                                                />
-
-                                                                <ReactTooltip id='copyIDInfo' type='info'
-                                                                              effect='solid'>
-                                                                            <span>
-                                                                                Copy Offer ID
-                                                                            </span>
-                                                                </ReactTooltip>
-                                                            </li>
-                                                        </ul>
-                                                        <hr class="border border-primary w-100"></hr>
-                                                        <div className="h-25 oflow-y-auto">
-                                                            <p>{this.state.show_purchase_offer_data.description.toUpperCase()}</p>
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-                                                :
-                                                <div>
-                                                    <Image src={require("./../../img/sails-logo.png")}></Image>
-
-                                                    <h3>{this.state.show_purchase_offer.title}</h3>
-
-                                                    <hr class="border border-dark w-100"></hr>
-
+                                                <div className="p-5 d-flex flex-column justify-content-center">
+                                                    <h3>{this.state.show_purchase_offer.title.toUpperCase()}</h3>
+                                                    <hr className="border border-dark w-100"></hr>
                                                     <ul>
                                                         <li>Price: {this.state.show_purchase_offer.price} SFX</li>
                                                         <li>Seller: {this.state.show_purchase_offer.seller}</li>
-                                                        <li>
-                                                            Offer ID: {this.state.show_purchase_offer.offerID}
+                                                        <li data-tip data-for='offerID'>
+                                                            Offer
+                                                            ID: {this.to_ellipsis(this.state.show_purchase_offer.offer_id, 10, 10)}
+                                                            <ReactTooltip id='offerID' type='light' effect='solid'>
+                                                                {this.state.show_purchase_offer.offer_id}
+                                                            </ReactTooltip>
+                                                            <FaCopy
+                                                                className="ml-4"
+                                                                data-tip data-for='copyIDInfo'
+                                                                onClick={() => copy(this.state.show_purchase_offer.offer_id)}
+                                                            />
 
-                                                            <IconContext.Provider
-                                                                value={{color: 'black', size: '20px'}}>
-                                                                <FaCopy
-                                                                    className="ml-4"
-                                                                    data-tip data-for='copyIDInfo'
-                                                                    onClick={this.copyOfferToClipboard}
-                                                                />
-
-                                                                <ReactTooltip id='copyIDInfo' type='info'
-                                                                              effect='solid'>
-                                                                            <span>
-                                                                                Copy Offer ID
-                                                                            </span>
-                                                                </ReactTooltip>
-                                                            </IconContext.Provider>
+                                                            <ReactTooltip id='copyIDInfo' type='info'
+                                                                            effect='solid'>
+                                                                        <span>
+                                                                            Copy Offer ID
+                                                                        </span>
+                                                            </ReactTooltip>
                                                         </li>
                                                     </ul>
+                                                    <hr className="border border-primary w-100"></hr>
+                                                    <div className="h-25 oflow-y-auto">
+                                                        <p>{this.state.show_purchase_offer_data.description.toUpperCase()}</p>
+                                                    </div>
                                                 </div>
-                                            }
 
+                                            </div>
+                                            :
+                                            <div>
+                                                <Image src={require("./../../img/sails-logo.png")}></Image>
 
+                                                <h3>{this.state.show_purchase_offer.title}</h3>
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm={3}>
                                                     {this.state.show_purchase_offer.quantity} available
@@ -2940,13 +2829,13 @@ class WalletHome extends React.Component {
                                             </Form.Group>
                                                 <Form.Group name="streets" as={Row}>
                                                     <Form.Label column sm={3}>
-                                                       address 1
+                                                       Address Line 1
                                                     </Form.Label>
                                                     <Col sm={4}>
                                                         <Form.Control name="address1" rows="3"/>
                                                     </Col>
                                                     <Form.Label column sm={3}>
-                                                        address 2
+                                                        Address Line 2
                                                     </Form.Label>
                                                     <Col sm={4}>
                                                         <Form.Control name="address2" rows="3"/>
@@ -2954,13 +2843,13 @@ class WalletHome extends React.Component {
                                                 </Form.Group>
                                                 <Form.Group name="place" as={Row}>
                                                     <Form.Label column sm={3}>
-                                                    city
+                                                        City
                                                     </Form.Label>
                                                     <Col sm={4}>
                                                         <Form.Control name="city" rows="3"/>
                                                     </Col>
                                                     <Form.Label column sm={3}>
-                                                    state
+                                                        State/County
                                                     </Form.Label>
                                                     <Col sm={4}>
                                                         <Form.Control name="state" rows="3"/>
@@ -2968,13 +2857,13 @@ class WalletHome extends React.Component {
                                                 </Form.Group>
                                                 <Form.Group name="countrycodes" as={Row}>
                                                     <Form.Label column sm={3}>
-                                                    zip code
+                                                        Zip/Area Code
                                                     </Form.Label>
                                                     <Col sm={4}>
                                                         <Form.Control name="zipcode" rows="3"/>
                                                     </Col>
                                                     <Form.Label column sm={3}>
-                                                    country
+                                                        Country
                                                     </Form.Label>
                                                     <Col sm={4}>
                                                         <Form.Control name="country" rows="3"/>
@@ -2982,418 +2871,390 @@ class WalletHome extends React.Component {
                                                 </Form.Group>
                                                 <Form.Group as={Row}>
                                                     <Form.Label column sm={3}>
-                                                        email address
+                                                        Email
                                                     </Form.Label>
                                                     <Col sm={4}>
                                                         <Form.Control name="email_address" rows="3"/>
                                                     </Col>
                                                     <Form.Label column sm={3}>
-                                                        phone number
+                                                        Phone
                                                     </Form.Label>
                                                     <Col sm={4}>
                                                         <Form.Control name="phone_number" rows="3"/>
                                                     </Col>
                                                 </Form.Group></div>) : ''}
-                                            {this.state.show_purchase_offer_data.open_message ? (<Form.Group as={Row}>
-                                                <Form.Label column sm={3}>
-                                                    NFT Ethereum Address
-                                                </Form.Label>
-                                                <Col sm={9}>
-                                                    <Form.Control name="message" rows="3"/>
-                                                </Col>
-                                            </Form.Group>) : ''}
-
-                                            <Form.Group as={Row}>
-                                                <Form.Label column sm={3}>
-                                                    Mixins
-                                                    <IconContext.Provider value={{color: 'black', size: '20px'}}>
-                                                        <FaInfoCircle data-tip data-for='apiInfo'
-                                                                      className="blockchain-icon mx-4"/>
-
-                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                                    <span>
-                                                                        Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                        They are combined with yours for private transactions.<br/>
-                                                                        Changing this from the default could hurt your privacy.<br/>
-                                                                    </span>
-                                                        </ReactTooltip>
-                                                    </IconContext.Provider>
-                                                </Form.Label>
-                                                <Col sm={9}>
-                                                    <Form.Control
-                                                        name="mixins"
-                                                        as="select"
-                                                        defaultValue="7"
-                                                    >
-                                                        <option>1</option>
-                                                        <option>2</option>
-                                                        <option>3</option>
-                                                        <option>4</option>
-                                                        <option>5</option>
-                                                        <option>6</option>
-                                                        <option>7</option>
-                                                    </Form.Control>
-                                                </Col>
-                                            </Form.Group>
-
-                                            {this.state.showLoader ?
-                                                (<Loader
-                                                    className="justify-content-center align-content-center"
-                                                    type="Bars"
-                                                    color="#00BFFF"
-                                                    height={50}
-                                                    width={50}
-                                                />)
-                                                :
-                                                (<Button
-                                                    size="lg"
-                                                    className="mt-2"
-                                                    type="submit"
-                                                    variant="success"
-                                                >
-                                                    Confirm Payment
-                                                </Button>)
-                                            }
-                                        </Form>
-                                    </Modal.Body>
-                                    <Modal.Footer className="align-self-start">
-
-                                        <Button size="lg" variant="danger" onClick={this.handleClosePurchaseForm}>
-                                            Close
-                                        </Button>
-                                    </Modal.Footer>
-                                </Modal>
-
-                                <Modal className="purchase-offer-modal text-align-center" animation={false}
-                                       centered
-                                       show={this.state.show_purchase_confirm_modal}
-                                       onHide={this.handleConfirmationModal}>
-                                    <Modal.Header closeButton>
-                                        <Modal.Title>
-                                            Purchase Confirmed: {this.state.show_purchase_offer.title.toUpperCase()}
-                                        </Modal.Title>
-                                    </Modal.Header>
-                                    <Modal.Body>
-                                            <ul>
-                                                <li>Purchase transaction committed.</li>
-                                                <li>Transaction ID: {this.state.purchase_txn_id}</li>
-                                                <li>Amount: {this.state.purchase_txn_quantity} X {this.state.purchase_txn_title}</li>
-                                                <li>Price: {this.state.purchase_txn_price} SFX</li>
-                                                <li>
-                                                    Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
-                                                    <IconContext.Provider  value={{color: 'black', size: '20px'}}>
-                                                        <FaCopy
-                                                            className="ml-4"
-                                                            data-tip data-for='copyIDInfo1'
-                                                            onClick={this.copyOrderToClipboard}
-                                                        />
-
-                                                        <ReactTooltip id='copyIDInfo1' type='info' effect='solid'>
-                                                            <span>
-                                                                Copy Offer ID
-                                                            </span>
-                                                        </ReactTooltip>
-                                                    </IconContext.Provider>
-                                                </li>
-                                            </ul>
-                                    </Modal.Body>
-
-                                </Modal>
-
-                        <Row className="justify-content-between align-items-center">
-
-                                    <Col sm={2} className="p-1 white-text align-self-center b-r10 light-blue-back">
-
-                                        <div className="d-flex flex-row justify-content-center align-items-end">
-                                            <IconContext.Provider value={{color: 'white', size: '20px'}}>
-                                                <div>
-                                                    <GrCubes className="blockchain-icon m-1 white-text"/>
-                                                </div>
-                                            </IconContext.Provider>
-                                            <p className="mb-2"><b>{this.state.blockchain_height.toLocaleString()}</b>
-                                            </p>
-                                        </div>
-
-                                        {this.state.wallet_height < this.state.blockchain_height ?
-                                            (<p className="mb-2">
-                                                {this.state.wallet_height} / {this.state.blockchain_height}
-                                            </p>) : ''}
-                                        <p className="mb-2 text-align-center">{this.state.connection_status}</p>
-
-                                    </Col>
-
-                                    {/*<div className="menu-logo">
-                                <Image className=" align-content-center"
-                                    src={require("./../../img/sails-logo.png")}/>
-                                </div>*/}
-
-                                    <Col sm={6} className="menu">
-                                        <ul className="menu__list">
-                                            <li className={this.state.interface_view === 'home' ? "menu-link-active" : "menu__list-item"}>
-                                                <a className="menu__link" href="javascript:void(0)"
-                                                   onClick={this.go_home}>Home</a>
-                                            </li>
-                                            <li className={this.state.interface_view === 'market' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                                <a className="menu__link" href="javascript:void(0)"
-                                                   onClick={this.show_market}>Market</a>
-                                            </li>
-                                            <li className={this.state.interface_view === 'merchant' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                                <a className="menu__link" href="javascript:void(0)"
-                                                   onClick={this.show_merchant}>Merchant</a>
-                                            </li>
-                                            <li className={this.state.interface_view === 'tokens' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                                <a className="menu__link" href="javascript:void(0)"
-                                                   onClick={this.show_tokens}>Tokens</a>
-                                            </li>
-
-
-                                        </ul>
-
-                                    </Col>
-                                    <div className="d-flex flex-column">
-                                        <a className="menu__link" href="javascript:void(0)"
-                                           onClick={this.show_settings}><FaCogs size={20} className="m-3"/></a>
-
-
-                                        <a className="menu__link" href="javascript:void(0)"
-                                           onClick={this.logout}><GiExitDoor className="m-3"/></a>
-                                    </div>
-                                </Row>
-
-
-                                <Row
-                                    className="no-gutters p-2 justify-content-between align-items-center b-r10 white-text">
-                                    <Col id="balances" sm={3}>
-                                        <li className="d-flex flex-row">
-                                            SFX: {this.state.first_refresh === true ?
-                                            (this.state.cash.toLocaleString()) :
-                                            (<Loader className="ml-5" type="ThreeDots" color="#00BFFF" height={20}
-                                                     width={20}/>)
-                                        }
-
-                                            {this.state.pending_cash > 0 ?
-                                                ` - (${this.state.pending_cash.toLocaleString()} SFX Pending)` :
+                                            {this.state.show_purchase_offer_data.open_message ? 
+                                                <Form.Group as={Row}>
+                                                    <Form.Label column sm={3}>
+                                                        NFT Ethereum Address
+                                                    </Form.Label>
+                                                    <Col sm={9}>
+                                                        <Form.Control name="message" rows="3"/>
+                                                    </Col>
+                                                </Form.Group> 
+                                            : 
                                                 ''
                                             }
-                                        </li>
 
-                                        <li className="d-flex flex-row">
-                                            SFT: {this.state.first_refresh === true ?
-                                            (this.state.tokens.toLocaleString()) :
-                                            (<Loader className="ml-5" type="ThreeDots" color="#00BFFF" height={20}
-                                                     width={20}/>)
-                                        }
+                                                <hr className="border border-dark w-100"></hr>
 
-                                            {this.state.pending_tokens > 0 ?
-                                                ` - (${this.state.pending_tokens.toLocaleString()} SFT Pending)` :
-                                                ''
-                                            }
-                                        </li>
-                                    </Col>
-                                    <Col className="text-align-center" sm={8}>
-                                        <p>SFX + SFT Public Address:<br/>
-                                            <br/>
-                                            <b>{this.state.address}</b>
-                                        </p>
-                                        <Row className="justify-content-center">
+                                                <ul>
+                                                    <li>Price: {this.state.show_purchase_offer.price} SFX</li>
+                                                    <li>Seller: {this.state.show_purchase_offer.seller}</li>
+                                                    <li>
+                                                        Offer ID: {this.state.show_purchase_offer.offerID}
 
-                                            <div id="header-buttons" className="d-flex flex-row" sm={1}>
+                                                        <IconContext.Provider
+                                                            value={{color: 'black', size: '20px'}}>
+                                                            <FaCopy
+                                                                className="ml-4"
+                                                                data-tip data-for='copyIDInfo'
+                                                                onClick={() => copy(this.state.show_purchase_offer.offerID)}
+                                                            />
 
-                                                {this.state.synced === false ? (
-                                                    <Button variant="warning" onClick={this.check}>
-                                                        Check
-                                                    </Button>) : ''}
-
-                                                <Button variant="danger" onClick={this.rescan}>
-                                                    Hard Rescan
-                                                </Button>
-
-                                                <Button variant="primary" onClick={this.handleShow}>
-                                                    Show Keys
-                                                </Button>
-
-                                                <Modal
-                                                    className="width100 black-text"
-                                                    animation={false}
-                                                    show={this.state.show_keys}
-                                                    onHide={this.handleClose}
-                                                >
-                                                    <Modal.Header closeButton>
-                                                        <Modal.Title>Your Private Keys</Modal.Title>
-                                                    </Modal.Header>
-                                                    <Modal.Body>
-                                                        <ul>
-                                                            <li>
-                                                                <b>Address:</b> <br/> {this.props.wallet.address()}
-                                                            </li>
-                                                            <li>
-                                                                <b>Secret Spend Key:</b>
-                                                                <br/> {this.props.wallet.secretSpendKey()}
-                                                            </li>
-                                                            <li>
-                                                                <b>Secret View Key:</b>
-                                                                <br/> {this.props.wallet.secretViewKey()}
-                                                            </li>
-                                                            <li>
-                                                                <b>Mnemonic Seed:</b>
-                                                                <br/> {this.props.wallet.seed().toUpperCase()}
-                                                            </li>
-                                                        </ul>
-                                                    </Modal.Body>
-                                                    <Modal.Footer>
-                                                        <Button variant="secondary" onClick={this.handleClose}>
-                                                            Close
-                                                        </Button>
-                                                    </Modal.Footer>
-                                                </Modal>
-                                                <Button className="ml-3" onClick={this.copyAddressToClipboard}>
-                                                    Copy Address
-                                                </Button>
+                                                            <ReactTooltip id='copyIDInfo' type='info'
+                                                                            effect='solid'>
+                                                                        <span>
+                                                                            Copy Offer ID
+                                                                        </span>
+                                                            </ReactTooltip>
+                                                        </IconContext.Provider>
+                                                    </li>
+                                                </ul>
                                             </div>
-                                        </Row>
-                                    </Col>
+                                        }
 
-                                </Row>
-                            </Container>
 
-                            <Row>
-                                <Col className="market-table white-text overflow-y" md={12}>
-                                    <div
-                                        className="
-                                        search-box d-flex flex-column
-                                        align-items-center border
-                                        border-white safex-blue
-                                        "
-                                    >
+                                        <Form.Group as={Row}>
+                                            <Form.Label column sm={3}>
+                                                Mixins
+                                                <IconContext.Provider value={{color: 'black', size: '20px'}}>
+                                                    <FaInfoCircle data-tip data-for='apiInfo'
+                                                                    className="blockchain-icon mx-4"/>
 
-                                        <div class="row width100 border-bottom border-white" id="search">
-                                            <form className="width100 no-gutters p-2 d-flex justify-content-center"
-                                                  id="search-form" action=""
-                                                  method="" enctype="multipart/form-data">
-                                                <div class="form-group col-sm-9 mr-5">
-                                                    <input class="form-control" type="text"
-                                                           onChange={this.handle_change_api_fetch_url} placeholder="eg. api.theworldmarketplace.com"/>
+                                                    <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                                <span>
+                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                    They are combined with yours for private transactions.<br/>
+                                                                    Changing this from the default could hurt your privacy.<br/>
+                                                                </span>
+                                                    </ReactTooltip>
+                                                </IconContext.Provider>
+                                            </Form.Label>
+                                            <Col sm={9}>
+                                                <Form.Control
+                                                    name="mixins"
+                                                    as="select"
+                                                    defaultValue="7"
+                                                >
+                                                    <option>1</option>
+                                                    <option>2</option>
+                                                    <option>3</option>
+                                                    <option>4</option>
+                                                    <option>5</option>
+                                                    <option>6</option>
+                                                    <option>7</option>
+                                                </Form.Control>
+                                            </Col>
+                                        </Form.Group>
+
+                                        {this.state.showLoader ?
+                                            (<Loader
+                                                className="justify-content-center align-content-center"
+                                                type="Bars"
+                                                color="#00BFFF"
+                                                height={50}
+                                                width={50}
+                                            />)
+                                            :
+                                            (<Button
+                                                size="lg"
+                                                className="mt-2"
+                                                type="submit"
+                                                variant="success"
+                                            >
+                                                Confirm Payment
+                                            </Button>)
+                                        }
+                                    </Form>
+                                </Modal.Body>
+                                <Modal.Footer className="align-self-start">
+
+                                    <Button size="lg" variant="danger" onClick={this.handleClosePurchaseForm}>
+                                        Close
+                                    </Button>
+                                </Modal.Footer>
+                            </Modal>
+
+                            <Modal className="purchase-offer-modal text-align-center" animation={false}
+                                    centered
+                                    show={this.state.show_purchase_confirm_modal}
+                                    onHide={this.handleConfirmationModal}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>
+                                        Purchase Confirmed: {this.state.show_purchase_offer.title.toUpperCase()}
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                        <ul>
+                                            <li>Purchase transaction committed.</li>
+                                            <li>Transaction ID: {this.state.purchase_txn_id}</li>
+                                            <li>Amount: {this.state.purchase_txn_quantity} X {this.state.purchase_txn_title}</li>
+                                            <li>Price: {this.state.purchase_txn_price} SFX</li>
+                                            <li>
+                                                Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
+                                                <IconContext.Provider  value={{color: 'black', size: '20px'}}>
+                                                    <FaCopy
+                                                        className="ml-4"
+                                                        data-tip data-for='copyIDInfo1'
+                                                        onClick={() => copy(this.state.purchase_txn_id)}
+                                                    />
+
+                                                    <ReactTooltip id='copyIDInfo1' type='info' effect='solid'>
+                                                        <span>
+                                                            Copy Offer ID
+                                                        </span>
+                                                    </ReactTooltip>
+                                                </IconContext.Provider>
+                                            </li>
+                                        </ul>
+                                </Modal.Body>
+
+                            </Modal>
+                        
+                            <Col sm={4} className="no-padding d-flex flex-column align-items-center justify-content-between">
+                                <HomeInfo
+                                    blockHeight={this.state.blockchain_height}
+                                    connection={this.state.connection_status}
+                                    firstRefresh={this.state.first_refresh}
+                                    cashBalance={this.state.cash}
+                                    tokenBalance={this.state.tokens}
+                                    pendingCash={this.state.pending_cash}
+                                    pendingTokens={this.state.pending_tokens}
+                                />
+                            </Col>
+
+                            <Col sm={7} className="no-padding d-flex flex-column  justify-content-between">
+                                <AccountInfo
+                                    rescan={this.rescan}
+                                    handleShow={this.handleKeys}
+                                    show={this.state.show_keys}
+                                    handleKeyRequest={() => {this.setState({keyRequest: !this.state.keyRequest})}}
+                                    keyRequest={this.state.keyRequest}
+                                    address={this.props.wallet.address()}
+                                    spendKey={this.props.wallet.secretSpendKey()}
+                                    viewKey={this.props.wallet.secretViewKey()}
+                                    seed={this.props.wallet.seed()}
+                                    toEllipsis={this.to_ellipsis}
+                                />
+                            </Col>
+
+                            <Col sm={12}>
+                                <div
+                                    className="search-box d-flex flex-column align-items-center"
+                                >
+                                    { !this.state.showMyOrders ?
+                                        <div className="row width100 border-bottom border-white" id="search">
+                                            <form 
+                                                className="w-100 no-gutters p-2 align-items-baseline d-flex justify-content-center"
+                                                id="search-form" action=""
+                                                method="" enctype="multipart/form-data"
+                                            >
+                                                <div className="col-sm-6">
+                                                    <input className="w-100" type="text"
+                                                            onChange={this.handle_change_api_fetch_url} placeholder="eg. api.theworldmarketplace.com"/>
                                                 </div>
-                                                <div class="form-group col-sm-2">
-                                                    <button onClick={this.load_offers_from_api} class="btn btn-primary mx-3">
+
+                                                <div className="col-sm-4 justify-content-around d-flex">
+                                                    <button onClick={this.load_offers_from_api} className="search-button">
                                                         Set Market API
-
                                                     </button>
-                                                    <button onClick={this.load_offers_from_blockchain} class="btn btn-primary mx-3">
-                                                        Load from Blockchain
 
+                                                    <button onClick={this.load_offers_from_blockchain} className="search-button">
+                                                        Load From Blockchain
                                                     </button>
-                                                    <IconContext.Provider value={{color: 'white', size: '20px'}}>
+
+                                                    <IconContext.Provider value={{color: '#13d3fd', size: '20px'}}>
 
                                                         <FaInfoCircle data-tip data-for='apiInfo'
-                                                                      className="blockchain-icon mx-4 white-text"/>
+                                                                        className=""/>
 
                                                         <ReactTooltip id='apiInfo' type='light' effect='solid'>
                                                             <span>This is info about setting a market API. Lorem Ipsum.</span>
                                                         </ReactTooltip>
                                                     </IconContext.Provider>
-
-
                                                 </div>
                                             </form>
                                         </div>
-                                        <div class="row" id="search">
-                                            <form className="no-gutters p-2" id="search-form" action=""
+                                    :
+                                        ''
+                                    }
 
-                                                  enctype="multipart/form-data">
-                                                <div class="form-group col-sm-9">
-                                                    <input class="form-control" type="text" placeholder="Search"/>
-                                                </div>
-                                                <div class="form-group col-sm-3">
-                                                    <button
-                                                        onClick={() => (alert("We are wokring on getting this feature up and running as soon as possible. Please be patient!"))}
-                                                        class="btn btn-block btn-primary">Search
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <div class="row" id="filter">
-                                            <form>
-                                                <div class="form-group col-sm-3 col-xs-6">
+                                    <Row className="w-100 justify-content-center">
+                                        
+                                    { !this.state.showMyOrders ?
+                                        <Col sm={6}>
+                                            <div className="row" id="search">
+                                                <form className="w-75 no-gutters p-2" id="search-form"
+
+                                                        enctype="multipart/form-data">
+                                                    <div className="form-group col-sm-9">
+                                                        <input className="" type="text" placeholder="Search"/>
+                                                    </div>
+                                                    <div className="form-group col-sm-3">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => (alert("We are wokring on getting this feature up and running as soon as possible. Thank you for your patience!"))}
+                                                            className="search-button"
+                                                        >
+                                                            Search
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            
+                                            <div className="row" id="filter">
+                                                <form>
                                                     <select data-filter="category"
-                                                            class="filter-make filter form-control">
+                                                            className="">
                                                         <option value="">Category</option>
                                                         <option value="">Any</option>
-                                                        <option value="">Category</option>
                                                         <option value="">Books</option>
                                                         <option value="">Clothes</option>
                                                         <option value="">Digital</option>
                                                         <option value="">Toys</option>
                                                     </select>
-                                                </div>
-                                                <div class="form-group col-sm-3 col-xs-6">
+                                                
                                                     <select data-filter="location"
-                                                            class="filter-model filter form-control">
+                                                            className="">
                                                         <option value="">Location</option>
                                                         <option value="">Any</option>
                                                         <option value="">Africa</option>
                                                         <option value="">Asia</option>
-                                                        <option value="">Africa</option>
+                                                        <option value="">Australia</option>
                                                         <option value="">Europe</option>
                                                         <option value="">North America</option>
                                                         <option value="">South America</option>
                                                     </select>
-                                                </div>
-                                                <div class="form-group col-sm-3 col-xs-6">
+                                                    
                                                     <select data-filter="price"
-                                                            class="filter-type filter form-control">
+                                                            className="">
                                                         <option value="">Price Range</option>
-                                                        <option value="">$0 - $24.99</option>
-                                                        <option value="">$25 - $49.99</option>
-                                                        <option value="">$50 - $199.99</option>
-                                                        <option value="">$200 - $499.99</option>
-                                                        <option value="">$500 - $999.99</option>
-                                                        <option value="">$1000+</option>
+                                                        <option value="">SFX 0 - SFX 24.99</option>
+                                                        <option value="">SFX 25 - SFX 49.99</option>
+                                                        <option value="">SFX 50 - SFX 199.99</option>
+                                                        <option value="">SFX 200 - SFX 499.99</option>
+                                                        <option value="">SFX 500 - SFX 999.99</option>
+                                                        <option value="">SFX 1000+</option>
                                                     </select>
-                                                </div>
-                                                <div class="form-group col-sm-3 col-xs-6">
+                                                    
                                                     <select data-filter="sort"
-                                                            class="filter-price filter form-control">
+                                                            className="">
                                                         <option value="">Sort by...</option>
-                                                        <option value="">$$$ Asc</option>
-                                                        <option value="">$$$ Dec</option>
-                                                        <option value="">Rating Asc</option>
-                                                        <option value="">Rating Dec</option>
+                                                        <option value="">SFX Asc</option>
+                                                        <option value="">SFX Dec</option>
                                                     </select>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <thead className="opaque-black text-align-center">
+                                                </form>
+                                            </div>
+                                        </Col>
+                                    :
+                                        ''
+                                    }
+                                    
+                                        <Col className="d-flex" sm={2}>
+                                            <button onClick={this.handleMyOrders} className="search-button">
+                                                {this.state.showMyOrders ? 'Close' : 'My Orders'}
+                                            </button>
+                                        </Col>
+                                       
+                                        { this.state.showMyOrders ?
+                                            <Col sm={12}>
+                                                <Row>
+                                                    <Col sm={10}>
+                                                        <h1>My Orders</h1>
+                                                    </Col>
 
-                                        <tr>
-                                            <th className="title-row">Title</th>
-                                            <th className="quantity-row">Price (SFX)</th>
-                                            <th className="quantity-row">Quantity</th>
-                                            <th className="quantity-row">Seller</th>
-                                            <th className="title-row">Offer ID</th>
-                                            <th className="actions-row">Actions</th>
+                                                    <Col sm={2}>
+                                                        <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
+                                                            <CgCloseR
+                                                                className="mx-auto"
+                                                                onClick={this.handleMyOrders}
+                                                            />
+                                                        </IconContext.Provider>
+                                                    </Col>
+                                                </Row>
+                                            
+                                                
+                                                <Row className="h-100">
+                                                    <Col className="h-100" sm={12}>
+                                                        <MyOrders
+                                                            rows={tableOfOrders}
+                                                            showMessages={this.state.showMessages}
+                                                            handleShowMessages={this.handleShowMessages}
+                                                            handleHideMessages={this.handleHideMessages}
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+                                        :
+                                            ''
+                                        }
+                                    </Row>
 
-                                        </tr>
-                                        </thead>
+                                        <ReactModal
+                                            isOpen={this.state.showMessages}
+                                            closeTimeoutMS={500}
+                                            className="keys-modal"
+                                            onRequestClose={this.hideMessages}
+                                        >   
+                                            <Row>
+                                                <Col sm={10}>
+                                                    <h1>
+                                                        Messages
+                                                    </h1>
 
-                                    </div>
 
+                                                </Col>
+                                                <Col sm={2}>
+                                                    <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
+                                                        <CgCloseR
+                                                            className="mx-auto"
+                                                            onClick={this.hideMessages}
+                                                        />
+                                                    </IconContext.Provider>
+                                                </Col>
+                                            </Row>
+                                            
+                                            <Row className="m-auto">
+                                                <Col sm={12}>
+                                                    <h1>PUT MESSAGE HERE</h1>
+                                                    {
+                                                    //  this.state.currentMessage
+                                                    }
+                                                </Col>
+                                            </Row>
+                                        </ReactModal>  
 
+                                    <Row className="staking-table-row">
+                                        <p>Title</p>
+                                        <p>Price (SFX)</p>
+                                        <p>Quantity</p>
+                                        <p>Seller</p>
+                                        <p>Offer ID</p>
+                                        <p style={{width: '24rem'}}>Actions</p>
+                                    </Row>
+                                </div>
+                            </Col>
 
-                                    <Table>
-
-
-                                        <tbody>
-                                        {table_of_listings}
-                                        </tbody>
-                                    </Table>
-                                </Col>
-                            </Row>
+                            <Col className="market-table white-text overflow-y" md={12}>
+                                {table_of_listings}
+                            </Col>
                         </div>
                     );
                 case "merchant": {
 
-                    this.fetch_messages_seller();
+                    
+
                     var twm_listings_table = this.state.twm_offers.map((listing, key) => {
                         console.log(key);
                         try {
@@ -3413,324 +3274,8 @@ class WalletHome extends React.Component {
 
                     });
 
-                    var non_listings_table = this.state.non_offers.map((listing, key) => {
-                        try {
-                            if (listing.seller === this.state.selected_user.username) {
-                                var data = {};
-                                data.description = '';
-                                data.main_image = '';
-                                data.sku = '';
-                                data.barcode = '';
-                                data.weight = '';
-                                data.country = '';
-                                data.message_type = '';
-                                data.physical = '';
-                                try {
-                                    let parsed_data = JSON.parse(listing.description);
-                                    console.log(parsed_data);
-                                    if (parsed_data.twm_version === 1) {
-                                        if (parsed_data.hasOwnProperty('main_image')) {
-                                            data.main_image = parsed_data.main_image;
-                                        }
-                                        if (parsed_data.hasOwnProperty('description')) {
-                                            data.description = parsed_data.description;
-                                        }
-                                        if (parsed_data.hasOwnProperty('sku')) {
-                                            data.sku = parsed_data.sku;
-                                        }
-                                        if (parsed_data.hasOwnProperty('barcode')) {
-                                            data.barcode = parsed_data.barcode;
-                                        }
-                                        if (parsed_data.hasOwnProperty('weight')) {
-                                            data.weight = parsed_data.weight;
-                                        }
-                                        if (parsed_data.hasOwnProperty('country')) {
-                                            data.country = parsed_data.country;
-                                        }
-                                        if (parsed_data.hasOwnProperty('message_type')) {
-                                            data.message_type = parsed_data.message_type;
-                                        }
-                                        if (parsed_data.hasOwnProperty('physical')) {
-                                            data.physical = parsed_data.physical;
-                                        }
-                                    }
-                                } catch (err) {
-                                    console.error(err);
-                                }
-                                return <tr key={key}>
-                                    <td className="title-row text-align-center"><h4>{listing.title}</h4></td>
-                                    <td className="quantity-row text-align-center">{listing.price / 10000000000}</td>
-                                    <td className="quantity-row text-align-center">{listing.quantity}</td>
-                                    <td className="quantity-row text-align-center">{listing.seller}</td>
-                                    <td className="actions-row text-align-center">{listing.offerID}</td>
-                                    <td className="title-row text-align-center">
-
-                                        <Button
-                                            size="lg"
-                                            variant="success"
-                                            onClick={() => this.handleShowEditOfferForm(listing)}
-                                            className="mx-2"
-                                        >
-                                            Edit
-                                        </Button>
-
-                                        <Modal
-                                            size="lg"
-                                            animation={false}
-                                            show={this.state.show_edit_offer_form}
-                                            onHide={this.handleCloseEditOfferForm}
-                                        >
-                                            <Modal.Header closeButton>
-                                                <Modal.Title>
-                                                    Edit Offer {this.state.show_edit_offer.title}
-                                                </Modal.Title>
-                                            </Modal.Header>
-
-                                            <Modal.Body>
-                                                <Form
-                                                    id="edit_offer"
-                                                    onSubmit={(e) => this.make_edit_offer(e, this.state.show_edit_offer)}
-                                                >
-                                                    <Form.Row>
-                                                        <Col md="8">
-                                                            <Form.Group as={Col}>
-                                                                <Form.Label>Offer ID</Form.Label>
-
-                                                                <Form.Control
-                                                                    disabled
-                                                                    name="offerid"
-                                                                    value={this.state.show_edit_offer.offerID}
-                                                                />
-                                                            </Form.Group>
-
-                                                            <Form.Group as={Col}>
-                                                                <Form.Label>Username</Form.Label>
-
-                                                                <Form.Control
-                                                                    disabled
-                                                                    name="username"
-                                                                    value={this.state.show_edit_offer.seller}
-                                                                />
-                                                            </Form.Group>
-                                                            <Form.Group as={Col}>
-                                                                <Form.Label>Image URL</Form.Label>
-
-                                                                <Form.Control
-                                                                    name="main_image"
-                                                                    defaultValue={data.main_image}
-                                                                    onChange={this.handleChange}
-                                                                />
-                                                            </Form.Group>
-                                                        </Col>
-
-                                                        <Col md="4">
-                                                            <Image
-                                                                className="border border-white grey-back"
-                                                                width={150}
-                                                                height={150}
-                                                                src={this.state.new_offer_image ? this.state.new_offer_image : data.main_image}
-                                                                roundedCircle
-                                                            />
-                                                        </Col>
-                                                    </Form.Row>
-
-                                                    <Form.Row md="8">
-                                                        <Form.Group as={Col}>
-                                                            <Form.Label>Title</Form.Label>
-
-                                                            <Form.Control name="title"
-                                                                          defaultValue={this.state.show_edit_offer.title}/>
-                                                        </Form.Group>
-
-                                                        <Form.Group as={Col}>
-                                                            <Form.Label>Description</Form.Label>
-
-                                                            <Form.Control maxLength="2000" as="textarea"
-                                                                          name="description"
-                                                                          defaultValue={data.description}/>
-                                                        </Form.Group>
-                                                    </Form.Row>
-
-                                                    <Form.Row>
-
-                                                        <Form.Group md="6" as={Col}>
-                                                            <Form.Label>Price (SFX)</Form.Label>
-
-                                                            <Form.Control
-                                                                name="price"
-                                                                defaultValue={this.state.show_edit_offer.price / 10000000000}
-                                                            />
-                                                        </Form.Group>
-
-                                                        <Form.Group md="6" as={Col}>
-                                                            <Form.Label>Available Quantity</Form.Label>
-
-                                                            <Form.Control
-                                                                name="quantity"
-                                                                defaultValue={this.state.show_edit_offer.quantity}
-                                                            />
-                                                        </Form.Group>
-
-                                                        <Form.Group md="6" as={Col}>
-                                                            <Form.Label>SKU</Form.Label>
-
-                                                            <Form.Control
-                                                                name="sku"
-                                                                defaultValue={data.sku}
-                                                            />
-                                                        </Form.Group>
-
-                                                        <Form.Group md="6" as={Col}>
-                                                            <Form.Label>Barcode (ISBN, UPC, GTIN, etc)</Form.Label>
-
-                                                            <Form.Control
-                                                                name="barcode"
-                                                                defaultValue={data.barcode}
-                                                            />
-                                                        </Form.Group>
-
-                                                        <Form.Group md="6" as={Col}>
-                                                            <Form.Label>Weight</Form.Label>
-
-                                                            <Form.Control
-                                                                name="weight"
-                                                                defaultValue={data.weight}
-                                                            />
-                                                        </Form.Group>
-
-                                                        <Form.Group md="6" as={Col}>
-                                                            <Form.Label>Physical Item?</Form.Label>
-
-                                                            <Form.Control
-                                                                name="physical"
-                                                                defaultValue={data.physical}
-                                                            />
-                                                        </Form.Group>
-
-
-                                                    </Form.Row>
-
-                                                    <Form.Row>
-
-                                                        <Form.Group md="6" as={Col}>
-                                                            <Form.Label>Country of Origin</Form.Label>
-
-                                                            <Form.Control
-                                                                name="country"
-                                                                defaultValue={data.country}
-                                                                placedholder="your location"
-                                                            />
-                                                        </Form.Group>
-
-                                                        <Form.Row md="8">
-                                                            <Form.Group as={Col}>
-                                                                <Form.Label>shipping</Form.Label>
-
-                                                                <Form.Check
-                                                                    checked={this.state.shipping_switch}
-                                                                    onChange={this.change_shipping_switch} type="switch" id="shipping-switch2" name="shipping" />
-                                                            </Form.Group>
-                                                            <Form.Group as={Col}>
-                                                                <Form.Label>nft</Form.Label>
-
-                                                                <Form.Check
-                                                                    checked={this.state.nft_switch}
-                                                                    onChange={this.change_nft_switch} type="switch" id="nft-switch2" name="nft" />
-                                                            </Form.Group>
-
-                                                            <Form.Group as={Col}>
-                                                                <Form.Label>open messages</Form.Label>
-
-                                                                <Form.Check
-                                                                    checked={this.state.open_message_switch}
-                                                                    onChange={this.change_open_message_switch} type="switch" id="open-switch2" name="open_message" />
-                                                            </Form.Group>
-                                                        </Form.Row>
-
-
-                                                    </Form.Row>
-
-
-                                                    <Form.Row>
-                                                        <Form.Group md="4" as={Col}>
-                                                            <Form.Label>Set Active?</Form.Label>
-
-                                                            <Form.Control
-                                                                name="active"
-                                                                defaultValue={this.state.show_edit_offer.active}
-                                                            />
-                                                        </Form.Group>
-
-                                                        <Form.Group md="8" as={Col}>
-                                                            <Form.Label>
-                                                                Mixins
-                                                                <IconContext.Provider
-                                                                    value={{color: 'black', size: '20px'}}>
-                                                                    <FaInfoCircle data-tip data-for='apiInfo'
-                                                                                  className="blockchain-icon mx-4 white-text"/>
-
-                                                                    <ReactTooltip id='apiInfo' type='info'
-                                                                                  effect='solid'>
-                                                                            <span>
-                                                                                Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                                They are combined with yours for private transactions.<br/>
-                                                                                Changing this from the default could hurt your privacy.<br/>
-                                                                            </span>
-                                                                    </ReactTooltip>
-                                                                </IconContext.Provider>
-                                                            </Form.Label>
-
-                                                            <Form.Control
-                                                                name="mixins"
-                                                                as="select"
-                                                                defaultValue="7"
-                                                            >
-                                                                <option>1</option>
-                                                                <option>2</option>
-                                                                <option>3</option>
-                                                                <option>4</option>
-                                                                <option>5</option>
-                                                                <option>6</option>
-                                                                <option>7</option>
-                                                            </Form.Control>
-                                                        </Form.Group>
-                                                    </Form.Row>
-
-
-                                                    <Button
-                                                        block
-                                                        size="lg"
-                                                        type="submit"
-                                                        variant="success"
-                                                    >
-                                                        Submit Edit
-                                                    </Button>
-                                                </Form>
-                                            </Modal.Body>
-                                            <Modal.Footer className="align-self-start">
-                                                <Button size="lg" variant="danger"
-                                                        onClick={this.handleCloseEditOfferForm}>
-                                                    Close
-                                                </Button>
-                                            </Modal.Footer>
-                                        </Modal>
-
-                                        <Button
-                                            size="lg"
-                                            variant="success"
-                                            onClick={this.show_orders}
-                                            className="mx-2"
-                                        >
-                                            Show Orders
-                                        </Button>
-                                    </td>
-                                </tr>
-                            }
-                        } catch (err) {
-                            console.error(`failed to properly parse the user data formatting`);
-                            console.error(err);
-                        }
-                    });
+                    
+                    this.fetch_messages_seller();
                     var accounts_table = this.state.usernames.map((user, key) => {
                         let avatar = '';
                         try {
@@ -3750,16 +3295,15 @@ class WalletHome extends React.Component {
                             <Row
                                 className={
                                     this.state.selected_user.username === user.username ?
-
-                                        "border border-white no-gutters account-element opaque-black"
-
-                                        : "border border-dark no-gutters account-element"}
+                                        "no-gutters account-element selected-account"
+                                    : 
+                                        "no-gutters account-element"
+                                }
                                 key={key}
                                 onClick={() => this.load_offers(user.username, key)}
                             >
 
                                 <Col>
-
                                     <Image
                                         width={50}
                                         height={50}
@@ -3768,18 +3312,22 @@ class WalletHome extends React.Component {
                                         className="border border-white grey-back"
                                     />
                                 </Col>
+
                                 <Col>
                                     <h2>{user.username}</h2>
-
                                 </Col>
-                                {user.status == 0 ? (
 
-                                    <Button variant="danger"
-                                            onClick={() => this.remove_account(user.username, key)}>
+                                {user.status == 0 ? 
+                                    <button 
+                                        className="merchant-mini-buttons"
+                                        onClick={this.remove_account(user.username, key)}
+                                    >
                                         Remove
-                                    </Button>
+                                    </button>
 
-                                ) : ''}
+                                : 
+                                    ''
+                                }
                             </Row>
                         )
                     });
@@ -3800,6 +3348,8 @@ class WalletHome extends React.Component {
                             }
                         } else {
                             console.log(`no user selected`);
+                            selected = {};
+                            selected.username = '';
                         }
                     } catch (err) {
                         console.error(err);
@@ -3807,800 +3357,816 @@ class WalletHome extends React.Component {
                     }
                     try {
                         return (
-                            <Row>
-                                <Col className="no-gutters">
-
-                                    <Row className="no-gutters">
-                                        <Col md={1}>
-                                            <Col
-                                                className={this.state.merchantTabs === "accounts" ?
-                                                    "merchant-tab border border-dark safex-cash-green" :
-                                                    "merchant-tab border border-light white-text"}
-                                                onClick={() => this.handleMerchantTabChange("accounts")}
-                                            >
-                                                <h2>Accounts</h2>
-
-                                                <IconContext.Provider value={{color: 'white', size: '50px'}}>
-                                                    <MdPeople data-tip data-for='accountsInfo'/>
-
-                                                    <ReactTooltip id='accountsInfo' type='info' effect='solid'>
-                                                        <span>
-                                                            Manage your accounts
-                                                        </span>
-                                                    </ReactTooltip>
-                                                </IconContext.Provider>
-                                            </Col>
-
-                                            <Col
-                                                className={this.state.merchantTabs === "offers" ?
-                                                    "merchant-tab border border-dark safex-cash-green" :
-                                                    "merchant-tab border border-light white-text"}
-                                                onClick={() => this.handleMerchantTabChange("offers")}
-                                            >
-
-                                                <h2>Offers</h2>
-
-
-                                                <IconContext.Provider value={{color: 'white', size: '50px'}}>
-                                                    <MdReceipt data-tip data-for='offersInfo'/>
-
-                                                    <ReactTooltip id='offersInfo' type='info' effect='solid'>
-                                                        <span>
-                                                            Manage your offers
-                                                        </span>
-                                                    </ReactTooltip>
-                                                </IconContext.Provider>
-                                            </Col>
-                                        </Col>
-
-                                        {/*Accounts Tab*/}
-                                        <Col
-                                            className={this.state.merchantTabs === "accounts" ?
-                                                "d-flex no-gutters p-3 justify-content-around grey-back b-r10" :
-                                                "display-none"}
-                                            md={11}
-                                        >
-                                            <Col md={5} className="account-list no-gutters p-3">
-
-                                                {accounts_table}
-
-                                            </Col>
-                                            {selected !== void (0) ? (
-                                                <Col md={3}
-                                                     className="
-                                                    no-gutters d-flex flex-column 
-                                                    align-items-center justify-content-center b-r10 
-                                                    merchant-profile-view text-align-center"
-                                                >
-                                                    <Row>
-                                                        <ul>
-                                                            <li>
-                                                                <Image
-                                                                    className="border border-white grey-back"
-                                                                    width={100}
-                                                                    height={100}
-                                                                    src={data.avatar}
-                                                                    roundedCircle
-                                                                />
-                                                            </li>
-                                                            <h2>{selected.username}</h2>
-
-                                                        </ul>
-                                                    </Row>
-
-                                                    <div id="account-edit-buttons" className=" d-flex flex-column">
-                                                        <Button size="lg" variant="success"
-                                                                onClick={() => this.handleShowEditAccountForm(selected)}>
-                                                            Edit
-                                                        </Button>
-
-                                                        <Modal
-                                                            animation={false}
-                                                            show={this.state.show_edit_account_form}
-                                                            onHide={this.handleCloseEditAccountForm}
-                                                        >
-                                                            <Modal.Header closeButton>
-                                                                <Modal.Title>
-                                                                    Edit Account {selected.username}
-                                                                </Modal.Title>
-                                                            </Modal.Header>
-
-                                                            <Modal.Body>
-
-                                                                <Form id="edit_account"
-                                                                      onSubmit={(e) => this.make_account_edit(e)}>
-                                                                    <Form.Row>
-                                                                        <Col md="8">
-                                                                            <Form.Group as={Col}>
-                                                                                <Form.Label>Username</Form.Label>
-
-                                                                                <Form.Control readOnly name="username"
-                                                                                              defaultValue={selected.username}/>
-                                                                            </Form.Group>
-
-                                                                            <Form.Group as={Col}>
-                                                                                <Form.Label>Avatar URL (optional)</Form.Label>
-
-                                                                                <Form.Control name="avatar"
-                                                                                              defaultValue={data.avatar}/>
-                                                                            </Form.Group>
-                                                                        </Col>
-
-                                                                        <Col md="4">
-                                                                            <Image
-                                                                                className="border border-white grey-back"
-                                                                                width={150}
-                                                                                height={150}
-                                                                                src={data.avatar}
-                                                                                roundedCircle
-                                                                            />
-                                                                        </Col>
-                                                                    </Form.Row>
-
-                                                                    <Form.Row>
-                                                                        <Col>
-                                                                            <Form.Group as={Col}>
-                                                                                <Form.Label>Biography (optional)</Form.Label>
-
-                                                                                <Form.Control maxLength="500"
-                                                                                              as="textarea"
-                                                                                              name="biography"
-                                                                                              defaulValue={data.biography ? data.biography : ''}/>
-                                                                            </Form.Group>
-
-
-                                                                            <Form.Group as={Col}>
-                                                                                <Form.Label>Location (optional)</Form.Label>
-
-                                                                                <Form.Control name="location"
-                                                                                              defaultValue={data.location ? data.location : ''}/>
-                                                                            </Form.Group>
-
-                                                                            <Form.Group as={Col}>
-                                                                                <Form.Label>Email (optional)</Form.Label>
-
-                                                                                <Form.Control name="email"
-                                                                                              defaultValue={data.email ? data.email : ''}/>
-                                                                            </Form.Group>
-
-                                                                            <Form.Group>
-                                                                                <Form.Group md="6" as={Col}>
-                                                                                    <Form.Label>Twitter
-                                                                                        Link (optional)</Form.Label>
-
-                                                                                    <Form.Control name="twitter"
-                                                                                                  defaultValue={data.twitter ? data.twitter : ''}/>
-                                                                                </Form.Group>
-
-                                                                                <Form.Group md="6" as={Col}>
-                                                                                    <Form.Label>Facebook
-                                                                                        Link (optional)</Form.Label>
-
-                                                                                    <Form.Control name="facebook"
-                                                                                                  defaultValue={data.facebook ? data.facebook : ''}/>
-                                                                                </Form.Group>
-
-                                                                                <Form.Group md="6" as={Col}>
-                                                                                    <Form.Label>LinkedIn
-                                                                                        Link (optional)</Form.Label>
-
-                                                                                    <Form.Control name="linkedin"
-                                                                                                  defaultValue={data.linkedin ? data.linkedin : ''}/>
-                                                                                </Form.Group>
-
-                                                                                <Form.Group md="6" as={Col}>
-
-                                                                                    <Form.Label>Website (optional)</Form.Label>
-                                                                                    <Form.Control name="website"
-                                                                                                  defaultValue={data.website ? data.website : ''}/>
-                                                                                </Form.Group>
-
-                                                                            </Form.Group>
-
-
-
-                                                                            <Form.Group as={Col}>
-
-                                                                                <Form.Label>Mixins</Form.Label>
-                                                                                <IconContext.Provider value={{
-                                                                                    color: 'white',
-                                                                                    size: '20px'
-                                                                                }}>
-                                                                                    <FaInfoCircle data-tip
-                                                                                                  data-for='apiInfo'
-                                                                                                  className="blockchain-icon mx-4 white-text"/>
-
-                                                                                    <ReactTooltip id='apiInfo'
-                                                                                                  type='info'
-                                                                                                  effect='solid'>
-                                                                                        <span>
-                                                                                            Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                                            They are combined with yours for private transactions.<br/>
-                                                                                            Changing this from the default could hurt your privacy.<br/>
-                                                                                        </span>
-                                                                                    </ReactTooltip>
-                                                                                </IconContext.Provider>
-
-
-                                                                                <Form.Control
-                                                                                    name="mixins"
-                                                                                    as="select"
-                                                                                    defaultValue="7"
-                                                                                >
-                                                                                    <option>1</option>
-                                                                                    <option>2</option>
-                                                                                    <option>3</option>
-                                                                                    <option>4</option>
-                                                                                    <option>5</option>
-                                                                                    <option>6</option>
-                                                                                    <option>7</option>
-                                                                                </Form.Control>
-
-                                                                            </Form.Group>
-                                                                        </Col>
-
-
-                                                                    </Form.Row>
-
-                                                                    <Button block size="lg" type="submit"
-                                                                            variant="success">
-                                                                        Submit Edit
-                                                                    </Button>
-                                                                </Form>
-                                                            </Modal.Body>
-                                                            <Modal.Footer className="align-self-start">
-                                                                <Button size="lg" variant="danger"
-                                                                        onClick={this.handleCloseEditAccountForm}>
-                                                                    Close
-                                                                </Button>
-                                                            </Modal.Footer>
-                                                        </Modal>
-                                                        <Button onClick={() => this.register_twmapi(selected)}>
-                                                            Register API
-                                                        </Button>
-                                                        <Button>Remove</Button>
-                                                    </div>
-                                                </Col>
-                                            ) : ''}
-
-                                            <Col className="align-self-center" md={2}>
-                                                <Button block size="lg" variant="success"
-                                                        onClick={this.handleShowNewAccountForm}>
-                                                    New Account
-                                                </Button>
-
-                                                <Modal
-                                                    animation={false}
-                                                    show={this.state.show_new_account_form}
-                                                    onHide={this.handleCloseNewAccountForm}
-                                                >
-                                                    <Modal.Header closeButton>
-                                                        <Modal.Title>Create New Account</Modal.Title>
-                                                    </Modal.Header>
-
-                                                    <Modal.Body>
-                                                        <Form id="create_account" onSubmit={this.register_account}>
-                                                            <Form.Row>
-                                                                <Col md="8">
-                                                                    <Form.Group as={Col}>
-                                                                        <Form.Label>Username</Form.Label>
-
-                                                                        <Form.Control name="username"
-                                                                                      placedholder="enter your desired username"/>
-                                                                    </Form.Group>
-
-                                                                    <Form.Group as={Col}>
-                                                                        <Form.Label>Avatar URL (optional)</Form.Label>
-                                                                        <Form.Control
-                                                                            onChange={this.handleChange}
-                                                                            value={this.state.new_account_image}
-                                                                            name="new_account_image"
-                                                                            placedholder="Enter the URL of your avatar"
-                                                                        />
-                                                                    </Form.Group>
-                                                                </Col>
-
-                                                                <Col md="4">
-                                                                    <Image
-                                                                        className="border border-white grey-back"
-                                                                        width={150}
-                                                                        height={150}
-                                                                        src={this.state.new_account_image}
-                                                                        roundedCircle
-                                                                    />
-                                                                </Col>
-                                                            </Form.Row>
-
-                                                            <Form.Row>
-                                                                <Col>
-                                                                    <Form.Group as={Col}>
-                                                                        <Form.Label>Biography (optional)</Form.Label>
-                                                                        <Form.Control
-                                                                            maxLength="500"
-                                                                            as="textarea"
-                                                                            name="biography"
-                                                                            placedholder="type up your biography"
-                                                                            style={{maxHeight: 150}}
-                                                                        />
-                                                                    </Form.Group>
-
-
-                                                                    <Form.Group as={Col}>
-                                                                        <Form.Label>Location (optional)</Form.Label>
-                                                                        <Form.Control
-                                                                            name="location"
-                                                                            defaultValue="Earth"
-                                                                            placedholder="your location"
-                                                                        />
-                                                                    </Form.Group>
-
-                                                                    <Form.Group as={Col}>
-
-                                                                        <Form.Label>Email (optional)</Form.Label>
-                                                                        <Form.Control
-                                                                            name="email"
-                                                                            defaultValue="xyz@example.com"
-                                                                            placedholder="your location"
-                                                                        />
-                                                                    </Form.Group>
-
-                                                                    <Form.Group>
-                                                                        <Form.Group md="6" as={Col}>
-                                                                            <Form.Label>Twitter Link (optional)</Form.Label>
-                                                                            <Form.Control
-                                                                                name="twitter"
-                                                                                defaultValue="twitter.com"
-                                                                                placedholder="enter the link to your twitter handle"
-                                                                            />
-
-                                                                        </Form.Group>
-
-                                                                        <Form.Group md="6" as={Col}>
-                                                                            <Form.Label>Facebook Link (optional)</Form.Label>
-                                                                            <Form.Control
-                                                                                name="facebook"
-                                                                                defaultValue="facebook.com"
-                                                                                placedholder="enter the to of your facebook page"
-                                                                            />
-
-                                                                        </Form.Group>
-
-                                                                        <Form.Group md="6" as={Col}>
-                                                                            <Form.Label>LinkedIn Link (optional)</Form.Label>
-                                                                            <Form.Control
-                                                                                name="linkedin"
-                                                                                defaultValue="linkedin.com"
-                                                                                placedholder="enter the link to your linkedin handle"
-                                                                            />
-                                                                        </Form.Group>
-
-                                                                        <Form.Group md="6" as={Col}>
-
-                                                                            <Form.Label>Website (optional)</Form.Label>
-                                                                            <Form.Control
-                                                                                name="website"
-                                                                                defaultValue="safex.org"
-                                                                                placedholder="if you have your own website: paste your link here"
-                                                                            />
-                                                                        </Form.Group>
-
-                                                                    </Form.Group>
-
-
-                                                                    <Form.Group as={Col}>
-
-                                                                        <Form.Label>Mixins</Form.Label>
-                                                                        <IconContext.Provider
-                                                                            value={{color: 'white', size: '20px'}}>
-                                                                            <FaInfoCircle data-tip data-for='apiInfo'
-                                                                                          className="blockchain-icon mx-4 white-text"/>
-
-                                                                            <ReactTooltip id='apiInfo' type='info'
-                                                                                          effect='solid'>
-                                                                                <span>
-                                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                                    They are combined with yours for private transactions.<br/>
-                                                                                    Changing this from the default could hurt your privacy.<br/>
-                                                                                </span>
-                                                                            </ReactTooltip>
-                                                                        </IconContext.Provider>
-
-
-                                                                        <Form.Control
-                                                                            name="mixins"
-                                                                            as="select"
-                                                                            defaultValue="7"
-                                                                        >
-                                                                            <option>1</option>
-                                                                            <option>2</option>
-                                                                            <option>3</option>
-                                                                            <option>4</option>
-                                                                            <option>5</option>
-                                                                            <option>6</option>
-                                                                            <option>7</option>
-                                                                        </Form.Control>
-
-                                                                    </Form.Group>
-                                                                </Col>
-
-
-                                                            </Form.Row>
-
-                                                            <Button
-                                                                block
-                                                                size="lg"
-                                                                variant="success"
-                                                                type="submit"
-                                                                className="my-5"
-                                                            >
-
-                                                                Create Account
-                                                            </Button>
-                                                        </Form>
-                                                    </Modal.Body>
-                                                    <Modal.Footer className="align-self-start">
-
-                                                        <Button variant="danger"
-                                                                onClick={this.handleCloseNewAccountForm}>
-                                                            Close
-                                                        </Button>
-                                                    </Modal.Footer>
-                                                </Modal>
-                                            </Col>
-
-                                        </Col>
-
-                                        {/*Messages Tab*/}
-                                        <Col
-                                            className={this.state.merchantTabs === "messages" ?
-                                                "d-flex no-gutters p-3 justify-content-around grey-back b-r10" :
-                                                "display-none"}
-                                            md={11}
-                                        >
-                                            <h1>Messages</h1>
-
-                                        </Col>
-
-                                        {/*Offers Tab*/}
-                                        <Col
-                                            className={this.state.merchantTabs === "offers" ?
-                                                "d-flex flex-column no-gutters p-3 justify-content-around grey-back b-r10" :
-                                                "display-none"}
-                                            md={11}
-                                        >
-
-                                            {selected !== void (0) ?
-                                                (
-                                                    <div>
-                                                        {this.state.show_orders ?
-                                                            (<Row>
-                                                                    <Col>
-                                                                        <Button variant="danger"
-                                                                                onClick={this.show_orders}>
-                                                                            Back
-                                                                        </Button>
-                                                                    </Col>
-                                                                    <Col>
-                                                                        <h1>*Offer Title* Orders Table</h1>
-                                                                    </Col>
-                                                                </Row>
-
-
-                                                            )
-
-                                                            :
-                                                            (<Table>
-                                                                <thead>
-
-                                                                </thead>
-
-                                                                <tbody>
-                                                                {non_listings_table}
-                                                                </tbody>
-                                                            </Table>)
-                                                        }
-                                                    </div>
-                                                )
-                                                :
-                                                (
-                                                    <div className="d-flex flex-column align-items-center">
-
-                                                        <Image
-                                                            src={require("./../../img/eating-panda.png")}
-                                                            width={100}
-                                                            height={100}
+                            <div className="home-main-div">
+                                <Col sm={4} className="no-padding d-flex flex-column align-items-center justify-content-between">
+                                    <HomeInfo
+                                        blockHeight={this.state.blockchain_height}
+                                        connection={this.state.connection_status}
+                                        firstRefresh={this.state.first_refresh}
+                                        cashBalance={this.state.cash}
+                                        tokenBalance={this.state.tokens}
+                                        pendingCash={this.state.pending_cash}
+                                        pendingTokens={this.state.pending_tokens}
+                                    />
+
+                                    <MerchantTabs
+                                        newAccountImage={this.state.newAccountImage}
+                                        handleNewAccountForm={this.handleNewAccountForm}
+                                        handleChange={this.handleChange}
+
+                                        handleNewOfferForm={this.handleShowNewOfferForm}
+                                        closeNewOfferForm={this.handleCloseEditOfferForm}
+                                        accountsImage={this.state.accountsImage}
+                                        showAccounts={() => this.setState({merchantTabs: 'accounts'})}
+
+                                        newOfferImage={this.state.newOfferImage}
+
+                                        offersImage={this.state.offersImage}
+                                        showOffers={() => this.setState({merchantTabs: 'offers'})}
+                                    />
+                                </Col>
+
+                                <Col sm={7} className="no-padding d-flex flex-column  justify-content-between">
+                                    <AccountInfo
+                                        rescan={this.rescan}
+                                        handleShow={this.handleKeys}
+                                        show={this.state.show_keys}
+                                        handleKeyRequest={() => {this.setState({keyRequest: !this.state.keyRequest})}}
+                                        keyRequest={this.state.keyRequest}
+                                        address={this.props.wallet.address()}
+                                        spendKey={this.props.wallet.secretSpendKey()}
+                                        viewKey={this.props.wallet.secretViewKey()}
+                                        seed={this.props.wallet.seed()}
+                                        toEllipsis={this.to_ellipsis}
+                                    />
+                                    
+                                    {this.state.merchantTabs === "accounts" ?
+
+                                        <MerchantAccounts
+                                            handleChange={this.handleChange}
+                                            handleNewAccountForm={this.handleNewAccountForm}
+                                            showNewAccountForm={this.state.show_new_account_form}
+                                            handleEditAccountForm={this.handleEditAccountForm}
+                                            showEditAccountForm={this.state.show_edit_account_form}
+                                            submitEdit={this.edit_account_top}
+                                            registerApi={this.register_twmapi}
+                                            newAccountImage={this.state.new_account_image}
+                                            registerAccount={this.register_account}
+                                            accounts={accounts_table}
+                                            merchantTabs={this.state.merchantTabs}
+                                            data={data}
+                                            selected={selected}
+                                        />  
+                                    :
+                                        <Row className="merchant-accounts-box">
+                                            {this.state.showMyOrders ? 
+                                                <Row className="h-100">
+                                                    <div style={{width: 800}} className="h-100" sm={12}>
+                                                        <MyOrders
+                                                            rows={tableOfOrders}
+                                                            showMessages={this.state.showMessages}
+                                                            handleShowMessages={this.handleShowMessages}
+                                                            handleHideMessages={this.handleHideMessages}
+                                                            handleOrders={this.handleMyOrders}
                                                         />
-
-                                                        <h3>You haven't selected an account so Panda decided to have a
-                                                            snack... <a className="black-text" href="javascript:void(0)"
-                                                                        onClick={() => this.handleMerchantTabChange('accounts')}><u> select
-                                                                or create an account</u></a> to get started!</h3>
                                                     </div>
-                                                )
+                                                </Row>
+                                                
+                                            :
+                                                <MerchantOffers
+                                                    handleOrders={this.handleMyOrders}
+                                                    offerRows={offerRows}
+                                                    loadOffers={this.call_non_listings_table}
+                                                />
                                             }
 
-                                        </Col>
+                                        </Row >
+                                    }
 
-                                    </Row>
+                                    <ReactModal
+                                        closeTimeoutMS={500}
+                                        isOpen={this.state.show_new_offer_form}
+                                        onRequestClose={this.handleCloseNewOfferForm}
+                                        className="new-account-modal"
 
-                                    <Col lg className="merchant-product-view b-r10 px-3 pb-5 opaque-black no-gutters mt-5">
-                                        {selected !== void (0) ? (
-                                            <div className="pt-5 align-items-center sticky d-flex flex-column">
-                                                <div>
-                                                    <Button
-                                                        className="mb-5"
-                                                        size="lg"
-                                                        variant="success"
-                                                        onClick={this.handleShowNewOfferForm}>
-                                                    New Offer
-                                                    </Button>
-                                                </div>
+                                        style={{
+                                            overlay: {
+                                            position: 'fixed',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                            },
+                                            content: {
+                                            position: 'absolute',
+                                            top: '40px',
+                                            left: '40px',
+                                            right: '40px',
+                                            bottom: '40px',
+                                            overflow: 'auto',
+                                            }
+                                        }}
+                                    >
+                                            <h1>Create New Offer</h1>
+                                    
 
-                                                <Modal
-                                                    animation={false}
-                                                    show={this.state.show_new_offer_form}
-                                                    onHide={this.handleCloseNewOfferForm}
-                                                    size="lg"
-                                                >
-                                                    <Modal.Header closeButton>
-                                                        <Modal.Title>Create New Offer</Modal.Title>
-                                                    </Modal.Header>
-                                                    <Modal.Body>
+                                            <Form
+                                                id="list_new_offer"
+                                                onSubmit={this.list_new_offer}
+                                            >
+                                                <Row className="no-gutters justify-content-between w-100">
+                                                    <Col md="8">
+                                                        <Form.Group as={Col}>
+                                                            <Form.Label>Username</Form.Label>
 
-                                                        <Form
-                                                            id="list_new_offer"
-                                                            onSubmit={this.list_new_offer}
+                                                            <Form.Control
+                                                                disabled
+                                                                name="username"
+                                                                value={selected.username}
+                                                            />
+                                                        </Form.Group>
+
+                                                        <Form.Group  as={Col}>
+                                                            <Form.Label>Image URL</Form.Label>
+
+                                                            <Form.Control
+                                                                name="new_account_image"
+                                                                defaultValue={data.main_image}
+                                                                onChange={this.handleChange}
+                                                            />
+                                                        </Form.Group>
+                                                    </Col>
+
+                                                    <Col md="4">
+                                                        <Image
+                                                            className="border border-white grey-back"
+                                                            width={150}
+                                                            height={150}
+                                                            src={this.state.new_account_image}
+                                                            roundedCircle
+                                                        />
+                                                    </Col>
+                                                </Row>
+
+                                                <Row  md="8">
+                                                    <Form.Group md="6" as={Col}>
+                                                        <Form.Label>Title</Form.Label>
+
+                                                        <Form.Control name="title"
+                                                                        defaultValue={this.state.show_edit_offer.title}/>
+                                                    </Form.Group>
+
+                                                    <Form.Group md="6" as={Col}>
+                                                        <Form.Label>Description</Form.Label>
+
+                                                        <Form.Control maxLength="2000" as="textarea"
+                                                                            name="description"
+                                                                            defaultValue={data.description}/>
+                                                    </Form.Group>
+
+                                                    <Form.Group  md="6" as={Col}>
+                                                        <Form.Label>Price (SFX)</Form.Label>
+
+                                                        <Form.Control
+                                                            name="price"
+                                                            defaultValue={1}
+                                                        />
+                                                    </Form.Group>
+
+                                                    <Form.Group  md="6" as={Col}>
+                                                        <Form.Label>Available Quantity</Form.Label>
+
+                                                        <Form.Control
+                                                            name="quantity"
+                                                            defaultValue={1}
+                                                        />
+                                                    </Form.Group>
+
+                                                    <Form.Group  md="6" as={Col}>
+                                                        <Form.Label>SKU</Form.Label>
+
+                                                        <Form.Control
+                                                            name="sku"
+                                                            defaultValue={data.sku}
+                                                        />
+                                                    </Form.Group>
+
+                                                    <Form.Group  md="6" as={Col}>
+                                                        <Form.Label>Barcode (ISBN, UPC, GTIN, etc)</Form.Label>
+
+                                                        <Form.Control
+                                                            name="barcode"
+                                                            defaultValue={data.barcode}
+                                                        />
+                                                    </Form.Group>
+
+                                                    <Form.Group  md="6" as={Col}>
+                                                        <Form.Label>Weight</Form.Label>
+
+                                                        <Form.Control
+                                                            name="weight"
+                                                            defaultValue={data.weight}
+                                                        />
+                                                    </Form.Group>
+
+                                                    <Form.Group  md="6" as={Col}>
+                                                        <Form.Label>Physical Item?</Form.Label>
+
+                                                        <Form.Control
+                                                            name="physical"
+                                                            defaultValue="true"
+                                                        />
+                                                    </Form.Group>
+
+                                                    <Form.Group md="6" as={Col}>
+                                                        <Form.Label>Message Types</Form.Label>
+
+                                                        <Form.Control
+                                                            name="shipping_type"
+                                                            defaultValue="Shipping"
+                                                        />
+                                                    </Form.Group>
+
+                                                    <Form.Group md="6" as={Col}>
+                                                        <Form.Label>Country of Origin</Form.Label>
+
+                                                        <Form.Control
+                                                            name="country"
+                                                            defaultValue={data.country}
+                                                            placedholder="your location"
+                                                        />
+                                                    </Form.Group>
+                                                </Row>
+
+                                                <Row className="w-100 justify-content-around my-3">
+                                                    <Form.Check
+                                                        label="Shipping"
+                                                        checked={this.state.shipping_switch}
+                                                        onChange={this.change_shipping_switch} 
+                                                        type="switch" 
+                                                        id="shipping-switch" 
+                                                        name="shipping" 
+                                                    />
+
+                                                    <Form.Check
+                                                        label="NFT"
+                                                        checked={this.state.nft_switch}
+                                                        onChange={this.change_nft_switch} 
+                                                        type="switch" 
+                                                        id="nft-switch" 
+                                                        name="nft" 
+                                                    />
+                                                    
+                                                    <Form.Check
+                                                        label="Open Messages"
+                                                        checked={this.state.open_message_switch}
+                                                        onChange={this.change_open_message_switch} 
+                                                        type="switch" 
+                                                        id="open-switch" 
+                                                        name="open_message" 
+                                                    />
+                                                </Row>
+
+
+                                                <Form.Group as={Col}>
+                                                    <Form.Label>
+                                                        Mixins
+                                                        <IconContext.Provider  value={{color: 'black', size: '20px'}}>
+                                                            <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon mx-4 white-text"/>
+
+                                                            <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                                <span>
+                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                    They are combined with yours for private transactions.<br/>
+                                                                    Changing this from the default could hurt your privacy.<br/>
+                                                                </span>
+                                                            </ReactTooltip>
+                                                        </IconContext.Provider>
+                                                    </Form.Label>
+
+                                                    <Form.Control
+                                                        name="mixins"
+                                                        as="select"
+                                                        defaultValue="7"
+                                                    >
+                                                        <option>1</option>
+                                                        <option>2</option>
+                                                        <option>3</option>
+                                                        <option>4</option>
+                                                        <option>5</option>
+                                                        <option>6</option>
+                                                        <option>7</option>
+                                                    </Form.Control>
+                                                </Form.Group>
+
+                                                <button className="my-5" type="submit">
+                                                    List Offer
+                                                </button>
+                                            </Form>
+                                        
+                                            <Button 
+                                                className="close-button"
+                                                onClick={this.handleCloseNewOfferForm}
+                                            >
+                                                Close
+                                            </Button>
+                                        </ReactModal>
+
+                                    <ReactModal
+                                        closeTimeoutMS={500}
+                                        isOpen={this.state.show_new_account_form}
+                                        onRequestClose={this.handleCloseEditOfferForm}
+                                        className="new-account-modal"
+
+                                        style={{
+                                            overlay: {
+                                            position: 'fixed',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                            },
+                                            content: {
+                                            position: 'absolute',
+                                            top: '40px',
+                                            left: '40px',
+                                            right: '40px',
+                                            bottom: '40px',
+                                            overflow: 'auto',
+                                            }
+                                        }}
+                                    >
+                                        
+                                        <h1>Make New Account</h1>
+                                
+                                        <Form id="create_account" onSubmit={this.register_account}>
+                                            <Row className="no-gutters justify-content-between w-100">
+                                                <Col md="8">
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Username</Form.Label>
+
+                                                        <Form.Control 
+                                                            name="username"
+                                                            placedholder="enter your desired username"
+                                                        />
+                                                    </Form.Group>
+
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Avatar URL</Form.Label>
+                                                        <Form.Control
+                                                            onChange={this.handleChange}
+                                                            value={this.state.new_account_image}
+                                                            name="new_account_image"
+                                                        />
+                                                    </Form.Group>
+                                                </Col>
+
+                                                <Col md="4">
+                                                    <Image
+                                                        width={125}
+                                                        height={125}
+                                                        src={this.state.new_account_image}
+                                                        roundedCircle
+                                                    />
+                                                </Col>
+                                            </Row>
+
+                                            <Row>
+                                                <Col>
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Biography</Form.Label>
+                                                        <Form.Control
+                                                            maxLength="500"
+                                                            as="textarea"
+                                                            name="biography"
+                                                            placedholder="type up your biography"
+                                                            style={{maxHeight: 150}}
+                                                        />
+                                                    </Form.Group>
+
+
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Location</Form.Label>
+                                                        <Form.Control
+                                                            name="location"
+                                                            defaultValue="Earth"
+                                                            placedholder="your location"
+                                                        />
+                                                    </Form.Group>
+
+                                                    <Form.Group as={Col}>
+
+                                                        <Form.Label>Email</Form.Label>
+                                                        <Form.Control
+                                                            name="email"
+                                                            defaultValue="xyz@example.com"
+                                                            placedholder="your location"
+                                                        />
+                                                    </Form.Group>
+
+                                                    <Form.Group>
+                                                        <Form.Group md="6" as={Col}>
+                                                            <Form.Label>Twitter Link</Form.Label>
+                                                            <Form.Control
+                                                                name="twitter"
+                                                                defaultValue="twitter.com"
+                                                                placedholder="enter the link to your twitter handle"
+                                                            />
+
+                                                        </Form.Group>
+
+                                                        <Form.Group md="6" as={Col}>
+                                                            <Form.Label>Facebook Link</Form.Label>
+                                                            <Form.Control
+                                                                name="facebook"
+                                                                defaultValue="facebook.com"
+                                                                placedholder="enter the to of your facebook page"
+                                                            />
+
+                                                        </Form.Group>
+
+                                                        <Form.Group md="6" as={Col}>
+                                                            <Form.Label>LinkedIn Link</Form.Label>
+                                                            <Form.Control
+                                                                name="linkedin"
+                                                                defaultValue="linkedin.com"
+                                                                placedholder="enter the link to your linkedin handle"
+                                                            />
+                                                        </Form.Group>
+
+                                                        <Form.Group md="6" as={Col}>
+
+                                                            <Form.Label>Website</Form.Label>
+                                                            <Form.Control
+                                                                name="website"
+                                                                defaultValue="safex.org"
+                                                                placedholder="if you have your own website: paste your link here"
+                                                            />
+                                                        </Form.Group>
+
+                                                    </Form.Group>
+
+
+                                                    <Form.Group as={Col}>
+
+                                                        <Form.Label>Mixins</Form.Label>
+                                                        <IconContext.Provider
+                                                            value={{color: 'white', size: '20px'}}>
+                                                            <FaInfoCircle data-tip data-for='apiInfo'
+                                                                            className="blockchain-icon mx-4 white-text"/>
+
+                                                            <ReactTooltip id='apiInfo' type='info'
+                                                                            effect='solid'>
+                                                                <span>
+                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                    They are combined with yours for private transactions.<br/>
+                                                                    Changing props from the default could hurt your privacy.<br/>
+                                                                </span>
+                                                            </ReactTooltip>
+                                                        </IconContext.Provider>
+
+
+                                                        <Form.Control
+                                                            name="mixins"
+                                                            as="select"
+                                                            defaultValue="7"
                                                         >
-                                                            <Form.Row>
-                                                            <Col md="8">
-                                                                <Form.Group as={Col}>
-                                                                    <Form.Label>Username</Form.Label>
+                                                            <option>1</option>
+                                                            <option>2</option>
+                                                            <option>3</option>
+                                                            <option>4</option>
+                                                            <option>5</option>
+                                                            <option>6</option>
+                                                            <option>7</option>
+                                                        </Form.Control>
 
-                                                                    <Form.Control
-                                                                        disabled
-                                                                        name="username"
-                                                                        value={selected.username}
-                                                                    />
-                                                                </Form.Group>
-                                                                <Form.Group  as={Col}>
-                                                                    <Form.Label>Image URL</Form.Label>
-
-                                                                    <Form.Control
-                                                                        name="new_account_image"
-                                                                        defaultValue={data.main_image}
-                                                                        onChange={this.handleChange}
-                                                                    />
-                                                                </Form.Group>
-                                                            </Col>
-
-                                                            <Col md="4">
-                                                                <Image
-                                                                    className="border border-white grey-back"
-                                                                    width={150}
-                                                                    height={150}
-                                                                    src={this.state.new_account_image}
-                                                                    roundedCircle
-                                                                />
-                                                            </Col>
-                                                        </Form.Row>
-
-                                                        <Form.Row  md="8">
-                                                            <Form.Group as={Col}>
-                                                                <Form.Label>Title</Form.Label>
-
-                                                                <Form.Control name="title"
-                                                                                defaultValue={this.state.show_edit_offer.title}/>
-                                                            </Form.Group>
-
-                                                            <Form.Group as={Col}>
-                                                                <Form.Label>Description</Form.Label>
-
-                                                                <Form.Control maxLength="2000" as="textarea"
-                                                                                    name="description"
-                                                                                    defaultValue={data.description}/>
-                                                            </Form.Group>
-                                                        </Form.Row>
-
-                                                        <Form.Row>
-
-                                                            <Form.Group  md="6" as={Col}>
-                                                                <Form.Label>Price (SFX)</Form.Label>
-
-                                                                <Form.Control
-                                                                    name="price"
-                                                                    defaultValue={1}
-                                                                />
-                                                            </Form.Group>
-
-                                                            <Form.Group  md="6" as={Col}>
-                                                                <Form.Label>Available Quantity</Form.Label>
-
-                                                                <Form.Control
-                                                                    name="quantity"
-                                                                    defaultValue={1}
-                                                                />
-                                                            </Form.Group>
-
-                                                            <Form.Group  md="6" as={Col}>
-                                                                <Form.Label>SKU</Form.Label>
-
-                                                                <Form.Control
-                                                                    name="sku"
-                                                                    defaultValue={data.sku}
-                                                                />
-                                                            </Form.Group>
-
-                                                            <Form.Group  md="6" as={Col}>
-                                                                <Form.Label>Barcode (ISBN, UPC, GTIN, etc)</Form.Label>
-
-                                                                <Form.Control
-                                                                    name="barcode"
-                                                                    defaultValue={data.barcode}
-                                                                />
-                                                            </Form.Group>
-
-                                                            <Form.Group  md="6" as={Col}>
-                                                                <Form.Label>Weight</Form.Label>
-
-                                                                <Form.Control
-                                                                    name="weight"
-                                                                    defaultValue={data.weight}
-                                                                />
-                                                            </Form.Group>
-
-                                                            <Form.Group  md="6" as={Col}>
-                                                                <Form.Label>Physical Item?</Form.Label>
-
-                                                                <Form.Control
-                                                                    name="physical"
-                                                                    defaultValue="true"
-                                                                />
-                                                            </Form.Group>
+                                                    </Form.Group>
+                                                </Col>
 
 
-                                                        </Form.Row>
+                                            </Row>
 
-                                                        <Form.Row>
-                                                            <Form.Group md="6" as={Col}>
-                                                                <Form.Label>Message Types</Form.Label>
+                                            <button
+                                                block
+                                                size="lg"
+                                                variant="success"
+                                                type="submit"
+                                                className="my-5"
+                                            >
 
-                                                                <Form.Control
-                                                                    name="shipping_type"
-                                                                    defaultValue="Shipping"
-                                                                />
-                                                            </Form.Group>
+                                                Create Account
+                                            </button>
+                                            
+                                            
+                                        </Form>
 
-                                                            <Form.Group md="6" as={Col}>
-                                                                <Form.Label>Country of Origin</Form.Label>
-
-                                                                <Form.Control
-                                                                    name="country"
-                                                                    defaultValue={data.country}
-                                                                    placedholder="your location"
-                                                                />
-                                                            </Form.Group>
-
-
-
-                                                        </Form.Row>
-
-                                                            <Form.Row md="8">
-                                                                <Form.Group as={Col}>
-                                                                    <Form.Label>shipping</Form.Label>
-
-                                                                    <Form.Check
-                                                                        onChange={this.change_shipping_switch} type="switch" id="shipping-switch" name="shipping" />
-                                                                </Form.Group>
-                                                                <Form.Group as={Col}>
-                                                                    <Form.Label>nft</Form.Label>
-
-                                                                    <Form.Check
-                                                                       onChange={this.change_nft_switch} type="switch" id="nft-switch" name="nft" />
-                                                                </Form.Group>
-
-                                                                <Form.Group as={Col}>
-                                                                    <Form.Label>open messages</Form.Label>
-
-                                                                    <Form.Check
-                                                                        onChange={this.change_open_message_switch} type="switch" id="open-switch" name="open_message" />
-                                                                </Form.Group>
-                                                            </Form.Row>
+                                        <button 
+                                            className="close-button"
+                                            onClick={this.handleNewAccountForm}
+                                        >
+                                            Close
+                                        </button>
+                                    </ReactModal>
 
 
-                                                            <Form.Group>
-                                                                <Form.Label>
-                                                                    Mixins
-                                                                    <IconContext.Provider  value={{color: 'black', size: '20px'}}>
-                                                                        <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon mx-4 white-text"/>
+                                    <ReactModal
+                                            isOpen={this.state.showMessages}
+                                            closeTimeoutMS={500}
+                                            className="keys-modal"
+                                            onRequestClose={this.hideMessages}
+                                        >   
+                                            <Row>
+                                                <Col sm={10}>
+                                                    <h1>
+                                                        Messages
+                                                    </h1>
 
-                                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                                            <span>
-                                                                                Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                                They are combined with yours for private transactions.<br/>
-                                                                                Changing this from the default could hurt your privacy.<br/>
-                                                                            </span>
-                                                                        </ReactTooltip>
-                                                                    </IconContext.Provider>
-                                                                </Form.Label>
 
-                                                                <Form.Control
-                                                                    name="mixins"
-                                                                    as="select"
-                                                                    defaultValue="7"
-                                                                >
-                                                                    <option>1</option>
-                                                                    <option>2</option>
-                                                                    <option>3</option>
-                                                                    <option>4</option>
-                                                                    <option>5</option>
-                                                                    <option>6</option>
-                                                                    <option>7</option>
-                                                                </Form.Control>
-                                                            </Form.Group>
+                                                </Col>
+                                                <Col sm={2}>
+                                                    <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
+                                                        <CgCloseR
+                                                            className="mx-auto"
+                                                            onClick={this.hideMessages}
+                                                        />
+                                                    </IconContext.Provider>
+                                                </Col>
+                                            </Row>
+                                            
+                                            <Row className="m-auto">
+                                                <Col sm={12}>
+                                                    <h1>PUT MESSAGE HERE</h1>
+                                                    {
+                                                    //  this.state.currentMessage
+                                                    }
+                                                </Col>
+                                            </Row>
+                                        </ReactModal>  
+                                
+                                    
+                                    <ReactModal
+                                        closeTimeoutMS={500}
+                                        isOpen={this.state.show_edit_offer_form}
+                                        onRequestClose={this.handleCloseEditOfferForm}
+                                        className="new-account-modal"
 
-                                                            <Button block size="lg" variant="success" type="submit">
-                                                                List Offer
-                                                            </Button>
-                                                        </Form>
-                                                    </Modal.Body>
-                                                    <Modal.Footer className="align-self-start">
-                                                        <Button size="lg" variant="danger"
-                                                                onClick={this.handleCloseNewOfferForm}>
-                                                            Close
-                                                        </Button>
-                                                    </Modal.Footer>
-                                                </Modal>
-                                                <thead className="w-100 opaque-black text-align-center">
+                                        style={{
+                                            overlay: {
+                                            position: 'fixed',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                            },
+                                            content: {
+                                            position: 'absolute',
+                                            top: '40px',
+                                            left: '40px',
+                                            right: '40px',
+                                            bottom: '40px',
+                                            overflow: 'auto',
+                                            }
+                                        }}
+                                    >
+                                            
+                                        <h1>Edit Offer {this.state.show_edit_offer.title}</h1>
 
-                                                    <tr>
-                                                        <th className="title-row">Title</th>
-                                                        <th className="quantity-row">Price (SFX)</th>
-                                                        <th className="quantity-row">Quantity</th>
-                                                        <th className="quantity-row">Seller</th>
-                                                        <th className="actions-row">Offer ID</th>
-                                                        <th className="title-row">Actions</th>
+                                        <Form
+                                            id="edit_offer"
+                                            onSubmit={(e) => this.make_edit_offer(e, this.state.show_edit_offer)}
+                                        >
+                                            <Form.Row>
+                                                <Col md="8">
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Offer ID</Form.Label>
 
-                                                    </tr>
-                                                </thead>
-                                            </div>) : ''}
+                                                        <Form.Control
+                                                            disabled
+                                                            name="offerid"
+                                                            value={this.state.show_edit_offer.offerID}
+                                                        />
+                                                    </Form.Group>
 
-                                        <Row className="no-gutters">
-                                            {this.state.twm_offers.length > 1 ? (
-                                                    <Table color="white"
-                                                           className="white-text border border-white b-r10">
-                                                        <thead>
-                                                        <tr>
-                                                            <th>Title</th>
-                                                            <th>Price (SFX)</th>
-                                                            <th>Quantity</th>
-                                                            <th>Seller</th>
-                                                            <th>Offer ID</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        {twm_listings_table}
-                                                        </tbody>
-                                                    </Table>)
-                                                : (<div></div>)}
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Username</Form.Label>
 
-                                            <Table>
-                                                <thead>
+                                                        <Form.Control
+                                                            disabled
+                                                            name="username"
+                                                            value={this.state.show_edit_offer.seller}
+                                                        />
+                                                    </Form.Group>
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Image URL</Form.Label>
 
-                                                </thead>
-                                                <tbody>
-                                                {non_listings_table}
-                                                </tbody>
-                                            </Table>
-                                        </Row>
-                                    </Col>
+                                                        <Form.Control
+                                                            name="main_image"
+                                                            defaultValue={data.main_image}
+                                                            onChange={this.handleChange}
+                                                        />
+                                                    </Form.Group>
+                                                </Col>
+
+                                                <Col md="4">
+                                                    <Image
+                                                        className="border border-white grey-back"
+                                                        width={150}
+                                                        height={150}
+                                                        src={this.state.new_offer_image ? this.state.new_offer_image : data.main_image}
+                                                        roundedCircle
+                                                    />
+                                                </Col>
+                                            </Form.Row>
+
+                                            <Form.Row md="8">
+                                                <Form.Group as={Col}>
+                                                    <Form.Label>Title</Form.Label>
+
+                                                    <Form.Control name="title"
+                                                                    defaultValue={this.state.show_edit_offer.title}/>
+                                                </Form.Group>
+
+                                                <Form.Group as={Col}>
+                                                    <Form.Label>Description</Form.Label>
+
+                                                    <Form.Control maxLength="2000" as="textarea"
+                                                                    name="description"
+                                                                    defaultValue={data.description}/>
+                                                </Form.Group>
+                                            </Form.Row>
+
+                                            <Form.Row>
+
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Price (SFX)</Form.Label>
+
+                                                    <Form.Control
+                                                        name="price"
+                                                        defaultValue={this.state.show_edit_offer.price / 10000000000}
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Available Quantity</Form.Label>
+
+                                                    <Form.Control
+                                                        name="quantity"
+                                                        defaultValue={this.state.show_edit_offer.quantity}
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>SKU</Form.Label>
+
+                                                    <Form.Control
+                                                        name="sku"
+                                                        defaultValue={data.sku}
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Barcode (ISBN, UPC, GTIN, etc)</Form.Label>
+
+                                                    <Form.Control
+                                                        name="barcode"
+                                                        defaultValue={data.barcode}
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Weight</Form.Label>
+
+                                                    <Form.Control
+                                                        name="weight"
+                                                        defaultValue={data.weight}
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Physical Item?</Form.Label>
+
+                                                    <Form.Control
+                                                        name="physical"
+                                                        defaultValue={data.physical}
+                                                    />
+                                                </Form.Group>
+
+
+                                            </Form.Row>
+
+                                            <Form.Row>
+
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Country of Origin</Form.Label>
+
+                                                    <Form.Control
+                                                        name="country"
+                                                        defaultValue={data.country}
+                                                        placedholder="your location"
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Row md="8">
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Shipping</Form.Label>
+
+                                                        <Form.Check
+                                                            checked={this.state.shipping_switch}
+                                                            onChange={this.change_shipping_switch} type="switch" id="shipping-switch2" name="shipping" />
+                                                    </Form.Group>
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>NFT</Form.Label>
+
+                                                        <Form.Check
+                                                            checked={this.state.nft_switch}
+                                                            onChange={this.change_nft_switch} type="switch" id="nft-switch2" name="nft" />
+                                                    </Form.Group>
+
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>open messages</Form.Label>
+
+                                                        <Form.Check
+                                                            checked={this.state.open_message_switch}
+                                                            onChange={this.change_open_message_switch} type="switch" id="open-switch2" name="open_message" />
+                                                    </Form.Group>
+                                                </Form.Row>
+
+
+                                            </Form.Row>
+
+
+                                            <Form.Row>
+                                                <Form.Group md="4" as={Col}>
+                                                    <Form.Label>Set Active?</Form.Label>
+
+                                                    <Form.Control
+                                                        name="active"
+                                                        defaultValue={this.state.show_edit_offer.active}
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group md="8" as={Col}>
+                                                    <Form.Label>
+                                                        Mixins
+                                                        <IconContext.Provider
+                                                            value={{color: 'black', size: '20px'}}>
+                                                            <FaInfoCircle data-tip data-for='apiInfo'
+                                                                            className="blockchain-icon mx-4 white-text"/>
+
+                                                            <ReactTooltip id='apiInfo' type='info'
+                                                                            effect='solid'>
+                                                                    <span>
+                                                                        Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                        They are combined with yours for private transactions.<br/>
+                                                                        Changing this from the default could hurt your privacy.<br/>
+                                                                    </span>
+                                                            </ReactTooltip>
+                                                        </IconContext.Provider>
+                                                    </Form.Label>
+
+                                                    <Form.Control
+                                                        name="mixins"
+                                                        as="select"
+                                                        defaultValue="7"
+                                                    >
+                                                        <option>1</option>
+                                                        <option>2</option>
+                                                        <option>3</option>
+                                                        <option>4</option>
+                                                        <option>5</option>
+                                                        <option>6</option>
+                                                        <option>7</option>
+                                                    </Form.Control>
+                                                </Form.Group>
+                                            </Form.Row>
+
+
+                                            <button type="submit">
+                                                Submit Edit
+                                            </button>
+                                        </Form>
+
+                                        <button 
+                                            className="close-button my-5" 
+                                            onClick={this.handleCloseEditOfferForm}
+                                        >
+                                            Close
+                                        </button>
+                                    </ReactModal>
+                                
                                 </Col>
-                            </Row>);
+                            </div>);
+
                     } catch (err) {
                         console.log(err);
                         alert(err);
-                        return (<div><p>Error loading</p></div>);
+                        return (<p>Error loading</p>);
                     }
                 }
+
                 case "tokens": {
                     let staked_tokens = wallet.stakedTokenBalance() / 10000000000;
                     let unlocked_tokens = wallet.unlockedStakedTokenBalance() / 10000000000;
@@ -4619,310 +4185,65 @@ class WalletHome extends React.Component {
                         console.error(`error at the interval loading of stacking`);
                     }
                     return (
-                        <div
-                            className="wallet no-gutters blue-gradient-back-opaque flex-column border-bottom border-white b-r10 oflow-y-scroll">
+                        <div className="home-main-div">
+                            <Col sm={3} className="no-padding d-flex flex-column justify-content-around align-items-center">
+                                <HomeInfo
+                                    blockHeight={this.state.blockchain_height}
+                                    connection={this.state.connection_status}
+                                    firstRefresh={this.state.first_refresh}
+                                    cashBalance={this.state.cash}
+                                    tokenBalance={this.state.tokens}
+                                    pendingCash={this.state.pending_cash}
+                                    pendingTokens={this.state.pending_tokens}
+                                />
 
-                            <h1 className="text-center m-2"> Token Management </h1>
+                                <SendSafex 
+                                    title="SEND TOKENS"
+                                    style="token"
+                                    send={this.token_send}
+                                    id="send_token"
+                                />
+                            </Col>
 
-                            <hr class="border border-light w-100"></hr>
+                            <Col sm={9} className="no-padding token-main-box">
+                                <Row className="mx-auto w-100">
+                                    <StakingTable 
+                                        /*
+                                            rows={stakingRows}
+                                            Needs to be created using .map and StakingTableRow
+                                        */
+                                    />
 
-                            <div className="d-flex justify-content-around">
+                                    <Row className="justify-content-around w-100 mx-auto my-5">
+                                        <Stake
+                                            style="stake"
+                                            send={this.make_token_stake}
+                                            id="stake_token"
+                                            tokenBalance={this.state.tokens.toLocaleString()}
+                                        />
 
-                                <div className="token-box p-2 font-size-small">
-                                    <h3> Send Tokens </h3>
+                                        <StakeInfo
+                                            tokenBalance={this.state.tokens.toLocaleString()}
+                                            pendingStakeBalance={pending_stake.toLocaleString()}
+                                            stakedBalance={unlocked_tokens.toLocaleString()}
+                                            interest={this.state.blockchain_current_interest.cash_per_token / 10000000000}
+                                            blockHeight={this.state.blockchain_height.toLocaleString()}
+                                            nextInterval={100 - (this.state.blockchain_height % 100)}
+                                            totalNetworkStake={this.state.blockchain_tokens_staked.toLocaleString()}
+                                        />
 
-                                    <hr class="border border-light w-100"></hr>
-
-                                    <ul>
-                                        <Col>
-                                            <li id="wallet-balance">{this.state.tokens.toLocaleString()} SFT</li>
-                                            {this.state.pending_tokens > 0 ?
-                                                (
-                                                    <li className="border border-warning p-1">{this.state.pending_tokens.toLocaleString()} SFT
-                                                        Pending</li>) : ''}
-                                        </Col>
-                                        {/*
-                                            this.state.pending_tokens > 0 ?
-                                                ( <li>{this.state.tokens.toLocaleString() + this.state.pending_tokens.toLocaleString()} NET</li>) : ''
-                                            */}
-                                    </ul>
-
-                                    <hr class="border border-light w-100"></hr>
-
-                                    <Form id="send_token" onSubmit={this.token_send}>
-                                        <Form.Group>
-                                            <Form.Label>Destination Address</Form.Label>
-
-                                            <Form.Control
-                                                name="destination"
-                                                defaultValue="Safex5..."
-                                                placedholder="the destination address"
-                                            />
-                                        </Form.Group>
-
-                                        <Form.Group>
-                                            <Form.Label>Amount (SFT)</Form.Label>
-
-                                            <Form.Control
-                                                name="amount"
-                                                defaultValue="0"
-                                                placedholder="the amount to send"
-                                            />
-                                        </Form.Group>
-
-                                        <Form.Group>
-                                            <Form.Label>
-                                                Mixins
-                                                <IconContext.Provider value={{color: 'white', size: '20px'}}>
-                                                    <FaInfoCircle data-tip data-for='mixinTokenSendInfo'
-                                                                  className="blockchain-icon ml-8 white-text"/>
-
-                                                    <ReactTooltip id='mixinTokenSendInfo' type='info' effect='solid'>
-                                                        <span>
-                                                            Mixins are transactions that have also been sent on the Safex blockchain.<br/>
-                                                            They are combined with yours for private transactions.<br/>
-                                                            Changing this from the default could hurt your privacy.<br/>
-                                                        </span><br/>
-                                                    </ReactTooltip>
-                                                </IconContext.Provider>
-                                            </Form.Label>
-                                            <Form.Control
-                                                name="mixins"
-                                                as="select"
-                                                defaultValue="7"
-                                            >
-                                                <option>1</option>
-                                                <option>2</option>
-                                                <option>3</option>
-                                                <option>4</option>
-                                                <option>5</option>
-                                                <option>6</option>
-                                                <option>7</option>
-                                            </Form.Control>
-                                        </Form.Group>
-
-                                        <Button className="mt-2" type="submit" variant="warning" size="lg" block>
-                                            Send Tokens
-                                        </Button>
-                                    </Form>
-                                </div>
-
-                                <div className="vl"></div>
-
-                                <Col sm={8} className="blue-gradient-back no-gutters pt-3 b-r10 opaque-black">
-
-                                    <div className="staking-table mt-2 rounded grey-back">
-
-                                        <h2 className="text-center "> Stakes </h2>
-
-                                        <Table color="white"
-                                               className="white-text border border-white b-r10 light-blue-back ">
-                                            <thead className="opaque-black">
-                                            <tr>
-                                                <th>TXID</th>
-                                                <th>Amount (SFT)</th>
-                                                <th>Interest (SFX)</th>
-                                                <th>Block</th>
-
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-
-                                            </tbody>
-                                        </Table>
-                                    </div>
-
-                                    <div className="staking-box border border-light rounded  my-3">
-
-                                        <div className="token-box grey-back p-2 font-size-small">
-
-                                            <h3 className="text-center m-2"> Stake Tokens </h3>
-
-                                       <Form id="stake_tokens" onSubmit={this.make_token_stake}>
-                                            <Form.Group>
-                                                <Form.Label>Amount (SFT)</Form.Label>
-
-                                                <Form.Control
-                                                    name="amount"
-                                                    defaultValue="0"
-                                                    placedholder="The amount to stake"
-                                                />
-                                            </Form.Group>
-
-                                            <Form.Group>
-                                                <Form.Label>
-                                                    Mixins
-                                                    <IconContext.Provider  value={{color: 'white', size: '20px'}}>
-                                                        <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon ml-8 white-text"/>
-
-                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                            <span>
-                                                                Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                They are combined with yours for private transactions. <br/>
-                                                                Changing this from the default could hurt your privacy. <br/>
-                                                            </span>
-                                                            </ReactTooltip>
-                                                        </IconContext.Provider>
-                                                    </Form.Label>
-                                                    <Form.Control
-                                                        name="mixins"
-                                                        as="select"
-                                                        defaultValue="7"
-                                                    >
-                                                        <option>1</option>
-                                                        <option>2</option>
-                                                        <option>3</option>
-                                                        <option>4</option>
-                                                        <option>5</option>
-                                                        <option>6</option>
-                                                        <option>7</option>
-                                                    </Form.Control>
-                                                </Form.Group>
-                                                <Button className="mt-2" type="submit" variant="warning" size="lg"
-                                                        block>
-                                                    Stake Tokens
-                                                </Button>
-                                            </Form>
-                                        </div>
-                                        <div className="height-fit-content align-self-center b-r10 opaque-black">
-                                            <Table className="border border-light">
-                                                <thead>
-                                                <tr>
-                                                    <th>Status</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <li>{this.state.cash.toLocaleString()} SFX</li>
-                                                        {this.state.pending_cash > 0 ?
-                                                            (<li>{this.state.pending_cash.toLocaleString()} SFX
-                                                                Pending</li>) : ''}
-                                                        {/*
-                                                    this.state.pending_cash > 0 ?
-                                                        (
-                                                            <li>{this.state.cash.toLocaleString() + this.state.pending_cash.toLocaleString()} NET</li>) : ''
-                                                    */}
-
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td>
-                                                        <li>{this.state.tokens.toLocaleString()} SFT</li>
-                                                        {this.state.pending_tokens > 0 ?
-                                                            (<li>{this.state.pending_tokens.toLocaleString()} SFT
-                                                                Pending</li>) : ''}
-                                                        {this.state.pending_tokens > 0 ?
-                                                            (
-                                                                <li>{this.state.tokens.toLocaleString() + this.state.pending_tokens.toLocaleString()} NET</li>) : ''}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <li>Total Staked
-                                                            Tokens: {this.state.blockchain_tokens_staked.toLocaleString()}</li>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td>
-                                                        <li>Your Total Staked
-                                                            Tokens: {unlocked_tokens.toLocaleString()} {pending_stake > 0 ? (
-                                                                <span>| {pending_stake.toLocaleString()} Pending</span>) : ''}</li>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <li>Current
-                                                            Block: {this.state.blockchain_height.toLocaleString()}</li>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <li>Next
-                                                            Interval: {100 - (this.state.blockchain_height % 100)} Blocks
-                                                        </li>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <li>
-                                                            Interest
-                                                            Accrued: {this.state.blockchain_current_interest.cash_per_token / 10000000000} SFX
-                                                            per token
-                                                        </li>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                                <tfoot>
-                                                </tfoot>
-                                            </Table>
-                                        </div>
-
-                                        <div className="token-box p-2 grey-back font-size-small">
-
-                                            <h3 className="text-center m-2"> Unstake Tokens </h3>
-
-                                            <select className="opaque-black" id="stakes">
-                                                <option value="">Choose Stake ID</option>
-                                            </select>
-
-                                            <Form id="unstake_tokens" onSubmit={this.make_token_unstake}>
-
-                                                <Form.Group>
-                                                    <Form.Label>
-                                                        Amount (SFT) (MAX: {unlocked_tokens.toLocaleString()})
-                                                    </Form.Label>
-
-                                                    <Form.Control
-                                                        name="amount"
-                                                        defaultValue="0"
-                                                        placedholder="the amount to send"
-                                                    />
-                                                </Form.Group>
-
-
-                                                <Form.Group>
-                                                    <Form.Label>
-                                                        Mixins
-                                                        <IconContext.Provider  value={{color: 'white', size: '20px'}}>
-                                                            <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon ml-8 white-text"/>
-
-                                                            <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                                <span>
-                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                    They are combined with yours for private transactions. <br/>
-                                                                    Changing this from the default could hurt your privacy. <br/>
-                                                                </span>
-                                                            </ReactTooltip>
-                                                        </IconContext.Provider>
-                                                    </Form.Label>
-                                                    <Form.Control
-                                                    name="mixins"
-                                                    as="select"
-                                                    defaultValue="7"
-                                                    >
-                                                        <option>1</option>
-                                                        <option>2</option>
-                                                        <option>3</option>
-                                                        <option>4</option>
-                                                        <option>5</option>
-                                                        <option>6</option>
-                                                        <option>7</option>
-                                                    </Form.Control>
-                                                </Form.Group>
-                                                <Button className="mt-2" type="submit" variant="danger" size="lg" block>
-                                                    Unstake and Collect
-                                                </Button>
-                                            </Form>
-                                        </div>
-                                    </div>
-                                </Col>
-                            </div>
+                                        <Stake 
+                                            style="unstake"
+                                            send={this.make_token_unstake}
+                                            id="stake_token"
+                                        />
+                                    </Row>
+                                </Row>
+                            </Col>
                         </div>
                     );
                 }
+
                 case "settings": {
                     return (
                         <div>
@@ -4932,6 +4253,7 @@ class WalletHome extends React.Component {
                         </div>
                     );
                 }
+
                 case "loading":
                     return (
                         <Container className="align-items-center justify-content-center d-flex white-text" fluid>
@@ -4940,7 +4262,7 @@ class WalletHome extends React.Component {
                                 className="align-content-center"
                                 src={require("./../../img/panda.png")}
                             />
-                            <h1 className="white-text">Bear with us... we're just loading the market...</h1>
+                            <h1 className="black-text">Bear with us... we're just loading the correct info...</h1>
                         </Container>
                     );
 
@@ -4950,183 +4272,22 @@ class WalletHome extends React.Component {
         };
 
         return (
-            <Container className="height100 justify-content-between whtie-text" fluid>
-                {this.state.interface_view === "market" ? "" :
-                    <Container
-                        fluid
-                        id="header"
-                        className="no-gutters my-5 p-2 b-r10 opaque-black"
-                    >
-
-
-                        <Row className="justify-content-between align-items-center">
-
-                            <Col sm={2} className="p-1 align-self-center b-r10 white-text light-blue-back">
-
-                                <div
-                                    className="d-flex flex-row text-align-center justify-content-center align-items-end">
-                                    <IconContext.Provider value={{color: 'white', size: '20px'}}>
-                                        <div className="white-text">
-                                            <GrCubes className="blockchain-icon m-1 white-text"/>
-                                        </div>
-                                    </IconContext.Provider>
-                                    {this.state.first_refresh === true ?
-                                        (<h5 className="mb-2 ml-3">
-                                            <b>
-                                                {
-                                                    this.state.wallet_height < this.state.blockchain_height ?
-                                                        this.state.wallet_height + ' / ' + this.state.blockchain_height :
-                                                        this.state.blockchain_height.toLocaleString()
-                                                }
-                                            </b>
-                                        </h5>) :
-                                        (<Loader className="ml-3" type="ThreeDots" color="#00BFFF" height={20}
-                                                 width={20}/>)
-                                    }
-
-                                </div>
-
-                                <p className="mb-2 text-align-center">{this.state.connection_status}</p>
-
-                            </Col>
-
-                            {/*<div className="menu-logo">
-                                <Image className=" align-content-center"
-                                    src={require("./../../img/sails-logo.png")}/>
-                                </div>*/}
-
-                            <Col sm={6} className="menu">
-                                <ul className="menu__list">
-                                    <li className={this.state.interface_view === 'home' ? "menu-link-active" : "menu__list-item"}>
-                                        <a className="menu__link" href="javascript:void(0)"
-                                           onClick={this.go_home}>Home</a>
-                                    </li>
-                                    <li className={this.state.interface_view === 'market' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                        <a className="menu__link" href="javascript:void(0)"
-                                           onClick={this.show_market}>Market</a>
-                                    </li>
-                                    <li className={this.state.interface_view === 'merchant' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                        <a className="menu__link" href="javascript:void(0)"
-                                           onClick={this.show_merchant}>Merchant</a>
-                                    </li>
-                                    <li className={this.state.interface_view === 'tokens' ? "menu__list-item menu-link-active" : "menu__list-item"}>
-                                        <a className="menu__link" href="javascript:void(0)"
-                                           onClick={this.show_tokens}>Tokens</a>
-                                    </li>
-                                </ul>
-                            </Col>
-
-                            <div className="d-flex flex-column">
-                                <a className="menu__link" href="javascript:void(0)"
-                                   onClick={this.show_settings}><FaCogs size={20} className="m-3"/></a>
-
-
-                                <a className="menu__link" href="javascript:void(0)"
-                                   onClick={this.logout}><GiExitDoor className="m-3"/></a>
-                            </div>
-                        </Row>
-
-
-                        <Row
-                            className="no-gutters p-2 justify-content-between align-items-center b-r10 white-text">
-                            <Col id="balances" sm={3}>
-                                <li className="d-flex flex-row">
-                                    SFX: {this.state.first_refresh === true ?
-                                    (this.state.cash.toLocaleString()) :
-                                    (<Loader className="ml-5" type="ThreeDots" color="#00BFFF" height={20} width={20}/>)
-                                }
-
-                                    {this.state.pending_cash > 0 ?
-                                        ` - (${this.state.pending_cash.toLocaleString()} SFX Pending)` :
-                                        ''
-                                    }
-                                </li>
-
-                                <li className="d-flex flex-row">
-                                    SFT: {this.state.first_refresh === true ?
-                                    (this.state.tokens.toLocaleString()) :
-                                    (<Loader className="ml-5" type="ThreeDots" color="#00BFFF" height={20} width={20}/>)
-                                }
-
-                                    {this.state.pending_tokens > 0 ?
-                                        ` - (${this.state.pending_tokens.toLocaleString()} SFT Pending)` :
-                                        ''
-                                    }
-                                </li>
-                            </Col>
-
-                            <Col className="text-align-center" sm={8}>
-                                <p>SFX + SFT Public Address:<br/>
-                                    <br/>
-                                    <b>{this.state.address}</b>
-                                </p>
-                                <Row className="justify-content-center">
-
-                                    <div id="header-buttons" className="d-flex flex-row" sm={1}>
-
-                                        {this.state.synced === false ? (
-                                            <Button variant="warning" onClick={this.check}>
-                                                Check
-                                            </Button>) : ''}
-
-                                        <Button variant="danger" onClick={this.rescan}>
-                                            Hard Rescan
-                                        </Button>
-
-
-                                        <Button variant="primary" onClick={this.handleShow}>
-                                            Show Keys
-                                        </Button>
-
-                                        <Modal
-                                            className="width100 black-text"
-                                            animation={false}
-                                            show={this.state.show_keys}
-                                            onHide={this.handleClose}
-                                        >
-                                            <Modal.Header closeButton>
-                                                <Modal.Title>Your Private Keys</Modal.Title>
-                                            </Modal.Header>
-                                            <Modal.Body>
-                                                <ul>
-                                                    <li>
-                                                        <b>Address:</b> <br/> {this.props.wallet.address()}
-                                                    </li>
-                                                    <li>
-                                                        <b>Secret Spend Key:</b>
-                                                        <br/> {this.props.wallet.secretSpendKey()}
-                                                    </li>
-                                                    <li>
-                                                        <b>Secret View Key:</b>
-                                                        <br/> {this.props.wallet.secretViewKey()}
-                                                    </li>
-                                                    <li>
-                                                        <b>Mnemonic Seed:</b>
-                                                        <br/> {this.props.wallet.seed().toUpperCase()}
-                                                    </li>
-                                                </ul>
-                                            </Modal.Body>
-                                            <Modal.Footer>
-                                                <Button variant="secondary" onClick={this.handleClose}>
-                                                    Close
-                                                </Button>
-                                            </Modal.Footer>
-                                        </Modal>
-                                        <Button className="ml-3" onClick={this.copyAddressToClipboard}>
-                                            Copy Address
-                                        </Button>
-                                    </div>
-                                </Row>
-                            </Col>
-
-                        </Row>
-                    </Container>
-                }
-
-
+            <div className="" >
+                <Image className="entry-scene" src={require("./../../img/loading-scene.svg")}/>
+                <Image className="plant3" src={require("./../../img/plant2.svg")}/>
+                
+                <MainHeader 
+                    view={this.state.interface_view} 
+                    goHome={this.go_home} 
+                    goToTokens={this.show_tokens}
+                    goToMarket={this.show_market}
+                    goToMerchant={this.show_merchant}
+                    goToSettings={this.show_settings}
+                    logout={this.logout}
+                />
+                    
                 {twmwallet()}
-
-            </Container>
+            </div>
         );
     }
 }

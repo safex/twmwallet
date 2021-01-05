@@ -1,13 +1,6 @@
 import React from 'react';
-import {Button, Col, Container, Row, Image, Tabs, Tab} from 'react-bootstrap'
-import { FaHistory, FaAlignLeft, FaKey, FaFolderPlus, FaFolderOpen } from 'react-icons/fa'
+import {Button, Col, Container, Row, Image, Tabs, Tab, Alert, Collapse} from 'react-bootstrap'
 
-
-import {open_wallet_util} from "../../utils/wallet_creation";
-import {purchase_offer} from "../../utils/wallet_actions";
-
-import {save_twm_file, open_twm_file} from "../../utils/twm_actions";
-import copy from "copy-to-clipboard";
 const os = window.require('os');
 const fs = window.require('fs').promises;
 const libPath = window.require('path');
@@ -34,7 +27,8 @@ export default class SelectEntry extends React.Component {
 
         this.state = {
             legacy_wallet: '',
-            legacy_detected: false
+            legacy_detected: false,
+            showLegacyAlert: false
         };
     }
 
@@ -56,6 +50,11 @@ export default class SelectEntry extends React.Component {
     };
 
 
+
+    back = (e) => {
+        e.preventDefault();
+        this.props.history.push({pathname: '/'});
+    };
 
     open_existing = (e) => {
         e.preventDefault();
@@ -85,64 +84,62 @@ export default class SelectEntry extends React.Component {
     render() {
         return (
             <div className="width100 height100 d-flex flex-column text-center">
+                
+                <Container fluid className="height100 flex-column d-flex justify-content-center">
 
-                <Container className="height100 flex-column p-5 d-flex justify-content-center">
-                    <Row className="row justify-content-md-center justify-content-center p-3">
-                        <Image className="entry-image align-content-center mb-5" src={require("./../../img/safex-logo.png")}/>
+                    <Image className="plant" src={require("./../../img/plant.svg")}/>
+                    <Image className="plant2" src={require("./../../img/corner-plant.svg")}/>
+                    <Image className="entry-scene" src={require("./../../img/entry-scene.svg")}/>
+                    <Image onClick={this.back} className="entry-off-button" src={require("./../../img/off.svg")}/>
+                    
+
+                    <Row className="rowjustify-content-md-center justify-content-center p-3">
+                        <Image className="w-25" src={require("./../../img/safex-home-multi.svg")}/>
                     </Row>
-                    <Row className="row justify-content-md-center justify-content-center p-3">
-                        <p>
 
-                            This wallet is for testing Stagenet 3, December 11, 2020 ONLY USE THIS WALLET FOR TESTING
-                        </p>
-                        </Row>
-                    <Row className="row justify-content-md-center justify-content-center p-3">
-                        <Col sm={6}>
-                            <Button onClick={this.open_existing} className="font-size-medium" variant="primary" size="lg" block>
-                                <FaFolderOpen className="mr-3"/>
-                                Open Existing
-                            </Button>
+                    <Col className="my-5">
+                        <Col className="my-2 p-3">
+                            <button onClick={this.open_existing} className="custom-button-entry">Open Existing Wallet</button>
                         </Col>
-                    </Row>
 
-                    <Row className="justify-content-md-center font-size-medium justify-content-center p-3">
-                        <Col sm={6}>
-                            <Button onClick={this.create_new} className="font-size-medium" variant="primary" size="lg" block>
-                                <FaFolderPlus className="mr-3"/>
-                                Create New
-                            </Button>
+                        <Col className="my-2 p-3">
+                            <button onClick={this.create_new} className="custom-button-entry">Create New Wallet</button>
                         </Col>
-                    </Row>
 
-                    <Row className="justify-content-md-center justify-content-center p-3">
-                        <Col sm={6}>
-                            <Button onClick={this.restore_keys} className="font-size-medium" variant="primary" size="lg" block>
-                                <FaKey className="mr-3"/>
-                                Recover From Keys
-                            </Button>
+                        <Col className="my-2 p-3">
+                            <button onClick={this.restore_keys} className="custom-button-entry">Recover Wallet From Keys</button>
                         </Col>
-                    </Row>
 
-                    <Row className="justify-content-md-center justify-content-center p-3">
-                        <Col sm={6}>
-                            <Button onClick={this.seed_phrase} className="font-size-medium" variant="primary" size="lg" block>
-                                <FaAlignLeft className="mr-3"/>
-                                Recover From Seed Phrase
-                            </Button>
+                        <Col className="my-2 p-3">
+                            <button onClick={this.seed_phrase} className="custom-button-entry">Recover Wallet From Seed Phrase</button>
                         </Col>
-                    </Row>
 
-                    {this.state.legacy_detected ? (
-                        <Row className="justify-content-md-center justify-content-center p-3">
-                            <Col sm={5}>
-                                <Button onClick={this.restore_legacy} className="font-size-medium" variant="warning" size="lg" block>
-                                    <FaHistory className="mr-3"/>
-                                    Open Legacy Wallet
-                                </Button>
+                        {this.state.legacy_detected ? 
+                        (
+                            <Col className="my-5 p-3">
+                                <button className="custom-button-entry orange-border" onClick={() => this.setState({showLegacyAlert: !this.state.showLegacyAlert})}>Open Legacy Wallet</button>
+                                <Collapse in={this.state.showLegacyAlert}>
+                                <Alert 
+                                    variant="info" 
+                                    transition={false}
+                                    className="mt-3 w-50 mx-auto entry-back-text"    
+                                >
+                                    <Alert.Heading>We are working on this feature. Thank you for your patience!</Alert.Heading>
+                                   
+                                </Alert>
+                                </Collapse>
                             </Col>
-                        </Row>) : (<div></div>)
-                    }
-                </Container>
+                        ) 
+                        : 
+                            (<div></div>)
+                        }
+                        
+                    </Col>
+                    
+                    <Row  className="w-100 entry-footer">
+                        <p>THE WORLD MARKETPLACE</p>
+                    </Row>
+                </Container>  
             </div>);
     }
 }

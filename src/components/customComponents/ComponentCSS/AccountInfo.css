@@ -1,0 +1,138 @@
+.account-info-box {
+    height: 18vh;
+    max-height: 400px;
+    padding: 2rem;
+    margin-bottom: 2vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-content: center;
+
+    background-color: #fff;
+    border-radius: 50px;
+
+    color: #767676;
+    box-shadow: var(--blue-box-shadow);
+}
+
+.account-info-box button {
+    height: 4rem;
+    width: 25%;
+
+    border-radius: 10px;
+    border: 3px solid #13D3FD;
+    background-color: white;
+
+    font-family: 'Inter';
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 500;
+    text-align: center;
+
+}
+
+.account-info-box button:hover {
+    background: linear-gradient(90deg, #13D3FD 0%, #26B3F8 54.79%, #3698F3 100%);
+    color: #fff;
+}
+
+.account-info-box h1 {
+    font-family: 'Inter';
+    font-size: 2rem;
+    font-style: normal;
+    font-weight: 500;
+    text-align: center;
+}
+
+.account-info-box .row {
+    justify-content: space-around;
+}
+
+.show-keys-password-box {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: auto;
+}
+
+.show-keys-password {
+    height: 4rem;
+    margin: 3rem 0 0;
+
+    border-radius: 10px;
+    border: 3px solid #13D3FD;
+    background-color: white;
+
+    font-family: 'Inter';
+    font-size: 2rem;
+    font-style: normal;
+    font-weight: 600;
+    text-align: center;
+    color: #BDBDBD;
+
+}
+
+.password-header {
+    font-size: 2.2rem!important;
+    width: fit-content;
+}
+
+.keys-modal {
+    width: 60vw;
+    height: 60vh;
+    margin: auto;
+    padding: 3rem;
+    position: relative;
+    top: 25vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    background-color: white;
+    box-shadow: var(--blue-box-shadow);
+    border-radius: 50px;
+    text-align: center;
+    color: #767667;
+    font-family: 'Inter';
+
+}
+
+.keys-modal h1 {
+    font-size: 3rem;
+    font-style: normal;
+    font-weight: 500;
+    text-align: center;
+
+}
+
+.keys-modal h2 {
+    text-align: left;
+    font-size: 2rem;
+    font-style: normal;
+    font-weight: 500;
+    text-align: left;
+}
+
+.keys-modal .col-sm-10 {
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 400;
+    text-align: left;
+    word-wrap: break-word;
+    padding-bottom: 2rem;
+}
+
+.keys-modal button {
+    height: 3rem;
+    width: 6rem;
+
+    border-radius: 10px;
+    border: 3px solid #13D3FD;
+    background-color: white;
+
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 500;
+    text-align: center;
+}
