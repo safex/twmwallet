@@ -1307,6 +1307,7 @@ class WalletHome extends React.Component {
     make_token_stake = async (e) => {
         e.preventDefault();
         e.persist();
+        console.log(e.target);
         try {
             let mixins = e.target.mixins.value - 1;
             if (mixins >= 0) {
@@ -1699,29 +1700,9 @@ class WalletHome extends React.Component {
                                 console.error(err);
                             }
                         }
-                    }*/
+                    }
                 }
             }
-
-
-            /*
-                                                            const decryptedData = crypto.privateDecrypt(
-                                                                {
-                                                                    key: privateKey,
-                                                                    // In order to decrypt the data, we need to specify the
-                                                                    // same hashing function and padding scheme that we used to
-                                                                    // encrypt the data in the previous step
-                                                                    padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-                                                                    oaepHash: "sha256",
-                                                                },
-                                                                encrypted_message
-                                                            )
-
-                                                            console.log(decryptedData.toString());
-                                                            let decomped = zlib.inflateSync(Buffer.from(decryptedData));
-                                                            console.log(decomped.toString());
-                                                            alert(`what`);*/
-
         } catch(err) {
             console.error(err);
             console.error(`error at the fetch_messages_seller`);
