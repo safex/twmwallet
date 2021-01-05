@@ -1682,7 +1682,7 @@ class WalletHome extends React.Component {
                     req_payload.msg = date.toString();
                     req_payload.msg_hex = msg_hex;
 
-                    let req_msgs = await merchant_get_messages(req_payload);
+                    let req_msgs = await merchant_get_messages(req_payload, twm_api_url);
                     console.log(req_msgs.to);
                     console.log(req_msgs.from);
 
@@ -1923,7 +1923,7 @@ class WalletHome extends React.Component {
                                                 if (twm_confirm) {
                                                     let twm_file = this.state.twm_file;
 
-                                                    let seller_pubkey = await get_seller_pubkey(this.state.api_url, listing.username);
+                                                    let seller_pubkey = await get_seller_pubkey(listing.username, this.state.api_url);
 
                                                     console.log(seller_pubkey);
 
@@ -2027,7 +2027,7 @@ class WalletHome extends React.Component {
 
                                                     message_header_obj.encrypted_message = hex_enc_msg;
 
-                                                    let tdispatched = await dispatch_purchase_message(this.state.api_url, message_header_obj);
+                                                    let tdispatched = await dispatch_purchase_message(message_header_obj, this.state.api_url);
 
                                                     console.log(tdispatched);
 
@@ -3270,8 +3270,7 @@ class WalletHome extends React.Component {
 
                     });
 
-                    
-                    this.fetch_messages_seller();
+
                     var accounts_table = this.state.usernames.map((user, key) => {
                         let avatar = '';
                         try {
