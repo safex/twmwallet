@@ -98,7 +98,7 @@ class WalletHome extends React.Component {
             twm_offers: [],
             non_offers: [],
             api_offers: [],
-            api_url: '',
+            api_url: 'http://stageapi.theworldmarketplace.com:17700',
             offer_loading_flag: '',
             selected_user: {}, //merchant element
             show_new_offer_form: false,
@@ -190,6 +190,9 @@ class WalletHome extends React.Component {
             });
 
             try {
+                console.log(`interest mapping`);
+                console.log(wallet.getMyInterest());
+                console.log(`interest mapping`);
                 let gst_obj = {};
                 gst_obj.interval = 0;
                 gst_obj.daemon_host = this.props.daemon_host;
@@ -374,8 +377,7 @@ class WalletHome extends React.Component {
             "This will halt the wallet operation while the rescan is in progress.");
         console.log(confirmed);
         if (confirmed) {
-            wallet.off();
-            wallet.rescanBlockchain();
+            wallet.setRefreshFromBlockHeight(0);
             wallet.store(this.wallet_store_callback);
             wallet.on('refreshed', () => {
                 console.log();
@@ -396,18 +398,27 @@ class WalletHome extends React.Component {
         }
     };
 
-    remove_account = async (user) => {
-        try {
-            let removed = wallet.removeSafexAccount(user);
-            if (removed) {
-                console.log(`successfully removed ${user}`);
-            } else {
-                console.error(`error at trying to remove ${user}`);
+    remove_account = async (e, user) => {
+
+
+        e.preventDefault();
+        let confirm = window.confirm(`are you sure you want to remove ${user} you should only do this if you
+        think that the transaction to register the account did not go through, keep in mind this is irreversible`)
+        if (confirm) {
+            try {
+                let removed = wallet.removeSafexAccount(user);
+                if (removed) {
+                    console.log(`successfully removed ${user}`);
+                } else {
+                    console.error(`error at trying to remove ${user}`);
+                }
+            } catch (err) {
+                console.error(err);
+                console.error(`error at trying to remove an account`);
             }
-        } catch (err) {
-            console.error(err);
-            console.error(`error at trying to remove an account`);
         }
+
+
     };
 
     register_account = async (e) => {
@@ -583,13 +594,12 @@ class WalletHome extends React.Component {
 
                                 alert(`Transaction successfully submitted. 
                         Transaction ID: ${this.state.create_account_txn_id}
-                        Tokens locked for 300 blocks: 100 SFT
+                        1000 Safex Tokens will be locked for 22,000 blocks
                         Fee: ${this.state.create_account_txn_fee / 10000000000} SFX`);
                                 localStorage.setItem('twm_file', twm_file);
 
                                 this.setState({twm_file: twm_file});
 
-                                this.handleCloseNewAccountForm();
 
 
                             } catch (err) {
@@ -1172,6 +1182,7 @@ class WalletHome extends React.Component {
     //merchant
     load_offers = (username, index) => {
         this.setState({selected_user: {username: username, index: index}});
+        this.fetch_messages_seller(username, 'http://stageapi.theworldmarketplace.com:17700');
         console.log(username);
         console.log(index);
     };
@@ -1490,7 +1501,7 @@ class WalletHome extends React.Component {
         });
     };
 
-    register_twmapi = async (user, twm_api_url = 'http://127.0.0.1:17700') => {
+    register_twmapi = async (user, twm_api_url = 'http://stageapi.theworldmarketplace.com:17700') => {
         console.log(user);
 
         //here we contact the api and check if this user is already registered or not.
@@ -1574,7 +1585,6 @@ class WalletHome extends React.Component {
                             let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
 
                             console.log(twm_save);
-                            alert(`i think we saved the twm file on registration`);
                             try {
 
                                 let twm_file2 = await open_twm_file(this.state.new_path + '.twm', this.state.password);
@@ -1583,6 +1593,7 @@ class WalletHome extends React.Component {
 
                                 localStorage.setItem('twm_file', JSON.stringify(twm_file2.contents));
                                 this.setState({twm_file: twm_file2.contents});
+                                alert(`you have successfully registered to ${twm_api_url}`);
                             } catch (err) {
                                 this.setState({loading: false})
                                 console.error(err);
@@ -1627,22 +1638,22 @@ class WalletHome extends React.Component {
         return new Uint8Array(a);
     }
 
-    fetch_messages_seller = async () => {
+    fetch_messages_seller = async (username, twm_api_url = 'http://127.0.0.1:17700') => {
         try {
             //here fetch the messages from the seller
 
             //form a message, sign it http://stageapi.theworldmarketplace.com:17700
 
             console.log(this.state.twm_file);
-            if (this.state.twm_file.accounts.hasOwnProperty('final')) {
-                if (this.state.twm_file.accounts['final'].urls.hasOwnProperty('http://127.0.0.1:17700')) {
+            if (this.state.twm_file.accounts.hasOwnProperty(username)) {
+                if (this.state.twm_file.accounts[username].urls.hasOwnProperty(twm_api_url)) {
                     console.log(`it has the twmapi in it's file for the fetch messages_seller`);
                     let date = new Date(new Date().toUTCString());
                     console.log(date);
                     console.log(date.toString());
 
                     const crypto  = window.require('crypto');
-                    let our_key = crypto.createPrivateKey(this.state.twm_file.accounts['final'].urls['http://127.0.0.1:17700'].pgp_key.sec_key)
+                    let our_key = crypto.createPrivateKey(this.state.twm_file.accounts[username].urls[twm_api_url].pgp_key.sec_key)
                     console.log(our_key);
                     let date_msg = Buffer.from(date.toString());
                     console.log(date_msg);
@@ -1665,7 +1676,7 @@ class WalletHome extends React.Component {
                     console.log(`is verified :::  ${verified_sig}`);
                    let req_payload = {};
                     req_payload.signature = this.byteToHexString(signature);
-                    req_payload.username = 'final';
+                    req_payload.username = username;
                     req_payload.msg = date.toString();
                     req_payload.msg_hex = msg_hex;
 
@@ -1910,7 +1921,7 @@ class WalletHome extends React.Component {
                                                 if (twm_confirm) {
                                                     let twm_file = this.state.twm_file;
 
-                                                    let seller_pubkey = await get_seller_pubkey(listing.username);
+                                                    let seller_pubkey = await get_seller_pubkey(this.state.api_url, listing.username);
 
                                                     console.log(seller_pubkey);
 
@@ -2014,7 +2025,7 @@ class WalletHome extends React.Component {
 
                                                     message_header_obj.encrypted_message = hex_enc_msg;
 
-                                                    let tdispatched = await dispatch_purchase_message(message_header_obj);
+                                                    let tdispatched = await dispatch_purchase_message(this.state.api_url, message_header_obj);
 
                                                     console.log(tdispatched);
 
@@ -3303,7 +3314,7 @@ class WalletHome extends React.Component {
                                 {user.status == 0 ? 
                                     <button 
                                         className="merchant-mini-buttons"
-                                        onClick={this.remove_account(user.username, key)}
+                                        onClick={(e) => this.remove_account(e, user.username, key)}
                                     >
                                         Remove
                                     </button>
