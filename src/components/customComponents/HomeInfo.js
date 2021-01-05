@@ -12,21 +12,27 @@ export default function HomeInfo(props) {
     return (
        
             <div className="home-info-box">
-                <h3><FaCubes className="mr-3"/>{props.walletHeight} / {props.blockHeight}</h3>
+                <h3>
+                    <FaCubes className="mr-3"/>
+                    { props.walletHeight === props.blockHeight ? 
+                        props.blockHeight 
+                    : 
+                        `${props.walletHeight} / ${props.blockHeight}`}
+                </h3>
 
                 <p>{props.connection}</p>
 
                 <h2 className={!props.firstRefresh ? 'infinity' : ''}>
-                    SAFEX CASH: &nbsp;{ props.firstRefresh === true ?
+                    CASH: &nbsp;{ props.firstRefresh === true ?
                                     (props.cashBalance.toLocaleString() + ' SFX')
                                     :
                                     ('∞')
                     }
                     <br/>
                     {props.pendingCash > 0 ? `(${props.pendingCash.toLocaleString()} SFX Pending)` : ''}
+                    
                     <br/>
-                    <br/>
-                    SAFEX TOKENS: &nbsp;{ props.firstRefresh === true ?
+                    TOKENS: &nbsp;{ props.firstRefresh === true ?
                                 (props.tokenBalance.toLocaleString() + ' SFT')
                                 :
                                 ('∞')

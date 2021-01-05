@@ -15,7 +15,6 @@ export default function SendSafex(props) {
 
     return (
        
-
             <form className={`send-safex-box ${props.style}`} id={props.id} onSubmit={props.send}>
 
                 <div className>
@@ -50,14 +49,13 @@ export default function SendSafex(props) {
                     
                 <input
                     name="destination"
-                    defaultValue="Safex5..."
-                    placedholder="the destination address"
+                    placeholder="Safex5..."
                 />
 
                 <input
                     name="amount"
-                    defaultValue="0"
-                    placedholder="the amount to send"
+                    placeholder="How much to send?"
+                    type="number"
                 />
 
 
