@@ -33,7 +33,7 @@ export default class Settings extends React.Component {
                     <td>{txn.direction}</td>
                     <td>{txn.pending}</td>
                     <td>{txn.tokenAmount > 0 ? (`${txn.tokenAmount / 10000000000} sft`) : (`${txn.amount / 10000000000} sfx`)}</td>
-                    <td>{txn.fee}</td>
+                    <td>{txn.fee / 10000000000}</td>
                     <td>{txn.blockHeight}</td>
                     <td>{txn.confirmations}</td>
                 </tr>
@@ -61,7 +61,7 @@ export default class Settings extends React.Component {
                                 <th>in/out</th>
                                 <th>pending?</th>
                                 <th>amount</th>
-                                <th>fee</th>
+                                <th>fee (sfx)</th>
                                 <th>blockheight</th>
                                 <th>confirmations</th>
                             </tr>
