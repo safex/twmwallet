@@ -49,11 +49,11 @@ export default class OpenWallet extends React.Component {
     set_path = (e) => {
         e.preventDefault();
 
-        let sails_path = dialog.showOpenDialogSync();
-        console.log(sails_path);
-        sails_path = sails_path[0];
-
         try {
+            let sails_path = dialog.showOpenDialogSync();
+            console.log(sails_path);
+            sails_path = sails_path[0];
+
             if (sails_path.length > 0) {
 
                 let ipath;
