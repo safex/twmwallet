@@ -43,7 +43,7 @@ export default function Stake(props) {
                         <h5>Available: {props.tokenBalance} SFT</h5>    
 
                         <input
-                            name="destination"
+                            name="amount"
                             defaultValue="How much to stake?"
                             type="number"
                         />
