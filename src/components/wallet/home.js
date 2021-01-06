@@ -513,14 +513,14 @@ class WalletHome extends React.Component {
                         console.log(commit_create);
 
                     } else {
-                        let removed = wallet.removeSafexAccount(username);
-                        console.log(`account ${username} was cancelled so removed and not made`);
+                        let removed = wallet.removeSafexAccount(this_account.username);
+                        console.log(`account ${this_account.username} was cancelled so removed and not made`);
                         alert(`your transaction was cancelled, no account registration was completed`);
                     }
 
                 } else {
-                    let removed = wallet.removeSafexAccount(username);
-                    console.log(`account ${username} removed and not made`);
+                    let removed = wallet.removeSafexAccount(e.target.username.value);
+                    console.log(`account ${e.target.username.value} removed and not made`);
                     alert(`Not enough tokens for making an account`);
                 }
 
