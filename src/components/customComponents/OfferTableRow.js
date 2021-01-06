@@ -10,7 +10,7 @@ import ReactTooltip from "react-tooltip";
 export default function OfferTableRow(props) {
 
     return (
-        <Row key={props.key} className="staking-table-row">
+        <Row theKey={props.key} className="staking-table-row">
             <p>{props.title}</p>
         
             <p>{props.price}</p>

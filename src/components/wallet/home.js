@@ -1744,7 +1744,20 @@ class WalletHome extends React.Component {
                                 let decomped = zlib.inflateSync(Buffer.from(decryptedData));
                                 console.log(decomped.toString());
 
-                                finalMessage.push(<h1>{decomped}</h1>)  
+                                finalMessage.push(
+                                    <div>
+                                        <h1>
+                                            MESSAGE START
+                                            -------------------
+                                        </h1>
+                                        <h3>{decomped}</h3>
+                                        <br/><br/>
+                                        <h1>
+                                            MESSAGE END
+                                            -------------------
+                                        </h1>
+                                        <br/><br/>
+                                    </div>)  
                             } catch(err) {
                                 console.error(err);
                             }
@@ -2430,7 +2443,7 @@ class WalletHome extends React.Component {
                 }
                 return (
                     <OfferTableRow
-                        key={key}
+                        theKey={key}
                         title={listing.title}
                         price={listing.price / 10000000000}
                         quantity={listing.quantity}
@@ -3836,10 +3849,9 @@ class WalletHome extends React.Component {
                                                 </Col>
                                             </Row>
                                             
-                                            <Row className="m-auto">
+                                            <Row className="m-auto" style={{wordBreak: 'break-all', maxHeight: 500, overflowY: 'auto'}}>
                                                 <Col sm={12}>
                                                     {finalMessage}
-                                                    jjj
                                                 </Col>
                                             </Row>
                                         </ReactModal>  
