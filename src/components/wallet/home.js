@@ -514,10 +514,14 @@ class WalletHome extends React.Component {
                         console.log(commit_create);
 
                     } else {
+                        let removed = wallet.removeSafexAccount(this_account.username);
+                        console.log(`account ${this_account.username} was cancelled so removed and not made`);
                         alert(`your transaction was cancelled, no account registration was completed`);
                     }
 
                 } else {
+                    let removed = wallet.removeSafexAccount(e.target.username.value);
+                    console.log(`account ${e.target.username.value} removed and not made`);
                     alert(`Not enough tokens for making an account`);
                 }
 
@@ -529,6 +533,7 @@ class WalletHome extends React.Component {
             alert(`please wait until the wallet has fully loaded before performing registration actions`)
         }
     };
+
     create_account_async = async (wallet, username, mixins) => {
         return new Promise((resolve, reject) => {
             try {
@@ -537,9 +542,20 @@ class WalletHome extends React.Component {
 
                         console.error(err);
                         console.error(`error at the register first callback`);
-                        alert(`error at the register first callback`);
-                        alert(err);
+
+                        let confirm = window.confirm(`this account didn't get created, remove and try again?`)
+                        if (confirm) {
+
+                            let removed = wallet.removeSafexAccount(username);
+                            console.log(`removed ${username} at the first callback`)
+                            alert(`removed ${username} during the transaction creation, you should be able to try again`);
+                            alert(err);
+                        } else {
+                            alert(`error registering ${username} next message will give the error`);
+                            alert(err);
+                        }
                         reject(err);
+
                     } else {
                         resolve(res);
                     }
@@ -1634,6 +1650,8 @@ class WalletHome extends React.Component {
         } catch(err) {
             console.error(err);
             console.error(`error at the twm_file at register api`);
+            alert(`there was an error registering with the api`);
+            alert(err);
         }
     };
 
