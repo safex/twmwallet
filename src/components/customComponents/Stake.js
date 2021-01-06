@@ -31,10 +31,15 @@ export default function Stake(props) {
                             place="left"
                         >
                             <span>
-                                How to unstake?
+                                How to {props.style}?
                                 <br/>
-                                The amount that you are unstaking has to be grater than the amount you have staked.
-                                The transaction fee will be added on to the amount you are unstaking.
+                                { props.style === 'stake' ?
+                                    `The amount that you are staking has to be less than your token balance: ${props.tokenBalance}.
+                                    `
+                                :
+                                    `The amount that you are unstaking has to be greater than the amount you have staked.
+                                    The transaction fee will be added on to the amount you are unstaking.`
+                                }
                             </span>
                         </ReactTooltip>
                     </IconContext.Provider>
@@ -44,7 +49,7 @@ export default function Stake(props) {
 
                         <input
                             name="amount"
-                            defaultValue="How much to stake?"
+                            placeholder="How much to stake?"
                             type="number"
                         />
                     </div>
