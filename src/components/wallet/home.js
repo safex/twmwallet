@@ -2620,7 +2620,7 @@ class WalletHome extends React.Component {
 
                                             <p>{listing.quantity}</p>
 
-                                            <p>{listing.seller}</p>
+                                            <p>{listing.username}</p>
 
                                             <p data-tip data-for={`offerID${key}`}>
                                                 {this.to_ellipsis(listing.offer_id, 5, 5)}
