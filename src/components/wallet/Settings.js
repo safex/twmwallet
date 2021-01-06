@@ -19,13 +19,12 @@ export default class Settings extends React.Component {
 
     async componentDidMount() {
         console.log("load settings");
-        console.log(this.props.history);
-
+        this.props.updateHistory();
 
     };
 
     render() {
-        let txn_history_table_data = this.props.history.map((txn, key) => {
+        let txn_history_table_data = this.props.txnhistory.map((txn, key) => {
             console.log(txn);
             return (
                 <tr className="tx-row" key={key}>
