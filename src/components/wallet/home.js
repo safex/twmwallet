@@ -134,6 +134,7 @@ class WalletHome extends React.Component {
 
     async componentWillUnmount() {
 
+        wallet.store(this.wallet_store_callback);
         localStorage.removeItem('twm_file');
         localStorage.removeItem('encrypted_wallet');
         localStorage.removeItem('wallet');
@@ -248,15 +249,14 @@ class WalletHome extends React.Component {
                 this.setState({timer: timer});
                 this.setState({synced: false});
             }
-            this.refresh_action();
             wallet.on('newBlock', (height) => {
                 console.log("blockchain updated, height: " + height);
+                this.refresh_action();
                 this.setState({
-                    blockchain_height: height
+                    wallet_height: height
                 });
             });
             wallet.on('refreshed', () => {
-                console.log();
                 this.refresh_action();
             });
             console.log(wallet.synchronized());
@@ -295,6 +295,8 @@ class WalletHome extends React.Component {
 
                 console.log(`gim object`);
                 console.log(gim_obj);
+                console.log(`refresh get`);
+                console.log(wallet.getRefreshFromBlockHeight())
                 //let gim = await get_interest_map(gim_obj);
 
                 /* this.setState({
@@ -311,7 +313,7 @@ class WalletHome extends React.Component {
                     ),
                     synced: wallet.synchronized() ? true : false,
                     wallet_height: wallet.blockchainHeight(),
-                    blockchain_height: wallet.daemonBlockchainHeight(),
+                    blockchain_height: height,
                     cash: normalize_8decimals(wallet.unlockedBalance()),
                     pending_tokens: normalize_8decimals(wallet.tokenBalance() - wallet.unlockedTokenBalance()),
                     tokens: normalize_8decimals(wallet.unlockedTokenBalance()),
@@ -327,7 +329,7 @@ class WalletHome extends React.Component {
             console.error(`error at getting the staked tokens from the blockchain`);
         }
         try {
-            m_wallet.store(this.wallet_store_callback);
+            //m_wallet.store(this.wallet_store_callback);
 
 
         } catch (err) {
@@ -378,12 +380,11 @@ class WalletHome extends React.Component {
             "This will halt the wallet operation while the rescan is in progress.");
         console.log(confirmed);
         if (confirmed) {
-            wallet.setRefreshFromBlockHeight(0);
-            wallet.store(this.wallet_store_callback);
-            wallet.on('refreshed', () => {
+            wallet.rescanBlockchainAsync();
+           /* wallet.on('refreshed', () => {
                 console.log();
                 this.refresh_action();
-            });
+            });*/
         }
     };
 
@@ -1919,8 +1920,6 @@ class WalletHome extends React.Component {
                                                     } else {
                                                         //too many characters
                                                     }
-
-
                                                 }
 
                                                 let twm_confirm = window.confirm(confirm_message);
@@ -2017,8 +2016,6 @@ class WalletHome extends React.Component {
                                                         compressed_message_obj
                                                     );
 
-
-
                                                     let hex_enc_msg = this.byteToHexString(encrypted_message);
 
                                                     const enc_signature = crypto.sign("sha256", Buffer.from(encrypted_message), {
@@ -2068,16 +2065,12 @@ class WalletHome extends React.Component {
                                                         let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
 
                                                         try {
-
                                                             let opened_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
                                                             console.log(opened_twm_file);
 
                                                             localStorage.setItem('twm_file', twm_file);
 
-
                                                             this.setState({twm_file: twm_file});
-
-
 
                                                         } catch (err) {
                                                             console.error(err);
@@ -2101,30 +2094,17 @@ class WalletHome extends React.Component {
 
                                                     console.log(`purchase transaction committed`);
                                                     alert(`the purchase has been submitted`);
-
-
                                                 }
-
-
-
-
-
                                         } catch (err) {
                                                 alert(`error at getting the sellers public key from the api server`);
                                                 console.error(err);
                                                 console.error(`error at getting the sellers public key from the api server`);
-
                                             }
                                         } else {
-
                                             let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
 
                                             console.log(`purchase transaction committed`);
-
                                         }
-
-
-
                                     } catch (err) {
                                         this.setState({showLoader: false});
                                         console.error(err);
@@ -2152,7 +2132,6 @@ class WalletHome extends React.Component {
                     console.error(`Error at the purchase transaction`);
                 }
             }
-
         } else {
             alert(`can not have 0 quantity of purchase :)`);
         }
@@ -2195,15 +2174,15 @@ class WalletHome extends React.Component {
                     } else {
                         this.setState({showLoader: false, show_purchase_confirm_modal: true});
                         
-                        /*alert(
+                        alert(
                             `Purchase transaction committed.
                             Transaction ID: ${this.state.purchase_txn_id}
                             Amount: ${this.state.purchase_txn_quantity} X ${this.state.purchase_txn_title}
                             Price: ${this.state.purchase_txn_price} SFX
                             Network Fee: ${this.state.purchase_txn_fee / 10000000000} SFX
                             A link to this transaction on the Safex Block Explorer has been copied to your clipboard
-                            https://stagenet1.safex.org/search?value=${this.state.purchase_txn_id}`
-                        );*/
+                            https://stagenet3.safex.org/search?value=${this.state.purchase_txn_id}`
+                        );
 
                         this.handleClosePurchaseForm();
                         resolve(res);
