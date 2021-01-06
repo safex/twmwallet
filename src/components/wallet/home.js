@@ -175,9 +175,9 @@ class WalletHome extends React.Component {
                 console.error(`error at mounting with the twm file`);
             }
 
-            let history = wallet.history();
+            let txnhistory = wallet.history();
 
-            history.sort(function(a, b) {
+            txnhistory.sort(function(a, b) {
                 return parseFloat(b.timestamp) - parseFloat(a.timestamp);
             });
 
@@ -188,7 +188,7 @@ class WalletHome extends React.Component {
                 daemon_port: this.props.daemon_port,
                 password: this.props.password,
                 new_path: this.props.wallet_path,
-                history: history
+                txnhistory: txnhistory
             });
 
             try {
@@ -273,6 +273,15 @@ class WalletHome extends React.Component {
             console.log("errors on startup");
         }
     };
+
+    refresh_history = async() => {
+        let txnhistory = wallet.history();
+
+        txnhistory.sort(function(a, b) {
+            return parseFloat(b.timestamp) - parseFloat(a.timestamp);
+        });
+        this.setState({txnhistory: txnhistory});
+    }
 
     refresh_action = async () => {
         let m_wallet = wallet;
@@ -4188,7 +4197,8 @@ class WalletHome extends React.Component {
                     return (
                         <div>
                             <Settings
-                                history = {this.state.history}
+                                txnhistory = {this.state.txnhistory}
+                                updateHistory = {this.refresh_history}
                             />
                         </div>
                     );
