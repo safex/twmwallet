@@ -528,6 +528,7 @@ class WalletHome extends React.Component {
             alert(`please wait until the wallet has fully loaded before performing registration actions`)
         }
     };
+
     create_account_async = async (wallet, username, mixins) => {
         return new Promise((resolve, reject) => {
             try {
@@ -536,9 +537,19 @@ class WalletHome extends React.Component {
 
                         console.error(err);
                         console.error(`error at the register first callback`);
-                        alert(`error at the register first callback`);
-                        alert(err);
+
+                        let confirm = window.confirm(`this account didn't get created, remove and try again?`)
+                        if (confirm) {
+
+                            let removed = wallet.removeSafexAccount(username);
+                            console.log(`removed ${username} at the first callback`)
+                            alert(`removed ${username} during the transaction creation, you should be able to try again`);
+                        } else {
+                            alert(`error registering ${username} next message will give the error`);
+                            alert(err);
+                        }
                         reject(err);
+
                     } else {
                         resolve(res);
                     }
