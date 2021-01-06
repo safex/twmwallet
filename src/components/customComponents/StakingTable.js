@@ -19,7 +19,7 @@ export default function StakingTable(props) {
 
             <Col sm={10} className="pt-3 staking-table-table">
                 <Row className="staking-table-header no-gutters">
-                        <p>Transaction ID</p>
+                        <p>TXID</p>
 
                         <p>Date</p>
 

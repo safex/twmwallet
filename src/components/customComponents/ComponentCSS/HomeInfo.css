@@ -2,14 +2,14 @@
     height: 25vh;
     max-height: 400px;
     padding: 2rem;
-    width: 20vw;
+    width: 75%;
     margin-bottom: 1rem;
     overflow: auto;
 }
 
 .home-info-box h3 {
     font-family: 'Inter';
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-style: normal;
     font-weight: 600;
     text-align: center;
@@ -17,10 +17,11 @@
 }
 
 .home-info-box p {
-    width: 75%;
+    width: 80%;
     margin-left: auto;
     margin-right: auto;
     font-family: 'Inter';
+    line-height: initial;
     font-size: 1.5rem;
     font-style: normal;
     font-weight: 500;
@@ -39,12 +40,13 @@
 
 .home-info-box h2 {
     font-family: 'Inter';
-    font-size: 1.8rem;
+    font-size: calc(1vw + .5rem);
     font-style: normal;
     font-weight: 700;
     text-align: center;
     color: #13D3FD;
-    word-break: break-word;
+    white-space: nowrap;
+    line-height: calc(1vw + 1rem);
 
   
 }

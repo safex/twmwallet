@@ -71,6 +71,7 @@ export default class CreateWallet extends React.Component {
 
     change_daemon = (e) => {
         e.preventDefault();
+        alert('hey')
         this.setState({daemon_host: '', daemon_port: 0});
     };
 
@@ -444,7 +445,7 @@ export default class CreateWallet extends React.Component {
 
                                             <button
                                                 className="custom-button-entry"
-                                                size="lg"
+                                                type="button"
                                                 onClick={this.change_daemon}
                                             >
                                                 Reset Connection

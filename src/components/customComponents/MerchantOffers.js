@@ -19,7 +19,7 @@ import './ComponentCSS/StakingTable.css'
 export default function MerchantOffers(props) {
 
     return (
-        <Row >
+        <Row className="w-100">
             
             <h1>Offers</h1>
             
@@ -27,7 +27,7 @@ export default function MerchantOffers(props) {
                 <Row className="staking-table-header no-gutters">
                     <p>Title</p>
 
-                    <p>Price (SFX)</p>
+                    <p>Price</p>
 
                     <p>Quantity</p>
 
@@ -38,7 +38,7 @@ export default function MerchantOffers(props) {
                     <p>Actions</p>
                 </Row>
                 
-                <button className="my-2 " onClick={props.loadOffers}>
+                <button className="my-5 " onClick={props.loadOffers}>
                     Load Offers
                 </button>
                 
