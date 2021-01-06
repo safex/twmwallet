@@ -3821,6 +3821,7 @@ class WalletHome extends React.Component {
                                             <Row className="m-auto">
                                                 <Col sm={12}>
                                                     {finalMessage}
+                                                    jjj
                                                 </Col>
                                             </Row>
                                         </ReactModal>  
