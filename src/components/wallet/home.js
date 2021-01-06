@@ -548,6 +548,7 @@ class WalletHome extends React.Component {
                             let removed = wallet.removeSafexAccount(username);
                             console.log(`removed ${username} at the first callback`)
                             alert(`removed ${username} during the transaction creation, you should be able to try again`);
+                            alert(err);
                         } else {
                             alert(`error registering ${username} next message will give the error`);
                             alert(err);
@@ -1648,6 +1649,8 @@ class WalletHome extends React.Component {
         } catch(err) {
             console.error(err);
             console.error(`error at the twm_file at register api`);
+            alert(`there was an error registering with the api`);
+            alert(err);
         }
     };
 
