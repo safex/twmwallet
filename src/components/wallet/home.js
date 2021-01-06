@@ -2080,27 +2080,30 @@ class WalletHome extends React.Component {
 
 
                                                         } catch (err) {
+                                                            this.setState({showLoader: false});
                                                             console.error(err);
-                                                            console.error(`error opening twm file after save to verify`);
-                                                            alert(`error at saving to the twm file during account creation verification stage`);
+                                                            console.error(`Error opening twm file after save to verify`);
+                                                            alert(`Error at saving to the twm file during account creation verification stage`);
                                                         }
                                                         console.log(twm_save);
 
                                                     } catch (err) {
+                                                        this.setState({showLoader: false});
                                                         console.error(err);
-                                                        console.error(`error at initial save of the twm file`);
-                                                        alert(`error at saving to the twm file during account creation initialization stage`);
+                                                        console.error(`Error at initial save of the twm file`);
+                                                        alert(`Error at saving to the twm file during account creation initialization stage`);
                                                     }
                                                     //api_file_url_offer_id[order_id_hash].messages
                                                     //send it to the server
                                                     //save it to the twm_file
+                                                    this.setState({showLoader: false});
                                                     console.log(`payments from twm_url`);
                                                     alert(`what`);
 
                                                     let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
 
-                                                    console.log(`purchase transaction committed`);
-                                                    alert(`the purchase has been submitted`);
+                                                    console.log(`Purchase transaction committed`);
+                                                    alert(`Phe purchase has been submitted`);
 
 
                                                 }
@@ -2110,13 +2113,14 @@ class WalletHome extends React.Component {
 
 
                                         } catch (err) {
-                                                alert(`error at getting the sellers public key from the api server`);
+                                            this.setState({showLoader: false});
+                                                alert(`Error at getting the sellers public key from the api server`);
                                                 console.error(err);
                                                 console.error(`error at getting the sellers public key from the api server`);
 
                                             }
                                         } else {
-
+                                            this.setState({showLoader: false});
                                             let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
 
                                             console.log(`purchase transaction committed`);
@@ -2589,16 +2593,16 @@ class WalletHome extends React.Component {
                                             <p style={{width: '24rem'}}>
                                            
                                                 {listing.quantity <= 0 ?
-                                                    (<button disabled>
+                                                    (<button className="search-button m-2" disabled>
                                                         SOLD OUT
                                                     </button>)
                                                     :
-                                                    (<button onClick={() => this.handleShowPurchaseForm(listing, data)}>
+                                                    (<button className="search-button m-2" onClick={() => this.handleShowPurchaseForm(listing, data)}>
                                                         BUY
                                                     </button>)
                                                 }
 
-                                                <button className="ml-2">CHAT</button>
+                                                <button className="search-button m-2">CHAT</button>
                                             </p>
                                         </Row>
                                     )
@@ -2708,73 +2712,74 @@ class WalletHome extends React.Component {
 
                             {this.state.show_purchase_form ?
                                 <ReactModal 
-                                isOpen={this.state.show_purchase_form}
-                                closeTimeoutMS={500}
-                                className="keys-modal"
-                                onRequestClose={this.handleClosePurchaseForm}
+                                    isOpen={this.state.show_purchase_form}
+                                    closeTimeoutMS={500}
+                                    className="keys-modal"
+                                    onRequestClose={this.handleClosePurchaseForm}
 
-                                style={{
-                                    overlay: {
-                                    position: 'fixed',
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    backgroundColor: 'rgba(255, 255, 255, 0.75)'
-                                    },
-                                    content: {
-                                    position: 'absolute',
-                                    top: '40px',
-                                    left: '40px',
-                                    right: '40px',
-                                    bottom: '40px',
-                                    overflow: 'auto',
-                                    }
-                                }}
-                            >  
-                                <h1>PURCHASE {this.state.show_purchase_offer.title.toUpperCase()}</h1>
-                                
+                                    style={{
+                                        overlay: {
+                                        position: 'fixed',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                        },
+                                        content: {
+                                        position: 'absolute',
+                                        top: '40px',
+                                        left: '40px',
+                                        right: '40px',
+                                        bottom: '40px',
+                                        overflow: 'auto',
+                                        }
+                                    }}
+                                >  
+                                    <h1>PURCHASE {this.state.show_purchase_offer.title.toUpperCase()}</h1>
+                                    
 
-                                <Form id="purchase_item"
-                                        onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
+                                    <Form 
+                                        id="purchase_item"
+                                        onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}
+                                    >
+                                        <Image 
+                                            className="border border-dark rounded my-5"
+                                            src={this.state.show_purchase_offer_data.main_image}
+                                        />
 
-                                        <div className="d-flex flex-column justify-content-around p-3">
-                                            <Image className="border border-dark"
-                                                    src={this.state.show_purchase_offer_data.main_image}></Image>
+                                        <h2>Price: {this.state.show_purchase_offer.price} SFX</h2>
 
-                                            <div className="p-5 d-flex flex-column justify-content-center"></div>
-                                                <hr className="border border-dark w-100"></hr>
-                                                    <h2>Price: {this.state.show_purchase_offer.price} SFX</h2>
-                                                    <h2>Seller: {this.state.show_purchase_offer.seller}</h2>
-                                                    <h2 data-tip data-for='offerID'>
-                                                        Offer
-                                                        ID: {this.to_ellipsis(this.state.show_purchase_offer.offer_id, 10, 10)}
-                                                        <ReactTooltip id='offerID' type='light' effect='solid'>
-                                                            {this.state.show_purchase_offer.offer_id}
-                                                        </ReactTooltip>
-                                                        <FaCopy
-                                                            className="ml-4"
-                                                            data-tip data-for='copyIDInfo'
-                                                            onClick={() => copy(this.state.show_purchase_offer.offer_id)}
-                                                        />
+                                        <h2>Seller: {this.state.show_purchase_offer.seller}</h2>
 
-                                                        <ReactTooltip id='copyIDInfo' type='info'
-                                                                        effect='solid'>
-                                                                    <span>
-                                                                        Copy Offer ID
-                                                                    </span>
-                                                        </ReactTooltip>
-                                                    </h2>
-                                                <hr className="border border-primary w-100"></hr>
-                                                <div className="h-25 oflow-y-auto">
-                                                    <p>{this.state.show_purchase_offer_data.description.toUpperCase()}</p>
-                                                </div>
+                                        <h2 data-tip data-for='offerID'>
+                                            Offer ID: {this.to_ellipsis(this.state.show_purchase_offer.offer_id, 10, 10)}
+                                            <ReactTooltip id='offerID' type='light' effect='solid'>
+                                                {this.state.show_purchase_offer.offer_id}
+                                            </ReactTooltip>
+
+                                            <FaCopy
+                                                className="ml-4"
+                                                data-tip data-for='copyIDInfo'
+                                                onClick={() => copy(this.state.show_purchase_offer.offer_id)}
+                                            />
+
+                                            <ReactTooltip id='copyIDInfo' type='info' effect='solid'>
+                                                        <span>
+                                                            Copy Offer ID
+                                                        </span>
+                                            </ReactTooltip>
+                                        </h2>
+                                            
+                                        <div className="h-25 oflow-y-auto">
+                                            <h2 className="my-3">{this.state.show_purchase_offer_data.description.toUpperCase()}</h2>
+                                        </div>
 
                                         <Form.Group as={Row}>
-                                            <Form.Label column sm={3}>
+                                            <Form.Label column sm={4}>
                                                 {this.state.show_purchase_offer.quantity} available
                                             </Form.Label>
-                                            <Col sm={9}>
+                                            <Col sm={6}>
                                                 <Form.Control
                                                     className="light-blue-back"
                                                     id="quantity"
@@ -2783,6 +2788,7 @@ class WalletHome extends React.Component {
                                                 />
                                             </Col>
                                         </Form.Group>
+
                                         {this.state.show_purchase_offer_data.nft ? 
                                             (<Form.Group as={Row}>   
                                                 <Form.Label column sm={4}>
@@ -2793,84 +2799,90 @@ class WalletHome extends React.Component {
                                                 </Col>
                                             </Form.Group>) 
                                         : 
-                                            ''}
+                                            ''
+                                        }
+
                                         {this.state.show_purchase_offer_data.shipping ? 
-                                        (<div>
-                                            <Form.Group name="names" as={Row}>
-                                        
-                                            <Form.Label column sm={4}>
-                                                First Name
-                                            </Form.Label>
-                                            <Col sm={6}>
-                                                <Form.Control name="first_name" rows="3"/>
-                                            </Col>
-                                       
-                                            <Form.Label column sm={4}>
-                                                Last Name
-                                            </Form.Label>
-                                            <Col sm={6}>
-                                                <Form.Control name="last_name" rows="3"/>
-                                            </Col>
-                                            
-                                        
-                                            
-                                        </Form.Group>
-                                            <Form.Group name="streets" as={Row}>
-                                                <Form.Label column sm={4}>
-                                                Address Line 1
-                                                </Form.Label>
-                                                <Col sm={6}>
-                                                    <Form.Control name="address1" rows="3"/>
-                                                </Col>
-                                                <Form.Label column sm={4}>
-                                                    Address Line 2
-                                                </Form.Label>
-                                                <Col sm={6}>
-                                                    <Form.Control name="address2" rows="3"/>
-                                                </Col>
-                                            </Form.Group>
-                                            <Form.Group name="place" as={Row}>
-                                                <Form.Label column sm={4}>
-                                                    City
-                                                </Form.Label>
-                                                <Col sm={6}>
-                                                    <Form.Control name="city" rows="3"/>
-                                                </Col>
-                                                <Form.Label column sm={4}>
-                                                    State/County
-                                                </Form.Label>
-                                                <Col sm={6}>
-                                                    <Form.Control name="state" rows="3"/>
-                                                </Col>
-                                            </Form.Group>
-                                            <Form.Group name="countrycodes" as={Row}>
-                                                <Form.Label column sm={4}>
-                                                    Zip/Area Code
-                                                </Form.Label>
-                                                <Col sm={6}>
-                                                    <Form.Control name="zipcode" rows="3"/>
-                                                </Col>
-                                                <Form.Label column sm={4}>
-                                                    Country
-                                                </Form.Label>
-                                                <Col sm={6}>
-                                                    <Form.Control name="country" rows="3"/>
-                                                </Col>
-                                            </Form.Group>
-                                            <Form.Group as={Row}>
-                                                <Form.Label column sm={4}>
-                                                    Email
-                                                </Form.Label>
-                                                <Col sm={6}>
-                                                    <Form.Control name="email_address" rows="3"/>
-                                                </Col>
-                                                <Form.Label column sm={4}>
-                                                    Phone
-                                                </Form.Label>
-                                                <Col sm={6}>
-                                                    <Form.Control name="phone_number" rows="3"/>
-                                                </Col>
-                                            </Form.Group></div>) : ''}
+                                            <div>
+                                                <Form.Group name="names" as={Row}>
+                                                    <Form.Label column sm={4}>
+                                                        First Name
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="first_name" rows="3"/>
+                                                    </Col>
+                                                
+                                                    <Form.Label column sm={4}>
+                                                        Last Name
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="last_name" rows="3"/>
+                                                    </Col>
+                                                </Form.Group>
+
+                                                <Form.Group name="streets" as={Row}>
+                                                    <Form.Label column sm={4}>
+                                                    Address Line 1
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="address1" rows="3"/>
+                                                    </Col>
+                                                    <Form.Label column sm={4}>
+                                                        Address Line 2
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="address2" rows="3"/>
+                                                    </Col>
+                                                </Form.Group>
+
+                                                <Form.Group name="place" as={Row}>
+                                                    <Form.Label column sm={4}>
+                                                        City
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="city" rows="3"/>
+                                                    </Col>
+                                                    <Form.Label column sm={4}>
+                                                        State/County
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="state" rows="3"/>
+                                                    </Col>
+                                                </Form.Group>
+
+                                                <Form.Group name="countrycodes" as={Row}>
+                                                    <Form.Label column sm={4}>
+                                                        Zip/Area Code
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="zipcode" rows="3"/>
+                                                    </Col>
+                                                    <Form.Label column sm={4}>
+                                                        Country
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="country" rows="3"/>
+                                                    </Col>
+                                                </Form.Group>
+
+                                                <Form.Group as={Row}>
+                                                    <Form.Label column sm={4}>
+                                                        Email
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="email_address" rows="3"/>
+                                                    </Col>
+                                                    <Form.Label column sm={4}>
+                                                        Phone
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="phone_number" rows="3"/>
+                                                    </Col>
+                                                </Form.Group>
+                                            </div>
+                                        : 
+                                            ''
+                                        }
                                         {this.state.show_purchase_offer_data.open_message ? 
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm={4}>
@@ -2883,101 +2895,119 @@ class WalletHome extends React.Component {
                                         : 
                                             ''
                                         }
-                                        </div>
-                                    
+                                        
+                                        <Form.Group as={Row} className="w-50">
+                                            <Form.Label column sm={4}>
+                                                Mixins
+                                                <IconContext.Provider value={{color: 'black', size: '20px'}}>
+                                                    <FaInfoCircle data-tip data-for='apiInfo'
+                                                                    className="blockchain-icon mx-4"/>
 
-
-                                    <Form.Group as={Row} className="w-50">
-                                        <Form.Label column sm={3}>
-                                            Mixins
-                                            <IconContext.Provider value={{color: 'black', size: '20px'}}>
-                                                <FaInfoCircle data-tip data-for='apiInfo'
-                                                                className="blockchain-icon mx-4"/>
-
-                                                <ReactTooltip id='apiInfo' type='info' effect='solid'>
-                                                            <span>
-                                                                Mixins are transactions that have also been sent on the Safex blockchain. <br/>
-                                                                They are combined with yours for private transactions.<br/>
-                                                                Changing this from the default could hurt your privacy.<br/>
-                                                            </span>
-                                                </ReactTooltip>
-                                            </IconContext.Provider>
-                                        </Form.Label>
-                                        <Col sm={9}>
-                                            <Form.Control
-                                                name="mixins"
-                                                as="select"
-                                                defaultValue="7"
-                                            >
-                                                <option>1</option>
-                                                <option>2</option>
-                                                <option>3</option>
-                                                <option>4</option>
-                                                <option>5</option>
-                                                <option>6</option>
-                                                <option>7</option>
-                                            </Form.Control>
-                                        </Col>
-                                    </Form.Group>
-
-                                    {this.state.showLoader ?
-                                        <Loader
-                                            className="justify-content-center align-content-center"
-                                            type="Bars"
-                                            color="#00BFFF"
-                                            height={50}
-                                            width={50}
-                                        />
-                                        :
-                                        <button>
-                                            Buy
-                                        </button>
-                                    }
-                                </Form>
-
-                                <Button className="close-button" onClick={this.handleClosePurchaseForm}>
-                                    Close
-                                </Button>
-                            </ReactModal>
-                                    :
-                                    ''
-                                    } 
-
-                            <Modal className="purchase-offer-modal text-align-center" animation={false}
-                                    centered
-                                    show={this.state.show_purchase_confirm_modal}
-                                    onHide={this.handleConfirmationModal}>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>
-                                        Purchase Confirmed: {this.state.show_purchase_offer.title.toUpperCase()}
-                                    </Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body>
-                                        <ul>
-                                            <li>Purchase transaction committed.</li>
-                                            <li>Transaction ID: {this.state.purchase_txn_id}</li>
-                                            <li>Amount: {this.state.purchase_txn_quantity} X {this.state.purchase_txn_title}</li>
-                                            <li>Price: {this.state.purchase_txn_price} SFX</li>
-                                            <li>
-                                                Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
-                                                <IconContext.Provider  value={{color: 'black', size: '20px'}}>
-                                                    <FaCopy
-                                                        className="ml-4"
-                                                        data-tip data-for='copyIDInfo1'
-                                                        onClick={() => copy(this.state.purchase_txn_id)}
-                                                    />
-
-                                                    <ReactTooltip id='copyIDInfo1' type='info' effect='solid'>
-                                                        <span>
-                                                            Copy Offer ID
-                                                        </span>
+                                                    <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                                <span>
+                                                                    Mixins are transactions that have also been sent on the Safex blockchain. <br/>
+                                                                    They are combined with yours for private transactions.<br/>
+                                                                    Changing this from the default could hurt your privacy.<br/>
+                                                                </span>
                                                     </ReactTooltip>
                                                 </IconContext.Provider>
-                                            </li>
-                                        </ul>
-                                </Modal.Body>
+                                            </Form.Label>
 
-                            </Modal>
+                                            <Col sm={8}>
+                                                <Form.Control
+                                                    name="mixins"
+                                                    as="select"
+                                                    defaultValue="7"
+                                                >
+                                                    <option>1</option>
+                                                    <option>2</option>
+                                                    <option>3</option>
+                                                    <option>4</option>
+                                                    <option>5</option>
+                                                    <option>6</option>
+                                                    <option>7</option>
+                                                </Form.Control>
+                                            </Col>
+                                        </Form.Group>
+
+                                        {this.state.showLoader ?
+                                            <Loader
+                                                className="justify-content-center align-content-center"
+                                                type="Bars"
+                                                color="#00BFFF"
+                                                height={50}
+                                                width={50}
+                                            />
+                                        :
+                                            <button className="m-5">
+                                                Buy
+                                            </button>
+                                        }
+                                    </Form>
+
+                                    <Button className="close-button" onClick={this.handleClosePurchaseForm}>
+                                        Close
+                                    </Button>
+                                </ReactModal>
+                            :
+                                ''
+                            }
+
+                            <ReactModal 
+                                isOpen={this.state.show_purchase_confirm_modal}
+                                closeTimeoutMS={500}
+                                className="keys-modal"
+                                onRequestClose={this.handleConfirmationModal}
+
+                                style={{
+                                    overlay: {
+                                        position: 'fixed',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                    },
+                                    content: {
+                                        position: 'absolute',
+                                        top: '40px',
+                                        left: '40px',
+                                        right: '40px',
+                                        bottom: '40px',
+                                        overflow: 'auto',
+                                    }
+                                }}
+                            >  
+                                
+                                <h1>PURCHASE CONFIRMED: {this.state.show_purchase_offer.title.toUpperCase()}</h1>
+                                   
+                               
+                                    <h2>Purchase transaction committed.</h2>
+
+                                    <h2>Transaction ID: {this.state.purchase_txn_id}</h2>
+
+                                    <h2>Amount: {this.state.purchase_txn_quantity} X {this.state.purchase_txn_title}</h2>
+
+                                    <h2>Price: {this.state.purchase_txn_price} SFX</h2>
+
+                                    <h2>
+                                        Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
+                                        <IconContext.Provider  value={{color: 'black', size: '20px'}}>
+                                            <FaCopy
+                                                className="ml-4"
+                                                data-tip data-for='copyIDInfo1'
+                                                onClick={() => copy(this.state.purchase_txn_id)}
+                                            />
+
+                                            <ReactTooltip id='copyIDInfo1' type='info' effect='solid'>
+                                                <span>
+                                                    Copy Offer ID
+                                                </span>
+                                            </ReactTooltip>
+                                        </IconContext.Provider>
+                                    </h2>
+
+                            </ReactModal>
                         
                             <Col sm={4} className="no-padding d-flex flex-column align-items-center justify-content-between">
                                 <HomeInfo
