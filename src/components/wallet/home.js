@@ -1748,16 +1748,18 @@ class WalletHome extends React.Component {
                                 console.log(decomped.toString());
                             
                                 finalMessage.push(
-                                    <div>
+                                    <div key={''}>
                                         <h1>
-                                            MESSAGE START
-                                            -------------------
+                                            ---------------  
+                                            MESSAGE START 
+                                            --------------- 
                                         </h1>
                                         <h3>{decomped}</h3>
                                         <br/><br/>
                                         <h1>
-                                            MESSAGE END
-                                            -------------------
+                                            ------------- -- 
+                                            MESSAGE END 
+                                            --------------- 
                                         </h1>
                                         <br/><br/>
                                     </div>)  
