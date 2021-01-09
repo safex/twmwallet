@@ -1673,7 +1673,48 @@ class WalletHome extends React.Component {
         }
 
         return new Uint8Array(a);
-    }
+    };
+
+    get_seller_order_ids_by_offer = async (offer_id, username, twm_api_url) => {
+        try {
+
+            let twm_file = this.state.twm_file;
+            let more_core = twm_file.accounts[username].urls[twm_api_url].messages;
+            if (more_core.hasOwnProperty(offer_id)) {
+                let order_ids_array = [];
+                for (const order of more_core[offer_id].orders) {
+                    order_ids_array.push(order);
+                }
+                console.log(order_ids_array);
+                this.setState({order_ids_selected: order_ids_array});
+            } else {
+                console.log(`${offer_id} not found in file`);
+            }
+        } catch(err) {
+            console.error(err);
+            alert(`error user and/or url are not in this file, no messages`);
+        }
+    };
+
+    get_messages_by_order_id_of_seller = async (offer_id, username, twm_api_url, order_id) => {
+        try {
+            let twm_file = this.state.twm_file;
+            let more_core = twm_file.accounts[username].urls[twm_api_url].messages[offer_id].orders;
+            if (more_core.hasOwnProperty(order_id)) {
+                let messages_array = [];
+                for (const message of more_core[order_id].messages) {
+                    messages_array.push(message);
+                }
+                console.log(messages_array);
+                this.setState({messages_selected: messages_array});
+            } else {
+                console.log(`${order_id} not found in file`);
+            }
+        } catch(err) {
+            console.error(err);
+            alert(`error user and/or url are not in this file, no messages`);
+        }
+    };
 
     fetch_messages_seller = async (username, twm_api_url = 'http://127.0.0.1:17700') => {
         try {
