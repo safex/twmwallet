@@ -1747,22 +1747,7 @@ class WalletHome extends React.Component {
                                 let decomped = zlib.inflateSync(Buffer.from(decryptedData));
                                 console.log(decomped.toString());
                             
-                                finalMessage.push(
-                                    <div key={''}>
-                                        <h1>
-                                            ---------------  
-                                            MESSAGE START 
-                                            --------------- 
-                                        </h1>
-                                        <h3>{decomped}</h3>
-                                        <br/><br/>
-                                        <h1>
-                                            ------------- -- 
-                                            MESSAGE END 
-                                            --------------- 
-                                        </h1>
-                                        <br/><br/>
-                                    </div>)  
+                                
                                 try {
                                     let parsed = JSON.parse(decomped.toString());
                                     msg.msg = decomped.toString();
@@ -1791,6 +1776,23 @@ class WalletHome extends React.Component {
                                                 console.log(`seems we have a duplicated message`);
                                             } else {
                                                 twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
+
+                                                finalMessage.push(
+                                                    <div key={msg_hex}>
+                                                        <h1>
+                                                            ---------------  
+                                                            MESSAGE START 
+                                                            --------------- 
+                                                        </h1>
+                                                        <h3>{decomped}</h3>
+                                                        <br/><br/>
+                                                        <h1>
+                                                            ------------- -- 
+                                                            MESSAGE END 
+                                                            --------------- 
+                                                        </h1>
+                                                        <br/><br/>
+                                                    </div>)  
                                             }
                                         }
                                     } else {
