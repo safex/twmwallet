@@ -1747,24 +1747,38 @@ class WalletHome extends React.Component {
                                 console.log(decomped.toString());
                                 try {
                                     let parsed = JSON.parse(decomped.toString());
+                                    msg.msg = decomped.toString();
                                     console.log(parsed);
                                     if (msg.to === username) {
                                         if (twm_file.accounts[username].urls[twm_api_url].messages.hasOwnProperty(parsed.o)) {
+                                            //if has this offer
                                             if (twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders.hasOwnProperty(msg.order_id)) {
-
-                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.push(parsed);
+                                                //if has messages from this order_id
+                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.push(msg);
                                             } else {
-                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages = [];
-                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.push(parsed);
+                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id] = {};
+                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages = {};
+                                                if (twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.hasOwnProperty(msg.position)) {
+                                                    console.log(`seems we have a duplicated message`);
+                                                } else {
+                                                    twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
+                                                }
                                             }
                                         } else {
                                             twm_file.accounts[username].urls[twm_api_url].messages[parsed.o] = {};
                                             twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders = {};
-
-                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages = [];
-                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.push(parsed);
+                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id] = {};
+                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages = {};
+                                            if (twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.hasOwnProperty(msg.position)) {
+                                                console.log(`seems we have a duplicated message`);
+                                            } else {
+                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
+                                            }
                                         }
+                                    } else {
+                                        console.error(`there is an error with this msg.to doesn't match the username`);
                                     }
+                                    this.setState({twm_file: twm_file});
                                 } catch(err) {
                                     console.error(err);
                                     console.error(`error at parsing the message`)
