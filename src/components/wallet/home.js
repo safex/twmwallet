@@ -268,6 +268,7 @@ class WalletHome extends React.Component {
 
             console.log(accs);
             console.log(`accounts`);
+            this.refresh_action();
             //this.setState({usernames: accs, selected_user: {index: 0, username: accs[0].username}});
         } catch (err) {
             console.error(err);
@@ -1297,7 +1298,7 @@ class WalletHome extends React.Component {
     change_nft_switch = () => {
         this.setState({nft_switch: !this.state.nft_switch});
     };
-    
+
     change_open_message_switch = () => {
         this.setState({open_message_switch: !this.state.open_message_switch});
     };
@@ -1720,6 +1721,7 @@ class WalletHome extends React.Component {
                     console.log(req_msgs.to);
                     console.log(req_msgs.from);
 
+                    let twm_file = this.state.twm_file;
 
                     for (const order in req_msgs.to) {
                         console.log(req_msgs.to[order]);
@@ -1740,10 +1742,11 @@ class WalletHome extends React.Component {
                                     this.hexStringToByte(msg.message)
                                 );
 
+
                                 console.log(decryptedData.toString());
                                 let decomped = zlib.inflateSync(Buffer.from(decryptedData));
                                 console.log(decomped.toString());
-
+                            
                                 finalMessage.push(
                                     <div>
                                         <h1>
@@ -1758,11 +1761,40 @@ class WalletHome extends React.Component {
                                         </h1>
                                         <br/><br/>
                                     </div>)  
+                                try {
+                                    let parsed = JSON.parse(decomped.toString());
+                                    console.log(parsed);
+                                    if (msg.to === username) {
+                                        if (twm_file.accounts[username].urls[twm_api_url].messages.hasOwnProperty(parsed.o)) {
+                                            if (twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders.hasOwnProperty(msg.order_id)) {
+
+                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.push(parsed);
+                                            } else {
+                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages = [];
+                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.push(parsed);
+                                            }
+                                        } else {
+                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o] = {};
+                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders = {};
+
+                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages = [];
+                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.push(parsed);
+                                        }
+                                    }
+                                } catch(err) {
+                                    console.error(err);
+                                    console.error(`error at parsing the message`)
+                                }
+
+                                /*if (this.state.twm_file.accounts[username].urls[twm_api_url].messages.hasOwnProperty()) {
+
+                                }*/
                             } catch(err) {
                                 console.error(err);
                             }
                         }
                     }
+                    console.log(twm_file);
                 }
             }
         } catch(err) {
@@ -2024,6 +2056,7 @@ class WalletHome extends React.Component {
                                                     message_header_obj.order_id = order_id_hash;
                                                     message_header_obj.purchase_proof = txid;
                                                     message_header_obj.bc_height = this.state.blockchain_height;
+                                                    message_header_obj.position = 1;
 
                                                     let pre_sign_message_obj = {};
                                                     pre_sign_message_obj.s = ''; //subject
@@ -2135,7 +2168,6 @@ class WalletHome extends React.Component {
                                                     //send it to the server
                                                     //save it to the twm_file
                                                     console.log(`payments from twm_url`);
-                                                    alert(`what`);
 
                                                     let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
 
@@ -2223,7 +2255,7 @@ class WalletHome extends React.Component {
                         reject(err);
                     } else {
                         this.setState({showLoader: false, show_purchase_confirm_modal: true});
-                        
+
                         alert(
                             `Purchase transaction committed.
                             Transaction ID: ${this.state.purchase_txn_id}
@@ -2396,8 +2428,8 @@ class WalletHome extends React.Component {
 
 
     call_non_listings_table = () => offerRows = this.state.non_offers.map((listing, key) => {
-                               
-                        
+
+
         try {
             if (listing.seller === this.state.selected_user.username) {
                 var data = {};
@@ -2460,7 +2492,7 @@ class WalletHome extends React.Component {
             console.error(`failed to properly parse the user data formatting`);
             console.error(err);
         }
-        
+
     });
 
     render() {
@@ -2483,7 +2515,7 @@ class WalletHome extends React.Component {
                                     walletHeight={this.state.wallet_height}
                                 />
 
-                                <SendSafex 
+                                <SendSafex
                                     title="SEND SAFEX"
                                     style="cash"
                                     send={this.cash_send}
@@ -2505,12 +2537,12 @@ class WalletHome extends React.Component {
                                     toEllipsis={this.to_ellipsis}
                                 />
 
-                                <HomeCarousel/> 
+                                <HomeCarousel/>
                             </Col>
                         </div>
                     );
                 }
-                
+
                 case "market":
                     var table_of_listings;
                     if (this.state.offer_loading_flag === 'all') {
@@ -2617,7 +2649,7 @@ class WalletHome extends React.Component {
                                             </p>
 
                                             <p style={{width: '24rem'}}>
-                                           
+
                                                 {listing.quantity <= 0 ?
                                                     (<button disabled>
                                                         SOLD OUT
@@ -2682,7 +2714,7 @@ class WalletHome extends React.Component {
                                             </p>
 
                                             <p style={{width: '24rem'}}>
-                                            
+
                                                 {listing.quantity <= 0 ?
                                                     (<button className="search-button" disabled>
                                                         SOLD OUT
@@ -2714,7 +2746,7 @@ class WalletHome extends React.Component {
                             console.log(key);
                             try {
                                 return (
-                                    <OrderTableRow 
+                                    <OrderTableRow
                                         key={key}
                                         title={'placeholder'}
                                         price={'placeholder'}
@@ -2723,7 +2755,7 @@ class WalletHome extends React.Component {
                                         showMessages={this.showMessages}
                                         messageObject={'placeholder'}
                                     />
-                                        
+
                                 )
 
                             } catch (err) {
@@ -2737,7 +2769,7 @@ class WalletHome extends React.Component {
                         <div className="">
 
                             {this.state.show_purchase_form ?
-                                <ReactModal 
+                                <ReactModal
                                 isOpen={this.state.show_purchase_form}
                                 closeTimeoutMS={500}
                                 className="keys-modal"
@@ -2761,9 +2793,9 @@ class WalletHome extends React.Component {
                                     overflow: 'auto',
                                     }
                                 }}
-                            >  
+                            >
                                 <h1>PURCHASE {this.state.show_purchase_offer.title.toUpperCase()}</h1>
-                                
+
 
                                 <Form id="purchase_item"
                                         onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
@@ -2813,37 +2845,37 @@ class WalletHome extends React.Component {
                                                 />
                                             </Col>
                                         </Form.Group>
-                                        {this.state.show_purchase_offer_data.nft ? 
-                                            (<Form.Group as={Row}>   
+                                        {this.state.show_purchase_offer_data.nft ?
+                                            (<Form.Group as={Row}>
                                                 <Form.Label column sm={4}>
                                                     NFT Ethereum Address
                                                 </Form.Label>
                                                 <Col sm={6}>
                                                     <Form.Control name="eth_address" rows="3"/>
                                                 </Col>
-                                            </Form.Group>) 
-                                        : 
+                                            </Form.Group>)
+                                        :
                                             ''}
-                                        {this.state.show_purchase_offer_data.shipping ? 
+                                        {this.state.show_purchase_offer_data.shipping ?
                                         (<div>
                                             <Form.Group name="names" as={Row}>
-                                        
+
                                             <Form.Label column sm={4}>
                                                 First Name
                                             </Form.Label>
                                             <Col sm={6}>
                                                 <Form.Control name="first_name" rows="3"/>
                                             </Col>
-                                       
+
                                             <Form.Label column sm={4}>
                                                 Last Name
                                             </Form.Label>
                                             <Col sm={6}>
                                                 <Form.Control name="last_name" rows="3"/>
                                             </Col>
-                                            
-                                        
-                                            
+
+
+
                                         </Form.Group>
                                             <Form.Group name="streets" as={Row}>
                                                 <Form.Label column sm={4}>
@@ -2901,7 +2933,7 @@ class WalletHome extends React.Component {
                                                     <Form.Control name="phone_number" rows="3"/>
                                                 </Col>
                                             </Form.Group></div>) : ''}
-                                        {this.state.show_purchase_offer_data.open_message ? 
+                                        {this.state.show_purchase_offer_data.open_message ?
                                             <Form.Group as={Row}>
                                                 <Form.Label column sm={4}>
                                                     NFT Ethereum Address
@@ -2909,12 +2941,12 @@ class WalletHome extends React.Component {
                                                 <Col sm={6}>
                                                     <Form.Control name="message" rows="3"/>
                                                 </Col>
-                                            </Form.Group> 
-                                        : 
+                                            </Form.Group>
+                                        :
                                             ''
                                         }
                                         </div>
-                                    
+
 
 
                                     <Form.Group as={Row} className="w-50">
@@ -2971,7 +3003,7 @@ class WalletHome extends React.Component {
                             </ReactModal>
                                     :
                                     ''
-                                    } 
+                                    }
 
                             <Modal className="purchase-offer-modal text-align-center" animation={false}
                                     centered
@@ -3008,7 +3040,7 @@ class WalletHome extends React.Component {
                                 </Modal.Body>
 
                             </Modal>
-                        
+
                             <Col sm={4} className="no-padding d-flex flex-column align-items-center justify-content-between">
                                 <HomeInfo
                                     blockHeight={this.state.blockchain_height}
@@ -3043,7 +3075,7 @@ class WalletHome extends React.Component {
                                 >
                                     { !this.state.showMyOrders ?
                                         <div className="row width100 border-bottom border-white" id="search">
-                                            <form 
+                                            <form
                                                 className="w-100 no-gutters p-2 align-items-baseline d-flex justify-content-center"
                                                 id="search-form" action=""
                                                 method=""
@@ -3079,7 +3111,7 @@ class WalletHome extends React.Component {
                                     }
 
                                     <Row className="w-100 justify-content-center">
-                                        
+
                                     { !this.state.showMyOrders ?
                                         <Col sm={6}>
                                             <div className="row" id="search">
@@ -3100,7 +3132,7 @@ class WalletHome extends React.Component {
                                                     </div>
                                                 </form>
                                             </div>
-                                            
+
                                             <div className="row" id="filter">
                                                 <form>
                                                     <select data-filter="category"
@@ -3112,7 +3144,7 @@ class WalletHome extends React.Component {
                                                         <option value="">Digital</option>
                                                         <option value="">Toys</option>
                                                     </select>
-                                                
+
                                                     <select data-filter="location"
                                                             className="">
                                                         <option value="">Location</option>
@@ -3124,7 +3156,7 @@ class WalletHome extends React.Component {
                                                         <option value="">North America</option>
                                                         <option value="">South America</option>
                                                     </select>
-                                                    
+
                                                     <select data-filter="price"
                                                             className="">
                                                         <option value="">Price Range</option>
@@ -3135,7 +3167,7 @@ class WalletHome extends React.Component {
                                                         <option value="">SFX 500 - SFX 999.99</option>
                                                         <option value="">SFX 1000+</option>
                                                     </select>
-                                                    
+
                                                     <select data-filter="sort"
                                                             className="">
                                                         <option value="">Sort by...</option>
@@ -3148,13 +3180,13 @@ class WalletHome extends React.Component {
                                     :
                                         ''
                                     }
-                                    
+
                                         <Col className="d-flex" sm={2}>
                                             <button onClick={this.handleMyOrders} className="search-button">
                                                 {this.state.showMyOrders ? 'Close' : 'My Orders'}
                                             </button>
                                         </Col>
-                                       
+
                                         { this.state.showMyOrders ?
                                             <Col sm={12}>
                                                 <Row>
@@ -3171,8 +3203,8 @@ class WalletHome extends React.Component {
                                                         </IconContext.Provider>
                                                     </Col>
                                                 </Row>
-                                            
-                                                
+
+
                                                 <Row className="h-100">
                                                     <Col className="h-100" sm={12}>
                                                         <MyOrders
@@ -3188,6 +3220,40 @@ class WalletHome extends React.Component {
                                             ''
                                         }
                                     </Row>
+
+                                        <ReactModal
+                                            isOpen={this.state.showMessages}
+                                            closeTimeoutMS={500}
+                                            className="keys-modal"
+                                            onRequestClose={this.hideMessages}
+                                        >
+                                            <Row>
+                                                <Col sm={10}>
+                                                    <h1>
+                                                        Messages
+                                                    </h1>
+
+
+                                                </Col>
+                                                <Col sm={2}>
+                                                    <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
+                                                        <CgCloseR
+                                                            className="mx-auto"
+                                                            onClick={this.hideMessages}
+                                                        />
+                                                    </IconContext.Provider>
+                                                </Col>
+                                            </Row>
+
+                                            <Row className="m-auto">
+                                                <Col sm={12}>
+                                                    <h1>PUT MESSAGE HERE</h1>
+                                                    {
+                                                    //  this.state.currentMessage
+                                                    }
+                                                </Col>
+                                            </Row>
+                                        </ReactModal>
 
                                     <Row className="staking-table-row">
                                         <p>Title</p>
@@ -3207,7 +3273,7 @@ class WalletHome extends React.Component {
                     );
                 case "merchant": {
 
-                    
+
 
                     var twm_listings_table = this.state.twm_offers.map((listing, key) => {
                         console.log(key);
@@ -3249,7 +3315,7 @@ class WalletHome extends React.Component {
                                 className={
                                     this.state.selected_user.username === user.username ?
                                         "no-gutters account-element selected-account"
-                                    : 
+                                    :
                                         "no-gutters account-element"
                                 }
                                 key={key}
@@ -3270,15 +3336,15 @@ class WalletHome extends React.Component {
                                     <h2>{user.username}</h2>
                                 </Col>
 
-                                {user.status == 0 ? 
-                                    <button 
+                                {user.status == 0 ?
+                                    <button
                                         className="merchant-mini-buttons"
                                         onClick={(e) => this.remove_account(e, user.username, key)}
                                     >
                                         Remove
                                     </button>
 
-                                : 
+                                :
                                     ''
                                 }
                             </Row>
@@ -3353,7 +3419,7 @@ class WalletHome extends React.Component {
                                         seed={this.props.wallet.seed()}
                                         toEllipsis={this.to_ellipsis}
                                     />
-                                    
+
                                     {this.state.merchantTabs === "accounts" ?
 
                                         <MerchantAccounts
@@ -3370,10 +3436,10 @@ class WalletHome extends React.Component {
                                             merchantTabs={this.state.merchantTabs}
                                             data={data}
                                             selected={selected}
-                                        />  
+                                        />
                                     :
                                         <Row className="merchant-accounts-box">
-                                            {this.state.showMyOrders ? 
+                                            {this.state.showMyOrders ?
                                                 <Row className="h-100">
                                                     <div style={{width: 800}} className="h-100" sm={12}>
                                                         <MyOrders
@@ -3385,7 +3451,7 @@ class WalletHome extends React.Component {
                                                         />
                                                     </div>
                                                 </Row>
-                                                
+
                                             :
                                                 <MerchantOffers
                                                     handleOrders={this.handleMyOrders}
@@ -3423,7 +3489,7 @@ class WalletHome extends React.Component {
                                         }}
                                     >
                                             <h1>Create New Offer</h1>
-                                    
+
 
                                             <Form
                                                 id="list_new_offer"
@@ -3557,28 +3623,28 @@ class WalletHome extends React.Component {
                                                     <Form.Check
                                                         label="Shipping"
                                                         checked={this.state.shipping_switch}
-                                                        onChange={this.change_shipping_switch} 
-                                                        type="switch" 
-                                                        id="shipping-switch" 
-                                                        name="shipping" 
+                                                        onChange={this.change_shipping_switch}
+                                                        type="switch"
+                                                        id="shipping-switch"
+                                                        name="shipping"
                                                     />
 
                                                     <Form.Check
                                                         label="NFT"
                                                         checked={this.state.nft_switch}
-                                                        onChange={this.change_nft_switch} 
-                                                        type="switch" 
-                                                        id="nft-switch" 
-                                                        name="nft" 
+                                                        onChange={this.change_nft_switch}
+                                                        type="switch"
+                                                        id="nft-switch"
+                                                        name="nft"
                                                     />
-                                                    
+
                                                     <Form.Check
                                                         label="Open Messages"
                                                         checked={this.state.open_message_switch}
-                                                        onChange={this.change_open_message_switch} 
-                                                        type="switch" 
-                                                        id="open-switch" 
-                                                        name="open_message" 
+                                                        onChange={this.change_open_message_switch}
+                                                        type="switch"
+                                                        id="open-switch"
+                                                        name="open_message"
                                                     />
                                                 </Row>
 
@@ -3618,8 +3684,8 @@ class WalletHome extends React.Component {
                                                     List Offer
                                                 </button>
                                             </Form>
-                                        
-                                            <Button 
+
+                                            <Button
                                                 className="close-button"
                                                 onClick={this.handleCloseNewOfferForm}
                                             >
@@ -3652,16 +3718,16 @@ class WalletHome extends React.Component {
                                             }
                                         }}
                                     >
-                                        
+
                                         <h1>Make New Account</h1>
-                                
+
                                         <Form id="create_account" onSubmit={this.register_account}>
                                             <Row className="no-gutters justify-content-between w-100">
                                                 <Col md="8">
                                                     <Form.Group as={Col}>
                                                         <Form.Label>Username</Form.Label>
 
-                                                        <Form.Control 
+                                                        <Form.Control
                                                             name="username"
                                                             placedholder="enter your desired username"
                                                         />
@@ -3812,11 +3878,11 @@ class WalletHome extends React.Component {
 
                                                 Create Account
                                             </button>
-                                            
-                                            
+
+
                                         </Form>
 
-                                        <button 
+                                        <button
                                             className="close-button"
                                             onClick={this.handleNewAccountForm}
                                         >
@@ -3830,7 +3896,7 @@ class WalletHome extends React.Component {
                                             closeTimeoutMS={500}
                                             className="keys-modal"
                                             onRequestClose={this.hideMessages}
-                                        >   
+                                        >
                                             <Row>
                                                 <Col sm={10}>
                                                     <h1>
@@ -3854,9 +3920,9 @@ class WalletHome extends React.Component {
                                                     {finalMessage}
                                                 </Col>
                                             </Row>
-                                        </ReactModal>  
-                                
-                                    
+                                        </ReactModal>
+
+
                                     <ReactModal
                                         closeTimeoutMS={500}
                                         isOpen={this.state.show_edit_offer_form}
@@ -3882,7 +3948,7 @@ class WalletHome extends React.Component {
                                             }
                                         }}
                                     >
-                                            
+
                                         <h1>Edit Offer {this.state.show_edit_offer.title}</h1>
 
                                         <Form
@@ -4024,28 +4090,28 @@ class WalletHome extends React.Component {
                                                     <Form.Check
                                                         label="Shipping"
                                                         checked={this.state.shipping_switch}
-                                                        onChange={this.change_shipping_switch} 
-                                                        type="switch" 
-                                                        id="shipping-switch" 
-                                                        name="shipping" 
+                                                        onChange={this.change_shipping_switch}
+                                                        type="switch"
+                                                        id="shipping-switch"
+                                                        name="shipping"
                                                     />
 
                                                     <Form.Check
                                                         label="NFT"
                                                         checked={this.state.nft_switch}
-                                                        onChange={this.change_nft_switch} 
-                                                        type="switch" 
-                                                        id="nft-switch" 
-                                                        name="nft" 
+                                                        onChange={this.change_nft_switch}
+                                                        type="switch"
+                                                        id="nft-switch"
+                                                        name="nft"
                                                     />
-                                                    
+
                                                     <Form.Check
                                                         label="Open Messages"
                                                         checked={this.state.open_message_switch}
-                                                        onChange={this.change_open_message_switch} 
-                                                        type="switch" 
-                                                        id="open-switch" 
-                                                        name="open_message" 
+                                                        onChange={this.change_open_message_switch}
+                                                        type="switch"
+                                                        id="open-switch"
+                                                        name="open_message"
                                                     />
                                                 </Row>
                                             </Form.Row>
@@ -4102,14 +4168,14 @@ class WalletHome extends React.Component {
                                             </button>
                                         </Form>
 
-                                        <button 
-                                            className="close-button my-5" 
+                                        <button
+                                            className="close-button my-5"
                                             onClick={this.handleCloseEditOfferForm}
                                         >
                                             Close
                                         </button>
                                     </ReactModal>
-                                
+
                                 </Col>
                             </div>);
 
@@ -4151,7 +4217,7 @@ class WalletHome extends React.Component {
                                     walletHeight={this.state.wallet_height}
                                 />
 
-                                <SendSafex 
+                                <SendSafex
                                     title="SEND TOKENS"
                                     style="token"
                                     send={this.token_send}
@@ -4161,7 +4227,7 @@ class WalletHome extends React.Component {
 
                             <Col sm={9} className="no-padding token-main-box">
                                 <Row className="mx-auto w-100">
-                                    <StakingTable 
+                                    <StakingTable
                                         /*
                                             rows={stakingRows}
                                             Needs to be created using .map and StakingTableRow
@@ -4186,7 +4252,7 @@ class WalletHome extends React.Component {
                                             totalNetworkStake={this.state.blockchain_tokens_staked.toLocaleString()}
                                         />
 
-                                        <Stake 
+                                        <Stake
                                             style="unstake"
                                             send={this.make_token_unstake}
                                             id="stake_token"
@@ -4230,17 +4296,17 @@ class WalletHome extends React.Component {
             <div className="" >
                 <Image className="entry-scene" src={require("./../../img/loading-scene.svg")}/>
                 <Image className="plant3" src={require("./../../img/plant2.svg")}/>
-                
-                <MainHeader 
-                    view={this.state.interface_view} 
-                    goHome={this.go_home} 
+
+                <MainHeader
+                    view={this.state.interface_view}
+                    goHome={this.go_home}
                     goToTokens={this.show_tokens}
                     goToMarket={this.show_market}
                     goToMerchant={this.show_merchant}
                     goToSettings={this.show_settings}
                     logout={this.logout}
                 />
-                    
+
                 {twmwallet()}
             </div>
         );
