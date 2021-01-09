@@ -1704,7 +1704,7 @@ class WalletHome extends React.Component {
                 for (const message of more_core[order_id].messages) {
                     messages_array.push(message);
                 }
-                console.log(order_ids_array);
+                console.log(messages_array);
                 this.setState({messages_selected: messages_array});
             } else {
                 console.log(`${order_id} not found in file`);
