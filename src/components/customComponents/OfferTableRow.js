@@ -10,7 +10,13 @@ import ReactTooltip from "react-tooltip";
 export default function OfferTableRow(props) {
 
     return (
-        <Row theKey={props.key} className="staking-table-row">
+        <Row 
+            onLoad={
+                props.getOrders(props.id, props.seller, 'http://stageapi.theworldmarketplace.com:17700')} 
+                key={props.key
+            } 
+            className="staking-table-row"
+        >
             <p>{props.title}</p>
         
             <p>{props.price}</p>
@@ -21,7 +27,8 @@ export default function OfferTableRow(props) {
         
             <p data-tip data-for='offerID'>
                 {props.toEllipsis(props.id, 5, 5)}
-                
+                .
+                .
             </p>
                 <ReactTooltip 
                     className="entry-tooltip-container" 

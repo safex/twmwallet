@@ -115,6 +115,8 @@ class WalletHome extends React.Component {
             show_purchase_offer: {title: '', quantity: 0, offerID: '', seller: ''},
             show_purchase_offer_data: {main_image: false},
             show_edit_offer: {},
+            order_ids_selected: [],
+            messages_selected: [],
             show_orders: false,
             showMyOrders: false,
             new_account_image: require('./../../img/NewAccountPanda.svg'),
@@ -2543,6 +2545,7 @@ class WalletHome extends React.Component {
                         handleEditOfferForm={() => this.handleShowEditOfferForm(listing)}
                         handleShowOrders={this.handleMyOrders}
                         toEllipsis={this.to_ellipsis}
+                        getOrders={() => this.get_seller_order_ids_by_offer}
                     />
                 )
 
@@ -2801,13 +2804,13 @@ class WalletHome extends React.Component {
                     }
 
                     var tableOfOrders;
-                        tableOfOrders = this.state.twm_offers.map((order, key) => {
+                        tableOfOrders = this.state.order_ids_selected.map((order, key) => {
                             console.log(key);
                             try {
                                 return (
                                     <OrderTableRow
                                         key={key}
-                                        title={'placeholder'}
+                                        title={order}
                                         price={'placeholder'}
                                         quantity={'placeholder'}
                                         id={'placeholder'}
@@ -3976,7 +3979,7 @@ class WalletHome extends React.Component {
                                             
                                             <Row className="m-auto" style={{wordBreak: 'break-all', maxHeight: 500, overflowY: 'auto'}}>
                                                 <Col sm={12}>
-                                                    {finalMessage}
+                                                    {this.state.messages_selected}
                                                 </Col>
                                             </Row>
                                         </ReactModal>

@@ -41,19 +41,7 @@ export default function MyOrders(props) {
                 //Below should be replaced with prop which is array of OrderTableRow.js
                 //eg. { props.rows }
             }
-                <Row className="staking-table-row">
-                    <p>TEST Title</p>
-                
-                    <p>TEST Price</p>
-                
-                    <p>TEST Quantity</p>
-                
-                    <p>TEST ID</p>
-                
-                    <p style={{width: '24rem'}}>
-                        <button onClick={props.handleShowMessages} className="orders-button">View</button>
-                    </p>
-                </Row>
+                {props.rows}
             </Col>
         </div>
     )
