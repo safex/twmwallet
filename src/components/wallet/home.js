@@ -1712,7 +1712,9 @@ class WalletHome extends React.Component {
             if (more_core.hasOwnProperty(order_id)) {
                 let messages_array = [];
                 for (const message in more_core[order_id].messages) {
-                    messages_array.push(message);
+                    console.log(message);
+                    console.log(more_core[order_id].messages[message])
+                    messages_array.push(more_core[order_id].messages[message]);
                 }
                 console.log(messages_array);
                 this.setState({messages_selected: messages_array});
