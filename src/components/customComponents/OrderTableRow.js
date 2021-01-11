@@ -17,10 +17,9 @@ export default class OrderTableRow extends React.Component {
             toEllipsis: props.toEllipsis,
             handleEditOfferForm: props.handleEditOfferForm,
             handleShowMessages: props.handleShowMessages,
-            getOrders: props.getOrders
-
+            getOrders: props.getOrders,
+            getMessages: props.getMessages,
         };
-        //this.imagestore = this.imagestore.bind(this);
     }
 
     componentDidMount() {

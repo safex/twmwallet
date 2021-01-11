@@ -2646,7 +2646,7 @@ class WalletHome extends React.Component {
                     id={this.state.selectedOffer}
                     toEllipsis={this.to_ellipsis}
                     handleShowMessages={this.handleShowMessages}
-                    getMessages={
+                    getMessages={() =>
                         this.get_messages_by_order_id_of_seller(
                             this.state.selectedOffer,
                             this.state.selected_user.username,
