@@ -415,13 +415,10 @@ class WalletHome extends React.Component {
             //alert(error);
         } else {
             console.log("wallet stored callback");
-
         }
     };
 
     remove_account = async (e, user) => {
-
-
         e.preventDefault();
         let confirm = window.confirm(`Are you sure you want to remove ${user}? 
         You should only do this if you think that the transaction to register the account did not go through. 
@@ -1691,8 +1688,10 @@ class WalletHome extends React.Component {
             console.log(`accessing messaegs`);
             if (more_core.hasOwnProperty(offer_id)) {
                 console.log(`found offer_id`);
+                console.log(more_core[offer_id]);
                 let order_ids_array = [];
-                for (const order of more_core[offer_id].orders) {
+                for (const order in more_core[offer_id].orders) {
+                    console.log(order);
                     order_ids_array.push(order);
                 }
                 console.log(order_ids_array);
@@ -1712,7 +1711,7 @@ class WalletHome extends React.Component {
             let more_core = twm_file.accounts[username].urls[twm_api_url].messages[offer_id].orders;
             if (more_core.hasOwnProperty(order_id)) {
                 let messages_array = [];
-                for (const message of more_core[order_id].messages) {
+                for (const message in more_core[order_id].messages) {
                     messages_array.push(message);
                 }
                 console.log(messages_array);
