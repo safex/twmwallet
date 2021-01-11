@@ -137,7 +137,6 @@ class WalletHome extends React.Component {
 
     async componentWillUnmount() {
 
-        wallet.store(this.wallet_store_callback);
         localStorage.removeItem('twm_file');
         localStorage.removeItem('encrypted_wallet');
         localStorage.removeItem('wallet');
@@ -255,12 +254,18 @@ class WalletHome extends React.Component {
             wallet.on('newBlock', (height) => {
                 console.log("blockchain updated, height: " + height);
                 this.refresh_action();
+                if (height % 10000 === 0) {
+                    wallet.store(this.wallet_store_callback);
+                }
                 this.setState({
                     wallet_height: height
                 });
             });
             wallet.on('refreshed', () => {
                 this.refresh_action();
+            });
+            wallet.on('updated', () => {
+               console.log('updated?');
             });
             console.log(wallet.synchronized());
 
@@ -440,7 +445,7 @@ class WalletHome extends React.Component {
     register_account = async (e) => {
         e.preventDefault();
 
-        if (this.state.tokens >= 300 && this.state.first_refresh === true) {
+        if (this.state.tokens >= 1000 && this.state.first_refresh === true) {
             try {
                 let vees = e.target;
 
