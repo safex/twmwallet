@@ -2545,7 +2545,7 @@ class WalletHome extends React.Component {
                         handleEditOfferForm={() => this.handleShowEditOfferForm(listing)}
                         handleShowOrders={this.handleMyOrders}
                         toEllipsis={this.to_ellipsis}
-                        getOrders={() => this.get_seller_order_ids_by_offer}
+                        getOrders={this.get_seller_order_ids_by_offer}
                     />
                 )
 
