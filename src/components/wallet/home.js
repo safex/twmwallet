@@ -263,6 +263,7 @@ class WalletHome extends React.Component {
             });
             wallet.on('refreshed', () => {
                 this.refresh_action();
+                wallet.store(this.wallet_store_callback)
             });
             wallet.on('updated', () => {
                console.log('updated?');
@@ -1687,7 +1688,9 @@ class WalletHome extends React.Component {
 
             let twm_file = this.state.twm_file;
             let more_core = twm_file.accounts[username].urls[twm_api_url].messages;
+            console.log(`accessing messaegs`);
             if (more_core.hasOwnProperty(offer_id)) {
+                console.log(`found offer_id`);
                 let order_ids_array = [];
                 for (const order of more_core[offer_id].orders) {
                     order_ids_array.push(order);
@@ -1851,10 +1854,6 @@ class WalletHome extends React.Component {
                                     console.error(err);
                                     console.error(`error at parsing the message`)
                                 }
-
-                                /*if (this.state.twm_file.accounts[username].urls[twm_api_url].messages.hasOwnProperty()) {
-
-                                }*/
                             } catch(err) {
                                 console.error(err);
                             }
