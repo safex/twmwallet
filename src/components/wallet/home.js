@@ -1797,8 +1797,8 @@ class WalletHome extends React.Component {
                                 console.log(decryptedData.toString());
                                 let decomped = zlib.inflateSync(Buffer.from(decryptedData));
                                 console.log(decomped.toString());
-                            
-                                
+
+
                                 try {
                                     let parsed = JSON.parse(decomped.toString());
                                     msg.msg = decomped.toString();
@@ -1831,19 +1831,19 @@ class WalletHome extends React.Component {
                                                 finalMessage.push(
                                                     <div key={msg_hex}>
                                                         <h1>
-                                                            ---------------  
-                                                            MESSAGE START 
-                                                            --------------- 
+                                                            ---------------
+                                                            MESSAGE START
+                                                            ---------------
                                                         </h1>
                                                         <h3>{decomped}</h3>
                                                         <br/><br/>
                                                         <h1>
-                                                            ------------- -- 
-                                                            MESSAGE END 
-                                                            --------------- 
+                                                            ------------- --
+                                                            MESSAGE END
+                                                            ---------------
                                                         </h1>
                                                         <br/><br/>
-                                                    </div>)  
+                                                    </div>)
                                             }
                                         }
                                     } else {
@@ -1866,24 +1866,160 @@ class WalletHome extends React.Component {
             console.error(err);
             console.error(`error at the fetch_messages_seller`);
         }
+    };
 
+    fetch_buyers_messages = async() => {
 
+    };
+
+    seller_reply_message = async (username) => {
+        try {
+
+            /*
+             let message_header_obj = {};
+                                                    message_header_obj.sender_pgp_pub_key = publicKey;
+                                                    message_header_obj.to = listing.username;
+                                                    message_header_obj.from = publicKey;
+                                                    message_header_obj.order_id = order_id_hash;
+                                                    message_header_obj.purchase_proof = txid;
+                                                    message_header_obj.bc_height = this.state.blockchain_height;
+                                                    message_header_obj.position = 1;
+
+                                                    let pre_sign_message_obj = {};
+                                                    pre_sign_message_obj.s = ''; //subject
+                                                    pre_sign_message_obj.o = listing.offer_id; //offer_id
+                                                    pre_sign_message_obj.m = open_message; //open_message contents
+                                                    pre_sign_message_obj.n = nft_address; //nft address
+                                                    pre_sign_message_obj.so = JSON.stringify(shipping); //shipping object
+
+                                                    message_header_obj.message_hash = keccak256(JSON.stringify(pre_sign_message_obj)).toString('hex');
+
+                                                    message_header_obj.message_signature = '';
+
+                                                    let pres_sign_string = JSON.stringify(pre_sign_message_obj);
+
+                                                    const signature = crypto.sign("sha256", Buffer.from(pres_sign_string), {
+                                                        key: privateKey,
+                                                        padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                                                    });
+
+                                                    message_header_obj.message_signature = signature;
+
+                                                    let compressed_message_obj = zlib.deflateSync(Buffer.from(JSON.stringify(pre_sign_message_obj)));
+
+                                                    console.log(": " + compressed_message_obj.length + " characters, " +
+                                                        Buffer.byteLength((compressed_message_obj), 'utf8') + " bytes");
+
+                                                    let found_key = crypto.createPublicKey(seller_pubkey.user.pgp_key);
+
+                                                    let encrypted_message = crypto.publicEncrypt(
+                                                        {
+                                                            key: found_key,
+                                                            padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+                                                            oaepHash: "sha256",
+                                                        },
+                                                        compressed_message_obj
+                                                    );
+
+                                                    let hex_enc_msg = this.byteToHexString(encrypted_message);
+
+                                                    const enc_signature = crypto.sign("sha256", Buffer.from(encrypted_message), {
+                                                        key: privateKey,
+                                                        padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                                                    });
+
+                                                    let hex_enc_sig = this.byteToHexString(enc_signature);
+
+                                                    message_header_obj.encrypted_message_signature = hex_enc_sig;
+
+                                                    message_header_obj.encrypted_message = hex_enc_msg;
+
+                                                    let tdispatched = await dispatch_purchase_message(message_header_obj, this.state.api_url);
+
+                                                    console.log(tdispatched);
+
+                                                    message_header_obj.message = pre_sign_message_obj;
+
+                                                    let purchase_obj = {};
+                                                    purchase_obj.api_url = this.state.api_url;
+                                                    purchase_obj.offer_id = listing.offer_id;
+                                                    purchase_obj.title = listing.title;
+                                                    purchase_obj.price = listing.price;
+                                                    purchase_obj.quantity = quant;
+                                                    purchase_obj.bc_height = message_header_obj.bc_height;
+                                                    api_file_url_offer_id[order_id_hash].pgp_keys = {private_key: privateKey, public_key: publicKey};
+                                                    api_file_url_offer_id[order_id_hash].messages = [];
+                                                    api_file_url_offer_id[order_id_hash].purchase_obj = purchase_obj;
+                                                    api_file_url_offer_id[order_id_hash].messages.push(message_header_obj);
+
+                                                    console.log(twm_file);
+                                                   try {
+
+                                                        const crypto = window.require('crypto');
+                                                        const algorithm = 'aes-256-ctr';
+                                                        console.log(this.state.password);
+                                                        const cipher = crypto.createCipher(algorithm, this.state.password.toString());
+                                                        let crypted = cipher.update(JSON.stringify(twm_file), 'utf8', 'hex');
+                                                        crypted += cipher.final('hex');
+
+                                                        const hash1 = crypto.createHash('sha256');
+                                                        hash1.update(JSON.stringify(twm_file));
+                                                        console.log(`password ${this.state.password}`);
+                                                        console.log(JSON.stringify(twm_file));
+
+                                                        let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
+
+                                                        try {
+                                                            let opened_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
+                                                            console.log(opened_twm_file);
+
+                                                            localStorage.setItem('twm_file', twm_file);
+
+                                                            this.setState({twm_file: twm_file});
+
+                                                        } catch (err) {
+                                                            this.setState({showLoader: false});
+                                                            console.error(err);
+                                                            console.error(`error opening twm file after save to verify`);
+                                                            alert(`Error at saving to the twm file during account creation verification stage`);
+                                                        }
+                                                        console.log(twm_save);
+
+                                                    } catch (err) {
+                                                        this.setState({showLoader: false});
+                                                        console.error(err);
+                                                        console.error(`error at initial save of the twm file`);
+                                                        alert(`Error at saving to the twm file during account creation initialization stage`);
+                                                    }
+                                                    //api_file_url_offer_id[order_id_hash].messages
+                                                    //send it to the server
+                                                    //save it to the twm_file
+                                                    console.log(`payments from twm_url`);
+
+                                                    let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
+
+                                                    console.log(`purchase transaction committed`);
+                                                    alert(`The purchase has been submitted`);
+                                                }
+             */
+        } catch(err) {
+            console.error(err);
+            console.error(`error at the seller reply message function call`);
+        }
     };
 
     byteToHexString = (uint8arr) => {
         if (!uint8arr) {
             return '';
         }
-
         var hexStr = '';
         for (var i = 0; i < uint8arr.length; i++) {
             var hex = (uint8arr[i] & 0xff).toString(16);
             hex = (hex.length === 1) ? '0' + hex : hex;
             hexStr += hex;
         }
-
         return hexStr.toUpperCase();
-    }
+    };
 
     purchase_item = async (e, listing) => {
         e.preventDefault();
@@ -1933,7 +2069,7 @@ class WalletHome extends React.Component {
             if (alert_bool) {
                 alert(alert_text);
             } else {
-               
+
                 try {
                     if (mixins >= 0) {
                         let confirmed;
@@ -3980,7 +4116,7 @@ class WalletHome extends React.Component {
                                                     </IconContext.Provider>
                                                 </Col>
                                             </Row>
-                                            
+
                                             <Row className="m-auto" style={{wordBreak: 'break-all', maxHeight: 500, overflowY: 'auto'}}>
                                                 <Col sm={12}>
                                                     {this.state.messages_selected}
