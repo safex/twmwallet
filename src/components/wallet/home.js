@@ -1809,7 +1809,11 @@ class WalletHome extends React.Component {
                                             //if has this offer
                                             if (twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders.hasOwnProperty(msg.order_id)) {
                                                 //if has messages from this order_id
-                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.push(msg);
+                                                if (twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.hashOwnProperty(msg.position)) {
+                                                    console.log(`we already have this message`);
+                                                } else {
+                                                    twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
+                                                }
                                             } else {
                                                 twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id] = {};
                                                 twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages = {};
