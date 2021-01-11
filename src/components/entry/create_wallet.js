@@ -446,7 +446,7 @@ export default class CreateWallet extends React.Component {
                                             <button
                                                 className="custom-button-entry"
                                                 type="button"
-                                                onClick={this.change_daemon}
+                                                onClick={() => this.setState({daemon_host: '', daemon_port: 0})}
                                             >
                                                 Reset Connection
                                             </button>

@@ -74,6 +74,7 @@ const sfxjs = window.require('safex-addressjs');
 var wallet;
 
 let offerRows;
+let finalMessage = [];
 
 class WalletHome extends React.Component {
     constructor(props) {
@@ -114,6 +115,8 @@ class WalletHome extends React.Component {
             show_purchase_offer: {title: '', quantity: 0, offerID: '', seller: ''},
             show_purchase_offer_data: {main_image: false},
             show_edit_offer: {},
+            order_ids_selected: [],
+            messages_selected: [],
             show_orders: false,
             showMyOrders: false,
             new_account_image: require('./../../img/NewAccountPanda.svg'),
@@ -1751,7 +1754,7 @@ class WalletHome extends React.Component {
                         signature
                     );
                     console.log(`is verified :::  ${verified_sig}`);
-                   let req_payload = {};
+                    let req_payload = {};
                     req_payload.signature = this.byteToHexString(signature);
                     req_payload.username = username;
                     req_payload.msg = date.toString();
@@ -1786,6 +1789,8 @@ class WalletHome extends React.Component {
                                 console.log(decryptedData.toString());
                                 let decomped = zlib.inflateSync(Buffer.from(decryptedData));
                                 console.log(decomped.toString());
+                            
+                                
                                 try {
                                     let parsed = JSON.parse(decomped.toString());
                                     msg.msg = decomped.toString();
@@ -1814,6 +1819,23 @@ class WalletHome extends React.Component {
                                                 console.log(`seems we have a duplicated message`);
                                             } else {
                                                 twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
+
+                                                finalMessage.push(
+                                                    <div key={msg_hex}>
+                                                        <h1>
+                                                            ---------------  
+                                                            MESSAGE START 
+                                                            --------------- 
+                                                        </h1>
+                                                        <h3>{decomped}</h3>
+                                                        <br/><br/>
+                                                        <h1>
+                                                            ------------- -- 
+                                                            MESSAGE END 
+                                                            --------------- 
+                                                        </h1>
+                                                        <br/><br/>
+                                                    </div>)  
                                             }
                                         }
                                     } else {
@@ -1907,7 +1929,7 @@ class WalletHome extends React.Component {
             if (alert_bool) {
                 alert(alert_text);
             } else {
-                this.setState({showLoader: true});
+               
                 try {
                     if (mixins >= 0) {
                         let confirmed;
@@ -1938,7 +1960,9 @@ class WalletHome extends React.Component {
                                     purchase_txn_title: listing.title,
                                     purchase_txn_offerid: listing.offer_id,
                                     purchase_txn_price: listing.price,
-                                    purchase_txn_total_cost: total_cost
+                                    purchase_txn_total_cost: total_cost,
+                                    showLoader: true
+
                                 });
 
                                 let purchase_txn = await this.purchase_offer_async(
@@ -2188,16 +2212,18 @@ class WalletHome extends React.Component {
                                                             this.setState({twm_file: twm_file});
 
                                                         } catch (err) {
+                                                            this.setState({showLoader: false});
                                                             console.error(err);
                                                             console.error(`error opening twm file after save to verify`);
-                                                            alert(`error at saving to the twm file during account creation verification stage`);
+                                                            alert(`Error at saving to the twm file during account creation verification stage`);
                                                         }
                                                         console.log(twm_save);
 
                                                     } catch (err) {
+                                                        this.setState({showLoader: false});
                                                         console.error(err);
                                                         console.error(`error at initial save of the twm file`);
-                                                        alert(`error at saving to the twm file during account creation initialization stage`);
+                                                        alert(`Error at saving to the twm file during account creation initialization stage`);
                                                     }
                                                     //api_file_url_offer_id[order_id_hash].messages
                                                     //send it to the server
@@ -2207,10 +2233,11 @@ class WalletHome extends React.Component {
                                                     let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
 
                                                     console.log(`purchase transaction committed`);
-                                                    alert(`the purchase has been submitted`);
+                                                    alert(`The purchase has been submitted`);
                                                 }
                                         } catch (err) {
-                                                alert(`error at getting the sellers public key from the api server`);
+                                            this.setState({showLoader: false});
+                                                alert(`Error at getting the sellers public key from the api server`);
                                                 console.error(err);
                                                 console.error(`error at getting the sellers public key from the api server`);
                                             }
@@ -2236,6 +2263,7 @@ class WalletHome extends React.Component {
                                 alert(`error at the purchase transaction formation it was not commited`);
                             }
                         }
+                        this.setState({showLoader: false});
                     }
                 } catch (err) {
                     this.setState({showLoader: false});
@@ -2247,7 +2275,7 @@ class WalletHome extends React.Component {
                 }
             }
         } else {
-            alert(`can not have 0 quantity of purchase :)`);
+            alert(`You can not have 0 quantity for purchase.`);
         }
 
 
@@ -2269,6 +2297,7 @@ class WalletHome extends React.Component {
                     }
                 });
             } catch (err) {
+                this.setState({showLoader: false});
                 reject(err);
             }
         });
@@ -2303,6 +2332,7 @@ class WalletHome extends React.Component {
                     }
                 });
             } catch (err) {
+                this.setState({showLoader: false});
                 reject(err);
             }
         });
@@ -2506,7 +2536,7 @@ class WalletHome extends React.Component {
                 }
                 return (
                     <OfferTableRow
-                        key={key}
+                        theKey={key}
                         title={listing.title}
                         price={listing.price / 10000000000}
                         quantity={listing.quantity}
@@ -2515,6 +2545,7 @@ class WalletHome extends React.Component {
                         handleEditOfferForm={() => this.handleShowEditOfferForm(listing)}
                         handleShowOrders={this.handleMyOrders}
                         toEllipsis={this.to_ellipsis}
+                        getOrders={() => this.get_seller_order_ids_by_offer}
                     />
                 )
 
@@ -2773,13 +2804,13 @@ class WalletHome extends React.Component {
                     }
 
                     var tableOfOrders;
-                        tableOfOrders = this.state.twm_offers.map((order, key) => {
+                        tableOfOrders = this.state.order_ids_selected.map((order, key) => {
                             console.log(key);
                             try {
                                 return (
                                     <OrderTableRow
                                         key={key}
-                                        title={'placeholder'}
+                                        title={order}
                                         price={'placeholder'}
                                         quantity={'placeholder'}
                                         id={'placeholder'}
@@ -3109,7 +3140,7 @@ class WalletHome extends React.Component {
                                             <form
                                                 className="w-100 no-gutters p-2 align-items-baseline d-flex justify-content-center"
                                                 id="search-form" action=""
-                                                method="" enctype="multipart/form-data"
+                                                method=""
                                             >
                                                 <div className="col-sm-6">
                                                     <input className="w-100" type="text"
@@ -3945,13 +3976,10 @@ class WalletHome extends React.Component {
                                                     </IconContext.Provider>
                                                 </Col>
                                             </Row>
-
-                                            <Row className="m-auto">
+                                            
+                                            <Row className="m-auto" style={{wordBreak: 'break-all', maxHeight: 500, overflowY: 'auto'}}>
                                                 <Col sm={12}>
-                                                    <h1>PUT MESSAGE HERE</h1>
-                                                    {
-                                                    //  this.state.currentMessage
-                                                    }
+                                                    {this.state.messages_selected}
                                                 </Col>
                                             </Row>
                                         </ReactModal>

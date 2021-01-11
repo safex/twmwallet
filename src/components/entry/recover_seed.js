@@ -469,7 +469,7 @@ export default class RecoverSeed extends React.Component {
                                                         <button
                                                             className="custom-button-entry"
                                                             size="lg"
-                                                            onClick={this.change_daemon}
+                                                            onClick={() => this.setState({daemon_host: '', daemon_port: 0})}
                                                         >
                                                             Reset Connection
                                                         </button>
