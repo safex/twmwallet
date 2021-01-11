@@ -1811,7 +1811,7 @@ class WalletHome extends React.Component {
                                             //if has this offer
                                             if (twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders.hasOwnProperty(msg.order_id)) {
                                                 //if has messages from this order_id
-                                                if (twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.hashOwnProperty(msg.position)) {
+                                                if (twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.hasOwnProperty(msg.position)) {
                                                     console.log(`we already have this message`);
                                                 } else {
                                                     twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
@@ -2735,7 +2735,71 @@ class WalletHome extends React.Component {
 
     });
 
+
+
     render() {
+        var message_render;
+        try {
+            message_render = this.state.messages_selected.map((msg, key) => {
+                console.log(msg);
+                console.log(key);
+                try {
+                    let parsed_msg = JSON.parse(msg.msg);
+
+                    if (parsed_msg.n.length > 0) {
+                        console.log(`nft address supplied!`);
+                        return (
+                            <div>
+                                {msg.position}
+                                {parsed_msg.n}
+                            </div>
+                        );
+                    }
+                    if (parsed_msg.m.length > 0) {
+                        console.log(`this is a direct message open ended`);
+                        return (
+                            <div>
+                                {msg.position}
+                                {parsed_msg.m}
+                            </div>
+                        );
+                    }
+                    if (parsed_msg.so.length > 2) {
+                        console.log(`there is a shipping object supplied!`);
+                        try {
+                            let parsed_so = JSON.parse(parsed_msg.so);
+                            console.log(parsed_so);
+                            console.log(`parsed the so`);
+                            return (
+                                <div>
+                                    {msg.position}
+                                    {parsed_msg.so}
+                                </div>
+                            );
+                        } catch(err) {
+                            console.error(err);
+                            console.error(`error at parsing the shipping object`);
+                        }
+                    }
+                    return (
+                        <div>
+                            {msg.position}
+                            {msg.msg}
+                        </div>
+                    );
+
+                } catch(err) {
+                    console.error(err);
+                    console.error(`error parsing message contents`)
+                }
+
+            })
+        } catch(err) {
+            console.error(err);
+        }
+
+
+        console.log(message_render);
 
         const twmwallet = () => {
             switch (this.state.interface_view) {
@@ -4136,7 +4200,7 @@ class WalletHome extends React.Component {
 
                                             <Row className="m-auto" style={{wordBreak: 'break-all', maxHeight: 500, overflowY: 'auto'}}>
                                                 <Col sm={12}>
-                                                    {this.state.messages_selected}
+                                                    {message_render}
                                                 </Col>
                                             </Row>
                                         </ReactModal>
