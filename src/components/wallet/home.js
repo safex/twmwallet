@@ -74,6 +74,7 @@ const sfxjs = window.require('safex-addressjs');
 var wallet;
 
 let offerRows;
+let tableOfOrders;
 let finalMessage = [];
 
 class WalletHome extends React.Component {
@@ -2623,11 +2624,42 @@ class WalletHome extends React.Component {
     }
 
 
-    handleMyOrders = () => {
-        this.setState({showMyOrders: !this.state.showMyOrders})
+    handleMyOrders = (id) => {
+        this.setState({showMyOrders: !this.state.showMyOrders, selectedOffer: id})
+        alert(id)
     };
 
+    
+    call_order_table = () => tableOfOrders = this.state.order_ids_selected.map((order, key) =>{
+        console.log(key);
+        try {
+            return (
+                <OrderTableRow
+                    key={key}
+                    title={order}
+                    seller={this.state.selected_user.username}
+                    id={this.state.selectedOffer}
+                    toEllipsis={this.to_ellipsis}
+                    handleShowMessages={this.handleShowMessages}
+                    getMessages={
+                        this.get_messages_by_order_id_of_seller(
+                            order,
+                            this.state.selected_user.username,
+                            'http://stageapi.theworldmarketplace.com:17700',
+                            this.state.selectedOffer
+                        ) 
+                            
+                    }
+                />
 
+            )
+
+        } catch (err) {
+            console.error(`failed to properly parse the user data formatting`);
+            console.error(err);
+        }
+
+    });
 
     call_non_listings_table = () => offerRows = this.state.non_offers.map((listing, key) => {
 
@@ -2684,7 +2716,7 @@ class WalletHome extends React.Component {
                         seller={listing.seller}
                         id={listing.offerID}
                         handleEditOfferForm={() => this.handleShowEditOfferForm(listing)}
-                        handleShowOrders={this.handleMyOrders}
+                        handleShowOrders={() => this.handleMyOrders(listing.offerID)}
                         toEllipsis={this.to_ellipsis}
                         getOrders={this.get_seller_order_ids_by_offer}
                     />
@@ -2944,29 +2976,7 @@ class WalletHome extends React.Component {
                         });
                     }
 
-                    var tableOfOrders;
-                        tableOfOrders = this.state.order_ids_selected.map((order, key) => {
-                            console.log(key);
-                            try {
-                                return (
-                                    <OrderTableRow
-                                        key={key}
-                                        title={order}
-                                        price={'placeholder'}
-                                        quantity={'placeholder'}
-                                        id={'placeholder'}
-                                        showMessages={this.showMessages}
-                                        messageObject={'placeholder'}
-                                    />
-
-                                )
-
-                            } catch (err) {
-                                console.error(`failed to properly parse the user data formatting`);
-                                console.error(err);
-                            }
-
-                        });
+                    
 
                     return (
                         <div className="">
@@ -3651,6 +3661,7 @@ class WalletHome extends React.Component {
                                                             handleShowMessages={this.handleShowMessages}
                                                             handleHideMessages={this.handleHideMessages}
                                                             handleOrders={this.handleMyOrders}
+                                                            loadOrders={this.call_order_table}
                                                         />
                                                     </div>
                                                 </Row>
