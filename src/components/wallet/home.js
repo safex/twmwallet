@@ -2631,7 +2631,6 @@ class WalletHome extends React.Component {
 
     handleMyOrders = (id) => {
         this.setState({showMyOrders: !this.state.showMyOrders, selectedOffer: id})
-        alert(id)
     };
 
     
@@ -2772,8 +2771,23 @@ class WalletHome extends React.Component {
                             console.log(`parsed the so`);
                             return (
                                 <div>
-                                    {msg.position}
-                                    {parsed_msg.so}
+     
+                                    <Row style={{justifyContent: 'space-around'}}>
+                                       <h1 style={{border: '2px solid #13D3FD', borderRadius: '10', padding: '.5rem'}}>
+                                           {msg.position}
+                                        </h1>
+                                       <h2>First Name: {parsed_so.fn}</h2>
+                                       <h2>Last Name: {parsed_so.ln}</h2>
+                                       <h2>Street Address: {parsed_so.a1}</h2>
+                                       <h2>City: {parsed_so.city}</h2>
+                                       <h2>State: {parsed_so.s}</h2>
+                                       <h2>Area Code: {parsed_so.z}</h2>
+                                       <h2>Country: {parsed_so.c}</h2>
+                                       <h2>Email: {parsed_so.ea}</h2>
+                                       <h2>Phone: {parsed_so.ph}</h2>
+                                    </Row>
+                                    
+                                    
                                 </div>
                             );
                         } catch(err) {
@@ -3494,6 +3508,8 @@ class WalletHome extends React.Component {
                                                             showMessages={this.state.showMessages}
                                                             handleShowMessages={this.handleShowMessages}
                                                             handleHideMessages={this.handleHideMessages}
+                                                            handleOrders={this.handleMyOrders}
+                                                            loadOrders={this.call_order_table}
                                                         />
                                                     </Col>
                                                 </Row>
