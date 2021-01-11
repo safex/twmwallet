@@ -1710,6 +1710,7 @@ class WalletHome extends React.Component {
         try {
             let twm_file = this.state.twm_file;
             let more_core = twm_file.accounts[username].urls[twm_api_url].messages[offer_id].orders;
+            console.log(more_core);
             if (more_core.hasOwnProperty(order_id)) {
                 let messages_array = [];
                 for (const message in more_core[order_id].messages) {
@@ -2647,10 +2648,10 @@ class WalletHome extends React.Component {
                     handleShowMessages={this.handleShowMessages}
                     getMessages={
                         this.get_messages_by_order_id_of_seller(
-                            order,
+                            this.state.selectedOffer,
                             this.state.selected_user.username,
                             'http://stageapi.theworldmarketplace.com:17700',
-                            this.state.selectedOffer
+                            order
                         ) 
                             
                     }
