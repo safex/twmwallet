@@ -36,7 +36,7 @@ export default class OfferTableRow extends React.Component {
                     key={this.state.key} 
                 className="staking-table-row"
             >
-                <p>{this.state.title}</p>
+                <p style={{wordBreak: 'break-word'}}>{this.state.title}</p>
             
                 <p>{this.state.price}</p>
             
