@@ -41,7 +41,7 @@ export async function get_interest_map(obj) {
     });
 }
 
-export async function daemon_parse_transaction(data, out_put_type) {
+export async function daemon_parse_transaction(obj, data, output_type) {
     let d_obj = {};
     d_obj.jsonrpc = "2.0";
     d_obj.id = 0;
@@ -59,7 +59,7 @@ export async function daemon_parse_transaction(data, out_put_type) {
     })
 }
 
-export async function get_transactions(txid) {
+export async function get_transactions(obj, txid) {
     let tx_array = [];
     tx_array.push(txid);
     let t_obj = {};
