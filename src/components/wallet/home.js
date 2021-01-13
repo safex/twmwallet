@@ -1674,7 +1674,29 @@ class WalletHome extends React.Component {
                     order_ids_array.push(order);
                 }
                 console.log(order_ids_array);
-                this.setState({order_ids_selected: order_ids_array});
+                
+                tableOfOrders = order_ids_array.map((order, key) =>{
+                    console.log(key);
+                    try {
+                        return (
+                            <OrderTableRow
+                                key={key}
+                                myKey={key}
+                                title={order}
+                                id={offer_id}
+                                seller={this.state.selected_user.username}
+                                toEllipsis={this.to_ellipsis}
+                                handleShowMessages={this.handleShowMessages}
+                                getMessages={this.get_messages_by_order_id_of_seller}
+                            />
+            
+                        )
+                    } catch (err) {
+                        console.error(`failed to properly parse the user data formatting`);
+                        console.error(err);
+                    }
+            
+                });
             } else {
                 console.log(`${offer_id} not found in file`);
             }
@@ -2582,38 +2604,13 @@ class WalletHome extends React.Component {
     }
 
     handleMyOrders = (id) => {
-        this.setState({showMyOrders: !this.state.showMyOrders, selectedOffer: id})
+        this.setState({showMyOrders: !this.state.showMyOrders});
+
+        if (this.state.showMyOrders === true) {
+            tableOfOrders=[]
+        }
     };
 
-    call_order_table = () => tableOfOrders = this.state.order_ids_selected.map((order, key) =>{
-        console.log(key);
-        try {
-            return (
-                <OrderTableRow
-                    key={key}
-                    title={order}
-                    seller={this.state.selected_user.username}
-                    id={this.state.selectedOffer}
-                    toEllipsis={this.to_ellipsis}
-                    handleShowMessages={this.handleShowMessages}
-                    getMessages={() =>
-                        this.get_messages_by_order_id_of_seller(
-                            this.state.selectedOffer,
-                            this.state.selected_user.username,
-                            'http://stageapi.theworldmarketplace.com:17700',
-                            order
-                        ) 
-                            
-                    }
-                />
-
-            )
-        } catch (err) {
-            console.error(`failed to properly parse the user data formatting`);
-            console.error(err);
-        }
-
-    });
 
     call_non_listings_table = () => offerRows = this.state.non_offers.map((listing, key) => {
         try {
@@ -3440,7 +3437,6 @@ class WalletHome extends React.Component {
                                                             handleShowMessages={this.handleShowMessages}
                                                             handleHideMessages={this.handleHideMessages}
                                                             handleOrders={this.handleMyOrders}
-                                                            loadOrders={this.call_order_table}
                                                         />
                                                     </Col>
                                                 </Row>
@@ -3455,6 +3451,7 @@ class WalletHome extends React.Component {
                                             closeTimeoutMS={500}
                                             className="keys-modal"
                                             onRequestClose={this.hideMessages}
+                                            appElement={'el'}
                                         >
                                             <Row>
                                                 <Col sm={10}>
@@ -3672,7 +3669,6 @@ class WalletHome extends React.Component {
                                                             handleShowMessages={this.handleShowMessages}
                                                             handleHideMessages={this.handleHideMessages}
                                                             handleOrders={this.handleMyOrders}
-                                                            loadOrders={this.call_order_table}
                                                         />
                                                     </div>
                                                 </Row>

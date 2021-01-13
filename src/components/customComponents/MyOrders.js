@@ -18,14 +18,9 @@ export default class MyOrders extends React.Component {
             handleShowMessages: props.handleShowMessages,
             handleHideMessages: props.handleHideMessages,
             handleOrders: props.handleOrders,
-            loadOrders: props.loadOrders,
 
         };
         //this.imagestore = this.imagestore.bind(this);
-    }
-
-    componentDidMount() {
-        this.state.loadOrders()
     }
 
     render() {
@@ -45,13 +40,13 @@ export default class MyOrders extends React.Component {
                     style={{maxHeight: 300}}
                 >
                     <Row className="staking-table-header no-gutters">
-                        <p>Title</p>
+                        <p>Order ID</p>
 
-                        <p>Price (SFX)</p>
+                        <p></p>
 
-                        <p>Quantity</p>
+                        <p></p>
 
-                        <p>Offer ID</p>
+                        <p></p>
 
                         <p style={{width: '24rem'}}>Actions</p>
                     </Row>
