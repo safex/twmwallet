@@ -59,7 +59,7 @@ export async function daemon_parse_transaction(data, out_put_type) {
     })
 }
 
-async function get_transactions(txid) {
+export async function get_transactions(txid) {
     let tx_array = [];
     tx_array.push(txid);
     let t_obj = {};
