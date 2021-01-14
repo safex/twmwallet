@@ -13,7 +13,7 @@ export default class OrderTableRow extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            key: props.key,
+            finalKey: props.myKey,
             title: props.title,
             seller: props.seller,
             id: props.id,
@@ -26,12 +26,16 @@ export default class OrderTableRow extends React.Component {
     }
 
     componentDidMount() {
-        this.state.getMessages()
+        this.state.getMessages(
+            this.state.id,
+            this.state.seller,
+            'http://stageapi.theworldmarketplace.com:17700',
+            this.state.title)
     }
 
     render() {
         return (
-            <Row className="staking-table-row">
+            <Row key={this.state.finalKey} className="staking-table-row">
                  <h5 data-tip data-for='offerID'>
                     {this.state.toEllipsis(this.state.title, 25, 25)}
                 </h5>
@@ -45,6 +49,8 @@ export default class OrderTableRow extends React.Component {
                             {this.state.title}
                         </span>
                     </ReactTooltip>
+
+                    <p>{this.state.finalKey}</p>
             
                 <p style={{width: '24rem'}}>
                     {
