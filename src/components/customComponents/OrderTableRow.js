@@ -26,18 +26,15 @@ export default class OrderTableRow extends React.Component {
     }
 
     componentDidMount() {
-        this.state.getMessages(
-            this.state.id,
-            this.state.seller,
-            'http://stageapi.theworldmarketplace.com:17700',
-            this.state.title)
+        
     }
 
     render() {
         return (
             <Row key={this.state.finalKey} className="staking-table-row">
+                
                  <h5 data-tip data-for='offerID'>
-                    {this.state.toEllipsis(this.state.title, 25, 25)}
+                    {this.state.toEllipsis(this.state.title, 20, 20)}
                 </h5>
                 <ReactTooltip 
                         className="entry-tooltip-container" 
@@ -52,10 +49,21 @@ export default class OrderTableRow extends React.Component {
 
                     <p>{this.state.finalKey}</p>
             
-                <p style={{width: '24rem'}}>
-                    {
-                        //
-                    }
+                <p style={{width: '12rem'}}>
+                    <button 
+                        onClick={() =>
+                            this.state.getMessages(
+                                this.state.id,
+                                this.state.seller,
+                                'http://stageapi.theworldmarketplace.com:17700',
+                                this.state.title
+                            )
+                        } 
+                        className="orders-button"
+                    >
+                        Load
+                    </button>
+
                     <button 
                         onClick={this.state.handleShowMessages} 
                         className="orders-button"

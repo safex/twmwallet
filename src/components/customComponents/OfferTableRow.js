@@ -11,7 +11,7 @@ export default class OfferTableRow extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            key: props.key,
+            finalKey: props.myKey,
             title: props.title,
             price: props.price,
             quantity: props.quantity,
@@ -26,14 +26,10 @@ export default class OfferTableRow extends React.Component {
         //this.imagestore = this.imagestore.bind(this);
     }
 
-    componentDidMount() {
-        this.state.getOrders(this.state.id, this.state.seller, 'http://stageapi.theworldmarketplace.com:17700')
-    }
-
     render() {
         return (
             <Row 
-                    key={this.state.key} 
+                key={this.state.finalKey}  
                 className="staking-table-row"
             >
                 <p style={{wordBreak: 'break-word'}}>{this.state.title}</p>
@@ -46,8 +42,6 @@ export default class OfferTableRow extends React.Component {
             
                 <p data-tip data-for='offerID'>
                     {this.state.toEllipsis(this.state.id, 5, 5)}
-                    .
-                    .
                 </p>
                     <ReactTooltip 
                         className="entry-tooltip-container" 
@@ -61,12 +55,24 @@ export default class OfferTableRow extends React.Component {
                     </ReactTooltip>
                 <p>
                     <button 
+                        onClick={() => this.state.getOrders(
+                            this.state.id, 
+                            this.state.seller, 
+                            'http://stageapi.theworldmarketplace.com:17700'
+                            )
+                        } 
+                        className="edit-button"
+                    >
+                        Load Orders
+                    </button>
+
+                    <button 
                         onClick={this.state.handleEditOfferForm} 
                         className="edit-button"
                     >
                         Edit
                     </button>
-                    
+                     
                     <button 
                         onClick={this.state.handleShowOrders} 
                         className="orders-button"

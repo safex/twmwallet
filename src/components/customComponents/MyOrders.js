@@ -18,10 +18,13 @@ export default class MyOrders extends React.Component {
             handleShowMessages: props.handleShowMessages,
             handleHideMessages: props.handleHideMessages,
             handleOrders: props.handleOrders,
+            selectedOffer: props.selectedOffer
 
         };
         //this.imagestore = this.imagestore.bind(this);
+        
     }
+
 
     render() {
 
@@ -48,9 +51,9 @@ export default class MyOrders extends React.Component {
 
                         <p></p>
 
-                        <p style={{width: '24rem'}}>Actions</p>
+                        <p style={{width: '12rem'}}>Actions</p>
                     </Row>
-                
+
                     {this.state.rows}
 
                 </Col>
