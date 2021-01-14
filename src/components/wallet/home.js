@@ -23,7 +23,12 @@ import {
 import keccak256 from 'keccak256';
 
 
-import {get_staked_tokens, get_interest_map} from '../../utils/safexd_calls';
+import {
+    get_staked_tokens,
+    get_interest_map,
+    daemon_parse_transaction,
+    get_transactions
+} from '../../utils/safexd_calls';
 
 // Icon Imports
 import { FaInfoCircle, FaCopy} from 'react-icons/fa'
@@ -742,7 +747,7 @@ class WalletHome extends React.Component {
 */
         } catch (err) {
             console.error(err);
-            console.error("error at the register account function");
+            console.error("error at the edit account function");
         }
 
     };
@@ -1821,11 +1826,14 @@ class WalletHome extends React.Component {
                                             twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders = {};
                                             twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id] = {};
                                             twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages = {};
+                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].purchase_info = {};
                                             if (twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.hasOwnProperty(msg.position)) {
                                                 console.log(`seems we have a duplicated message`);
                                             } else {
                                                 twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
 
+                                                let pinfo_obj = {};
+                                                //pinfo_obj.buyer_pgp =
                                                 finalMessage.push(
                                                     <div key={msg_hex}>
                                                         <h1>
@@ -1866,22 +1874,51 @@ class WalletHome extends React.Component {
         }
     };
 
-    fetch_buyers_messages = async() => {
 
-    };
-
-    seller_reply_message = async (username) => {
+    seller_reply_message = async (seller_name, offer_id, order_id, twm_api_url, message) => {
         try {
+            //let's get the order we want to reply to
+            let twm_file = this.state.twm_file;
+            if (twm_file.accounts.hasOwnProperty(seller_name)) {
+                if (twm_file.accounts[seller_name].urls.hasOwnProperty(twm_api_url)) {
+                    if (twm_file.accounts[seller_name].urls[twm_api_url].messages.hasOwnProperty(offer_id)) {
+                        if (twm_file.accounts[seller_name].urls[twm_api_url].messages[offer_id].orders.hasOwnProperty(order_id)) {
+
+
+                            console.log(`hey, you're gonna be able to reply :)`);
+                            let message_header_obj = {};
+                            //message_header_obj.sender_pgp_pub_key = publicKey; //fill this from the purchase_info obj
+                            //message_header_obj.to = listing.username; //fill this from the purchase_info obj
+                            message_header_obj.from = seller_name;
+                            message_header_obj.order_id = order_id;
+                            message_header_obj.bc_height = this.state.blockchain_height;
+
+
+
+                            //form the message here, and send it to the API url.
+
+                        } else {
+                            console.log(`this ${order_id} is not present in the twmfile`);
+                            alert(`unable to send message ${order_id} is not present`);
+                        }
+                    } else {
+                        console.log(`user does not have the ${offer_id} in the file`);
+                        alert(`unable to send message since ${offer_id} is not present`);
+                    }
+                } else {
+                    console.log(`user has does not have content from ${twm_api_url}`);
+                    alert(`this ${seller_name} does not have content from ${twm_api_url}`);
+                }
+
+            } else {
+                console.log(`user is not present in the twm file`);
+                alert(`unable to send message, could not find your username in the twm file`);
+            }
+
+
 
             /*
-             let message_header_obj = {};
-                                                    message_header_obj.sender_pgp_pub_key = publicKey;
-                                                    message_header_obj.to = listing.username;
-                                                    message_header_obj.from = publicKey;
-                                                    message_header_obj.order_id = order_id_hash;
-                                                    message_header_obj.purchase_proof = txid;
-                                                    message_header_obj.bc_height = this.state.blockchain_height;
-                                                    message_header_obj.position = 1;
+
 
                                                     let pre_sign_message_obj = {};
                                                     pre_sign_message_obj.s = ''; //subject
@@ -2019,6 +2056,11 @@ class WalletHome extends React.Component {
         return hexStr.toUpperCase();
     };
 
+
+    fetch_buyers_messages = async() => {
+
+    };
+
     purchase_item = async (e, listing) => {
         e.preventDefault();
         e.persist();
@@ -2110,6 +2152,7 @@ class WalletHome extends React.Component {
                                 let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${purchase_txn.fee() / 10000000000}SFX`);
                                 let fee = purchase_txn.fee();
                                 let txid = purchase_txn.transactionsIds();
+                                console.log(txid);
                                 if (confirmed_fee) {
                                     try {
                                         this.setState({purchase_txn_id: txid, purchase_txn_fee: fee});
@@ -2240,9 +2283,8 @@ class WalletHome extends React.Component {
                                                     message_header_obj.to = listing.username;
                                                     message_header_obj.from = publicKey;
                                                     message_header_obj.order_id = order_id_hash;
-                                                    message_header_obj.purchase_proof = txid;
+                                                    message_header_obj.purchase_proof = txid[0];
                                                     message_header_obj.bc_height = this.state.blockchain_height;
-                                                    message_header_obj.position = 1;
 
                                                     let pre_sign_message_obj = {};
                                                     pre_sign_message_obj.s = ''; //subject
@@ -2682,6 +2724,7 @@ class WalletHome extends React.Component {
         var message_render;
         try {
             message_render = this.state.messages_selected.map((msg, key) => {
+                console.log(`messages rendered`);
                 console.log(msg);
                 console.log(key);
                 try {
