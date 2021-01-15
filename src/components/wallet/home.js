@@ -1843,7 +1843,7 @@ class WalletHome extends React.Component {
                                                 twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
 
                                                 let pinfo_obj = {};
-                                                //pinfo_obj.buyer_pgp =
+                                                //pinfo_obj.buyers_pgp =
                                                 finalMessage.push(
                                                     <div key={msg_hex}>
                                                         <h1>
@@ -2067,8 +2067,21 @@ class WalletHome extends React.Component {
     };
 
 
-    fetch_buyers_messages = async() => {
+    fetch_buyers_messages_for_order = async (pgp_key, offer_id, order_id, twm_api_url = 'http://127.0.0.1:17700') => {
+        let twm_file = this.state.twm_file;
+        if (twm_file.api.urls.hasOwnProperty(twm_api_url)) {
+            if (twm_file.api.urls[twm_api_url].hasOwnProperty(offer_id)) {
+                if (twm_file.api.urls[twm_api_url][offer_id].hasOwnProperty(order_id)) {
 
+                } else {
+                    console.log(`this order id was not found in the buyers twm file`);
+                }
+            } else {
+                console.log(`this offer was not found in the buyers twm file`);
+            }
+        } else {
+            console.log(`this url is not found in the buyers twm file`);
+        }
     };
 
     purchase_item = async (e, listing) => {
