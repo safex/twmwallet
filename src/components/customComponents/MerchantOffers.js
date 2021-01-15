@@ -42,7 +42,17 @@ export default function MerchantOffers(props) {
                     Load Offers
                 </button>
                 
-                {props.offerRows}
+                {props.loading ?
+                    <Loader
+                        className="justify-content-center align-content-center"
+                        type="Bars"
+                        color="#00BFFF"
+                        height={50}
+                        width={50}
+                    /> 
+                :
+                    props.offerRows
+                }
                 
             </Col>
 

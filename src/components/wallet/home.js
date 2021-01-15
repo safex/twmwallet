@@ -80,6 +80,7 @@ var wallet;
 
 let offerRows;
 let tableOfOrders;
+
 let finalMessage = [];
 
 class WalletHome extends React.Component {
@@ -138,6 +139,9 @@ class WalletHome extends React.Component {
             showMessages: false,
             currentMessage: {},
             offersLoaded: false,
+            selectedOffer: '',
+            tableOfTables: {},
+            loadingOffers: false,
         };
     }
 
@@ -1689,6 +1693,7 @@ class WalletHome extends React.Component {
                                 myKey={key}
                                 title={order}
                                 id={offer_id}
+                                
                                 seller={this.state.selected_user.username}
                                 toEllipsis={this.to_ellipsis}
                                 handleShowMessages={this.handleShowMessages}
@@ -1702,9 +1707,14 @@ class WalletHome extends React.Component {
                     }
             
                 });
+                
             } else {
                 console.log(`${offer_id} not found in file`);
             }
+            this.setState({tableOfTables: {...this.state.tableOfTables, [offer_id]: tableOfOrders}})
+                console.log(this.state.tableOfTables)
+                console.log(this.state.tableOfTables[offer_id])
+                tableOfOrders=[]
         } catch(err) {
             console.error(err);
             alert(`error user and/or url are not in this file, no messages`);
@@ -2481,16 +2491,6 @@ class WalletHome extends React.Component {
                     } else {
                         this.setState({showLoader: false, show_purchase_confirm_modal: true});
 
-                        alert(
-                            `Purchase transaction committed.
-                            Transaction ID: ${this.state.purchase_txn_id}
-                            Amount: ${this.state.purchase_txn_quantity} X ${this.state.purchase_txn_title}
-                            Price: ${this.state.purchase_txn_price} SFX
-                            Network Fee: ${this.state.purchase_txn_fee / 10000000000} SFX
-                            A link to this transaction on the Safex Block Explorer has been copied to your clipboard
-                            https://stagenet3.safex.org/search?value=${this.state.purchase_txn_id}`
-                        );
-
                         this.handleClosePurchaseForm();
                         resolve(res);
                     }
@@ -2648,7 +2648,7 @@ class WalletHome extends React.Component {
     handleMyOrders = (id) => {
         this.setState({showMyOrders: !this.state.showMyOrders});
 
-        if (this.state.showMyOrders === true) {
+        if (this.state.showMyOrders === false) {
             tableOfOrders=[]
         }
     };
@@ -2656,6 +2656,7 @@ class WalletHome extends React.Component {
 
     call_non_listings_table = () => offerRows = this.state.non_offers.map((listing, key) => {
         try {
+            this.setState({loadingOffers: true})
             if (listing.seller === this.state.selected_user.username) {
                 var data = {};
                 data.description = '';
@@ -2700,24 +2701,29 @@ class WalletHome extends React.Component {
                 }
                 return (
                     <OfferTableRow
-                        theKey={key}
+                        key={key}
+                        myKey={key}
                         title={listing.title}
                         price={listing.price / 10000000000}
                         quantity={listing.quantity}
                         seller={listing.seller}
                         id={listing.offerID}
                         handleEditOfferForm={() => this.handleShowEditOfferForm(listing)}
-                        handleShowOrders={() => this.handleMyOrders(listing.offerID)}
+                        handleShowOrders={() => this.setState({selectedOffer: listing.offerID, showMyOrders: !this.state.showMyOrders})}
                         toEllipsis={this.to_ellipsis}
                         getOrders={this.get_seller_order_ids_by_offer}
                     />
                 )
 
             }
+
         } catch (err) {
+            this.setState({loadingOffers: false})
             console.error(`failed to properly parse the user data formatting`);
             console.error(err);
         }
+
+        this.setState({loadingOffers: false})
     });
 
     render() {
@@ -2734,17 +2740,17 @@ class WalletHome extends React.Component {
                         console.log(`nft address supplied!`);
                         return (
                             <div>
-                                {msg.position}
-                                {parsed_msg.n}
+                                <h1>{msg.position}</h1>
+                                <h3>{parsed_msg.n}</h3>
                             </div>
                         );
                     }
                     if (parsed_msg.m.length > 0) {
                         console.log(`this is a direct message open ended`);
                         return (
-                            <div>
-                                {msg.position}
-                                {parsed_msg.m}
+                            <div key={key}>
+                                <h1>{msg.position}</h1>
+                                <h3>{parsed_msg.m}</h3>
                             </div>
                         );
                     }
@@ -2755,7 +2761,7 @@ class WalletHome extends React.Component {
                             console.log(parsed_so);
                             console.log(`parsed the so`);
                             return (
-                                <div>
+                                <div key={key}>
      
                                     <Row style={{justifyContent: 'space-around'}}>
                                        <h1 style={{border: '2px solid #13D3FD', borderRadius: '10', padding: '.5rem'}}>
@@ -2781,7 +2787,7 @@ class WalletHome extends React.Component {
                         }
                     }
                     return (
-                        <div>
+                        <div key={key}>
                             {msg.position}
                             {msg.msg}
                         </div>
@@ -3119,7 +3125,7 @@ class WalletHome extends React.Component {
                                                 <Form.Label column sm={4}>
                                                     NFT Ethereum Address
                                                 </Form.Label>
-                                                <Col sm={6}>
+                                                <Col sm={8}>
                                                     <Form.Control name="eth_address" rows="3"/>
                                                 </Col>
                                             </Form.Group>)
@@ -3207,7 +3213,7 @@ class WalletHome extends React.Component {
                                                 <Form.Label column sm={4}>
                                                     NFT Ethereum Address
                                                 </Form.Label>
-                                                <Col sm={6}>
+                                                <Col sm={8}>
                                                     <Form.Control name="message" rows="3"/>
                                                 </Col>
                                             </Form.Group>
@@ -3340,7 +3346,7 @@ class WalletHome extends React.Component {
                                 <div
                                     className="search-box d-flex flex-column align-items-center"
                                 >
-                                    { !this.state.showMyOrders ?
+                                    
                                         <div className="row width100 border-bottom border-white" id="search">
                                             <form
                                                 className="w-100 no-gutters p-2 align-items-baseline d-flex justify-content-center"
@@ -3373,13 +3379,9 @@ class WalletHome extends React.Component {
                                                 </div>
                                             </form>
                                         </div>
-                                    :
-                                        ''
-                                    }
 
                                     <Row className="w-100 justify-content-center">
 
-                                    { !this.state.showMyOrders ?
                                         <Col sm={6}>
                                             <div className="row" id="search">
                                                 <form className="w-75 no-gutters p-2" id="search-form"
@@ -3444,9 +3446,6 @@ class WalletHome extends React.Component {
                                                 </form>
                                             </div>
                                         </Col>
-                                    :
-                                        ''
-                                    }
 
                                         <Col className="d-flex" sm={2}>
                                             <button onClick={this.handleMyOrders} className="search-button">
@@ -3454,39 +3453,7 @@ class WalletHome extends React.Component {
                                             </button>
                                         </Col>
 
-                                        { this.state.showMyOrders ?
-                                            <Col sm={12}>
-                                                <Row>
-                                                    <Col sm={10}>
-                                                        <h1>My Orders</h1>
-                                                    </Col>
-
-                                                    <Col sm={2}>
-                                                        <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
-                                                            <CgCloseR
-                                                                className="mx-auto"
-                                                                onClick={this.handleMyOrders}
-                                                            />
-                                                        </IconContext.Provider>
-                                                    </Col>
-                                                </Row>
-
-
-                                                <Row className="h-100">
-                                                    <Col className="h-100" sm={12}>
-                                                        <MyOrders
-                                                            rows={tableOfOrders}
-                                                            showMessages={this.state.showMessages}
-                                                            handleShowMessages={this.handleShowMessages}
-                                                            handleHideMessages={this.handleHideMessages}
-                                                            handleOrders={this.handleMyOrders}
-                                                        />
-                                                    </Col>
-                                                </Row>
-                                            </Col>
-                                        :
-                                            ''
-                                        }
+                                       
                                     </Row>
 
                                         <ReactModal
@@ -3707,11 +3674,12 @@ class WalletHome extends React.Component {
                                                 <Row className="h-100">
                                                     <div style={{width: 800}} className="h-100" sm={12}>
                                                         <MyOrders
-                                                            rows={tableOfOrders}
+                                                            rows={this.state.tableOfTables[this.state.selectedOffer]}
                                                             showMessages={this.state.showMessages}
                                                             handleShowMessages={this.handleShowMessages}
                                                             handleHideMessages={this.handleHideMessages}
                                                             handleOrders={this.handleMyOrders}
+                                                            //selectedOffer={}
                                                         />
                                                     </div>
                                                 </Row>
@@ -3721,6 +3689,7 @@ class WalletHome extends React.Component {
                                                     handleOrders={this.handleMyOrders}
                                                     offerRows={offerRows}
                                                     loadOffers={this.call_non_listings_table}
+                                                    loading={this.state.loadingOffers}
                                                 />
                                             }
 
