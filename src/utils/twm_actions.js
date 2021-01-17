@@ -158,6 +158,19 @@ export async function merchant_get_messages(req_payload, twm_api_url = 'http://1
     });
 }
 
+export async function merchant_reply_message(req_payload, twm_api_url = 'http://127.0.0.1:17700') {
+    return axios({
+        method: 'post',
+        url: twm_api_url + '/messages/merchant_reply',
+        data: req_payload,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then((resp) => {
+        return resp.data;
+    });
+}
+
 /*
 export async function create_twm_file(filepath) {
     try {
