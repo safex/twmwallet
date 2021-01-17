@@ -66,7 +66,8 @@ import {
     get_offers_url,
     get_seller_pubkey,
     dispatch_purchase_message,
-    merchant_get_messages
+    merchant_get_messages,
+    merchant_reply_message
 } from "../../utils/twm_actions";
 
 import zlib from 'zlib';
@@ -1823,15 +1824,80 @@ class WalletHome extends React.Component {
                                                     twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
                                                 }
                                             } else {
+                                                //if this is a new order id for the offer
                                                 twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id] = {};
                                                 twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages = {};
+                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].purchase_info = {};
                                                 if (twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.hasOwnProperty(msg.position)) {
                                                     console.log(`seems we have a duplicated message`);
                                                 } else {
-                                                    twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
-                                                }
+                                                    let pinfo_obj = {};
+                                                    pinfo_obj.buyers_pgp = msg.sender_pgp_pub_key;
+                                                    pinfo_obj.purchase_proof = msg.purchase_proof;
+                                                    try {
+                                                        let gt_obj = {};
+                                                        gt_obj.daemon_host = this.state.daemon_host;
+                                                        gt_obj.daemon_port = this.state.daemon_port;
+                                                        console.log(`purchase proof ${msg.purchase_proof}`);
+                                                        console.log(msg.purchase_proof);
+                                                        console.log(`purchase proof ${msg.purchase_proof}`);
+                                                        let txn = await get_transactions(gt_obj, msg.purchase_proof);
+                                                        try {
+                                                            console.log(txn);
+                                                            let the_txn = JSON.parse(txn.txs[0].as_json);
+                                                            console.log(`gotten txn ${the_txn}`);
+                                                            console.log(the_txn);
+                                                            console.log(`the txn ^^^`);
+                                                            for (const vout of the_txn.vout) {
+                                                                if (vout.target.script) {
+                                                                    if (vout.target.script.output_type === 30) {
+                                                                        console.log(`we found the purchase txn here`);
+                                                                        try {
+                                                                            let parsed_txn = await daemon_parse_transaction(gt_obj, vout.target.script.data, 30);
+                                                                            console.log(parsed_txn);
+                                                                            console.log(`daemon parsed txn ^^`)
+                                                                            let o_id = '';
+                                                                            let l_price = 0;
+                                                                            let l_quant = 0;
+                                                                            for (const field of parsed_txn.parsed_fields) {
+                                                                                if (field.field === 'offer_id') {
+                                                                                    o_id = field.value;
+                                                                                } else if (field.field === 'price') {
+                                                                                    l_price = field.price / 10000000000;
+                                                                                } else if (field.field === 'quantity') {
+                                                                                    l_quant = field.quant;
+                                                                                }
+                                                                            }
+                                                                            if (o_id === parsed.o) {
+                                                                                pinfo_obj.quantity = l_quant;
+                                                                                pinfo_obj.price = l_price;
+
+                                                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].purchase_info = pinfo_obj;
+
+                                                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
+                                                                                alert(`just recorded transaction ${msg.order_id} order for ${parsed.o}`);
+                                                                            } else {
+                                                                                console.log(`retrieved purchase proof does not match the offer id on the message something is wrong here.`);
+                                                                            }
+                                                                        } catch(err) {
+                                                                            console.error(err);
+                                                                            console.error(`error getting the parsed transaction contents`);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        } catch(err) {
+                                                            console.error(err);
+                                                            console.error(`error at parsing the txn retreived`)
+                                                        }
+
+                                                    } catch(err) {
+                                                        console.error(err);
+                                                        console.error(`error fetching the transaction`);
+                                                    }                                                }
                                             }
                                         } else {
+                                            //in case this offer hasn't been seen before
                                             twm_file.accounts[username].urls[twm_api_url].messages[parsed.o] = {};
                                             twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders = {};
                                             twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id] = {};
@@ -1840,10 +1906,72 @@ class WalletHome extends React.Component {
                                             if (twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.hasOwnProperty(msg.position)) {
                                                 console.log(`seems we have a duplicated message`);
                                             } else {
-                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
-
                                                 let pinfo_obj = {};
-                                                //pinfo_obj.buyers_pgp =
+                                                pinfo_obj.buyers_pgp = msg.sender_pgp_pub_key;
+                                                pinfo_obj.purchase_proof = msg.purchase_proof;
+                                                try {
+                                                    let gt_obj = {};
+                                                    gt_obj.daemon_host = this.state.daemon_host;
+                                                    gt_obj.daemon_port = this.state.daemon_port;
+                                                    console.log(`purchase proof ${msg.purchase_proof}`);
+                                                    console.log(msg.purchase_proof);
+                                                    console.log(`purchase proof ${msg.purchase_proof}`);
+                                                    let txn = await get_transactions(gt_obj, msg.purchase_proof);
+                                                    try {
+                                                        console.log(txn);
+                                                        let the_txn = JSON.parse(txn.txs[0].as_json);
+                                                        console.log(`gotten txn ${the_txn}`);
+                                                        console.log(the_txn);
+                                                        console.log(`the txn ^^^`);
+                                                        for (const vout of the_txn.vout) {
+                                                            if (vout.target.script) {
+                                                                if (vout.target.script.output_type === 30) {
+                                                                    console.log(`we found the purchase txn here`);
+                                                                    try {
+                                                                        let parsed_txn = await daemon_parse_transaction(gt_obj, vout.target.script.data, 30);
+                                                                        console.log(parsed_txn);
+                                                                        console.log(`daemon parsed txn ^^`)
+                                                                        let o_id = '';
+                                                                        let l_price = 0;
+                                                                        let l_quant = 0;
+                                                                        for (const field of parsed_txn.parsed_fields) {
+                                                                            if (field.field === 'offer_id') {
+                                                                                o_id = field.value;
+                                                                            } else if (field.field === 'price') {
+                                                                                l_price = field.price / 10000000000;
+                                                                            } else if (field.field === 'quantity') {
+                                                                                l_quant = field.quant;
+                                                                            }
+                                                                        }
+                                                                        if (o_id === parsed.o) {
+                                                                            pinfo_obj.quantity = l_quant;
+                                                                            pinfo_obj.price = l_price;
+
+                                                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].purchase_info = pinfo_obj;
+
+                                                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
+                                                                            alert(`just recorded transaction ${msg.order_id} order for ${parsed.o}`);
+                                                                        } else {
+                                                                            console.log(`retrieved purchase proof does not match the offer id on the message something is wrong here.`);
+                                                                        }
+                                                                    } catch(err) {
+                                                                        console.error(err);
+                                                                        console.error(`error getting the parsed transaction contents`);
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    } catch(err) {
+                                                        console.error(err);
+                                                        console.error(`error at parsing the txn retreived`)
+                                                    }
+
+                                                } catch(err) {
+                                                    console.error(err);
+                                                    console.error(`error fetching the transaction`);
+                                                }
+
+
                                                 finalMessage.push(
                                                     <div key={msg_hex}>
                                                         <h1>
@@ -1894,17 +2022,71 @@ class WalletHome extends React.Component {
                     if (twm_file.accounts[seller_name].urls[twm_api_url].messages.hasOwnProperty(offer_id)) {
                         if (twm_file.accounts[seller_name].urls[twm_api_url].messages[offer_id].orders.hasOwnProperty(order_id)) {
 
-
+                            let the_order = twm_file.accounts[seller_name].urls[twm_api_url].messages[offer_id].orders[order_id];
                             console.log(`hey, you're gonna be able to reply :)`);
+
+                            let seller_pub = twm_file.accounts[seller_name].urls[twm_api_url].pgp_keys.public_key;
+                            let seller_pri = twm_file.accounts[seller_name].urls[twm_api_url].pgp_keys.private_key;
+
                             let message_header_obj = {};
-                            //message_header_obj.sender_pgp_pub_key = publicKey; //fill this from the purchase_info obj
-                            //message_header_obj.to = listing.username; //fill this from the purchase_info obj
+                            message_header_obj.sender_pgp_pub_key = seller_pub;
+                            message_header_obj.to = the_order.purchase_info.buyers_pgp;
                             message_header_obj.from = seller_name;
                             message_header_obj.order_id = order_id;
                             message_header_obj.bc_height = this.state.blockchain_height;
 
+                            let pre_sign_message_obj = {};
+                            pre_sign_message_obj.s = ''; //subject
+                            pre_sign_message_obj.o = offer_id; //offer_id
+                            pre_sign_message_obj.m = message; //open_message contents
+                            pre_sign_message_obj.n = ''; //nft address
+                            pre_sign_message_obj.so = ''; //shipping object
 
+                            message_header_obj.message_hash = keccak256(JSON.stringify(pre_sign_message_obj)).toString('hex');
 
+                            message_header_obj.message_signature = '';
+
+                            let pres_sign_string = JSON.stringify(pre_sign_message_obj);
+
+                            const signature = crypto.sign("sha256", Buffer.from(pres_sign_string), {
+                                key: seller_pri,
+                                padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                            });
+
+                            message_header_obj.message_signature = signature;
+
+                            let compressed_message_obj = zlib.deflateSync(Buffer.from(JSON.stringify(pre_sign_message_obj)));
+
+                            console.log(": " + compressed_message_obj.length + " characters, " +
+                                Buffer.byteLength((compressed_message_obj), 'utf8') + " bytes");
+
+                            let found_key = crypto.createPublicKey(the_order.purchase_info.buyers_pgp);
+
+                            let encrypted_message = crypto.publicEncrypt(
+                                {
+                                    key: found_key,
+                                    padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+                                    oaepHash: "sha256",
+                                },
+                                compressed_message_obj
+                            );
+
+                            let hex_enc_msg = this.byteToHexString(encrypted_message);
+
+                            const enc_signature = crypto.sign("sha256", Buffer.from(encrypted_message), {
+                                key: seller_pri,
+                                padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                            });
+
+                            let hex_enc_sig = this.byteToHexString(enc_signature);
+
+                            message_header_obj.encrypted_message_signature = hex_enc_sig;
+
+                            message_header_obj.encrypted_message = hex_enc_msg;
+
+                            let mdispatched = await merchant_reply_message(message_header_obj, this.state.api_url);
+
+                            console.log(mdispatched);
                             //form the message here, and send it to the API url.
 
                         } else {
