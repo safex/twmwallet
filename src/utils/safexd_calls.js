@@ -68,7 +68,7 @@ export async function get_transactions(obj, txid) {
     return axios({
         method: 'post',
         url: 'http://' + obj.daemon_host + ':' + obj.daemon_port +  '/get_transactions',
-        data: obj
+        data: t_obj
     }).then((resp) => {
         return resp.data;
     })
