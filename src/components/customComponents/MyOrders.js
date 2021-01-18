@@ -14,15 +14,8 @@ export default class MyOrders extends React.Component {
         super(props);
         this.state = {
             rows: props.rows,
-            showMessages: props.showMessages,
-            handleShowMessages: props.handleShowMessages,
-            handleHideMessages: props.handleHideMessages,
             handleOrders: props.handleOrders,
-            selectedOffer: props.selectedOffer
-
         };
-        //this.imagestore = this.imagestore.bind(this);
-        
     }
 
 

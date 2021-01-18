@@ -184,6 +184,22 @@
         background: linear-gradient(90deg, #13D3FD 0%, #3698F3 100%);
         border-radius: 10px;
         color: #fff;
+        border: 3px solid #13D3FD!important;
+        font-family: 'Inter';
+        font-size: 1.8rem;
+        font-style: normal;
+        font-weight: 600;
+        text-align: center;
+
+    }
+
+    .search-button:hover {
+        height: 3rem;
+        margin-left: 1rem;
+        background: white;
+        border-radius: 10px;
+        border: 3px solid #13D3FD!important;
+        color: #13D3FD;
         border: 0;
         font-family: 'Inter';
         font-size: 1.8rem;
