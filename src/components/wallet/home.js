@@ -67,7 +67,8 @@ import {
     get_seller_pubkey,
     dispatch_purchase_message,
     merchant_get_messages,
-    merchant_reply_message
+    merchant_reply_message,
+    buyer_get_messages
 } from "../../utils/twm_actions";
 
 import zlib from 'zlib';
@@ -1053,6 +1054,9 @@ class WalletHome extends React.Component {
 
             this.buyer_get_offer_ids_by_url(this.state.buyer_urls[0]);
             this.buyer_get_order_ids_by_offer_id(this.state.buyer_offer_ids[0], 'http://stageapi.theworldmarketplace.com:17700');
+
+            this.fetch_buyers_messages_for_order('39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
+                'da73d6d886cb63ae6d9899f331d021e7e8cd7da9c696bf6af626e91a84e03828', 'http://stageapi.theworldmarketplace.com:17700');
         } catch(err) {
             console.error(err);
         }
@@ -1242,8 +1246,8 @@ class WalletHome extends React.Component {
     load_offers = (username, index) => {
         this.setState({selected_user: {username: username, index: index}});
         this.fetch_messages_seller(username, 'http://stageapi.theworldmarketplace.com:17700');
-        this.seller_reply_message(username, '151a94e7d6359383ade1649a26e20d2d47f4fb90c079f40e594c904a15777261',
-            'd3b46fe73d385ac53c2bef4a08d75bacdf881dcbc8c2219e012a4faee41291aa',
+        this.seller_reply_message(username, '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
+            'da73d6d886cb63ae6d9899f331d021e7e8cd7da9c696bf6af626e91a84e03828',
             'http://stageapi.theworldmarketplace.com:17700', 'this is my message');
         console.log(username);
         console.log(index);
@@ -2006,7 +2010,45 @@ class WalletHome extends React.Component {
                                     } else {
                                         console.error(`there is an error with this msg.to doesn't match the username`);
                                     }
-                                    this.setState({twm_file: twm_file});
+                                    try {
+
+                                        const crypto = window.require('crypto');
+                                        const algorithm = 'aes-256-ctr';
+                                        console.log(this.state.password);
+                                        const cipher = crypto.createCipher(algorithm, this.state.password.toString());
+                                        let crypted = cipher.update(JSON.stringify(twm_file), 'utf8', 'hex');
+                                        crypted += cipher.final('hex');
+
+                                        const hash1 = crypto.createHash('sha256');
+                                        hash1.update(JSON.stringify(twm_file));
+                                        console.log(`password ${this.state.password}`);
+                                        console.log(JSON.stringify(twm_file));
+
+                                        let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
+
+                                        try {
+                                            let opened_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
+                                            console.log(opened_twm_file);
+
+                                            localStorage.setItem('twm_file', twm_file);
+
+                                            this.setState({twm_file: twm_file});
+
+                                        } catch (err) {
+                                            this.setState({showLoader: false});
+                                            console.error(err);
+                                            console.error(`error opening twm file after save to verify`);
+                                            alert(`Error at saving to the twm file during account creation verification stage`);
+                                        }
+                                        console.log(twm_save);
+
+                                    } catch (err) {
+                                        this.setState({showLoader: false});
+                                        console.error(err);
+                                        console.error(`error at initial save of the twm file`);
+                                        alert(`Error at saving to the twm file during account creation initialization stage`);
+                                    }
+
                                 } catch(err) {
                                     console.error(err);
                                     console.error(`error at parsing the message`)
@@ -2032,7 +2074,6 @@ class WalletHome extends React.Component {
         }
         return true;
     };
-
 
     buyer_get_offer_ids_by_api = async() => {
         try {
@@ -2074,7 +2115,6 @@ class WalletHome extends React.Component {
         }
     };
 
-
     buyer_get_order_ids_by_offer_id = async(offer_id, twm_api_url) => {
         try {
             let order_ids = [];
@@ -2096,13 +2136,22 @@ class WalletHome extends React.Component {
 
     buyer_get_messages_by_order_id = async(offer_id, twm_api_url, order_id) => {
         try {
-
+            let messages = [];
+            let t_f = this.state.twm_file;
+            if (!this.isEmpty(t_f.api.urls[twm_api_url][offer_id][order_id])) {
+                let core = t_f.api.urls[twm_api_url][offer_id][order_id];
+                for (const msg in core) {
+                    console.log(msg);
+                    messages.push(msg);
+                }
+            } else {
+                console.log(`the object is empty no messages found for ${order_id}`);
+            }
         } catch(err) {
             console.error(err);
             console.error(`error at buyer_get_messages_by_offer_id`);
         }
     };
-
 
     seller_reply_message = async (seller_name, offer_id, order_id, twm_api_url, message) => {
         try {
@@ -2176,11 +2225,51 @@ class WalletHome extends React.Component {
 
                             message_header_obj.encrypted_message = hex_enc_msg;
 
+
                             let mdispatched = await merchant_reply_message(message_header_obj, this.state.api_url);
 
-                            console.log(mdispatched);
-                            //form the message here, and send it to the API url.
 
+                            message_header_obj.message = pre_sign_message_obj;
+                            message_header_obj.position = mdispatched.msg_obj.position;
+                            the_order.messages[mdispatched.msg_obj.position] = message_header_obj;
+
+                            try {
+                                const crypto = window.require('crypto');
+                                const algorithm = 'aes-256-ctr';
+                                console.log(this.state.password);
+                                const cipher = crypto.createCipher(algorithm, this.state.password.toString());
+                                let crypted = cipher.update(JSON.stringify(twm_file), 'utf8', 'hex');
+                                crypted += cipher.final('hex');
+
+                                const hash1 = crypto.createHash('sha256');
+                                hash1.update(JSON.stringify(twm_file));
+                                console.log(`password ${this.state.password}`);
+                                console.log(JSON.stringify(twm_file));
+
+                                let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
+
+                                try {
+                                    let opened_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
+                                    console.log(opened_twm_file);
+
+                                    localStorage.setItem('twm_file', twm_file);
+
+                                    this.setState({twm_file: twm_file});
+
+                                } catch (err) {
+                                    this.setState({showLoader: false});
+                                    console.error(err);
+                                    console.error(`error opening twm file after save to verify`);
+                                    alert(`Error at saving to the twm file during account creation verification stage`);
+                                }
+                                console.log(twm_save);
+
+                            } catch (err) {
+                                this.setState({showLoader: false});
+                                console.error(err);
+                                console.error(`error at initial save of the twm file`);
+                                alert(`Error at saving to the twm file during account creation initialization stage`);
+                            }
                         } else {
                             console.log(`this ${order_id} is not present in the twmfile`);
                             alert(`unable to send message ${order_id} is not present`);
@@ -2193,134 +2282,10 @@ class WalletHome extends React.Component {
                     console.log(`user has does not have content from ${twm_api_url}`);
                     alert(`this ${seller_name} does not have content from ${twm_api_url}`);
                 }
-
             } else {
                 console.log(`user is not present in the twm file`);
                 alert(`unable to send message, could not find your username in the twm file`);
             }
-
-
-
-            /*
-
-
-                                                    let pre_sign_message_obj = {};
-                                                    pre_sign_message_obj.s = ''; //subject
-                                                    pre_sign_message_obj.o = listing.offer_id; //offer_id
-                                                    pre_sign_message_obj.m = open_message; //open_message contents
-                                                    pre_sign_message_obj.n = nft_address; //nft address
-                                                    pre_sign_message_obj.so = JSON.stringify(shipping); //shipping object
-
-                                                    message_header_obj.message_hash = keccak256(JSON.stringify(pre_sign_message_obj)).toString('hex');
-
-                                                    message_header_obj.message_signature = '';
-
-                                                    let pres_sign_string = JSON.stringify(pre_sign_message_obj);
-
-                                                    const signature = crypto.sign("sha256", Buffer.from(pres_sign_string), {
-                                                        key: privateKey,
-                                                        padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-                                                    });
-
-                                                    message_header_obj.message_signature = signature;
-
-                                                    let compressed_message_obj = zlib.deflateSync(Buffer.from(JSON.stringify(pre_sign_message_obj)));
-
-                                                    console.log(": " + compressed_message_obj.length + " characters, " +
-                                                        Buffer.byteLength((compressed_message_obj), 'utf8') + " bytes");
-
-                                                    let found_key = crypto.createPublicKey(seller_pubkey.user.pgp_key);
-
-                                                    let encrypted_message = crypto.publicEncrypt(
-                                                        {
-                                                            key: found_key,
-                                                            padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-                                                            oaepHash: "sha256",
-                                                        },
-                                                        compressed_message_obj
-                                                    );
-
-                                                    let hex_enc_msg = this.byteToHexString(encrypted_message);
-
-                                                    const enc_signature = crypto.sign("sha256", Buffer.from(encrypted_message), {
-                                                        key: privateKey,
-                                                        padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-                                                    });
-
-                                                    let hex_enc_sig = this.byteToHexString(enc_signature);
-
-                                                    message_header_obj.encrypted_message_signature = hex_enc_sig;
-
-                                                    message_header_obj.encrypted_message = hex_enc_msg;
-
-                                                    let tdispatched = await dispatch_purchase_message(message_header_obj, this.state.api_url);
-
-                                                    console.log(tdispatched);
-
-                                                    message_header_obj.message = pre_sign_message_obj;
-
-                                                    let purchase_obj = {};
-                                                    purchase_obj.api_url = this.state.api_url;
-                                                    purchase_obj.offer_id = listing.offer_id;
-                                                    purchase_obj.title = listing.title;
-                                                    purchase_obj.price = listing.price;
-                                                    purchase_obj.quantity = quant;
-                                                    purchase_obj.bc_height = message_header_obj.bc_height;
-                                                    api_file_url_offer_id[order_id_hash].pgp_keys = {private_key: privateKey, public_key: publicKey};
-                                                    api_file_url_offer_id[order_id_hash].messages = [];
-                                                    api_file_url_offer_id[order_id_hash].purchase_obj = purchase_obj;
-                                                    api_file_url_offer_id[order_id_hash].messages.push(message_header_obj);
-
-                                                    console.log(twm_file);
-                                                   try {
-
-                                                        const crypto = window.require('crypto');
-                                                        const algorithm = 'aes-256-ctr';
-                                                        console.log(this.state.password);
-                                                        const cipher = crypto.createCipher(algorithm, this.state.password.toString());
-                                                        let crypted = cipher.update(JSON.stringify(twm_file), 'utf8', 'hex');
-                                                        crypted += cipher.final('hex');
-
-                                                        const hash1 = crypto.createHash('sha256');
-                                                        hash1.update(JSON.stringify(twm_file));
-                                                        console.log(`password ${this.state.password}`);
-                                                        console.log(JSON.stringify(twm_file));
-
-                                                        let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
-
-                                                        try {
-                                                            let opened_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
-                                                            console.log(opened_twm_file);
-
-                                                            localStorage.setItem('twm_file', twm_file);
-
-                                                            this.setState({twm_file: twm_file});
-
-                                                        } catch (err) {
-                                                            this.setState({showLoader: false});
-                                                            console.error(err);
-                                                            console.error(`error opening twm file after save to verify`);
-                                                            alert(`Error at saving to the twm file during account creation verification stage`);
-                                                        }
-                                                        console.log(twm_save);
-
-                                                    } catch (err) {
-                                                        this.setState({showLoader: false});
-                                                        console.error(err);
-                                                        console.error(`error at initial save of the twm file`);
-                                                        alert(`Error at saving to the twm file during account creation initialization stage`);
-                                                    }
-                                                    //api_file_url_offer_id[order_id_hash].messages
-                                                    //send it to the server
-                                                    //save it to the twm_file
-                                                    console.log(`payments from twm_url`);
-
-                                                    let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
-
-                                                    console.log(`purchase transaction committed`);
-                                                    alert(`The purchase has been submitted`);
-                                                }
-             */
         } catch(err) {
             console.error(err);
             console.error(`error at the seller reply message function call`);
@@ -2341,61 +2306,56 @@ class WalletHome extends React.Component {
     };
 
 
-    fetch_buyers_messages_for_order = async (pgp_key, offer_id, order_id, twm_api_url = 'http://127.0.0.1:17700') => {
-        let twm_file = this.state.twm_file;
-        if (twm_file.api.urls.hasOwnProperty(twm_api_url)) {
-            if (twm_file.api.urls[twm_api_url].hasOwnProperty(offer_id)) {
-                if (twm_file.api.urls[twm_api_url][offer_id].hasOwnProperty(order_id)) {
-
-
-                    console.log(`it has the twmapi in it's file for the fetch messages_of the buyer`);
-
-                    let date = new Date(new Date().toUTCString());
-                    console.log(date);
-                    console.log(date.toString());
-
-
+    fetch_buyers_messages_for_order = async (offer_id, order_id, twm_api_url = 'http://127.0.0.1:17700') => {
+        let t_f = this.state.twm_file;
+        if (t_f.api.urls.hasOwnProperty(twm_api_url)) {
+            if (t_f.api.urls[twm_api_url].hasOwnProperty(offer_id)) {
+                if (t_f.api.urls[twm_api_url][offer_id].hasOwnProperty(order_id)) {
                     try {
-                        //let req_msgs = await buyer_get_messages();
+                        console.log(`it has the twmapi in it's file for the fetch messages_of the buyer`);
+
+                        let date = new Date(new Date().toUTCString());
+                        console.log(date);
+                        console.log(date.toString());
+
+                        const crypto  = window.require('crypto');
+                        let our_key = crypto.createPrivateKey(t_f.api.urls[twm_api_url][offer_id][order_id].pgp_keys.private_key)
+                        console.log(our_key);
+                        let date_msg = Buffer.from(date.toString());
+                        console.log(date_msg);
+
+                        let msg_hex = this.byteToHexString(date_msg);
+                        const signature = crypto.sign("sha256", date_msg, {
+                            key: our_key,
+                            padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                        });
+
+                        console.log(signature);
+                        let verified_sig = crypto.verify(
+                            "sha256",
+                            date_msg,
+                            {
+                                key: our_key,
+                                padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                            },
+                            signature
+                        );
+                        console.log(`is verified :::  ${verified_sig}`);
+                        let req_payload = {};
+                        req_payload.signature = this.byteToHexString(signature);
+                        req_payload.pgp_public_key = t_f.api.urls[twm_api_url][offer_id][order_id].pgp_keys.public_key;
+                        req_payload.msg = date.toString();
+                        req_payload.msg_hex = msg_hex;
+                        let req_msgs = await buyer_get_messages(req_payload, twm_api_url);
+                        console.log(req_msgs.to);
+                        console.log(req_msgs.from);
                     } catch(err) {
                         console.error(err);
                         console.error(`error at fetching the messages of the buyer`);
                     }
 /*
   console.log(`it has the twmapi in it's file for the fetch messages_seller`);
-                    let date = new Date(new Date().toUTCString());
-                    console.log(date);
-                    console.log(date.toString());
 
-                    const crypto  = window.require('crypto');
-                    let our_key = crypto.createPrivateKey(this.state.twm_file.accounts[username].urls[twm_api_url].pgp_key.sec_key)
-                    console.log(our_key);
-                    let date_msg = Buffer.from(date.toString());
-                    console.log(date_msg);
-
-                    let msg_hex = this.byteToHexString(date_msg);
-                   const signature = crypto.sign("sha256", date_msg, {
-                        key: our_key,
-                        padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-                    });
-                   console.log(signature);
-                    let verified_sig = crypto.verify(
-                        "sha256",
-                        date_msg,
-                        {
-                            key: our_key,
-                            padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-                        },
-                        signature
-                    );
-                    console.log(`is verified :::  ${verified_sig}`);
-                    let req_payload = {};
-                    req_payload.signature = this.byteToHexString(signature);
-                    req_payload.username = username;
-                    req_payload.msg = date.toString();
-                    req_payload.msg_hex = msg_hex;
-
-                    let req_msgs = await merchant_get_messages(req_payload, twm_api_url);
                     console.log(req_msgs.to);
                     console.log(req_msgs.from);
 
