@@ -1,8 +1,6 @@
 import React from 'react';
-import {Row, Col, Container, Button, Form, Image, FormFile} from 'react-bootstrap';
-import path from 'path';
+import {Row, Col, Container, Form, Image} from 'react-bootstrap';
 import {create_wallet_util} from '../../utils/wallet_creation';
-import {FaBackward} from 'react-icons/fa'
 
 import WalletHome from "../wallet/home";
 import {open_twm_file, save_twm_file} from "../../utils/twm_actions";
