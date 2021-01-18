@@ -1,7 +1,6 @@
 import React from 'react';
-import {Row, Col, OverlayTrigger, Container, Button, Form, Image} from 'react-bootstrap';
+import {Row, Col, Container, Form, Image} from 'react-bootstrap';
 import {open_wallet_util} from '../../utils/wallet_creation';
-import {FaBackward} from 'react-icons/fa';
 import WalletHome from '../wallet/home';
 import {open_twm_file, save_twm_file} from "../../utils/twm_actions";
 
@@ -13,7 +12,6 @@ import ProgressIcon from "../customComponents/ProgressIcon";
 
 import { AiOutlineInfoCircle } from 'react-icons/ai';
 import { IoIosArrowBack } from 'react-icons/io';
-import { FaInfoCircle } from 'react-icons/fa';
 import { IconContext } from 'react-icons';
 
 
@@ -116,7 +114,7 @@ export default class OpenWallet extends React.Component {
                     console.error(err);
                     let make_new_twm_file = window.confirm(`the wallet couldn't open the twm file, perhaps there was none, let's make a new one?`);
                     console.log(make_new_twm_file);
-                    if (make_new_twm_file == true) {
+                    if (make_new_twm_file === true) {
                         try {
 
                             let twm_obj = {};

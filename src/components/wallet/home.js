@@ -3581,7 +3581,7 @@ class WalletHome extends React.Component {
                                             <div className="row" id="search">
                                                 <form className="w-75 no-gutters p-2" id="search-form"
 
-                                                        enctype="multipart/form-data">
+                                                        encType="multipart/form-data">
                                                     <div className="form-group col-sm-9">
                                                         <input className="" type="text" placeholder="Search"/>
                                                     </div>
@@ -3656,7 +3656,6 @@ class WalletHome extends React.Component {
                                             closeTimeoutMS={500}
                                             className="keys-modal"
                                             onRequestClose={this.hideMessages}
-                                            appElement={'el'}
                                         >
                                             <Row>
                                                 <Col sm={10}>

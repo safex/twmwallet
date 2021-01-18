@@ -1,9 +1,6 @@
 import React from 'react';
-import ReactJson from 'react-json-view';
 
-import Navigation from './Navigation';
-
-import {Row, Col, Container, Button, Table} from 'react-bootstrap';
+import {Row, Col, Container, Table} from 'react-bootstrap';
 
 
 export default class Settings extends React.Component {
