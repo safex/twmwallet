@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Col, Container, Row, Image, Tabs, Tab, Alert, Collapse} from 'react-bootstrap'
+import {Col, Container, Row, Image, Alert, Collapse} from 'react-bootstrap'
 
 const os = window.require('os');
 const fs = window.require('fs').promises;

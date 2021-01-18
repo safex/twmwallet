@@ -1,15 +1,15 @@
 import React from 'react';
 
-import { Row, Col, Form, Modal, Image } from 'react-bootstrap'
+import { Row, Col } from 'react-bootstrap'
 
 // Icon Imports
-import {IconContext} from 'react-icons'
+import { IconContext } from 'react-icons'
 import { CgCloseR } from 'react-icons/cg'
 
 import './ComponentCSS/MerchantAccounts.css'
 import './ComponentCSS/StakingTable.css'
 
-export default class MyOrders extends React.Component {
+export default class BuyerOrders extends React.Component {
     constructor(props) {
         super(props);
         this.state = {

@@ -1,7 +1,6 @@
 import React from 'react';
-import {Row, Col, Container, Button, Form, Image} from 'react-bootstrap';
+import {Row, Col, Container, Form, Image} from 'react-bootstrap';
 import {recover_from_keys_util} from '../../utils/wallet_creation';
-import {FaBackward} from 'react-icons/fa'
 
 import WalletHome from "../wallet/home";
 

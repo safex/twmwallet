@@ -18,22 +18,22 @@ export default function MainHeader(props) {
                 <Col sm={6} className="d-flex">
                     
                         <Col className={props.view === 'home' ? "menu-link-active" : ""}>
-                            <p tabIndex={0} className="" href="javascript:void(0)" onClick={props.goHome}>
+                            <p tabIndex={0} onClick={props.goHome}>
                                 Home
                             </p>
                         </Col>
-                        <Col tabIndex={1} className={props.view === 'market' ? "menu-link-active" : ""}>
-                            <p className="" href="javascript:void(0)" onClick={props.goToMarket}>
+                        <Col className={props.view === 'market' ? "menu-link-active" : ""}>
+                            <p onClick={props.goToMarket}>
                                 Market
                             </p>
                         </Col>
-                        <Col tabIndex={2} className={props.view === 'merchant' ? "menu-link-active" : ""}>
-                            <p className="" href="javascript:void(0)" onClick={props.goToMerchant}>
+                        <Col className={props.view === 'merchant' ? "menu-link-active" : ""}>
+                            <p onClick={props.goToMerchant}>
                                 Merchant
                             </p>
                         </Col>
-                        <Col tabIndex={3} className={props.view === 'tokens' ? "menu-link-active" : ""}>
-                            <p className="" href="javascript:void(0)" onClick={props.goToTokens}>
+                        <Col className={props.view === 'tokens' ? "menu-link-active" : ""}>
+                            <p onClick={props.goToTokens}>
                                 Tokens
                             </p>
                         </Col>
