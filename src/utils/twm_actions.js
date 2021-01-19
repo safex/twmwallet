@@ -96,33 +96,6 @@ export async function get_offers_url(twm_api_url = 'http://127.0.0.1:17700') {
     });
 }
 
-
-export async function get_messages(twm_api_url = 'http://127.0.0.1:17700', r_obj) {
-    return axios({
-        method: 'post',
-        url: twm_api_url + '/messages/register',
-        data: r_obj,
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then((resp) => {
-        return resp.data;
-    });
-}
-
-export async function send_message(twm_api_url = 'http://127.0.0.1:17700', r_obj) {
-    return axios({
-        method: 'post',
-        url: twm_api_url + '/messages/register',
-        data: r_obj,
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then((resp) => {
-        return resp.data;
-    });
-}
-
 export async function get_seller_pubkey(username, twm_api_url = 'http://127.0.0.1:17700') {
     return axios({
         method: 'post',
@@ -175,6 +148,19 @@ export async function buyer_get_messages(req_payload, twm_api_url = 'http://127.
     return axios({
         method: 'post',
         url: twm_api_url + '/messages/buyer_get_messages',
+        data: req_payload,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then((resp) => {
+        return resp.data;
+    });
+}
+
+export async function buyer_send_message(req_payload, twm_api_url = 'http://127.0.0.1:17700') {
+    return axios({
+        method: 'post',
+        url: twm_api_url + '/messages/buyer_reply',
         data: req_payload,
         headers: {
             'Content-Type': 'application/json'
