@@ -86,6 +86,9 @@ var wallet;
 let offerRows;
 let tableOfOrders;
 let buyerOrders;
+let buyerUrls = [];
+let offerDropdown = [];
+let orderDropdown = [];
 
 let finalMessage = [];
 
@@ -149,6 +152,7 @@ class WalletHome extends React.Component {
             selectedOffer: '',
             tableOfTables: {},
             loadingOffers: false,
+            showBuyerMessages: false,
         };
     }
 
@@ -1054,20 +1058,7 @@ class WalletHome extends React.Component {
     //open market view from navigation
     show_market = () => {
         this.show_loading();
-        this.buyer_get_offer_ids_by_api();
-        try {
-
-            this.buyer_get_offer_ids_by_url(this.state.buyer_urls[0]);
-            this.buyer_get_order_ids_by_offer_id(this.state.buyer_offer_ids[0], 'http://stageapi.theworldmarketplace.com:17700');
-
-            this.fetch_buyers_messages_for_order('39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
-                'da73d6d886cb63ae6d9899f331d021e7e8cd7da9c696bf6af626e91a84e03828', 'http://stageapi.theworldmarketplace.com:17700');
-        } catch(err) {
-            console.error(err);
-        }
-       // this.buyer_get_order_ids_by_offer_id('39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
-       //     'http://stageapi.theworldmarketplace.com:17700');
-
+        
         setTimeout(() => {
 
             this.setState({
@@ -1155,6 +1146,10 @@ class WalletHome extends React.Component {
             this.props.history.push({pathname: '/'});
         }
     };
+
+    handleBuyerMessages = () => {
+        this.setState({showBuyerMessages: !this.state.showBuyerMessages})
+    }
 
     //show modal of private keys
     handleKeys = () => {
@@ -1251,7 +1246,7 @@ class WalletHome extends React.Component {
     load_offers = (username, index) => {
         this.setState({selected_user: {username: username, index: index}});
         this.fetch_messages_seller(username, 'http://stageapi.theworldmarketplace.com:17700');
-        this.seller_reply_message(username, '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
+        this.seller_reply_message(username, 'da73d6d886cb63ae6d9899f331d021e7e8cd7da9c696bf6af626e91a84e03828',
             'da73d6d886cb63ae6d9899f331d021e7e8cd7da9c696bf6af626e91a84e03828',
             'http://stageapi.theworldmarketplace.com:17700', 'this is my message');
         console.log(username);
@@ -1673,9 +1668,12 @@ class WalletHome extends React.Component {
     };
 
     to_ellipsis = (text, firstHalf, secondHalf) => {
-        const ellipse = `${text.substring(0, firstHalf)}.....${text.substring(text.length - secondHalf, text.length)}`
+        if (typeof text !== "string") {return text} else {
+             const ellipse = `${text.substring(0, firstHalf)}.....${text.substring(text.length - secondHalf, text.length)}`
 
-        return (ellipse)
+            return (ellipse)
+        }
+       
     };
 
     hexStringToByte = (str) => {
@@ -2094,19 +2092,22 @@ class WalletHome extends React.Component {
             } else {
                 console.log(`there are no urls to parse from`);
             }
+            console.log(this.state.buyer_urls)
         } catch(err) {
             console.error(err);
             console.error(`error at the checking of the urls of the buyer_get_offer_ids_by_api`)
         }
     };
 
-    buyer_get_offer_ids_by_url = async(twm_api_url) => {
+    buyer_get_offer_ids_by_url = async(e) => {
+        e.preventDefault();
+        console.log(e.target.url.value)
         try {
             let offer_ids = [];
             let t_f = this.state.twm_file;
-            if (!this.isEmpty(t_f.api.urls[twm_api_url])) {
+            if (!this.isEmpty(t_f.api.urls[e.target.url.value])) {
                 console.log(`we have offer_ids at this url for the buyer`);
-                for (const offer in t_f.api.urls[twm_api_url]) {
+                for (const offer in t_f.api.urls[e.target.url.value]) {
                     console.log(offer);
                     offer_ids.push(offer);
                 }
@@ -2118,40 +2119,58 @@ class WalletHome extends React.Component {
             console.error(err);
             console.error(`error at the checking of the urls of the buyer_get_offer_ids_by_api`)
         }
+            offerDropdown = this.state.buyer_offer_ids.map((offer, key) => {
+                return (
+                    <option key={key}>{offer}</option>
+                )
+        })
+
+        console.log(offerDropdown)
     };
 
-    buyer_get_order_ids_by_offer_id = async(offer_id, twm_api_url) => {
+    buyer_get_order_ids_by_offer_id = async(e) => {
+        e.preventDefault();
         try {
+            this.setState({selectedBuyerOffer: e.target.offer.value})
             let order_ids = [];
             let t_f = this.state.twm_file;
-            if (!this.isEmpty(t_f.api.urls[twm_api_url][offer_id])) {
-                let core = t_f.api.urls[twm_api_url][offer_id];
+            if (!this.isEmpty(t_f.api.urls[e.target.url.value][e.target.offer.value])) {
+                let core = t_f.api.urls[e.target.url.value][e.target.offer.value];
                 for (const order in core) {
                     console.log(order);
                     order_ids.push(order);
                 }
+                this.setState({buyerOrders: order_ids})
             } else {
-                console.log(`offer id is not found in the api urls ${twm_api_url} object`);
+                console.log(`offer id is not found in the api urls ${e.target.url.value} object`);
             }
         } catch(err) {
             console.error(err);
             console.error(`error at the buyer_get_order_ids_by_offer_id`);
         }
+
+        orderDropdown = this.state.buyerOrders.map((order, key) => {
+            return (
+                <option key={key}>{order}</option>
+            )
+        })
     };
 
-    buyer_get_messages_by_order_id = async(offer_id, twm_api_url, order_id) => {
+    buyer_get_messages_by_order_id = async(e) => {
+        e.preventDefault();
         try {
             let messages = [];
             let t_f = this.state.twm_file;
-            if (!this.isEmpty(t_f.api.urls[twm_api_url][offer_id][order_id])) {
-                let core = t_f.api.urls[twm_api_url][offer_id][order_id];
+            if (!this.isEmpty(t_f.api.urls[e.target.url.value][e.target.offer.value][e.target.order.value])) {
+                let core = t_f.api.urls[e.target.url.value][e.target.offer.value][e.target.order.value];
                 for (const msg in core) {
                     console.log(msg);
-                    messages.push(msg);
+                    messages.push(<h3>{msg}</h3>);
                 }
             } else {
-                console.log(`the object is empty no messages found for ${order_id}`);
+                console.log(`the object is empty no messages found for ${e.target.order.value}`);
             }
+            this.setState({buyerMessages: messages})
         } catch(err) {
             console.error(err);
             console.error(`error at buyer_get_messages_by_offer_id`);
@@ -3411,7 +3430,8 @@ class WalletHome extends React.Component {
                     return (
                         <div className="">
 
-                            {this.state.show_purchase_form ?
+                            
+
                                 <ReactModal
                                     isOpen={this.state.show_purchase_form}
                                     closeTimeoutMS={500}
@@ -3437,7 +3457,7 @@ class WalletHome extends React.Component {
                                         }
                                     }}
                                 >
-                                    <h1>PURCHASE {this.state.show_purchase_offer.title.toUpperCase()}</h1>
+                                    <h1>PURCHASE {this.state.show_purchase_offer.title}</h1>
 
 
                                     <Form id="purchase_item"
@@ -3472,7 +3492,7 @@ class WalletHome extends React.Component {
                                                         </h2>
 
                                                     <div className="h-25 oflow-y-auto">
-                                                        <p>{this.state.show_purchase_offer_data.description.toUpperCase()}</p>
+                                                        <p>{this.state.show_purchase_offer_data.description}</p>
                                                     </div>
 
                                                 <Form.Group as={Row}>
@@ -3651,9 +3671,6 @@ class WalletHome extends React.Component {
                                         Close
                                     </Button>
                                 </ReactModal>
-                            :
-                                ''
-                            }
 
                             <ReactModal 
                                 isOpen={this.state.show_purchase_confirm_modal}
@@ -3680,7 +3697,7 @@ class WalletHome extends React.Component {
                                     }
                                 }}
                             >
-                                <h1>Purchase Confirmed: {this.state.show_purchase_offer.title.toUpperCase()}</h1>
+                                <h1>Purchase Confirmed: {this.state.show_purchase_offer.title}</h1>
                             
                                 <button onClick={() => print('receipt', 'html')}>Print</button> 
 
@@ -3703,7 +3720,7 @@ class WalletHome extends React.Component {
                                     style={{display: 'none'}}
                                 >
                                     <h1 id="receipt" style={{textAlign: 'center'}}>
-                                        Purchase Confirmed: {this.state.show_purchase_offer.title.toUpperCase()}
+                                        Purchase Confirmed: {this.state.show_purchase_offer.title}
                                         <br/><br/>
                                         Date: {new Date().toString()}
                                         <br/><br/>
@@ -3866,43 +3883,7 @@ class WalletHome extends React.Component {
                                                 {this.state.showBuyerOrders ? 'Close' : 'My Orders'}
                                             </button>
                                         </Col>
-
-
                                     </Row>
-
-                                        <ReactModal
-                                            isOpen={this.state.showMessages}
-                                            closeTimeoutMS={500}
-                                            className="keys-modal"
-                                            onRequestClose={this.hideMessages}
-                                        >
-                                            <Row>
-                                                <Col sm={10}>
-                                                    <h1>
-                                                        Messages
-                                                    </h1>
-
-
-                                                </Col>
-                                                <Col sm={2}>
-                                                    <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
-                                                        <CgCloseR
-                                                            className="mx-auto"
-                                                            onClick={this.hideMessages}
-                                                        />
-                                                    </IconContext.Provider>
-                                                </Col>
-                                            </Row>
-
-                                            <Row className="m-auto">
-                                                <Col sm={12}>
-                                                    <h1>PUT MESSAGE HERE</h1>
-                                                    {
-                                                    //  this.state.currentMessage
-                                                    }
-                                                </Col>
-                                            </Row>
-                                        </ReactModal>
 
                                     <Row className="staking-table-row">
                                         <p>Title</p>
@@ -3918,14 +3899,52 @@ class WalletHome extends React.Component {
 
                             {this.state.showBuyerOrders ?
                                 <Col className="market-table overflow-y" md={12}>
-                                        <BuyerOrders
-                                            rows={buyerOrders}
-                                            showMessages={this.state.showMessages}
-                                            handleShowMessages={this.handleShowMessages}
-                                            handleHideMessages={this.handleHideMessages}
-                                            handleOrders={this.handleBuyerOrders}
-                                            loadMessages={this.callBuyerOrders()}
-                                        />
+                                    <BuyerOrders
+                                        urls={buyerUrls}
+                                        offers={offerDropdown}
+                                        orders={orderDropdown}
+                                        showMessages={this.state.showMessages}
+                                        handleShowMessages={this.handleShowMessages}
+                                        handleHideMessages={this.handleHideMessages}
+                                        handleOrders={this.handleBuyerOrders}
+                                        getUrls={this.buyer_get_offer_ids_by_api}
+                                        getOffers={this.buyer_get_offer_ids_by_url}
+                                        getOrders={this.buyer_get_order_ids_by_offer_id}
+                                        selectedBuyerOffer={this.state.selectedBuyerOffer}
+                                        getMessages={this.buyer_get_messages_by_order_id}
+                                        handleMessages={this.handleBuyerMessages}
+                                    />
+
+                                    <ReactModal
+                                        isOpen={this.state.showBuyerMessages}
+                                        closeTimeoutMS={500}
+                                        className="keys-modal"
+                                        onRequestClose={this.handleBuyerMessages}
+                                    >
+                                        <Row>
+                                            <Col sm={10}>
+                                                <h1>
+                                                    Messages
+                                                </h1>
+
+
+                                            </Col>
+                                            <Col sm={2}>
+                                                <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
+                                                    <CgCloseR
+                                                        className="mx-auto"
+                                                        onClick={this.handleBuyerMessages}
+                                                    />
+                                                </IconContext.Provider>
+                                            </Col>
+                                        </Row>
+
+                                        <Row className="m-auto">
+                                            <Col sm={12}>
+                                                {this.state.buyerMessages}
+                                            </Col>
+                                        </Row>
+                                    </ReactModal>
                                 </Col>
 
                             :
