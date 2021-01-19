@@ -2408,6 +2408,16 @@ class WalletHome extends React.Component {
         }
     };
 
+    buyer_reply_by_order = async() => {
+        let t_f = this.state.twm_file;
+        try {
+
+        } catch(err) {
+            console.error(err);
+            console.error(`error at the buyer_reply_by_order`);
+        }
+    };
+
     purchase_item = async (e, listing) => {
         e.preventDefault();
         e.persist();
