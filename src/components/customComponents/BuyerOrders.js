@@ -18,7 +18,7 @@ export default class BuyerOrders extends React.Component {
         };
     }
 
-
+    
     render() {
 
         return (
@@ -46,6 +46,12 @@ export default class BuyerOrders extends React.Component {
 
                         <p style={{width: '12rem'}}>Actions</p>
                     </Row>
+
+
+                    <button className="my-5 " onClick={props.loadOrders}>
+                        Load Offers
+                    </button>
+                
 
                     {this.state.rows}
 

@@ -3843,12 +3843,12 @@ class WalletHome extends React.Component {
                             >
                                         <h1>Purchase Confirmed: {this.state.show_purchase_offer.title.toUpperCase()}</h1>
                                     
-                                        <ul>
-                                            <li>Purchase transaction committed.</li>
-                                            <li>Transaction ID: {this.state.purchase_txn_id}</li>
-                                            <li>Amount: {this.state.purchase_txn_quantity} X {this.state.purchase_txn_title}</li>
-                                            <li>Price: {this.state.purchase_txn_price} SFX</li>
-                                            <li>
+                                        
+                                            <h2>Purchase transaction committed.</h2>
+                                            <h2>Transaction ID: {this.state.purchase_txn_id}</h2>
+                                            <h2>Amount: {this.state.purchase_txn_quantity} X {this.state.purchase_txn_title}</h2>
+                                            <h2>Price: {this.state.purchase_txn_price} SFX</h2>
+                                            <h2>
                                                 Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
                                                 <IconContext.Provider  value={{color: 'black', size: '20px'}}>
                                                     <FaCopy
@@ -3863,8 +3863,8 @@ class WalletHome extends React.Component {
                                                         </span>
                                                     </ReactTooltip>
                                                 </IconContext.Provider>
-                                            </li>
-                                        </ul>
+                                            </h2>
+                                        
                             </ReactModal>
 
                             <Col sm={4} className="no-padding d-flex flex-column align-items-center justify-content-between">
