@@ -68,7 +68,8 @@ import {
     dispatch_purchase_message,
     merchant_get_messages,
     merchant_reply_message,
-    buyer_get_messages
+    buyer_get_messages,
+    buyer_send_message
 } from "../../utils/twm_actions";
 
 import zlib from 'zlib';
