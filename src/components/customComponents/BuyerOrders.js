@@ -48,7 +48,7 @@ export default class BuyerOrders extends React.Component {
                     </Row>
 
 
-                    <button className="my-5 " onClick={props.loadOrders}>
+                    <button className="my-5 " onClick={''}>
                         Load Offers
                     </button>
                 

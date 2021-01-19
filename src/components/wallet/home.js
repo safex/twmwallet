@@ -39,7 +39,8 @@ import copy from "copy-to-clipboard"
 import ReactTooltip from "react-tooltip";
 import ReactModal from 'react-modal';
 import Loader from 'react-loader-spinner'
-import Fade from 'react-reveal/Fade';
+
+import print from 'print-js'
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 
@@ -84,6 +85,7 @@ var wallet;
 
 let offerRows;
 let tableOfOrders;
+let buyerOrders;
 
 let finalMessage = [];
 
@@ -2408,6 +2410,22 @@ class WalletHome extends React.Component {
         }
     };
 
+    callBuyerOrders = (twm_api_url, offer_id, order_id) => buyerOrders = this.state.twm_file.api.urls[twm_api_url][offer_id][order_id].messages.map((message, key) => {
+        try {
+            //this.setState({loadingOffers: true})
+            
+                return (
+                    <h1 key={key}>{key} ---###--- {message}</h1>
+                )
+
+
+        } catch (err) {
+            this.setState({loadingOffers: false})
+            console.error(`failed to properly parse the user data formatting`);
+            console.error(err);
+        }
+    })
+
     buyer_reply_by_order = async() => {
         let t_f = this.state.twm_file;
         try {
@@ -2491,6 +2509,7 @@ class WalletHome extends React.Component {
                                 this.setState({
                                     purchase_txn_quantity: quant,
                                     purchase_txn_title: listing.title,
+                                    purchase_txn_seller: listing.username,
                                     purchase_txn_offerid: listing.offer_id,
                                     purchase_txn_price: listing.price,
                                     purchase_txn_total_cost: total_cost,
@@ -3295,10 +3314,10 @@ class WalletHome extends React.Component {
                                             <p data-tip data-for={`offerID${key}`}>
                                                 {this.to_ellipsis(listing.offer_id, 5, 5)}
 
-                                                <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
+                                               
+                                            </p> <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
                                                     <span>{listing.offer_id}</span>
                                                 </ReactTooltip>
-                                            </p>
 
                                             <p style={{width: '24rem'}}>
 
@@ -3661,30 +3680,48 @@ class WalletHome extends React.Component {
                                     }
                                 }}
                             >
-                                        <h1>Purchase Confirmed: {this.state.show_purchase_offer.title.toUpperCase()}</h1>
-                                    
-                                        
-                                            <h2>Purchase transaction committed.</h2>
-                                            <h2>Transaction ID: {this.state.purchase_txn_id}</h2>
-                                            <h2>Amount: {this.state.purchase_txn_quantity} X {this.state.purchase_txn_title}</h2>
-                                            <h2>Price: {this.state.purchase_txn_price} SFX</h2>
-                                            <h2>
-                                                Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
-                                                <IconContext.Provider  value={{color: 'black', size: '20px'}}>
-                                                    <FaCopy
-                                                        className="ml-4"
-                                                        data-tip data-for='copyIDInfo1'
-                                                        onClick={() => copy(this.state.purchase_txn_id)}
-                                                    />
+                                <h1>Purchase Confirmed: {this.state.show_purchase_offer.title.toUpperCase()}</h1>
+                            
+                                <button onClick={() => print('receipt', 'html')}>Print</button> 
 
-                                                    <ReactTooltip id='copyIDInfo1' type='info' effect='solid'>
-                                                        <span>
-                                                            Copy Offer ID
-                                                        </span>
-                                                    </ReactTooltip>
-                                                </IconContext.Provider>
-                                            </h2>
-                                        
+                                <h2>Purchase transaction committed.</h2>
+
+                                <h2>Transaction ID: {this.state.purchase_txn_id}</h2>
+
+                                <h2>Seller: {this.state.purchase_txn_seller}</h2>
+
+                                <h2>Purchased: {this.state.purchase_txn_title}</h2>
+
+                                <h2>Amount: {this.state.purchase_txn_quantity}</h2>
+
+                                <h2>Price: {this.state.purchase_txn_price} SFX</h2>
+                                
+                                <h2>Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX</h2> 
+
+                                <div 
+                                    
+                                    style={{display: 'none'}}
+                                >
+                                    <h1 id="receipt" style={{textAlign: 'center'}}>
+                                        Purchase Confirmed: {this.state.show_purchase_offer.title.toUpperCase()}
+                                        <br/><br/>
+                                        Date: {new Date().toString()}
+                                        <br/><br/>
+                                        Transaction ID: {this.state.purchase_txn_id} 
+                                        <br/><br/>
+                                        Seller: {this.state.purchase_txn_seller}
+                                        <br/><br/>
+                                        Purchased: {this.state.purchase_txn_title}
+                                        <br/><br/>
+                                        Amount: {this.state.purchase_txn_quantity}
+                                        <br/><br/>
+                                        Price: {this.state.purchase_txn_price} SFX
+                                        <br/><br/>
+                                        Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
+                                        <br/><br/>
+                                        Thank You For Shopping With Safex!
+                                    </h1>
+                                </div>                 
                             </ReactModal>
 
                             <Col sm={4} className="no-padding d-flex flex-column align-items-center justify-content-between">
@@ -3882,11 +3919,12 @@ class WalletHome extends React.Component {
                             {this.state.showBuyerOrders ?
                                 <Col className="market-table overflow-y" md={12}>
                                         <BuyerOrders
-                                            rows={this.state.tableOfTables[this.state.selectedOffer]}
+                                            rows={buyerOrders}
                                             showMessages={this.state.showMessages}
                                             handleShowMessages={this.handleShowMessages}
                                             handleHideMessages={this.handleHideMessages}
                                             handleOrders={this.handleBuyerOrders}
+                                            loadMessages={this.callBuyerOrders()}
                                         />
                                 </Col>
 
