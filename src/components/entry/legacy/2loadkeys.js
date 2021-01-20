@@ -1,5 +1,5 @@
 import React from 'react';
-import {Row, Col, Container, Button, Table} from 'react-bootstrap';
+import {Container, Button, Table} from 'react-bootstrap';
 
 
 export default class LegacyKeys extends React.Component {

@@ -78,7 +78,6 @@
 }
 
 .keys-modal {
-    width: 60vw;
     margin: auto;
     padding: 3rem;
     position: relative;
@@ -115,7 +114,6 @@
     font-size: 2rem;
     font-style: normal;
     font-weight: 500;
-    text-align: left;
 }
 
 .keys-modal .col-sm-10 {

@@ -13,12 +13,26 @@ export default class BuyerOrders extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            rows: props.rows,
+            urls: props.urls,
             handleOrders: props.handleOrders,
+            getUrls: props.getUrls,
+            getOffers: props.getOffers, 
+            offers: props.offers,
+            getOrders: props.getOrders,
+            selectedBuyerOffer: props.selectedBuyerOffer,
+            getMessages: props.getMessages,
+            orders: props.orders,
+            handleMessages: props.handleMessages,
         };
     }
 
-
+    componentDidMount() {
+        this.state.getUrls()
+        
+    }
+    
+    forceUpdate(){}
+    
     render() {
 
         return (
@@ -35,20 +49,38 @@ export default class BuyerOrders extends React.Component {
                     className="pt-3 staking-table-table"
                     style={{maxHeight: 300}}
                 >
-                    <Row className="staking-table-header no-gutters">
-                        <p>Order ID</p>
+        
+                    <form onSubmit={this.state.getOffers}>
+                        <h1>Select URL</h1>
+                        <select name="url">
+                            {this.state.urls}
+                            <option>http://stageapi.theworldmarketplace.com:17700</option>
+                        </select>
+                        <button type="submit">Get Offers</button>
+                    </form>
 
-                        <p></p>
+                    <form onSubmit={this.state.getOrders}>
+                        <h1>Select Offer</h1>
+                        <select name="offer">
+                            {this.state.offers}
+                        </select>
+                        <input name="url" value="http://stageapi.theworldmarketplace.com:17700"/>
+                        <button type="submit">Get Orders</button>
+                    </form>
 
-                        <p></p>
+                    <form onSubmit={this.state.getMessages}>
+                        <h1>Select Order</h1>
+                        <select name="order">
+                            {this.state.orders}
+                        </select>
+                        <input name="url" value="http://stageapi.theworldmarketplace.com:17700"/>
+                        <input name="offer" value={this.state.selectedBuyerOffer}/>
+                        
+                        <button type="submit">Get Messages</button>
+                    </form>
 
-                        <p></p>
-
-                        <p style={{width: '12rem'}}>Actions</p>
-                    </Row>
-
-                    {this.state.rows}
-
+                    <button type="button" onClick={this.state.handleMessages}>Show Messages</button>
+                    
                 </Col>
             </div>
         )
