@@ -76,7 +76,7 @@ import {
 import zlib from 'zlib';
 import BuyerOrders from '../customComponents/BuyerOrders';
 
-
+const cryptoRandomString = require('crypto-random-string');
 
 const sfxjs = window.require('safex-addressjs');
 
@@ -152,7 +152,8 @@ class WalletHome extends React.Component {
             selectedOffer: '',
             tableOfTables: {},
             loadingOffers: false,
-            showBuyerMessages: false
+            showBuyerMessages: false,
+            url: ''
         };
     }
 
@@ -784,6 +785,15 @@ class WalletHome extends React.Component {
         }
     };
 
+    handleBuyerChange = (e) => {
+        let name = e.target.name
+        let value = e.target.value  
+        this.setState({[name]: value})
+        console.log(e.target.name)
+        console.log(e.target.value)
+        console.log(this.state.url)
+    }
+
 
     //basic send transactions
     token_send = async (e) => {
@@ -1057,13 +1067,13 @@ class WalletHome extends React.Component {
 
     //open market view from navigation
     show_market = () => {
-        this.fetch_buyers_messages_for_order('39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
-            'da73d6d886cb63ae6d9899f331d021e7e8cd7da9c696bf6af626e91a84e03828',
-            'http://stageapi.theworldmarketplace.com:17700');
+       // this.fetch_buyers_messages_for_order('39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
+         //   'da73d6d886cb63ae6d9899f331d021e7e8cd7da9c696bf6af626e91a84e03828',
+           // 'http://stageapi.theworldmarketplace.com:17700');
         this.show_loading();
-        this.buyer_reply_by_order('http://stageapi.theworldmarketplace.com:17700',
-            '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
-            'da73d6d886cb63ae6d9899f331d021e7e8cd7da9c696bf6af626e91a84e03828');
+        //this.buyer_reply_by_order('http://stageapi.theworldmarketplace.com:17700',
+          //  '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
+            //'da73d6d886cb63ae6d9899f331d021e7e8cd7da9c696bf6af626e91a84e03828');
         
         setTimeout(() => {
 
@@ -2170,8 +2180,9 @@ class WalletHome extends React.Component {
             if (!this.isEmpty(t_f.api.urls[e.target.url.value][e.target.offer.value][e.target.order.value])) {
                 let core = t_f.api.urls[e.target.url.value][e.target.offer.value][e.target.order.value];
                 for (const msg in core) {
-                    console.log(msg);
-                    messages.push(<h3>{msg}</h3>);
+                    let tempKey = msg + '--#--' + cryptoRandomString({length: 10});
+                    console.log(msg, tempKey);
+                    messages.push(<h3 key={tempKey}>{msg}</h3>);
                 }
             } else {
                 console.log(`the object is empty no messages found for ${e.target.order.value}`);
@@ -2488,7 +2499,9 @@ class WalletHome extends React.Component {
         }
     })
 
-    buyer_reply_by_order = async(twm_api_url, offer_id, order_id, message) => {
+    buyer_reply_by_order = async(e, twm_api_url = this.state.url, offer_id = this.state.offer, order_id = this.state.order) => {
+        e.preventDefault();
+        let message = e.target.value
         let t_f = this.state.twm_file;
         try {
             if (t_f.api.urls.hasOwnProperty(twm_api_url)) {
@@ -4084,8 +4097,11 @@ class WalletHome extends React.Component {
                                         getOffers={this.buyer_get_offer_ids_by_url}
                                         getOrders={this.buyer_get_order_ids_by_offer_id}
                                         selectedBuyerOffer={this.state.selectedBuyerOffer}
+                                        selectedBuyerOrder={this.state.order}
+                                        selectedBuyerUrl={this.state.url}
                                         getMessages={this.buyer_get_messages_by_order_id}
                                         handleMessages={this.handleBuyerMessages}
+                                        handleChange={this.handleBuyerChange}
                                     />
 
                                     <ReactModal
@@ -4097,7 +4113,7 @@ class WalletHome extends React.Component {
                                         <Row>
                                             <Col sm={10}>
                                                 <h1>
-                                                    Messages
+                                                    Buyer Messages
                                                 </h1>
 
 
@@ -4113,8 +4129,18 @@ class WalletHome extends React.Component {
                                         </Row>
 
                                         <Row className="m-auto">
-                                            <Col sm={12}>
+                                            <Col sm={8}>
                                                 {this.state.buyerMessages}
+                                            </Col>
+
+                                            <Col sm={4}>
+                                                <form onSubmit={this.buyer_reply_by_order}>
+                                                    <textarea name="message"></textarea>
+                                                    
+                                                    <button type="submit">Send</button>
+                                                </form>
+                                                
+                                                
                                             </Col>
                                         </Row>
                                     </ReactModal>

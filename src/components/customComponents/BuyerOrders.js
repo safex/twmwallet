@@ -20,9 +20,12 @@ export default class BuyerOrders extends React.Component {
             offers: props.offers,
             getOrders: props.getOrders,
             selectedBuyerOffer: props.selectedBuyerOffer,
+            selectedBuyerOrder: props.selectedBuyerOrder,
+            selectedBuyerUrl: props.selectedBuyerUrl,
             getMessages: props.getMessages,
             orders: props.orders,
             handleMessages: props.handleMessages,
+            handleChange: props.handleChange,
         };
     }
 
@@ -52,16 +55,18 @@ export default class BuyerOrders extends React.Component {
         
                     <form onSubmit={this.state.getOffers}>
                         <h1>Select URL</h1>
-                        <select name="url">
+                        <select value={this.state.selectedBuyerUrl} name="url" onChange={this.state.handleChange}>
+                            <option>Please Select</option>
                             {this.state.urls}
-                            <option>http://stageapi.theworldmarketplace.com:17700</option>
+                            <option value="http://stageapi.theworldmarketplace.com:17700">http://stageapi.theworldmarketplace.com:17700</option>
                         </select>
                         <button type="submit">Get Offers</button>
                     </form>
 
                     <form onSubmit={this.state.getOrders}>
                         <h1>Select Offer</h1>
-                        <select name="offer">
+                        <select value={this.state.selectedBuyerOffer} name="offer" onChange={this.state.handleChange}>
+                            <option>Please Select</option>
                             {this.state.offers}
                         </select>
                         <input name="url" value="http://stageapi.theworldmarketplace.com:17700"/>
@@ -70,7 +75,8 @@ export default class BuyerOrders extends React.Component {
 
                     <form onSubmit={this.state.getMessages}>
                         <h1>Select Order</h1>
-                        <select name="order">
+                        <select name="order" onChange={this.state.handleChange}>
+                            <option>Please Select</option>
                             {this.state.orders}
                         </select>
                         <input name="url" value="http://stageapi.theworldmarketplace.com:17700"/>
