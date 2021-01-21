@@ -1058,12 +1058,12 @@ class WalletHome extends React.Component {
     //open market view from navigation
     show_market = () => {
         this.fetch_buyers_messages_for_order('39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
-            'da73d6d886cb63ae6d9899f331d021e7e8cd7da9c696bf6af626e91a84e03828',
+            '064c0f8eb9309a7cb66d017c0278cd12ac5453ff3279fa3dde48159d0807e16d',
             'http://stageapi.theworldmarketplace.com:17700');
         this.show_loading();
         this.buyer_reply_by_order('http://stageapi.theworldmarketplace.com:17700',
             '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
-            'da73d6d886cb63ae6d9899f331d021e7e8cd7da9c696bf6af626e91a84e03828');
+            '064c0f8eb9309a7cb66d017c0278cd12ac5453ff3279fa3dde48159d0807e16d');
         
         setTimeout(() => {
 
@@ -1253,7 +1253,7 @@ class WalletHome extends React.Component {
         this.setState({selected_user: {username: username, index: index}});
         this.fetch_messages_seller(username, 'http://stageapi.theworldmarketplace.com:17700');
         this.seller_reply_message(username, '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
-            'da73d6d886cb63ae6d9899f331d021e7e8cd7da9c696bf6af626e91a84e03828',
+            '064c0f8eb9309a7cb66d017c0278cd12ac5453ff3279fa3dde48159d0807e16d',
             'http://stageapi.theworldmarketplace.com:17700', 'this is my message');
         console.log(username);
         console.log(index);
@@ -1837,7 +1837,7 @@ class WalletHome extends React.Component {
 
                                 try {
                                     let parsed = JSON.parse(decomped.toString());
-                                    msg.msg = decomped.toString();
+                                    msg.message = decomped.toString();
                                     console.log(parsed);
                                     if (msg.to === username) {
                                         if (twm_file.accounts[username].urls[twm_api_url].messages.hasOwnProperty(parsed.o)) {
@@ -2398,10 +2398,10 @@ class WalletHome extends React.Component {
                                     console.log(decomped.toString());
                                     try {
                                         let parsed = JSON.parse(decomped.toString());
-                                        msg.msg = decomped.toString();
+                                        msg.message = decomped.toString();
                                         console.log(parsed);
                                         if (msg.to === req_payload.pgp_public_key) {
-                                            console.log(msg.msg);
+                                            console.log(msg.message );
                                             if (t_f.api.urls[twm_api_url][offer_id][order_id].messages.hasOwnProperty(msg.position)) {
                                                 console.log(`duplicate message here for fetch buyer messages`)
                                             } else {
@@ -3294,30 +3294,34 @@ class WalletHome extends React.Component {
                 console.log(msg);
                 console.log(key);
                 try {
-                    let parsed_msg = JSON.parse(msg.msg);
+                    console.log(msg.message);
+                    console.log(msg.message.m);
+                    if (typeof msg.message == 'string') {
+                        msg.message = JSON.parse(msg.message);
+                    }
 
-                    if (parsed_msg.n.length > 0) {
+                    if (msg.message.n.length > 0) {
                         console.log(`nft address supplied!`);
                         return (
                             <div>
                                 <h1>{msg.position}</h1>
-                                <h3>{parsed_msg.n}</h3>
+                                <h3>{msg.message.n}</h3>
                             </div>
                         );
                     }
-                    if (parsed_msg.m.length > 0) {
+                    if (msg.message.m.length > 0) {
                         console.log(`this is a direct message open ended`);
                         return (
                             <div key={key}>
                                 <h1>{msg.position}</h1>
-                                <h3>{parsed_msg.m}</h3>
+                                <h3>{msg.message.m}</h3>
                             </div>
                         );
                     }
-                    if (parsed_msg.so.length > 2) {
+                    if (msg.message.so.length > 2) {
                         console.log(`there is a shipping object supplied!`);
                         try {
-                            let parsed_so = JSON.parse(parsed_msg.so);
+                            let parsed_so = JSON.parse(msg.message.so);
                             console.log(parsed_so);
                             console.log(`parsed the so`);
                             return (
