@@ -9,13 +9,14 @@ import { CgCloseR } from 'react-icons/cg'
 import './ComponentCSS/MerchantAccounts.css'
 import './ComponentCSS/StakingTable.css'
 
+let urls=[];
+
 export default class BuyerOrders extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             urls: props.urls,
             handleOrders: props.handleOrders,
-            getUrls: props.getUrls,
             getOffers: props.getOffers, 
             offers: props.offers,
             getOrders: props.getOrders,
@@ -30,8 +31,21 @@ export default class BuyerOrders extends React.Component {
     }
 
     componentDidMount() {
-        this.state.getUrls()
+
+        urls = this.state.urls.map((url, key) => {
+            return (
+                <option value={url} key={key}>{url}</option>
+            )
+        })
         
+    }
+
+    handleUpdate = (e) => {
+        this.state.handleChange(e)
+
+        let name = e.target.name
+        let value = e.target.value  
+        this.setState({[name]: value})
     }
     
     forceUpdate(){}
@@ -55,10 +69,9 @@ export default class BuyerOrders extends React.Component {
         
                     <form onSubmit={this.state.getOffers}>
                         <h1>Select URL</h1>
-                        <select value={this.state.selectedBuyerUrl} name="url" onChange={this.state.handleChange}>
+                        <select value={this.state.selectedBuyerUrl} name="url" onChange={this.handleUpdate}>
                             <option>Please Select</option>
-                            {this.state.urls}
-                            <option value="http://stageapi.theworldmarketplace.com:17700">http://stageapi.theworldmarketplace.com:17700</option>
+                            {urls}                           
                         </select>
                         <button type="submit">Get Offers</button>
                     </form>

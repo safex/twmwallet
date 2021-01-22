@@ -1067,26 +1067,9 @@ class WalletHome extends React.Component {
 
     //open market view from navigation
     show_market = () => {
-<<<<<<< HEAD
-       // this.fetch_buyers_messages_for_order('39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
-         //   'da73d6d886cb63ae6d9899f331d021e7e8cd7da9c696bf6af626e91a84e03828',
-           // 'http://stageapi.theworldmarketplace.com:17700');
         this.show_loading();
-        //this.buyer_reply_by_order('http://stageapi.theworldmarketplace.com:17700',
-          //  '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
-            //'da73d6d886cb63ae6d9899f331d021e7e8cd7da9c696bf6af626e91a84e03828');
-=======
-        this.fetch_buyers_messages_for_order('39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
-            '064c0f8eb9309a7cb66d017c0278cd12ac5453ff3279fa3dde48159d0807e16d',
-            'http://stageapi.theworldmarketplace.com:17700');
-        this.show_loading();
-        this.buyer_reply_by_order('http://stageapi.theworldmarketplace.com:17700',
-            '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
-            '064c0f8eb9309a7cb66d017c0278cd12ac5453ff3279fa3dde48159d0807e16d');
->>>>>>> f3ca95afe6e093ece16014816624a7c632353ed4
-        
+        this.buyer_get_offer_ids_by_api();
         setTimeout(() => {
-
             this.setState({
                 interface_view: 'market',
                 keyRequest: false
@@ -3311,6 +3294,7 @@ class WalletHome extends React.Component {
 
     render() {
         var message_render;
+        let nObjectLength, mObjectLength, soObjectLength;
         try {
             message_render = this.state.messages_selected.map((msg, key) => {
                 console.log(`messages rendered`);
@@ -3321,9 +3305,12 @@ class WalletHome extends React.Component {
                     console.log(msg.message.m);
                     if (typeof msg.message == 'string') {
                         msg.message = JSON.parse(msg.message);
+                        nObjectLength = Object.keys(msg.message.n).length
+                        mObjectLength = Object.keys(msg.message.m).length
+                        soObjectLength = Object.keys(msg.message.so).length
                     }
 
-                    if (msg.message.n.length > 0) {
+                    if (nObjectLength > 0) {
                         console.log(`nft address supplied!`);
                         return (
                             <div>
@@ -3332,7 +3319,7 @@ class WalletHome extends React.Component {
                             </div>
                         );
                     }
-                    if (msg.message.m.length > 0) {
+                    if (mObjectLength > 0) {
                         console.log(`this is a direct message open ended`);
                         return (
                             <div key={key}>
@@ -3341,7 +3328,7 @@ class WalletHome extends React.Component {
                             </div>
                         );
                     }
-                    if (msg.message.so.length > 2) {
+                    if (soObjectLength > 2) {
                         console.log(`there is a shipping object supplied!`);
                         try {
                             let parsed_so = JSON.parse(msg.message.so);
@@ -4077,7 +4064,7 @@ class WalletHome extends React.Component {
                                         <Col className="d-flex justify-content-center align-self-center" sm={4}>
                                             <button 
                                                 onClick={this.handleBuyerOrders} 
-                                                style={{padding: '3rem', lineHeight: 0, }} 
+                                                style={{padding: '3rem', lineHeight: 0}} 
                                                 className="search-button"
                                             >
                                                 {this.state.showBuyerOrders ? 'Close' : 'My Orders'}
@@ -4100,14 +4087,13 @@ class WalletHome extends React.Component {
                             {this.state.showBuyerOrders ?
                                 <Col className="market-table overflow-y" md={12}>
                                     <BuyerOrders
-                                        urls={buyerUrls}
+                                        urls={this.state.buyer_urls}
                                         offers={offerDropdown}
                                         orders={orderDropdown}
                                         showMessages={this.state.showMessages}
                                         handleShowMessages={this.handleShowMessages}
                                         handleHideMessages={this.handleHideMessages}
                                         handleOrders={this.handleBuyerOrders}
-                                        getUrls={this.buyer_get_offer_ids_by_api}
                                         getOffers={this.buyer_get_offer_ids_by_url}
                                         getOrders={this.buyer_get_order_ids_by_offer_id}
                                         selectedBuyerOffer={this.state.selectedBuyerOffer}
