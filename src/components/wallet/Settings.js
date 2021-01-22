@@ -89,7 +89,7 @@ export default class Settings extends React.Component {
                     <td>{txn.id}</td>
                     <td>{txn.direction}</td>
                     <td>{txn.pending}</td>
-                    <td>{the_type}</td>
+                    <td className="">{the_type}</td>
                     <td>{txn.tokenAmount > 0 ? (`${txn.tokenAmount / 10000000000} SFT`) : (`${txn.amount / 10000000000} SFX`)}</td>
                     <td>{txn.fee / 10000000000}</td>
                     <td>{txn.blockHeight}</td>

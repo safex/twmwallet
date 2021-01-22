@@ -52,6 +52,7 @@
     "bootstrap": "^4.3.1",
     "child_process": "^1.0.2",
     "copy-to-clipboard": "^3.3.1",
+    "crypto-random-string": "^3.3.0",
     "electron-context-menu": "^0.16.0",
     "keccak256": "^1.0.2",
     "mdbreact": "^4.27.0",

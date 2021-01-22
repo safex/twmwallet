@@ -40,7 +40,6 @@ export default class LegacyPassword extends React.Component {
             parsedWallet = JSON.parse(dec);
         }
         catch (e) {
-            alert(`Invalid password or corrupted wallet data`);
             console.log(`Invalid password or corrupted wallet data`);
         }
 
