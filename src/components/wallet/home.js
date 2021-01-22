@@ -3343,18 +3343,19 @@ class WalletHome extends React.Component {
                                     <div key={key}>
 
                                         <Row style={{justifyContent: 'space-around'}}>
-                                            <h1 style={{border: '2px solid #13D3FD', borderRadius: '10', padding: '.5rem'}}>
+                                            <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
                                                 {msg.position}
                                             </h1>
-                                            <h2>First Name: {parsed_so.fn}</h2>
-                                            <h2>Last Name: {parsed_so.ln}</h2>
-                                            <h2>Street Address: {parsed_so.a1}</h2>
-                                            <h2>City: {parsed_so.city}</h2>
-                                            <h2>State: {parsed_so.s}</h2>
-                                            <h2>Area Code: {parsed_so.z}</h2>
-                                            <h2>Country: {parsed_so.c}</h2>
-                                            <h2>Email: {parsed_so.ea}</h2>
-                                            <h2>Phone: {parsed_so.ph}</h2>
+                                            <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> <i>/</i></h2>
+                                            <h2><i>/ <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> <i>/</i></h2>
+                                            <h2><i>/ <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/> <i>/</i></h2>
+                                            <h2><i>/ <u>City:</u></i> <b></b>{parsed_so.city}<b/> <i>/</i></h2>
+                                            <h2><i>/ <u>State:</u></i> <b></b>{parsed_so.s}<b/> <i>/</i></h2>
+                                            <h2><i>/ <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/> <i>/</i></h2>
+                                            <h2><i>/ <u>Country:</u></i> <b></b>{parsed_so.c}<b/> <i>//</i></h2>
+                                            <br/><br/>
+                                            <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
+                                            <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
                                         </Row>
 
 
