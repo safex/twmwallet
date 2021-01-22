@@ -3302,24 +3302,20 @@ class WalletHome extends React.Component {
                 console.log(key);
                 try {
                     console.log(msg.message);
-                    console.log(msg.message.m);
                     if (typeof msg.message == 'string') {
                         msg.message = JSON.parse(msg.message);
-                        nObjectLength = Object.keys(msg.message.n).length
-                        mObjectLength = Object.keys(msg.message.m).length
-                        soObjectLength = Object.keys(msg.message.so).length
+                        
                     }
 
-                    if (nObjectLength > 0) {
+                    if (msg.message.n.length > 0) {
                         console.log(`nft address supplied!`);
                         return (
-                            <div>
+                            <div key={key}>
                                 <h1>{msg.position}</h1>
                                 <h3>{msg.message.n}</h3>
                             </div>
                         );
-                    }
-                    if (mObjectLength > 0) {
+                    } else if (msg.message.m.length > 0) {
                         console.log(`this is a direct message open ended`);
                         return (
                             <div key={key}>
@@ -3327,37 +3323,47 @@ class WalletHome extends React.Component {
                                 <h3>{msg.message.m}</h3>
                             </div>
                         );
-                    }
-                    if (soObjectLength > 2) {
-                        console.log(`there is a shipping object supplied!`);
-                        try {
-                            let parsed_so = JSON.parse(msg.message.so);
+                    } else if (msg.message.hasOwnProperty('so')) {
+                        console.log(msg.message.so);
+                        console.log(`found shipping object`);
+                        let parsed_so;
+                        if (typeof msg.message.so == 'string') {
+                            console.log(`so is a string`);
+
+                            parsed_so = JSON.parse(msg.message.so);
                             console.log(parsed_so);
-                            console.log(`parsed the so`);
-                            return (
-                                <div key={key}>
+                        } else {
+                            parsed_so = msg.message.so;
+                        }
+                        if (parsed_so.fn.length > 2) {
+                            console.log(`there is a shipping object supplied!`);
+                            try {
+                                console.log(`parsed the so`);
+                                return (
+                                    <div key={key}>
 
-                                    <Row style={{justifyContent: 'space-around'}}>
-                                       <h1 style={{border: '2px solid #13D3FD', borderRadius: '10', padding: '.5rem'}}>
-                                           {msg.position}
-                                        </h1>
-                                       <h2>First Name: {parsed_so.fn}</h2>
-                                       <h2>Last Name: {parsed_so.ln}</h2>
-                                       <h2>Street Address: {parsed_so.a1}</h2>
-                                       <h2>City: {parsed_so.city}</h2>
-                                       <h2>State: {parsed_so.s}</h2>
-                                       <h2>Area Code: {parsed_so.z}</h2>
-                                       <h2>Country: {parsed_so.c}</h2>
-                                       <h2>Email: {parsed_so.ea}</h2>
-                                       <h2>Phone: {parsed_so.ph}</h2>
-                                    </Row>
+                                        <Row style={{justifyContent: 'space-around'}}>
+                                            <h1 style={{border: '2px solid #13D3FD', borderRadius: '10', padding: '.5rem'}}>
+                                                {msg.position}
+                                            </h1>
+                                            <h2>First Name: {parsed_so.fn}</h2>
+                                            <h2>Last Name: {parsed_so.ln}</h2>
+                                            <h2>Street Address: {parsed_so.a1}</h2>
+                                            <h2>City: {parsed_so.city}</h2>
+                                            <h2>State: {parsed_so.s}</h2>
+                                            <h2>Area Code: {parsed_so.z}</h2>
+                                            <h2>Country: {parsed_so.c}</h2>
+                                            <h2>Email: {parsed_so.ea}</h2>
+                                            <h2>Phone: {parsed_so.ph}</h2>
+                                        </Row>
 
 
-                                </div>
-                            );
-                        } catch(err) {
-                            console.error(err);
-                            console.error(`error at parsing the shipping object`);
+                                    </div>
+                                );
+                            } catch(err) {
+                                console.error(err);
+                                console.error(`error at parsing the shipping object`);
+                            }
                         }
                     }
                     return (
