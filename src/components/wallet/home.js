@@ -3295,7 +3295,6 @@ class WalletHome extends React.Component {
                 console.log(key);
                 try {
                     console.log(msg.message);
-                    console.log(msg.message.m);
                     if (typeof msg.message == 'string') {
                         msg.message = JSON.parse(msg.message);
                     }
@@ -3303,7 +3302,7 @@ class WalletHome extends React.Component {
                     if (msg.message.n.length > 0) {
                         console.log(`nft address supplied!`);
                         return (
-                            <div>
+                            <div key={key}>
                                 <h1>{msg.position}</h1>
                                 <h3>{msg.message.n}</h3>
                             </div>
