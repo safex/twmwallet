@@ -153,7 +153,8 @@ class WalletHome extends React.Component {
             tableOfTables: {},
             loadingOffers: false,
             showBuyerMessages: false,
-            url: ''
+            url: '',
+            buyer_urls: [],
         };
     }
 
@@ -1700,7 +1701,7 @@ class WalletHome extends React.Component {
 
     get_seller_order_ids_by_offer = async (offer_id, username, twm_api_url) => {
         try {
-
+            this.setState({selectedMerchantOffer: offer_id})
             let twm_file = this.state.twm_file;
             let more_core = twm_file.accounts[username].urls[twm_api_url].messages;
             console.log(`accessing messages`);
@@ -1752,6 +1753,7 @@ class WalletHome extends React.Component {
     };
 
     get_messages_by_order_id_of_seller = async (offer_id, username, twm_api_url, order_id) => {
+        this.setState({selectedMerchantOrder: order_id})
         try {
             let twm_file = this.state.twm_file;
             let more_core = twm_file.accounts[username].urls[twm_api_url].messages[offer_id].orders;
@@ -2124,7 +2126,7 @@ class WalletHome extends React.Component {
                 this.setState({buyer_offer_ids: offer_ids});
                 offerDropdown = offer_ids.map((offer, key) => {
                     return (
-                        <option key={key}>{offer}</option>
+                        <option value={offer} key={key}>{offer}</option>
                     )
                 })
 
@@ -2261,7 +2263,13 @@ class WalletHome extends React.Component {
         }
     };
 
-    seller_reply_message = async (seller_name, offer_id, order_id, twm_api_url, message) => {
+    seller_reply_message = async (e, seller_name, offer_id, order_id, twm_api_url) => {
+        e.preventDefault();
+        console.log(seller_name)
+        console.log(offer_id)
+        console.log(order_id)
+        console.log(twm_api_url)
+        console.log(e.target.merchantMessageBox.value)
         try {
             //let's get the order we want to reply to
             let twm_file = this.state.twm_file;
@@ -2287,7 +2295,7 @@ class WalletHome extends React.Component {
                             let pre_sign_message_obj = {};
                             pre_sign_message_obj.s = ''; //subject
                             pre_sign_message_obj.o = offer_id; //offer_id
-                            pre_sign_message_obj.m = message; //open_message contents
+                            pre_sign_message_obj.m = e.target.merchantMessageBox.value; //open_message contents
                             pre_sign_message_obj.n = ''; //nft address
                             pre_sign_message_obj.so = ''; //shipping object
 
@@ -2568,7 +2576,7 @@ class WalletHome extends React.Component {
 
     buyer_reply_by_order = async(e, twm_api_url = this.state.url, offer_id = this.state.offer, order_id = this.state.order) => {
         e.preventDefault();
-        let message = e.target.message.value
+        let messageToSend = e.target.messageBox.value
         let t_f = this.state.twm_file;
         try {
             if (t_f.api.urls.hasOwnProperty(twm_api_url)) {
@@ -2593,7 +2601,7 @@ class WalletHome extends React.Component {
                             let pre_sign_message_obj = {};
                             pre_sign_message_obj.s = ''; //subject
                             pre_sign_message_obj.o = offer_id; //offer_id
-                            pre_sign_message_obj.m = message; //open_message contents
+                            pre_sign_message_obj.m = messageToSend; //open_message contents
                             pre_sign_message_obj.n = ''; //nft address
                             pre_sign_message_obj.so = ''; //shipping object
 
@@ -3384,18 +3392,18 @@ class WalletHome extends React.Component {
                     if (msg.message.n.length > 0) {
                         console.log(`nft address supplied!`);
                         return (
-                            <div key={key}>
+                            <Row key={key}>
                                 <h1>{msg.position}</h1>
-                                <h3>{msg.message.n}</h3>
-                            </div>
+                                <h3 className="mx-auto">{msg.message.n}</h3>
+                            </Row>
                         );
                     } else if (msg.message.m.length > 0) {
                         console.log(`this is a direct message open ended`);
                         return (
-                            <div key={key}>
+                            <Row key={key}>
                                 <h1>{msg.position}</h1>
-                                <h3>{msg.message.m}</h3>
-                            </div>
+                                <h3 className="mx-auto">{msg.message.m}</h3>
+                            </Row>
                         );
                     } else if (msg.message.hasOwnProperty('so')) {
                         console.log(msg.message.so);
@@ -4004,8 +4012,22 @@ class WalletHome extends React.Component {
                                         <br/><br/>
                                         Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
                                         <br/><br/>
+                                        Buyer: {this.state.sele} SFX
+                                        <br/><br/>
+                                        Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
+                                        <br/><br/>
                                         Thank You For Shopping With Safex!
                                     </h1>
+                                        
+                                    {/*<p>
+                                    Public Key: {this.state.show_purchase_confirm_modal ? 
+                                        this.state.twm_file.api.urls[this.state.api_url][this.state.show_purchase_offer.offer_id][this.state.purchase_txn_id].pgp_keys.public_key
+                                    :
+                                        ''
+                                    }
+                                </p>*/}
+                                        
+                                    
                                 </div>                 
                             </ReactModal>
 
@@ -4216,9 +4238,9 @@ class WalletHome extends React.Component {
 
                                             <Col sm={4}>
                                                 <form onSubmit={this.buyer_reply_by_order}>
-                                                    <textarea name="message"></textarea>
+                                                    <textarea name="messageBox"></textarea>
                                                     
-                                                    <button type="submit">Send</button>
+                                                    <button className="my-3" type="submit">Send</button>
                                                 </form>
                                                 
                                                 
@@ -4863,7 +4885,7 @@ class WalletHome extends React.Component {
                                             <Row>
                                                 <Col sm={10}>
                                                     <h1>
-                                                        Messages
+                                                        Merchant Messages
                                                     </h1>
 
 
@@ -4879,8 +4901,25 @@ class WalletHome extends React.Component {
                                             </Row>
 
                                             <Row className="m-auto" style={{wordBreak: 'break-all', maxHeight: 500, overflowY: 'auto'}}>
-                                                <Col sm={12}>
+                                                <Col sm={8}>
                                                     {message_render}
+                                                </Col>
+
+
+                                                <Col sm={4}>
+                                                    <form onSubmit={(e) => this.seller_reply_message(
+                                                                            e, 
+                                                                            this.state.selected_user.username, 
+                                                                            this.state.selectedMerchantOffer, 
+                                                                            this.state.selectedMerchantOrder,
+                                                                            'http://stageapi.theworldmarketplace.com:17700',
+                                                                        )
+                                                                    }
+                                                    >
+                                                        <textarea name="merchantMessageBox"></textarea>
+                                                        
+                                                        <button className="my-3" type="submit">Send</button>
+                                                    </form>
                                                 </Col>
                                             </Row>
                                         </ReactModal>
