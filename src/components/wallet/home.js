@@ -2494,7 +2494,7 @@ class WalletHome extends React.Component {
 
     buyer_reply_by_order = async(e, twm_api_url = this.state.url, offer_id = this.state.offer, order_id = this.state.order) => {
         e.preventDefault();
-        let message = e.target.value
+        let messageToSend = e.target.messageBox.value
         let t_f = this.state.twm_file;
         try {
             if (t_f.api.urls.hasOwnProperty(twm_api_url)) {
@@ -2519,7 +2519,7 @@ class WalletHome extends React.Component {
                             let pre_sign_message_obj = {};
                             pre_sign_message_obj.s = ''; //subject
                             pre_sign_message_obj.o = offer_id; //offer_id
-                            pre_sign_message_obj.m = message; //open_message contents
+                            pre_sign_message_obj.m = messageToSend; //open_message contents
                             pre_sign_message_obj.n = ''; //nft address
                             pre_sign_message_obj.so = ''; //shipping object
 
@@ -3930,8 +3930,22 @@ class WalletHome extends React.Component {
                                         <br/><br/>
                                         Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
                                         <br/><br/>
+                                        Buyer: {this.state.sele} SFX
+                                        <br/><br/>
+                                        Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
+                                        <br/><br/>
                                         Thank You For Shopping With Safex!
                                     </h1>
+                                        
+                                    {/*<p>
+                                    Public Key: {this.state.show_purchase_confirm_modal ? 
+                                        this.state.twm_file.api.urls[this.state.api_url][this.state.show_purchase_offer.offer_id][this.state.purchase_txn_id].pgp_keys.public_key
+                                    :
+                                        ''
+                                    }
+                                </p>*/}
+                                        
+                                    
                                 </div>                 
                             </ReactModal>
 
@@ -4142,7 +4156,7 @@ class WalletHome extends React.Component {
 
                                             <Col sm={4}>
                                                 <form onSubmit={this.buyer_reply_by_order}>
-                                                    <textarea name="message"></textarea>
+                                                    <textarea name="messageBox"></textarea>
                                                     
                                                     <button type="submit">Send</button>
                                                 </form>
