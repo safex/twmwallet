@@ -2114,6 +2114,7 @@ class WalletHome extends React.Component {
         try {
             let offer_ids = [];
             let t_f = this.state.twm_file;
+            console.log(t_f.api.urls[e.target.url.value]);
             if (!this.isEmpty(t_f.api.urls[e.target.url.value])) {
                 console.log(`we have offer_ids at this url for the buyer`);
                 for (const offer in t_f.api.urls[e.target.url.value]) {
@@ -2121,6 +2122,13 @@ class WalletHome extends React.Component {
                     offer_ids.push(offer);
                 }
                 this.setState({buyer_offer_ids: offer_ids});
+                offerDropdown = offer_ids.map((offer, key) => {
+                    return (
+                        <option key={key}>{offer}</option>
+                    )
+                })
+
+                console.log(offerDropdown)
             } else {
                 console.log(`there are no urls to parse from`);
             }
@@ -2128,13 +2136,7 @@ class WalletHome extends React.Component {
             console.error(err);
             console.error(`error at the checking of the urls of the buyer_get_offer_ids_by_api`)
         }
-            offerDropdown = this.state.buyer_offer_ids.map((offer, key) => {
-                return (
-                    <option key={key}>{offer}</option>
-                )
-        })
 
-        console.log(offerDropdown)
     };
 
     buyer_get_order_ids_by_offer_id = async(e) => {
@@ -2150,6 +2152,11 @@ class WalletHome extends React.Component {
                     order_ids.push(order);
                 }
                 this.setState({buyerOrders: order_ids})
+                orderDropdown = order_ids.map((order, key) => {
+                    return (
+                        <option key={key}>{order}</option>
+                    )
+                })
             } else {
                 console.log(`offer id is not found in the api urls ${e.target.url.value} object`);
             }
@@ -2158,11 +2165,7 @@ class WalletHome extends React.Component {
             console.error(`error at the buyer_get_order_ids_by_offer_id`);
         }
 
-        orderDropdown = this.state.buyerOrders.map((order, key) => {
-            return (
-                <option key={key}>{order}</option>
-            )
-        })
+
     };
 
     buyer_get_messages_by_order_id = async(e) => {
@@ -2172,10 +2175,81 @@ class WalletHome extends React.Component {
             let t_f = this.state.twm_file;
             if (!this.isEmpty(t_f.api.urls[e.target.url.value][e.target.offer.value][e.target.order.value])) {
                 let core = t_f.api.urls[e.target.url.value][e.target.offer.value][e.target.order.value];
-                for (const msg in core) {
-                    let tempKey = msg + '--#--' + cryptoRandomString({length: 10});
-                    console.log(msg, tempKey);
-                    messages.push(<h3 key={tempKey}>{msg}</h3>);
+                for (const msg in core.messages) {
+                    //let tempKey = msg + '--#--' + key;
+                    //console.log(t_f.api.urls[e.target.url.value][e.target.offer.value][e.target.order.value].messages[msg]);
+
+                    try {
+                        let t_msg = core.messages[msg];
+                        if (typeof t_msg.message == 'string') {
+                            t_msg.message = JSON.parse(t_msg.message);
+                        }
+
+                        if (t_msg.message.n.length > 0) {
+                            console.log(`nft address supplied!`);
+                            messages.push (
+                                <div key={msg}>
+                                    <h1>{t_msg.position}</h1>
+                                    <h3>{t_msg.message.n}</h3>
+                                </div>
+                            );
+                        } else if (t_msg.message.m.length > 0) {
+                            console.log(`this is a direct message open ended`);
+                            messages.push (
+                                <div key={msg}>
+                                    <h1>{t_msg.position}</h1>
+                                    <h3>{t_msg.message.m}</h3>
+                                </div>
+                            );
+                        } else if (t_msg.message.hasOwnProperty('so')) {
+                            console.log(t_msg.message.so);
+                            console.log(`found shipping object`);
+                            let parsed_so;
+                            if (typeof t_msg.message.so == 'string') {
+                                console.log(`so is a string`);
+
+                                parsed_so = JSON.parse(t_msg.message.so);
+                                console.log(parsed_so);
+                            } else {
+                                parsed_so = t_msg.message.so;
+                            }
+                            if (parsed_so.fn.length > 2) {
+                                console.log(`there is a shipping object supplied!`);
+                                try {
+                                    console.log(`parsed the so`);
+                                    messages.push (
+                                        <div key={msg}>
+
+                                            <Row style={{justifyContent: 'space-around'}}>
+                                                <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
+                                                    {t_msg.position}
+                                                </h1>
+                                                <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> <i>/</i></h2>
+                                                <h2><i>/ <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> <i>/</i></h2>
+                                                <h2><i>/ <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/> <i>/</i></h2>
+                                                <h2><i>/ <u>City:</u></i> <b></b>{parsed_so.city}<b/> <i>/</i></h2>
+                                                <h2><i>/ <u>State:</u></i> <b></b>{parsed_so.s}<b/> <i>/</i></h2>
+                                                <h2><i>/ <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/> <i>/</i></h2>
+                                                <h2><i>/ <u>Country:</u></i> <b></b>{parsed_so.c}<b/> <i>//</i></h2>
+                                                <br/><br/>
+                                                <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
+                                                <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
+                                            </Row>
+
+
+                                        </div>
+                                    );
+                                } catch(err) {
+                                    console.error(err);
+                                    console.error(`error at parsing the shipping object`);
+                                }
+                            }
+                        }
+
+                    //messages.push(<h3 key={msg}>{core.messages[msg]}</h3>);
+                } catch(err) {
+                        console.error(err);
+                    }
                 }
             } else {
                 console.log(`the object is empty no messages found for ${e.target.order.value}`);
