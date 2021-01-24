@@ -1256,6 +1256,9 @@ class WalletHome extends React.Component {
     load_offers = (username, index) => {
         this.setState({selected_user: {username: username, index: index}});
         this.fetch_messages_seller(username, 'http://stageapi.theworldmarketplace.com:17700');
+        this.seller_reply_message(username, '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
+            '064c0f8eb9309a7cb66d017c0278cd12ac5453ff3279fa3dde48159d0807e16d',
+            'http://stageapi.theworldmarketplace.com:17700', 'this is my message');
         console.log(username);
         console.log(index);
     };
@@ -1750,8 +1753,8 @@ class WalletHome extends React.Component {
     };
 
     get_messages_by_order_id_of_seller = async (offer_id, username, twm_api_url, order_id) => {
+        this.setState({selectedMerchantOrder: order_id})
         try {
-            this.setState({selectedMerchantOrder: order_id})
             let twm_file = this.state.twm_file;
             let more_core = twm_file.accounts[username].urls[twm_api_url].messages[offer_id].orders;
             console.log(more_core);
@@ -2260,35 +2263,39 @@ class WalletHome extends React.Component {
         }
     };
 
-    seller_reply_message = async (e, twm_api_url = 'http://stageapi.theworldmarketplace.com:17700') => {
+    seller_reply_message = async (e, seller_name, offer_id, order_id, twm_api_url) => {
         e.preventDefault();
+        console.log(seller_name)
+        console.log(offer_id)
+        console.log(order_id)
+        console.log(twm_api_url)
+        console.log(e.target.merchantMessageBox.value)
         try {
-            let sellerMessageToSend= e.target.merchantMessageBox.value
             //let's get the order we want to reply to
             let twm_file = this.state.twm_file;
-            if (twm_file.accounts.hasOwnProperty(this.state.selected_user.username)) {
-                if (twm_file.accounts[this.state.selected_user.username].urls.hasOwnProperty(twm_api_url)) {
-                    if (twm_file.accounts[this.state.selected_user.username].urls[twm_api_url].messages.hasOwnProperty(this.state.selectedMerchantOffer)) {
-                        if (twm_file.accounts[this.state.selected_user.username].urls[twm_api_url].messages[this.state.selectedMerchantOffer].orders.hasOwnProperty(this.state.selectedMerchantOrder)) {
+            if (twm_file.accounts.hasOwnProperty(seller_name)) {
+                if (twm_file.accounts[seller_name].urls.hasOwnProperty(twm_api_url)) {
+                    if (twm_file.accounts[seller_name].urls[twm_api_url].messages.hasOwnProperty(offer_id)) {
+                        if (twm_file.accounts[seller_name].urls[twm_api_url].messages[offer_id].orders.hasOwnProperty(order_id)) {
 
                             const crypto = window.require('crypto');
-                            let the_order = twm_file.accounts[this.state.selected_user.username].urls[twm_api_url].messages[this.state.selectedMerchantOffer].orders[this.state.selectedMerchantOrder];
+                            let the_order = twm_file.accounts[seller_name].urls[twm_api_url].messages[offer_id].orders[order_id];
                             console.log(`hey, you're gonna be able to reply :)`);
 
-                            let seller_pub = twm_file.accounts[this.state.selected_user.username].urls[twm_api_url].pgp_key.pub_key;
-                            let seller_pri = twm_file.accounts[this.state.selected_user.username].urls[twm_api_url].pgp_key.sec_key;
+                            let seller_pub = twm_file.accounts[seller_name].urls[twm_api_url].pgp_key.pub_key;
+                            let seller_pri = twm_file.accounts[seller_name].urls[twm_api_url].pgp_key.sec_key;
 
                             let message_header_obj = {};
                             message_header_obj.sender_pgp_pub_key = seller_pub;
                             message_header_obj.to = the_order.purchase_info.buyers_pgp;
-                            message_header_obj.from = this.state.selected_user.username;
-                            message_header_obj.order_id = this.state.selectedMerchantOrder;
+                            message_header_obj.from = seller_name;
+                            message_header_obj.order_id = order_id;
                             message_header_obj.bc_height = this.state.blockchain_height;
 
                             let pre_sign_message_obj = {};
                             pre_sign_message_obj.s = ''; //subject
-                            pre_sign_message_obj.o = this.state.selectedMerchantOffer; //offer_id
-                            pre_sign_message_obj.m = sellerMessageToSend; //open_message contents
+                            pre_sign_message_obj.o = offer_id; //offer_id
+                            pre_sign_message_obj.m = e.target.merchantMessageBox.value; //open_message contents
                             pre_sign_message_obj.n = ''; //nft address
                             pre_sign_message_obj.so = ''; //shipping object
 
@@ -2380,16 +2387,16 @@ class WalletHome extends React.Component {
                                 alert(`Error at saving to the twm file during account creation initialization stage`);
                             }
                         } else {
-                            console.log(`this ${this.state.selectedMerchantOrder} is not present in the twmfile`);
-                            alert(`unable to send message ${this.state.selectedMerchantOrder} is not present`);
+                            console.log(`this ${order_id} is not present in the twmfile`);
+                            alert(`unable to send message ${order_id} is not present`);
                         }
                     } else {
-                        console.log(`user does not have the ${this.state.selectedMerchantOffer} in the file`);
-                        alert(`unable to send message since ${this.state.selectedMerchantOffer} is not present`);
+                        console.log(`user does not have the ${offer_id} in the file`);
+                        alert(`unable to send message since ${offer_id} is not present`);
                     }
                 } else {
                     console.log(`user has does not have content from ${twm_api_url}`);
-                    alert(`this ${this.state.selected_user.username} does not have content from ${twm_api_url}`);
+                    alert(`this ${seller_name} does not have content from ${twm_api_url}`);
                 }
             } else {
                 console.log(`user is not present in the twm file`);
@@ -4900,7 +4907,15 @@ class WalletHome extends React.Component {
 
 
                                                 <Col sm={4}>
-                                                    <form onSubmit={this.seller_reply_message}>
+                                                    <form onSubmit={(e) => this.seller_reply_message(
+                                                                            e, 
+                                                                            this.state.selected_user.username, 
+                                                                            this.state.selectedMerchantOffer, 
+                                                                            this.state.selectedMerchantOrder,
+                                                                            'http://stageapi.theworldmarketplace.com:17700',
+                                                                        )
+                                                                    }
+                                                    >
                                                         <textarea name="merchantMessageBox"></textarea>
                                                         
                                                         <button className="my-3" type="submit">Send</button>
