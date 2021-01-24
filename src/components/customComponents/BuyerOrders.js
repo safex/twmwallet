@@ -46,10 +46,9 @@ export default class BuyerOrders extends React.Component {
         let name = e.target.name
         let value = e.target.value  
         this.setState({[name]: value})
+
     }
-    
-    forceUpdate(){}
-    
+
     render() {
 
         return (
@@ -70,8 +69,9 @@ export default class BuyerOrders extends React.Component {
                     <form onSubmit={this.state.getOffers}>
                         <h1>Select URL</h1>
                           
-                        <select value={this.state.selectedBuyerUrl} name="url" onChange={this.handleUpdate}>
+                        <select value={this.state.url} name="url" onChange={this.state.handleChange}>
                             <option>Please Select</option>
+                            <option value={'http://stageapi.theworldmarketplace.com:17700'}>http://stageapi.theworldmarketplace.com:17700</option>
                             {urls}                           
                         </select>
                         <button type="submit">Get Offers</button>
@@ -79,7 +79,7 @@ export default class BuyerOrders extends React.Component {
 
                     <form onSubmit={this.state.getOrders}>
                         <h1>Select Offer</h1>
-                        <select value={this.state.selectedBuyerOffer} name="offer" onChange={this.state.handleChange}>
+                        <select value={this.state.offer} name="offer" onChange={this.state.handleChange}>
                             <option>Please Select</option>
                             {this.state.offers}
                         </select>
@@ -89,7 +89,7 @@ export default class BuyerOrders extends React.Component {
 
                     <form onSubmit={this.state.getMessages}>
                         <h1>Select Order</h1>
-                        <select name="order" onChange={this.state.handleChange}>
+                        <select value={this.state.order} name="order" onChange={this.state.handleChange}>
                             <option>Please Select</option>
                             {this.state.orders}
                         </select>
