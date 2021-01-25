@@ -551,7 +551,7 @@ class WalletHome extends React.Component {
                 } else {
                     let removed = wallet.removeSafexAccount(e.target.username.value);
                     console.log(`account ${e.target.username.value} removed and not made`);
-                    alert(`Not enough tokens for making an account`);
+                    alert(`The account creation failed, ${e.target.username.value} was not created`);
                 }
 
             } catch (err) {
