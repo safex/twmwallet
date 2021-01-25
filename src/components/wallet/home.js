@@ -1858,9 +1858,7 @@ class WalletHome extends React.Component {
                                                 }
                                             } else {
                                                 //if this is a new order id for the offer
-                                                if (twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.hasOwnProperty(msg.position)) {
-                                                    console.log(`seems we have a duplicated message`);
-                                                } else {
+
 
                                                     let pinfo_obj = {};
                                                     pinfo_obj.buyers_pgp = msg.sender_pgp_pub_key;
@@ -1929,7 +1927,7 @@ class WalletHome extends React.Component {
                                                     } catch(err) {
                                                         console.error(err);
                                                         console.error(`error fetching the transaction`);
-                                                    }                                                }
+                                                    }
                                             }
                                         } else {
                                             //in case this offer hasn't been seen before
