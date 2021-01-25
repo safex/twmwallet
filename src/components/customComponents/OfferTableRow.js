@@ -63,7 +63,7 @@ export default class OfferTableRow extends React.Component {
                         } 
                         className="edit-button"
                     >
-                        Load Orders
+                        Load
                     </button>
 
                     <button 

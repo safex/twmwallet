@@ -18,6 +18,9 @@ export default class MyOrders extends React.Component {
         };
     }
 
+    componentDidMount() {
+        console.log(this.state.rows)
+    }
 
     render() {
 
@@ -47,7 +50,14 @@ export default class MyOrders extends React.Component {
                         <p style={{width: '12rem'}}>Actions</p>
                     </Row>
 
-                    {this.state.rows}
+                    {typeof this.state.rows === 'undefined' ?
+                        <h3 className="my-5">
+                            Please return to the previous screen and 
+                            click the load button to see your orders
+                        </h3>
+                    :
+                        this.state.rows
+                    }
 
                 </Col>
             </div>

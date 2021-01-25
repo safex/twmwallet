@@ -1256,9 +1256,7 @@ class WalletHome extends React.Component {
     load_offers = (username, index) => {
         this.setState({selected_user: {username: username, index: index}});
         this.fetch_messages_seller(username, 'http://stageapi.theworldmarketplace.com:17700');
-        this.seller_reply_message(username, '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
-            '064c0f8eb9309a7cb66d017c0278cd12ac5453ff3279fa3dde48159d0807e16d',
-            'http://stageapi.theworldmarketplace.com:17700', 'this is my message');
+        
         console.log(username);
         console.log(index);
     };
@@ -1741,6 +1739,7 @@ class WalletHome extends React.Component {
 
             } else {
                 console.log(`${offer_id} not found in file`);
+                alert(`There are no orders found for ${offer_id}`)
             }
             this.setState({tableOfTables: {...this.state.tableOfTables, [offer_id]: tableOfOrders}})
                 console.log(this.state.tableOfTables)
@@ -1776,7 +1775,7 @@ class WalletHome extends React.Component {
         }
     };
 
-    fetch_messages_seller = async (username, twm_api_url = 'http://127.0.0.1:17700') => {
+    fetch_messages_seller = async (username, twm_api_url) => {
         try {
             console.log(this.state.twm_file);
             if (this.state.twm_file.accounts.hasOwnProperty(username)) {
@@ -2190,18 +2189,18 @@ class WalletHome extends React.Component {
                         if (t_msg.message.n.length > 0) {
                             console.log(`nft address supplied!`);
                             messages.push (
-                                <div key={msg}>
+                                <Row style={{justifyContent: 'space-around'}} key={msg}>
                                     <h1>{t_msg.position}</h1>
                                     <h3>{t_msg.message.n}</h3>
-                                </div>
+                                </Row>
                             );
                         } else if (t_msg.message.m.length > 0) {
                             console.log(`this is a direct message open ended`);
                             messages.push (
-                                <div key={msg}>
+                                <Row style={{justifyContent: 'space-around'}} key={msg}>
                                     <h1>{t_msg.position}</h1>
                                     <h3>{t_msg.message.m}</h3>
-                                </div>
+                                </Row>
                             );
                         } else if (t_msg.message.hasOwnProperty('so')) {
                             console.log(t_msg.message.so);
@@ -2226,16 +2225,20 @@ class WalletHome extends React.Component {
                                                 <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
                                                     {t_msg.position}
                                                 </h1>
-                                                <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> <i>/</i></h2>
-                                                <h2><i>/ <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> <i>/</i></h2>
-                                                <h2><i>/ <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/> <i>/</i></h2>
-                                                <h2><i>/ <u>City:</u></i> <b></b>{parsed_so.city}<b/> <i>/</i></h2>
-                                                <h2><i>/ <u>State:</u></i> <b></b>{parsed_so.s}<b/> <i>/</i></h2>
-                                                <h2><i>/ <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/> <i>/</i></h2>
-                                                <h2><i>/ <u>Country:</u></i> <b></b>{parsed_so.c}<b/> <i>//</i></h2>
-                                                <br/><br/>
-                                                <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
-                                                <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
+                                                <Col>
+                                                    <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> </h2>
+                                                    <h2><i> <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> </h2>
+                                                    <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
+                                                    <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
+                                                </Col>
+
+                                                <Col>
+                                                    <h2><i> <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/> </h2>
+                                                    <h2><i> <u>City:</u></i> <b></b>{parsed_so.city}<b/> </h2>
+                                                    <h2><i> <u>State:</u></i> <b></b>{parsed_so.s}<b/> </h2>
+                                                    <h2><i> <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/> </h2>
+                                                    <h2><i> <u>Country:</u></i> <b></b>{parsed_so.c}<b/> </h2>
+                                                </Col>
                                             </Row>
 
 
@@ -2281,6 +2284,8 @@ class WalletHome extends React.Component {
                             const crypto = window.require('crypto');
                             let the_order = twm_file.accounts[seller_name].urls[twm_api_url].messages[offer_id].orders[order_id];
                             console.log(`hey, you're gonna be able to reply :)`);
+
+                            console.log(the_order)
 
                             let seller_pub = twm_file.accounts[seller_name].urls[twm_api_url].pgp_key.pub_key;
                             let seller_pri = twm_file.accounts[seller_name].urls[twm_api_url].pgp_key.sec_key;
@@ -2421,7 +2426,7 @@ class WalletHome extends React.Component {
         return hexStr.toUpperCase();
     };
 
-    fetch_buyers_messages_for_order = async (offer_id, order_id, twm_api_url = 'http://127.0.0.1:17700') => {
+    fetch_buyers_messages_for_order = async (offer_id, order_id, twm_api_url) => {
         let t_f = this.state.twm_file;
         if (t_f.api.urls.hasOwnProperty(twm_api_url)) {
             if (t_f.api.urls[twm_api_url].hasOwnProperty(offer_id)) {
@@ -2534,7 +2539,7 @@ class WalletHome extends React.Component {
                                 alert(`Error at saving to the twm file during account creation verification stage`);
                             }
                             console.log(twm_save);
-
+                            
                         } catch (err) {
                             this.setState({showLoader: false});
                             console.error(err);
@@ -2587,6 +2592,8 @@ class WalletHome extends React.Component {
                             let seller_pubkey = await get_seller_pubkey(the_order.messages[1].to, twm_api_url);
                             const crypto = window.require('crypto');
                             console.log(`hey buyer, you're gonna be able to reply :)`);
+
+                            
 
                             let buyer_pub = the_order.pgp_keys.public_key;
                             let buyer_pri = the_order.pgp_keys.private_key;
@@ -3671,10 +3678,12 @@ class WalletHome extends React.Component {
                                             <p data-tip data-for={`offerID${key}`}>
                                                 {this.to_ellipsis(listing.offer_id, 5, 5)}
 
-                                                <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
-                                                    <span>{listing.offer_id}</span>
-                                                </ReactTooltip>
+                                               
                                             </p>
+
+                                            <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
+                                                <span>{listing.offer_id}</span>
+                                            </ReactTooltip>
 
                                             <p style={{width: '24rem'}}>
 
@@ -4219,6 +4228,16 @@ class WalletHome extends React.Component {
                                                     Buyer Messages
                                                 </h1>
 
+                                                <button 
+                                                    onClick={ () =>
+                                                        this.fetch_buyers_messages_for_order(
+                                                            this.state.selectedBuyerOffer, 
+                                                            this.state.order,
+                                                            'http://stageapi.theworldmarketplace.com:17700'
+                                                        )}
+                                                >
+                                                    Refresh Messages
+                                                </button>
 
                                             </Col>
                                             <Col sm={2}>
