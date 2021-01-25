@@ -218,7 +218,7 @@ class WalletHome extends React.Component {
 
             try {
                 console.log(`interest mapping`);
-                console.log(wallet.getMyInterest());
+                console.log(wallet.getMyStake());
                 console.log(`interest mapping`);
                 let gst_obj = {};
                 gst_obj.interval = 0;
@@ -1132,7 +1132,9 @@ class WalletHome extends React.Component {
 
     //open staking view from navigation
     show_tokens = () => {
-        this.setState({interface_view: 'tokens', keyRequest: false})
+        let token_stakes = wallet.getMyStake();
+        console.log(token_stakes);
+        this.setState({interface_view: 'tokens', keyRequest: false, token_stakes: token_stakes})
     };
 
     //open settings view from navigation
@@ -1256,9 +1258,9 @@ class WalletHome extends React.Component {
     load_offers = (username, index) => {
         this.setState({selected_user: {username: username, index: index}});
         this.fetch_messages_seller(username, 'http://stageapi.theworldmarketplace.com:17700');
-        this.seller_reply_message(username, '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
+       /* this.seller_reply_message(username, '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
             '064c0f8eb9309a7cb66d017c0278cd12ac5453ff3279fa3dde48159d0807e16d',
-            'http://stageapi.theworldmarketplace.com:17700', 'this is my message');
+            'http://stageapi.theworldmarketplace.com:17700', 'this is my message');*/
         console.log(username);
         console.log(index);
     };
@@ -5230,10 +5232,7 @@ class WalletHome extends React.Component {
                             <Col sm={9} className="no-padding token-main-box">
                                 <Row className="mx-auto w-100">
                                     <StakingTable
-                                        /*
-                                            rows={stakingRows}
-                                            Needs to be created using .map and StakingTableRow
-                                        */
+                                        stakeRows={this.state.token_stakes}
                                     />
 
                                     <Row className="justify-content-around w-100 mx-auto my-5">
