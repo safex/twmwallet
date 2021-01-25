@@ -1258,13 +1258,9 @@ class WalletHome extends React.Component {
     load_offers = (username, index) => {
         this.setState({selected_user: {username: username, index: index}});
         this.fetch_messages_seller(username, 'http://stageapi.theworldmarketplace.com:17700');
-<<<<<<< HEAD
-        
-=======
        /* this.seller_reply_message(username, '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
             '064c0f8eb9309a7cb66d017c0278cd12ac5453ff3279fa3dde48159d0807e16d',
             'http://stageapi.theworldmarketplace.com:17700', 'this is my message');*/
->>>>>>> 9b3eaeaf47078cdca6e8be4b3b1d607576f6f356
         console.log(username);
         console.log(index);
     };
