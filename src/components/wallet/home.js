@@ -1858,12 +1858,10 @@ class WalletHome extends React.Component {
                                                 }
                                             } else {
                                                 //if this is a new order id for the offer
-                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id] = {};
-                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages = {};
-                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].purchase_info = {};
                                                 if (twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages.hasOwnProperty(msg.position)) {
                                                     console.log(`seems we have a duplicated message`);
                                                 } else {
+
                                                     let pinfo_obj = {};
                                                     pinfo_obj.buyers_pgp = msg.sender_pgp_pub_key;
                                                     pinfo_obj.purchase_proof = msg.purchase_proof;
@@ -1896,14 +1894,18 @@ class WalletHome extends React.Component {
                                                                                 if (field.field === 'offer_id') {
                                                                                     o_id = field.value;
                                                                                 } else if (field.field === 'price') {
-                                                                                    l_price = field.price / 10000000000;
+                                                                                    l_price = field.value / 10000000000;
                                                                                 } else if (field.field === 'quantity') {
-                                                                                    l_quant = field.quant;
+                                                                                    l_quant = field.value;
                                                                                 }
                                                                             }
                                                                             if (o_id === parsed.o) {
                                                                                 pinfo_obj.quantity = l_quant;
                                                                                 pinfo_obj.price = l_price;
+
+                                                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id] = {};
+                                                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages = {};
+                                                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].purchase_info = {};
 
                                                                                 twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].purchase_info = pinfo_obj;
 
