@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Row, Col, Image, } from 'react-bootstrap';
+import { Row } from 'react-bootstrap';
 
 import ReactTooltip from "react-tooltip";
 

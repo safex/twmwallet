@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Row, Col } from 'react-bootstrap'
+import { Col } from 'react-bootstrap'
 
 // Icon Imports
 import { IconContext } from 'react-icons'
@@ -32,17 +32,17 @@ export default class BuyerOrders extends React.Component {
 
     componentDidMount() {
 
-        urls = this.state.urls.map((url, key) => {
-            return (
-                <option value={url} key={key}>{url}</option>
-            )
-        })
         
     }
 
-    handleUpdate = (e) => {
-        this.state.handleChange(e)
+    componentDidUpdate(prevProps) {
+        // Typical usage (don't forget to compare props):
+        if (this.props.offers !== prevProps.offers) {
+            this.forceUpdate()
+        }
+      }
 
+    handleUpdate = (e) => {
         let name = e.target.name
         let value = e.target.value  
         this.setState({[name]: value})
@@ -69,17 +69,16 @@ export default class BuyerOrders extends React.Component {
                     <form onSubmit={(e) => this.state.getOffers(e)}>
                         <h1>Select URL</h1>
                           
-                        <select value={this.state.selectedBuyerUrl} name="url" onChange={this.state.handleChange}>
+                        <select value={this.state.url} name="url" onChange={this.state.handleUpdate}>
                             <option>Please Select</option>
-                            <option value={'http://stageapi.theworldmarketplace.com:17700'}>http://stageapi.theworldmarketplace.com:17700</option>
-                            {urls}                           
+                            {this.state.urls}                           
                         </select>
                         <button type="submit">Get Offers</button>
                     </form>
 
                     <form onSubmit={this.state.getOrders}>
                         <h1>Select Offer</h1>
-                        <select value={this.state.selectedBuyerOffer} name="offer" onChange={this.state.handleChange}>
+                        <select value={this.state.offer} name="offer" onChange={this.state.handleChange}>
                             <option>Please Select</option>
                             {this.state.offers}
                         </select>
@@ -89,7 +88,7 @@ export default class BuyerOrders extends React.Component {
 
                     <form onSubmit={this.state.getMessages}>
                         <h1>Select Order</h1>
-                        <select value={this.state.selectedBuyerOrder} name="order" onChange={this.state.handleChange}>
+                        <select value={this.state.order} name="order" onChange={this.state.handleChange}>
                             <option>Please Select</option>
                             {this.state.orders}
                         </select>

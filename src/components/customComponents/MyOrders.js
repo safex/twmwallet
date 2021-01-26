@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Row, Col, Form, Modal, Image } from 'react-bootstrap'
+import { Row, Col } from 'react-bootstrap'
 
 // Icon Imports
 import {IconContext} from 'react-icons'

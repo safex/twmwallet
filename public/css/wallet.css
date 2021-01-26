@@ -244,7 +244,7 @@
     }
 
     .market-table {
-        max-height: 42vh;
+        max-height: 60vh;
         overflow: auto;
     }
 
