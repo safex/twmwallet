@@ -74,7 +74,6 @@ import {
 } from "../../utils/twm_actions";
 
 import zlib from 'zlib';
-import BuyerOrders from '../customComponents/BuyerOrders';
 
 const cryptoRandomString = require('crypto-random-string');
 
@@ -4302,7 +4301,7 @@ class WalletHome extends React.Component {
                                                     <button className="search-button" type="submit">Get Offers</button>
                                                 </form>
 
-                                                <form onSubmit={(e) => this.buyer_get_order_ids_by_offer_id(e)}>
+                                                <form className="my-5" onSubmit={(e) => this.buyer_get_order_ids_by_offer_id(e)}>
                                                     <h1>Select Offer</h1>
 
                                                     <select
