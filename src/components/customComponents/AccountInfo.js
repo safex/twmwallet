@@ -1,13 +1,13 @@
 import React from 'react';
 
-import {Row, Modal, Button, Col} from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import ReactModal from 'react-modal';
 
 import ReactTooltip from "react-tooltip";
 
 // Icon Imports
 import { AiOutlineInfoCircle } from 'react-icons/ai'
-import {IconContext} from 'react-icons'
+import { IconContext } from 'react-icons'
 import { CgCloseR } from 'react-icons/cg'
 
 import './ComponentCSS/AccountInfo.css'

@@ -74,7 +74,6 @@ import {
 } from "../../utils/twm_actions";
 
 import zlib from 'zlib';
-import BuyerOrders from '../customComponents/BuyerOrders';
 
 const cryptoRandomString = require('crypto-random-string');
 
@@ -300,6 +299,7 @@ class WalletHome extends React.Component {
             console.log(accs);
             console.log(`accounts`);
             this.refresh_action();
+            this.buyer_get_offer_ids_by_api();
             //this.setState({usernames: accs, selected_user: {index: 0, username: accs[0].username}});
         } catch (err) {
             console.error(err);
@@ -792,7 +792,7 @@ class WalletHome extends React.Component {
         this.setState({[name]: value})
         console.log(e.target.name)
         console.log(e.target.value)
-        console.log(this.state.url)
+        console.log(this.state.buyerSelectUrl)
     }
 
 
@@ -1743,6 +1743,7 @@ class WalletHome extends React.Component {
 
             } else {
                 console.log(`${offer_id} not found in file`);
+                alert(`There are no orders found for ${offer_id}`)
             }
             this.setState({tableOfTables: {...this.state.tableOfTables, [offer_id]: tableOfOrders}})
                 console.log(this.state.tableOfTables)
@@ -1778,7 +1779,7 @@ class WalletHome extends React.Component {
         }
     };
 
-    fetch_messages_seller = async (username, twm_api_url = 'http://127.0.0.1:17700') => {
+    fetch_messages_seller = async (username, twm_api_url) => {
         try {
             console.log(this.state.twm_file);
             if (this.state.twm_file.accounts.hasOwnProperty(username)) {
@@ -2114,14 +2115,14 @@ class WalletHome extends React.Component {
 
     buyer_get_offer_ids_by_url = async(e) => {
         e.preventDefault();
-        console.log(e.target.url.value)
+        console.log(this.state.buyerSelectUrl)
         try {
             let offer_ids = [];
             let t_f = this.state.twm_file;
-            console.log(t_f.api.urls[e.target.url.value]);
-            if (!this.isEmpty(t_f.api.urls[e.target.url.value])) {
+            console.log(t_f.api.urls[this.state.buyerSelectUrl]);
+            if (!this.isEmpty(t_f.api.urls[this.state.buyerSelectUrl])) {
                 console.log(`we have offer_ids at this url for the buyer`);
-                for (const offer in t_f.api.urls[e.target.url.value]) {
+                for (const offer in t_f.api.urls[this.state.buyerSelectUrl]) {
                     console.log(offer);
                     offer_ids.push(offer);
                 }
@@ -2145,12 +2146,13 @@ class WalletHome extends React.Component {
 
     buyer_get_order_ids_by_offer_id = async(e) => {
         e.preventDefault();
+        console.log(this.state.buyerSelectUrl)
+        console.log(this.state.buyerSelectOffer)
         try {
-            this.setState({selectedBuyerOffer: e.target.offer.value})
             let order_ids = [];
             let t_f = this.state.twm_file;
-            if (!this.isEmpty(t_f.api.urls[e.target.url.value][e.target.offer.value])) {
-                let core = t_f.api.urls[e.target.url.value][e.target.offer.value];
+            if (!this.isEmpty(t_f.api.urls[this.state.buyerSelectUrl][this.state.buyerSelectOffer])) {
+                let core = t_f.api.urls[this.state.buyerSelectUrl][this.state.buyerSelectOffer];
                 for (const order in core) {
                     console.log(order);
                     order_ids.push(order);
@@ -2162,7 +2164,7 @@ class WalletHome extends React.Component {
                     )
                 })
             } else {
-                console.log(`offer id is not found in the api urls ${e.target.url.value} object`);
+                console.log(`offer id is not found in the api urls ${this.state.buyerSelectUrl} object`);
             }
         } catch(err) {
             console.error(err);
@@ -2177,11 +2179,11 @@ class WalletHome extends React.Component {
         try {
             let messages = [];
             let t_f = this.state.twm_file;
-            if (!this.isEmpty(t_f.api.urls[e.target.url.value][e.target.offer.value][e.target.order.value])) {
-                let core = t_f.api.urls[e.target.url.value][e.target.offer.value][e.target.order.value];
+            if (!this.isEmpty(t_f.api.urls[this.state.buyerSelectUrl][this.state.buyerSelectOffer][this.state.buyerSelectOrder])) {
+                let core = t_f.api.urls[this.state.buyerSelectUrl][this.state.buyerSelectOffer][this.state.buyerSelectOrder];
                 for (const msg in core.messages) {
                     //let tempKey = msg + '--#--' + key;
-                    //console.log(t_f.api.urls[e.target.url.value][e.target.offer.value][e.target.order.value].messages[msg]);
+                    //console.log(t_f.api.urls[this.state.buyerSelectUrl][this.state.buyerSelectOffer][this.state.buyerSelectOrder].messages[msg]);
 
                     try {
                         let t_msg = core.messages[msg];
@@ -2192,18 +2194,41 @@ class WalletHome extends React.Component {
                         if (t_msg.message.n.length > 0) {
                             console.log(`nft address supplied!`);
                             messages.push (
-                                <div key={msg}>
-                                    <h1>{t_msg.position}</h1>
+                                <Row style={{justifyContent: 'space-around'}} key={msg}>
+                                    <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
+                                        {t_msg.position} 
+                                    </h1>
                                     <h3>{t_msg.message.n}</h3>
-                                </div>
+                                </Row>
                             );
                         } else if (t_msg.message.m.length > 0) {
                             console.log(`this is a direct message open ended`);
                             messages.push (
-                                <div key={msg}>
-                                    <h1>{t_msg.position}</h1>
-                                    <h3>{t_msg.message.m}</h3>
-                                </div>
+                                <Row className="my-3 w-75 text-break p-1" 
+                                    style={ t_msg.message.m === 'seller' ?
+                                        {
+                                            justifyContent: 'space-around', 
+                                            alignItems: 'center', 
+                                            backgroundColor: '#13D3FD', 
+                                            color: 'white', 
+                                            marginRight: 'auto',
+                                            borderRadius: 25,
+                                        }
+                                    :
+                                        {justifyContent: 'space-around', alignItems: 'center', marginLeft: 'auto', borderRadius: 25, border: '2px solid #13D3FD'}
+                                    } 
+                                    key={msg}
+                                >
+                                    <h1 style={t_msg.message.m === 'seller' ? 
+                                                {border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}
+                                            :
+                                                {border: '2px solid white', borderRadius: 10, padding: '.5rem', margin: '1rem'}
+                                        }
+                                    >
+                                        {t_msg.position} 
+                                    </h1>
+                                    <h3 style={{maxWidth: '50vh'}}>{t_msg.message.m}</h3>
+                                </Row>
                             );
                         } else if (t_msg.message.hasOwnProperty('so')) {
                             console.log(t_msg.message.so);
@@ -2214,6 +2239,8 @@ class WalletHome extends React.Component {
 
                                 parsed_so = JSON.parse(t_msg.message.so);
                                 console.log(parsed_so);
+                                console.log(t_msg)
+                                console.log(t_msg.message)
                             } else {
                                 parsed_so = t_msg.message.so;
                             }
@@ -2226,18 +2253,23 @@ class WalletHome extends React.Component {
 
                                             <Row style={{justifyContent: 'space-around'}}>
                                                 <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
-                                                    {t_msg.position}
+                                                    {t_msg.position} 
                                                 </h1>
-                                                <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> <i>/</i></h2>
-                                                <h2><i>/ <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> <i>/</i></h2>
-                                                <h2><i>/ <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/> <i>/</i></h2>
-                                                <h2><i>/ <u>City:</u></i> <b></b>{parsed_so.city}<b/> <i>/</i></h2>
-                                                <h2><i>/ <u>State:</u></i> <b></b>{parsed_so.s}<b/> <i>/</i></h2>
-                                                <h2><i>/ <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/> <i>/</i></h2>
-                                                <h2><i>/ <u>Country:</u></i> <b></b>{parsed_so.c}<b/> <i>//</i></h2>
-                                                <br/><br/>
-                                                <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
-                                                <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
+
+                                                <Col>
+                                                    <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> </h2>
+                                                    <h2><i> <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> </h2>
+                                                    <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
+                                                    <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
+                                                </Col>
+
+                                                <Col>
+                                                    <h2><i> <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/> </h2>
+                                                    <h2><i> <u>City:</u></i> <b></b>{parsed_so.city}<b/> </h2>
+                                                    <h2><i> <u>State:</u></i> <b></b>{parsed_so.s}<b/> </h2>
+                                                    <h2><i> <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/> </h2>
+                                                    <h2><i> <u>Country:</u></i> <b></b>{parsed_so.c}<b/> </h2>
+                                                </Col>
                                             </Row>
 
 
@@ -2283,6 +2315,8 @@ class WalletHome extends React.Component {
                             const crypto = window.require('crypto');
                             let the_order = twm_file.accounts[seller_name].urls[twm_api_url].messages[offer_id].orders[order_id];
                             console.log(`hey, you're gonna be able to reply :)`);
+
+                            console.log(the_order)
 
                             let seller_pub = twm_file.accounts[seller_name].urls[twm_api_url].pgp_key.pub_key;
                             let seller_pri = twm_file.accounts[seller_name].urls[twm_api_url].pgp_key.sec_key;
@@ -2423,7 +2457,7 @@ class WalletHome extends React.Component {
         return hexStr.toUpperCase();
     };
 
-    fetch_buyers_messages_for_order = async (offer_id, order_id, twm_api_url = 'http://127.0.0.1:17700') => {
+    fetch_buyers_messages_for_order = async (offer_id, order_id, twm_api_url) => {
         let t_f = this.state.twm_file;
         if (t_f.api.urls.hasOwnProperty(twm_api_url)) {
             if (t_f.api.urls[twm_api_url].hasOwnProperty(offer_id)) {
@@ -2536,7 +2570,7 @@ class WalletHome extends React.Component {
                                 alert(`Error at saving to the twm file during account creation verification stage`);
                             }
                             console.log(twm_save);
-
+                            
                         } catch (err) {
                             this.setState({showLoader: false});
                             console.error(err);
@@ -2576,7 +2610,7 @@ class WalletHome extends React.Component {
         }
     })
 
-    buyer_reply_by_order = async(e, twm_api_url = this.state.url, offer_id = this.state.offer, order_id = this.state.order) => {
+    buyer_reply_by_order = async(e, twm_api_url = this.state.buyerSelectUrl, offer_id = this.state.buyerSelectOffer, order_id = this.state.buyerSelectOrder) => {
         e.preventDefault();
         let messageToSend = e.target.messageBox.value
         let t_f = this.state.twm_file;
@@ -2589,6 +2623,8 @@ class WalletHome extends React.Component {
                             let seller_pubkey = await get_seller_pubkey(the_order.messages[1].to, twm_api_url);
                             const crypto = window.require('crypto');
                             console.log(`hey buyer, you're gonna be able to reply :)`);
+
+                            
 
                             let buyer_pub = the_order.pgp_keys.public_key;
                             let buyer_pri = the_order.pgp_keys.private_key;
@@ -3297,11 +3333,16 @@ class WalletHome extends React.Component {
         this.setState({showMyOrders: !this.state.showMyOrders});
 
         if (this.state.showMyOrders === false) {
-            tableOfOrders=[]
+            offerRows=[]
         }
     };
 
-    handleBuyerOrders = () => this.setState({showBuyerOrders: !this.state.showBuyerOrders})
+    handleBuyerOrders = () => this.setState({
+        showBuyerOrders: !this.state.showBuyerOrders,
+        buyerSelectOffer: '',
+        buyerSelectOrder: '',
+        buyerSelectUrl: ''
+    })
 
 
     call_non_listings_table = () => offerRows = this.state.non_offers.map((listing, key) => {
@@ -3378,7 +3419,7 @@ class WalletHome extends React.Component {
 
     render() {
         var message_render;
-        let nObjectLength, mObjectLength, soObjectLength;
+
         try {
             message_render = this.state.messages_selected.map((msg, key) => {
                 console.log(`messages rendered`);
@@ -3394,17 +3435,41 @@ class WalletHome extends React.Component {
                     if (msg.message.n.length > 0) {
                         console.log(`nft address supplied!`);
                         return (
-                            <Row key={key}>
-                                <h1>{msg.position}</h1>
+                            <Row style={{justifyContent: 'space-around'}} key={key}>
+                                <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
+                                    {msg.position}
+                                </h1>
                                 <h3 className="mx-auto">{msg.message.n}</h3>
                             </Row>
                         );
                     } else if (msg.message.m.length > 0) {
                         console.log(`this is a direct message open ended`);
                         return (
-                            <Row key={key}>
-                                <h1>{msg.position}</h1>
-                                <h3 className="mx-auto">{msg.message.m}</h3>
+                            <Row className="my-3 w-75 text-break p-1" 
+                                style={ msg.message.m === 'seller' ?
+                                    {
+                                        justifyContent: 'space-around', 
+                                        alignItems: 'center', 
+                                        backgroundColor: '#13D3FD', 
+                                        color: 'white', 
+                                        marginRight: 'auto',
+                                        borderRadius: 25,
+                                    }
+                                :
+                                    {justifyContent: 'space-around', alignItems: 'center', marginLeft: 'auto', borderRadius: 25, border: '2px solid #13D3FD'}
+                                }  
+                                key={key}
+                            >
+                                <h1
+                                    style={ msg.message.m === 'seller' ? 
+                                            {border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}
+                                        :
+                                            {border: '2px solid white', borderRadius: 10, padding: '.5rem', margin: '1rem'}
+                                    }
+                                >
+                                    {msg.position}
+                                </h1>
+                                <h3 style={{maxWidth: '50vh'}} className="mx-auto">{msg.message.m}</h3>
                             </Row>
                         );
                     } else if (msg.message.hasOwnProperty('so')) {
@@ -3517,6 +3582,12 @@ class WalletHome extends React.Component {
                 }
 
                 case "market":
+                    buyerUrls = this.state.buyer_urls.map((url, key) => {
+                        return (
+                            <option value={url} key={key}>{url}</option>
+                        )
+                    })
+
                     var table_of_listings;
                     if (this.state.offer_loading_flag === 'all') {
                         table_of_listings = this.state.non_offers.map((listing, key) => {
@@ -3673,10 +3744,12 @@ class WalletHome extends React.Component {
                                             <p data-tip data-for={`offerID${key}`}>
                                                 {this.to_ellipsis(listing.offer_id, 5, 5)}
 
-                                                <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
-                                                    <span>{listing.offer_id}</span>
-                                                </ReactTooltip>
+                                               
                                             </p>
+
+                                            <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
+                                                <span>{listing.offer_id}</span>
+                                            </ReactTooltip>
 
                                             <p style={{width: '24rem'}}>
 
@@ -3869,7 +3942,7 @@ class WalletHome extends React.Component {
                                                                 Email
                                                             </Form.Label>
                                                             <Col sm={6}>
-                                                                <Form.Control name="email_address" rows="3"/>
+                                                                <Form.Control type="email" name="email_address" rows="3"/>
                                                             </Col>
                                                             <Form.Label column sm={4}>
                                                                 Phone
@@ -4046,7 +4119,10 @@ class WalletHome extends React.Component {
                                 />
                             </Col>
 
-                            <Col sm={7} className="no-padding d-flex flex-column  justify-content-between">
+                            <Col 
+                                sm={7} 
+                                className="no-padding d-flex flex-column justify-content-between"
+                            >
                                 <AccountInfo
                                     rescan={this.rescan}
                                     handleShow={this.handleKeys}
@@ -4061,7 +4137,15 @@ class WalletHome extends React.Component {
                                 />
                             </Col>
 
-                            <Col sm={12}>
+                            <Col 
+                                sm={12}
+                                className={ this.state.showBuyerOrders ?
+                                    "display-none"
+                                :
+                                    ""
+                                }
+                            
+                            >
                                 <div
                                     className="search-box d-flex flex-column align-items-center"
                                 >
@@ -4101,7 +4185,7 @@ class WalletHome extends React.Component {
 
                                     <Row className="w-100 justify-content-center">
 
-                                        <Col sm={6}>
+                                        <Col sm={8}>
                                             <div className="row" id="search">
                                                 <form className="w-75 no-gutters p-2" id="search-form"
 
@@ -4169,12 +4253,13 @@ class WalletHome extends React.Component {
                                         <Col className="d-flex justify-content-center align-self-center" sm={4}>
                                             <button 
                                                 onClick={this.handleBuyerOrders} 
-                                                style={{padding: '3rem', lineHeight: 0}} 
+                                                style={{padding: '1rem', lineHeight: 0, }} 
                                                 className="search-button"
                                             >
                                                 {this.state.showBuyerOrders ? 'Close' : 'My Orders'}
                                             </button>
                                         </Col>
+
                                     </Row>
 
                                     <Row className="staking-table-row">
@@ -4188,11 +4273,16 @@ class WalletHome extends React.Component {
                                 </div>
                             </Col>
 
+                            
 
                             {this.state.showBuyerOrders ?
                                 <Col className="market-table overflow-y" md={12}>
-                                    <BuyerOrders
-                                        urls={this.state.buyer_urls}
+                                    {/*<BuyerOrders
+                                        urls = {this.state.buyer_urls.map((url, key) => {
+                                            return (
+                                                <option value={url} key={key}>{url}</option>
+                                            )
+                                        })}
                                         offers={offerDropdown}
                                         orders={orderDropdown}
                                         showMessages={this.state.showMessages}
@@ -4207,22 +4297,122 @@ class WalletHome extends React.Component {
                                         getMessages={this.buyer_get_messages_by_order_id}
                                         handleMessages={this.handleBuyerMessages}
                                         handleChange={this.handleBuyerChange}
-                                    />
+                                    />*/
+}
+                                    <div className="h-100">
+
+                                        <IconContext.Provider value={{color: '#FEB056', size: '20px'}}>
+                                            <CgCloseR
+                                                className="ml-5"
+                                                onClick={this.handleBuyerOrders}
+                                            />
+                                        </IconContext.Provider>
+
+                                        <Row className="p-5 justify-content-center">
+                                            <Col 
+                                                sm={4}
+                                                style={{wordBreak: 'break-all', fontFamily: 'Inter'}}
+                                            >
+                                                    <div>
+                                                        <h2>Selected URL:</h2> 
+                                                        <h3>{this.state.buyerSelectUrl}</h3>
+                                                    </div>
+
+                                                    <div className="my-3">
+                                                        <h2>Selected Offer:</h2>
+                                                        <h3>{this.state.buyerSelectOffer}</h3>
+                                                    </div> 
+
+                                                    <div>
+                                                        <h2>Selected Order:</h2> 
+                                                        <h3>{this.state.buyerSelectOrder}</h3>
+                                                    </div>
+                                            </Col>
+
+                                            <Col 
+                                                sm={8}
+                                                className="pt-3 staking-table-table"
+                                                style={{maxHeight: '60vh'}}
+                                            >
+
+                                                <form onSubmit={(e) => this.buyer_get_offer_ids_by_url(e)}>
+                                                    <h1>Select URL</h1>
+                                                    
+                                                    <select
+                                                        className="my-3" 
+                                                        value={this.state.buyerSelectUrl} 
+                                                        name="buyerSelectUrl" 
+                                                        onChange={this.handleBuyerChange}
+                                                    >
+                                                        <option>Please Select</option>
+                                                        {buyerUrls}                           
+                                                    </select>
+
+                                                    <button className="search-button" type="submit">Get Offers</button>
+                                                </form>
+
+                                                <form className="my-5" onSubmit={(e) => this.buyer_get_order_ids_by_offer_id(e)}>
+                                                    <h1>Select Offer</h1>
+
+                                                    <select
+                                                        className="my-3" 
+                                                        value={this.state.buyerSelectOffer} 
+                                                        name="buyerSelectOffer" 
+                                                        onChange={this.handleBuyerChange}
+                                                    >
+                                                        <option>Please Select</option>
+                                                        {offerDropdown}
+                                                    </select>
+                                                    
+                                                    <button className="search-button" type="submit">Get Orders</button>
+                                                </form>
+
+                                                <form onSubmit={this.buyer_get_messages_by_order_id}>
+                                                    <h1>Select Order</h1>
+                                                    <select
+                                                        className="my-3" 
+                                                        value={this.state.buyerSelectOrder} 
+                                                        name="buyerSelectOrder" 
+                                                        onChange={this.handleBuyerChange}
+                                                    >
+                                                        <option>Please Select</option>
+                                                        {orderDropdown}
+                                                    </select>
+                                                    
+                                                    <button className="search-button" type="submit">Get Messages</button>
+                                                </form>
+
+                                                <button className="search-button mt-3" type="button" onClick={this.handleBuyerMessages}>Show Messages</button>
+                                                
+                                            </Col>
+                                        </Row>
+                                    </div>
 
                                     <ReactModal
                                         isOpen={this.state.showBuyerMessages}
                                         closeTimeoutMS={500}
-                                        className="keys-modal"
+                                        className="buyer-messages-modal"
                                         onRequestClose={this.handleBuyerMessages}
                                     >
                                         <Row>
                                             <Col sm={10}>
                                                 <h1>
-                                                    Buyer Messages
+                                                    Buyer Messages for 
                                                 </h1>
+                                                <h3>Order: {this.state.buyerSelectOrder}</h3>
 
-
+                                                <button 
+                                                    onClick={ () =>
+                                                        this.fetch_buyers_messages_for_order(
+                                                            this.state.buyerSelectOffer, 
+                                                            this.state.buyerSelectOrder,
+                                                            'http://stageapi.theworldmarketplace.com:17700'
+                                                        )}
+                                                >
+                                                    Refresh Messages
+                                                </button>
                                             </Col>
+
                                             <Col sm={2}>
                                                 <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
                                                     <CgCloseR
@@ -4234,18 +4424,16 @@ class WalletHome extends React.Component {
                                         </Row>
 
                                         <Row className="m-auto">
-                                            <Col sm={8}>
+                                            <Col style={{overflowY: 'auto', maxHeight: '50vh'}} sm={12}>
                                                 {this.state.buyerMessages}
                                             </Col>
 
-                                            <Col sm={4}>
+                                            <Col className="mx-auto my-5" sm={6}>
                                                 <form onSubmit={this.buyer_reply_by_order}>
-                                                    <textarea name="messageBox"></textarea>
+                                                    <textarea style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', fontSize: '1.5rem'}} rows="6" cols="50" name="messageBox"></textarea>
                                                     
-                                                    <button className="my-3" type="submit">Send</button>
+                                                    <button className="my-3 search-button" type="submit">Send</button>
                                                 </form>
-                                                
-                                                
                                             </Col>
                                         </Row>
                                     </ReactModal>
@@ -4713,7 +4901,6 @@ class WalletHome extends React.Component {
                                                 <Col md="8">
                                                     <Form.Group as={Col}>
                                                         <Form.Label>Username</Form.Label>
-
                                                         <Form.Control
                                                             name="username"
                                                             placedholder="enter your desired username"
@@ -4764,12 +4951,10 @@ class WalletHome extends React.Component {
                                                     </Form.Group>
 
                                                     <Form.Group as={Col}>
-
                                                         <Form.Label>Email</Form.Label>
                                                         <Form.Control
                                                             name="email"
-                                                            defaultValue="xyz@example.com"
-                                                            placedholder="your location"
+                                                            type="email"
                                                         />
                                                     </Form.Group>
 
@@ -4778,18 +4963,13 @@ class WalletHome extends React.Component {
                                                             <Form.Label>Twitter Link</Form.Label>
                                                             <Form.Control
                                                                 name="twitter"
-                                                                defaultValue="twitter.com"
-                                                                placedholder="enter the link to your twitter handle"
                                                             />
-
                                                         </Form.Group>
 
                                                         <Form.Group md="6" as={Col}>
                                                             <Form.Label>Facebook Link</Form.Label>
                                                             <Form.Control
                                                                 name="facebook"
-                                                                defaultValue="facebook.com"
-                                                                placedholder="enter the to of your facebook page"
                                                             />
 
                                                         </Form.Group>
@@ -4798,21 +4978,15 @@ class WalletHome extends React.Component {
                                                             <Form.Label>LinkedIn Link</Form.Label>
                                                             <Form.Control
                                                                 name="linkedin"
-                                                                defaultValue="linkedin.com"
-                                                                placedholder="enter the link to your linkedin handle"
                                                             />
                                                         </Form.Group>
 
                                                         <Form.Group md="6" as={Col}>
-
                                                             <Form.Label>Website</Form.Label>
                                                             <Form.Control
                                                                 name="website"
-                                                                defaultValue="safex.org"
-                                                                placedholder="if you have your own website: paste your link here"
                                                             />
                                                         </Form.Group>
-
                                                     </Form.Group>
 
 
@@ -4881,15 +5055,16 @@ class WalletHome extends React.Component {
                                     <ReactModal
                                             isOpen={this.state.showMessages}
                                             closeTimeoutMS={500}
-                                            className="keys-modal"
+                                            className="buyer-messages-modal"
                                             onRequestClose={this.hideMessages}
                                         >
                                             <Row>
                                                 <Col sm={10}>
                                                     <h1>
-                                                        Merchant Messages
+                                                        Merchant Messages for
                                                     </h1>
 
+                                                    <h2>Order: { this.state.selectedMerchantOrder }</h2>
 
                                                 </Col>
                                                 <Col sm={2}>
@@ -4902,25 +5077,25 @@ class WalletHome extends React.Component {
                                                 </Col>
                                             </Row>
 
-                                            <Row className="m-auto" style={{wordBreak: 'break-all', maxHeight: 500, overflowY: 'auto'}}>
-                                                <Col sm={8}>
+                                            <Row className="m-auto">
+                                                <Col style={{overflowY: 'auto', maxHeight: '50vh'}} sm={12}>
                                                     {message_render}
                                                 </Col>
 
 
-                                                <Col sm={4}>
+                                                <Col className="mx-auto my-5" sm={6}>
                                                     <form onSubmit={(e) => this.seller_reply_message(
-                                                                            e, 
-                                                                            this.state.selected_user.username, 
-                                                                            this.state.selectedMerchantOffer, 
-                                                                            this.state.selectedMerchantOrder,
-                                                                            'http://stageapi.theworldmarketplace.com:17700',
-                                                                        )
-                                                                    }
+                                                                e, 
+                                                                this.state.selected_user.username, 
+                                                                this.state.selectedMerchantOffer, 
+                                                                this.state.selectedMerchantOrder,
+                                                                'http://stageapi.theworldmarketplace.com:17700',
+                                                            )
+                                                        }
                                                     >
-                                                        <textarea name="merchantMessageBox"></textarea>
+                                                        <textarea style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', fontSize: '1.5rem' }} rows="6" cols="50" name="merchantMessageBox"></textarea>
                                                         
-                                                        <button className="my-3" type="submit">Send</button>
+                                                        <button className="my-3 search-button" type="submit">Send</button>
                                                     </form>
                                                 </Col>
                                             </Row>

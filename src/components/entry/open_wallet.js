@@ -88,7 +88,6 @@ export default class OpenWallet extends React.Component {
     open_wallet_result = async(error, wallet) => {
         if (error) {
             console.error(error);
-            alert(error);
             this.setState({error: 'password'})
         } else {
             try {
