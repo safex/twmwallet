@@ -138,3 +138,27 @@
     font-weight: 500;
     text-align: center;
 }
+
+.buyer-messages-modal {
+    height: 100vh;
+    max-height: 100vh;
+
+    padding: 3rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    background-color: white;
+    box-shadow: var(--blue-box-shadow);
+    border-radius: 50px;
+    text-align: center;
+    color: #767667;
+    font-family: 'Inter';
+
+
+}
+
+.buyer-messages-modal::-webkit-scrollbar {
+    display: none;
+}

@@ -2195,16 +2195,39 @@ class WalletHome extends React.Component {
                             console.log(`nft address supplied!`);
                             messages.push (
                                 <Row style={{justifyContent: 'space-around'}} key={msg}>
-                                    <h1>{t_msg.position}</h1>
+                                    <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
+                                        {t_msg.position} 
+                                    </h1>
                                     <h3>{t_msg.message.n}</h3>
                                 </Row>
                             );
                         } else if (t_msg.message.m.length > 0) {
                             console.log(`this is a direct message open ended`);
                             messages.push (
-                                <Row style={{justifyContent: 'space-around'}} key={msg}>
-                                    <h1>{t_msg.position}</h1>
-                                    <h3>{t_msg.message.m}</h3>
+                                <Row className="my-3 w-75 text-break p-1" 
+                                    style={ t_msg.message.m === 'seller' ?
+                                        {
+                                            justifyContent: 'space-around', 
+                                            alignItems: 'center', 
+                                            backgroundColor: '#13D3FD', 
+                                            color: 'white', 
+                                            marginRight: 'auto',
+                                            borderRadius: 25,
+                                        }
+                                    :
+                                        {justifyContent: 'space-around', alignItems: 'center', marginLeft: 'auto', borderRadius: 25, border: '2px solid #13D3FD'}
+                                    } 
+                                    key={msg}
+                                >
+                                    <h1 style={t_msg.message.m === 'seller' ? 
+                                                {border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}
+                                            :
+                                                {border: '2px solid white', borderRadius: 10, padding: '.5rem', margin: '1rem'}
+                                        }
+                                    >
+                                        {t_msg.position} 
+                                    </h1>
+                                    <h3 style={{maxWidth: '50vh'}}>{t_msg.message.m}</h3>
                                 </Row>
                             );
                         } else if (t_msg.message.hasOwnProperty('so')) {
@@ -2216,6 +2239,8 @@ class WalletHome extends React.Component {
 
                                 parsed_so = JSON.parse(t_msg.message.so);
                                 console.log(parsed_so);
+                                console.log(t_msg)
+                                console.log(t_msg.message)
                             } else {
                                 parsed_so = t_msg.message.so;
                             }
@@ -2228,8 +2253,9 @@ class WalletHome extends React.Component {
 
                                             <Row style={{justifyContent: 'space-around'}}>
                                                 <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
-                                                    {t_msg.position}
+                                                    {t_msg.position} 
                                                 </h1>
+
                                                 <Col>
                                                     <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> </h2>
                                                     <h2><i> <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> </h2>
@@ -3307,7 +3333,7 @@ class WalletHome extends React.Component {
         this.setState({showMyOrders: !this.state.showMyOrders});
 
         if (this.state.showMyOrders === false) {
-            tableOfOrders=[]
+            offerRows=[]
         }
     };
 
@@ -3393,7 +3419,7 @@ class WalletHome extends React.Component {
 
     render() {
         var message_render;
-        let nObjectLength, mObjectLength, soObjectLength;
+
         try {
             message_render = this.state.messages_selected.map((msg, key) => {
                 console.log(`messages rendered`);
@@ -3409,17 +3435,41 @@ class WalletHome extends React.Component {
                     if (msg.message.n.length > 0) {
                         console.log(`nft address supplied!`);
                         return (
-                            <Row key={key}>
-                                <h1>{msg.position}</h1>
+                            <Row style={{justifyContent: 'space-around'}} key={key}>
+                                <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
+                                    {msg.position}
+                                </h1>
                                 <h3 className="mx-auto">{msg.message.n}</h3>
                             </Row>
                         );
                     } else if (msg.message.m.length > 0) {
                         console.log(`this is a direct message open ended`);
                         return (
-                            <Row key={key}>
-                                <h1>{msg.position}</h1>
-                                <h3 className="mx-auto">{msg.message.m}</h3>
+                            <Row className="my-3 w-75 text-break p-1" 
+                                style={ msg.message.m === 'seller' ?
+                                    {
+                                        justifyContent: 'space-around', 
+                                        alignItems: 'center', 
+                                        backgroundColor: '#13D3FD', 
+                                        color: 'white', 
+                                        marginRight: 'auto',
+                                        borderRadius: 25,
+                                    }
+                                :
+                                    {justifyContent: 'space-around', alignItems: 'center', marginLeft: 'auto', borderRadius: 25, border: '2px solid #13D3FD'}
+                                }  
+                                key={key}
+                            >
+                                <h1
+                                    style={ msg.message.m === 'seller' ? 
+                                            {border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}
+                                        :
+                                            {border: '2px solid white', borderRadius: 10, padding: '.5rem', margin: '1rem'}
+                                    }
+                                >
+                                    {msg.position}
+                                </h1>
+                                <h3 style={{maxWidth: '50vh'}} className="mx-auto">{msg.message.m}</h3>
                             </Row>
                         );
                     } else if (msg.message.hasOwnProperty('so')) {
@@ -4341,14 +4391,15 @@ class WalletHome extends React.Component {
                                     <ReactModal
                                         isOpen={this.state.showBuyerMessages}
                                         closeTimeoutMS={500}
-                                        className="keys-modal"
+                                        className="buyer-messages-modal"
                                         onRequestClose={this.handleBuyerMessages}
                                     >
                                         <Row>
                                             <Col sm={10}>
                                                 <h1>
-                                                    Buyer Messages
+                                                    Buyer Messages for 
                                                 </h1>
+                                                <h3>Order: {this.state.buyerSelectOrder}</h3>
 
                                                 <button 
                                                     onClick={ () =>
@@ -4360,8 +4411,8 @@ class WalletHome extends React.Component {
                                                 >
                                                     Refresh Messages
                                                 </button>
-
                                             </Col>
+
                                             <Col sm={2}>
                                                 <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
                                                     <CgCloseR
@@ -4373,18 +4424,16 @@ class WalletHome extends React.Component {
                                         </Row>
 
                                         <Row className="m-auto">
-                                            <Col sm={8}>
+                                            <Col style={{overflowY: 'auto', maxHeight: '50vh'}} sm={12}>
                                                 {this.state.buyerMessages}
                                             </Col>
 
-                                            <Col sm={4}>
+                                            <Col className="mx-auto my-5" sm={6}>
                                                 <form onSubmit={this.buyer_reply_by_order}>
-                                                    <textarea name="messageBox"></textarea>
+                                                    <textarea style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', fontSize: '1.5rem'}} rows="6" cols="50" name="messageBox"></textarea>
                                                     
-                                                    <button className="my-3" type="submit">Send</button>
+                                                    <button className="my-3 search-button" type="submit">Send</button>
                                                 </form>
-                                                
-                                                
                                             </Col>
                                         </Row>
                                     </ReactModal>
@@ -5006,15 +5055,16 @@ class WalletHome extends React.Component {
                                     <ReactModal
                                             isOpen={this.state.showMessages}
                                             closeTimeoutMS={500}
-                                            className="keys-modal"
+                                            className="buyer-messages-modal"
                                             onRequestClose={this.hideMessages}
                                         >
                                             <Row>
                                                 <Col sm={10}>
                                                     <h1>
-                                                        Merchant Messages
+                                                        Merchant Messages for
                                                     </h1>
 
+                                                    <h2>Order: { this.state.selectedMerchantOrder }</h2>
 
                                                 </Col>
                                                 <Col sm={2}>
@@ -5027,25 +5077,25 @@ class WalletHome extends React.Component {
                                                 </Col>
                                             </Row>
 
-                                            <Row className="m-auto" style={{wordBreak: 'break-all', maxHeight: 500, overflowY: 'auto'}}>
-                                                <Col sm={8}>
+                                            <Row className="m-auto">
+                                                <Col style={{overflowY: 'auto', maxHeight: '50vh'}} sm={12}>
                                                     {message_render}
                                                 </Col>
 
 
-                                                <Col sm={4}>
+                                                <Col className="mx-auto my-5" sm={6}>
                                                     <form onSubmit={(e) => this.seller_reply_message(
-                                                                            e, 
-                                                                            this.state.selected_user.username, 
-                                                                            this.state.selectedMerchantOffer, 
-                                                                            this.state.selectedMerchantOrder,
-                                                                            'http://stageapi.theworldmarketplace.com:17700',
-                                                                        )
-                                                                    }
+                                                                e, 
+                                                                this.state.selected_user.username, 
+                                                                this.state.selectedMerchantOffer, 
+                                                                this.state.selectedMerchantOrder,
+                                                                'http://stageapi.theworldmarketplace.com:17700',
+                                                            )
+                                                        }
                                                     >
-                                                        <textarea name="merchantMessageBox"></textarea>
+                                                        <textarea style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', fontSize: '1.5rem' }} rows="6" cols="50" name="merchantMessageBox"></textarea>
                                                         
-                                                        <button className="my-3" type="submit">Send</button>
+                                                        <button className="my-3 search-button" type="submit">Send</button>
                                                     </form>
                                                 </Col>
                                             </Row>
