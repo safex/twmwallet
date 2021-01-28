@@ -273,16 +273,6 @@ class WalletHome extends React.Component {
                 this.setState({timer: timer});
                 this.setState({synced: false});
             }
-            wallet.on('newBlock', (height) => {
-                console.log("blockchain updated, height: " + height);
-                this.refresh_action();
-                if (height % 10000 === 0) {
-                    wallet.store(this.wallet_store_callback);
-                }
-                this.setState({
-                    wallet_height: height
-                });
-            });
             wallet.on('refreshed', () => {
                 this.refresh_action();
                 wallet.store(this.wallet_store_callback)
