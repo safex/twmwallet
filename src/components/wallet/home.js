@@ -3495,16 +3495,21 @@ class WalletHome extends React.Component {
                                             <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
                                                 {msg.position}
                                             </h1>
-                                            <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> <i>/</i></h2>
-                                            <h2><i>/ <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> <i>/</i></h2>
-                                            <h2><i>/ <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/> <i>/</i></h2>
-                                            <h2><i>/ <u>City:</u></i> <b></b>{parsed_so.city}<b/> <i>/</i></h2>
-                                            <h2><i>/ <u>State:</u></i> <b></b>{parsed_so.s}<b/> <i>/</i></h2>
-                                            <h2><i>/ <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/> <i>/</i></h2>
-                                            <h2><i>/ <u>Country:</u></i> <b></b>{parsed_so.c}<b/> <i>//</i></h2>
-                                            <br/><br/>
-                                            <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
-                                            <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
+                                            
+                                            <Col>
+                                                <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> </h2>
+                                                <h2><i> <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> </h2>
+                                                <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
+                                                <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
+                                            </Col>
+
+                                            <Col>
+                                                <h2><i> <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/> </h2>
+                                                <h2><i> <u>City:</u></i> <b></b>{parsed_so.city}<b/> </h2>
+                                                <h2><i> <u>State:</u></i> <b></b>{parsed_so.s}<b/> </h2>
+                                                <h2><i> <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/> </h2>
+                                                <h2><i> <u>Country:</u></i> <b></b>{parsed_so.c}<b/> </h2>
+                                            </Col>
                                         </Row>
 
 
