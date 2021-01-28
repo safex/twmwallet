@@ -85,7 +85,6 @@ var wallet;
 let offerRows;
 let tableOfOrders;
 let buyerOrders;
-let buyerUrls = [];
 let offerDropdown = [];
 let orderDropdown = [];
 
@@ -433,8 +432,8 @@ class WalletHome extends React.Component {
 
     remove_account = async (e, user) => {
         e.preventDefault();
-        let confirm = window.confirm(`Are you sure you want to remove ${user}? 
-        You should only do this if you think that the transaction to register the account did not go through. 
+        let confirm = window.confirm(`Are you sure you want to remove ${user}?
+        You should only do this if you think that the transaction to register the account did not go through.
         Keep in mind this is IRREVERSABLE!`)
         if (confirm) {
             try {
@@ -639,7 +638,7 @@ class WalletHome extends React.Component {
                                 console.log("committed transaction");
 
 
-                                alert(`Transaction successfully submitted. 
+                                alert(`Transaction successfully submitted.
                         Transaction ID: ${this.state.create_account_txn_id}
                         1000 Safex Tokens will be locked for 22,000 blocks
                         Fee: ${this.state.create_account_txn_fee / 10000000000} SFX`);
@@ -778,7 +777,7 @@ class WalletHome extends React.Component {
 
     handleBuyerChange = (e) => {
         let name = e.target.name
-        let value = e.target.value  
+        let value = e.target.value
         this.setState({[name]: value})
         console.log(e.target.name)
         console.log(e.target.value)
@@ -873,7 +872,7 @@ class WalletHome extends React.Component {
                         alert(err);
                         reject(err);
                     } else {
-                        alert(`Token transaction successfully submitted 
+                        alert(`Token transaction successfully submitted
                                         Transaction id: ${this.state.token_txn_id}
                                         Amount: ${this.state.token_txn_amount} SFT
                                         Fee: ${this.state.token_txn_fee / 10000000000} SFX`);
@@ -903,7 +902,7 @@ class WalletHome extends React.Component {
                         });
                         let s_cash = await this.send_cash_async(wallet, e.target.destination.value.trim(), e.target.amount.value, mixins);
                         console.log(s_cash);
-                        let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${s_cash.fee() / 10000000000} SFX (Safex Cash) 
+                        let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${s_cash.fee() / 10000000000} SFX (Safex Cash)
             sending ${this.state.cash_txn_amount} SFX to ${this.state.cash_txn_destination}`);
                         let fee = s_cash.fee();
                         let txid = s_cash.transactionsIds();
@@ -969,7 +968,7 @@ class WalletHome extends React.Component {
                         alert(err);
                         reject(err);
                     } else {
-                        alert(`cash transaction successfully submitted 
+                        alert(`cash transaction successfully submitted
                                         transaction id: ${this.state.cash_txn_id}
                                         amount: ${this.state.cash_txn_amount}
                                         fee: ${this.state.cash_txn_fee / 10000000000}`);
@@ -1371,7 +1370,7 @@ class WalletHome extends React.Component {
                         reject(err);
                     } else {
                         console.log("committed create offer transaction");
-                        alert(`Transaction listing ${this.state.create_offer_txn_title.toUpperCase()} successfully submitted.  
+                        alert(`Transaction listing ${this.state.create_offer_txn_title.toUpperCase()} successfully submitted.
                         Transaction ID: ${this.state.create_offer_txn_id}
                         Fee: ${this.state.create_offer_txn_fee / 10000000000} SFX`);
 
@@ -1464,7 +1463,7 @@ class WalletHome extends React.Component {
                         alert(err);
                         reject(err);
                     } else {
-                        alert(`token staking transaction successfully submitted 
+                        alert(`token staking transaction successfully submitted
                                         transaction id: ${this.state.stake_txn_id}
                                         staking ${this.state.stake_txn_amount} SFT
                                         fee: ${this.state.stake_txn_fee / 10000000000} SFX`);
@@ -1558,7 +1557,7 @@ class WalletHome extends React.Component {
                         alert(err);
                         reject(err);
                     } else {
-                        alert(`token unstake transaction committed  
+                        alert(`token unstake transaction committed
                                         transaction id: ${this.state.unstake_txn_id}
                                         amount: ${this.state.unstake_txn_amount} SFT
                                         fee: ${this.state.unstake_txn_fee / 10000000000} SFX`);
@@ -2102,67 +2101,52 @@ class WalletHome extends React.Component {
             console.error(`error at the checking of the urls of the buyer_get_offer_ids_by_api`)
         }
     };
-
-    buyer_get_offer_ids_by_url = async(e) => {
-        e.preventDefault();
-        console.log(this.state.buyerSelectUrl)
-        try {
-            let offer_ids = [];
-            let t_f = this.state.twm_file;
-            console.log(t_f.api.urls[this.state.buyerSelectUrl]);
-            if (!this.isEmpty(t_f.api.urls[this.state.buyerSelectUrl])) {
-                console.log(`we have offer_ids at this url for the buyer`);
-                for (const offer in t_f.api.urls[this.state.buyerSelectUrl]) {
-                    console.log(offer);
-                    offer_ids.push(offer);
-                }
-                this.setState({buyer_offer_ids: offer_ids});
-                offerDropdown = offer_ids.map((offer, key) => {
-                    return (
-                        <option value={offer} key={key}>{offer}</option>
-                    )
-                })
-
-                console.log(offerDropdown)
-            } else {
-                console.log(`there are no urls to parse from`);
-            }
-        } catch(err) {
-            console.error(err);
-            console.error(`error at the checking of the urls of the buyer_get_offer_ids_by_api`)
-        }
-
-    };
-
-    buyer_get_order_ids_by_offer_id = async(e) => {
-        e.preventDefault();
-        console.log(this.state.buyerSelectUrl)
-        console.log(this.state.buyerSelectOffer)
-        try {
-            let order_ids = [];
-            let t_f = this.state.twm_file;
-            if (!this.isEmpty(t_f.api.urls[this.state.buyerSelectUrl][this.state.buyerSelectOffer])) {
-                let core = t_f.api.urls[this.state.buyerSelectUrl][this.state.buyerSelectOffer];
-                for (const order in core) {
-                    console.log(order);
-                    order_ids.push(order);
-                }
-                this.setState({buyerOrders: order_ids})
-                orderDropdown = order_ids.map((order, key) => {
-                    return (
-                        <option key={key}>{order}</option>
-                    )
-                })
-            } else {
-                console.log(`offer id is not found in the api urls ${this.state.buyerSelectUrl} object`);
-            }
-        } catch(err) {
-            console.error(err);
-            console.error(`error at the buyer_get_order_ids_by_offer_id`);
-        }
-
-
-    };
+	
+	/**
+	 * @return {string[]}
+	 */
+	buyer_get_offer_ids = () => {
+    	const {buyerSelectUrl, twm_file: twm} = this.state;
+    	if (!buyerSelectUrl || !twm || !twm.api || !twm.api.urls) {
+			return [];
+		}
+    	
+    	const offersAtUrl = this.state.twm_file.api.urls[this.state.buyerSelectUrl];
+    	if (!offersAtUrl) {
+    		return [];
+		}
+    	
+    	return Object.keys(offersAtUrl);
+	};
+	
+	/**
+	 * @return {Array<BuyerPurchaseObj & { order_id }>}
+	 */
+    buyer_get_orders = () => {
+    	const {buyerSelectUrl,buyerSelectOffer, twm_file: twm} = this.state;
+		if (!buyerSelectUrl || !buyerSelectOffer || !twm || !twm.api || !twm.api.urls) {
+			return [];
+		}
+	
+		const offersAtUrl = this.state.twm_file.api.urls[this.state.buyerSelectUrl];
+		if (!offersAtUrl) {
+			return [];
+		}
+		
+		const ordersAtOffers = offersAtUrl[buyerSelectOffer];
+		if (!ordersAtOffers) {
+			return [];
+		}
+		
+		const result = [];
+		for (const orderId in ordersAtOffers) {
+			result.push({
+				...ordersAtOffers[orderId].purchase_obj,
+				order_id: orderId
+			});
+		}
+		return result;
+	};
 
     buyer_get_messages_by_order_id = async(e) => {
         e.preventDefault();
@@ -2186,7 +2170,7 @@ class WalletHome extends React.Component {
                             messages.push (
                                 <Row style={{justifyContent: 'space-around'}} key={msg}>
                                     <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
-                                        {t_msg.position} 
+                                        {t_msg.position}
                                     </h1>
                                     <h3>{t_msg.message.n}</h3>
                                 </Row>
@@ -2194,28 +2178,28 @@ class WalletHome extends React.Component {
                         } else if (t_msg.message.m.length > 0) {
                             console.log(`this is a direct message open ended`);
                             messages.push (
-                                <Row className="my-3 w-75 text-break p-1" 
+                                <Row className="my-3 w-75 text-break p-1"
                                     style={ t_msg.message.m === 'seller' ?
                                         {
-                                            justifyContent: 'space-around', 
-                                            alignItems: 'center', 
-                                            backgroundColor: '#13D3FD', 
-                                            color: 'white', 
+                                            justifyContent: 'space-around',
+                                            alignItems: 'center',
+                                            backgroundColor: '#13D3FD',
+                                            color: 'white',
                                             marginRight: 'auto',
                                             borderRadius: 25,
                                         }
                                     :
                                         {justifyContent: 'space-around', alignItems: 'center', marginLeft: 'auto', borderRadius: 25, border: '2px solid #13D3FD'}
-                                    } 
+                                    }
                                     key={msg}
                                 >
-                                    <h1 style={t_msg.message.m === 'seller' ? 
+                                    <h1 style={t_msg.message.m === 'seller' ?
                                                 {border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}
                                             :
                                                 {border: '2px solid white', borderRadius: 10, padding: '.5rem', margin: '1rem'}
                                         }
                                     >
-                                        {t_msg.position} 
+                                        {t_msg.position}
                                     </h1>
                                     <h3 style={{maxWidth: '50vh'}}>{t_msg.message.m}</h3>
                                 </Row>
@@ -2243,7 +2227,7 @@ class WalletHome extends React.Component {
 
                                             <Row style={{justifyContent: 'space-around'}}>
                                                 <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
-                                                    {t_msg.position} 
+                                                    {t_msg.position}
                                                 </h1>
 
                                                 <Col>
@@ -3291,7 +3275,7 @@ class WalletHome extends React.Component {
                         alert(err);
                         reject(err);
                     } else {
-                        alert(`Edit offer committed 
+                        alert(`Edit offer committed
                     Transaction ID: ${this.state.edit_offer_txn_id}
                     For Offer ID: ${this.state.edit_offer_txn_offerid}
                     Title: ${this.state.edit_offer_txn_title}
@@ -3435,23 +3419,23 @@ class WalletHome extends React.Component {
                     } else if (msg.message.m.length > 0) {
                         console.log(`this is a direct message open ended`);
                         return (
-                            <Row className="my-3 w-75 text-break p-1" 
+                            <Row className="my-3 w-75 text-break p-1"
                                 style={ msg.message.m === 'seller' ?
                                     {
-                                        justifyContent: 'space-around', 
-                                        alignItems: 'center', 
-                                        backgroundColor: '#13D3FD', 
-                                        color: 'white', 
+                                        justifyContent: 'space-around',
+                                        alignItems: 'center',
+                                        backgroundColor: '#13D3FD',
+                                        color: 'white',
                                         marginRight: 'auto',
                                         borderRadius: 25,
                                     }
                                 :
                                     {justifyContent: 'space-around', alignItems: 'center', marginLeft: 'auto', borderRadius: 25, border: '2px solid #13D3FD'}
-                                }  
+                                }
                                 key={key}
                             >
                                 <h1
-                                    style={ msg.message.m === 'seller' ? 
+                                    style={ msg.message.m === 'seller' ?
                                             {border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}
                                         :
                                             {border: '2px solid white', borderRadius: 10, padding: '.5rem', margin: '1rem'}
@@ -3577,12 +3561,6 @@ class WalletHome extends React.Component {
                 }
 
                 case "market":
-                    buyerUrls = this.state.buyer_urls.map((url, key) => {
-                        return (
-                            <option value={url} key={key}>{url}</option>
-                        )
-                    })
-
                     var table_of_listings;
                     if (this.state.offer_loading_flag === 'all') {
                         table_of_listings = this.state.non_offers.map((listing, key) => {
@@ -3947,7 +3925,7 @@ class WalletHome extends React.Component {
                                                             </Col>
                                                         </Form.Group>
                                                     </div>
-                                                : 
+                                                :
                                                     ''
                                                 }
 
@@ -4018,7 +3996,7 @@ class WalletHome extends React.Component {
                                     </Button>
                                 </ReactModal>
 
-                            <ReactModal 
+                            <ReactModal
                                 isOpen={this.state.show_purchase_confirm_modal}
                                 closeTimeoutMS={500}
                                 className="keys-modal"
@@ -4045,7 +4023,7 @@ class WalletHome extends React.Component {
                             >
                                 <h1>Purchase Confirmed: {this.state.show_purchase_offer.title}</h1>
                             
-                                <button onClick={() => print('receipt', 'html')}>Print</button> 
+                                <button onClick={() => print('receipt', 'html')}>Print</button>
 
                                 <h2>Purchase transaction committed.</h2>
 
@@ -4059,9 +4037,9 @@ class WalletHome extends React.Component {
 
                                 <h2>Price: {this.state.purchase_txn_price} SFX</h2>
                                 
-                                <h2>Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX</h2> 
+                                <h2>Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX</h2>
 
-                                <div 
+                                <div
                                     
                                     style={{display: 'none'}}
                                 >
@@ -4070,7 +4048,7 @@ class WalletHome extends React.Component {
                                         <br/><br/>
                                         Date: {new Date().toString()}
                                         <br/><br/>
-                                        Transaction ID: {this.state.purchase_txn_id} 
+                                        Transaction ID: {this.state.purchase_txn_id}
                                         <br/><br/>
                                         Seller: {this.state.purchase_txn_seller}
                                         <br/><br/>
@@ -4088,17 +4066,17 @@ class WalletHome extends React.Component {
                                         <br/><br/>
                                         Thank You For Shopping With Safex!
                                     </h1>
-                                        
+                                    
                                     {/*<p>
-                                    Public Key: {this.state.show_purchase_confirm_modal ? 
+                                    Public Key: {this.state.show_purchase_confirm_modal ?
                                         this.state.twm_file.api.urls[this.state.api_url][this.state.show_purchase_offer.offer_id][this.state.purchase_txn_id].pgp_keys.public_key
                                     :
                                         ''
                                     }
                                 </p>*/}
-                                        
-                                    
-                                </div>                 
+                                
+                                
+                                </div>
                             </ReactModal>
 
                             <Col sm={4} className="no-padding d-flex flex-column align-items-center justify-content-between">
@@ -4114,8 +4092,8 @@ class WalletHome extends React.Component {
                                 />
                             </Col>
 
-                            <Col 
-                                sm={7} 
+                            <Col
+                                sm={7}
                                 className="no-padding d-flex flex-column justify-content-between"
                             >
                                 <AccountInfo
@@ -4132,7 +4110,7 @@ class WalletHome extends React.Component {
                                 />
                             </Col>
 
-                            <Col 
+                            <Col
                                 sm={12}
                                 className={ this.state.showBuyerOrders ?
                                     "display-none"
@@ -4246,9 +4224,9 @@ class WalletHome extends React.Component {
                                         </Col>
 
                                         <Col className="d-flex justify-content-center align-self-center" sm={4}>
-                                            <button 
-                                                onClick={this.handleBuyerOrders} 
-                                                style={{padding: '1rem', lineHeight: 0, }} 
+                                            <button
+                                                onClick={this.handleBuyerOrders}
+                                                style={{padding: '1rem', lineHeight: 0, }}
                                                 className="search-button"
                                             >
                                                 {this.state.showBuyerOrders ? 'Close' : 'My Orders'}
@@ -4282,74 +4260,78 @@ class WalletHome extends React.Component {
                                         </IconContext.Provider>
 
                                         <Row className="p-5 justify-content-center">
-                                            <Col 
+                                            <Col
                                                 sm={4}
                                                 style={{wordBreak: 'break-all', fontFamily: 'Inter'}}
                                             >
                                                     <div>
-                                                        <h2>Selected URL:</h2> 
+                                                        <h2>Selected URL:</h2>
                                                         <h3>{this.state.buyerSelectUrl}</h3>
                                                     </div>
 
                                                     <div className="my-3">
                                                         <h2>Selected Offer:</h2>
                                                         <h3>{this.state.buyerSelectOffer}</h3>
-                                                    </div> 
+                                                    </div>
 
                                                     <div>
-                                                        <h2>Selected Order:</h2> 
+                                                        <h2>Selected Order:</h2>
                                                         <h3>{this.state.buyerSelectOrder}</h3>
                                                     </div>
                                             </Col>
 
-                                            <Col 
+                                            <Col
                                                 sm={8}
                                                 className="pt-3 staking-table-table"
                                                 style={{maxHeight: '60vh'}}
                                             >
+	
+												<div>
+													<h1>Select URL</h1>
+													
+													<select
+														className="my-3"
+														value={this.state.buyerSelectUrl}
+														name="buyerSelectUrl"
+														onChange={this.handleBuyerChange}
+													>
+														<option>Please Select</option>
+														{this.state.buyer_urls.map((url, key) => {
+															return (
+																<option value={url} key={key}>{url}</option>
+															)
+														})}
+													</select>
+												</div>
 
-                                                <form onSubmit={(e) => this.buyer_get_offer_ids_by_url(e)}>
-                                                    <h1>Select URL</h1>
-                                                    
-                                                    <select
-                                                        className="my-3" 
-                                                        value={this.state.buyerSelectUrl} 
-                                                        name="buyerSelectUrl" 
-                                                        onChange={this.handleBuyerChange}
-                                                    >
-                                                        <option>Please Select</option>
-                                                        {buyerUrls}                           
-                                                    </select>
+                                                <div className="my-5">
+													<h1>Select Offer</h1>
+	
+													<select
+														className="my-3"
+														value={this.state.buyerSelectOffer}
+														name="buyerSelectOffer"
+														onChange={this.handleBuyerChange}
+													>
+														<option>Please Select</option>
+														{this.buyer_get_offer_ids().map(offerId => <option key={offerId}>{offerId}</option>)}
+													</select>
+												</div>
 
-                                                    <button className="search-button" type="submit">Get Offers</button>
-                                                </form>
-
-                                                <form className="my-5" onSubmit={(e) => this.buyer_get_order_ids_by_offer_id(e)}>
-                                                    <h1>Select Offer</h1>
-
-                                                    <select
-                                                        className="my-3" 
-                                                        value={this.state.buyerSelectOffer} 
-                                                        name="buyerSelectOffer" 
-                                                        onChange={this.handleBuyerChange}
-                                                    >
-                                                        <option>Please Select</option>
-                                                        {offerDropdown}
-                                                    </select>
-                                                    
-                                                    <button className="search-button" type="submit">Get Orders</button>
-                                                </form>
-
-                                                <form onSubmit={this.buyer_get_messages_by_order_id}>
+												<form onSubmit={this.buyer_get_messages_by_order_id}>
                                                     <h1>Select Order</h1>
                                                     <select
-                                                        className="my-3" 
-                                                        value={this.state.buyerSelectOrder} 
-                                                        name="buyerSelectOrder" 
+                                                        className="my-3"
+                                                        value={this.state.buyerSelectOrder}
+                                                        name="buyerSelectOrder"
                                                         onChange={this.handleBuyerChange}
                                                     >
                                                         <option>Please Select</option>
-                                                        {orderDropdown}
+														{this.buyer_get_orders().map(order => (
+															<option key={order.order_id} value={order.order_id}>
+																{order.quantity} {order.title} ({order.order_id.slice(0, 6)})
+															</option>
+														))}
                                                     </select>
                                                     
                                                     <button className="search-button" type="submit">Get Messages</button>
@@ -4370,14 +4352,14 @@ class WalletHome extends React.Component {
                                         <Row>
                                             <Col sm={10}>
                                                 <h1>
-                                                    Buyer Messages for 
+                                                    Buyer Messages for
                                                 </h1>
                                                 <h3>Order: {this.state.buyerSelectOrder}</h3>
 
-                                                <button 
+                                                <button
                                                     onClick={ () =>
                                                         this.fetch_buyers_messages_for_order(
-                                                            this.state.buyerSelectOffer, 
+                                                            this.state.buyerSelectOffer,
                                                             this.state.buyerSelectOrder,
                                                             'http://stageapi.theworldmarketplace.com:17700'
                                                         )}
@@ -5058,9 +5040,9 @@ class WalletHome extends React.Component {
 
                                                 <Col className="mx-auto my-5" sm={6}>
                                                     <form onSubmit={(e) => this.seller_reply_message(
-                                                                e, 
-                                                                this.state.selected_user.username, 
-                                                                this.state.selectedMerchantOffer, 
+                                                                e,
+                                                                this.state.selected_user.username,
+                                                                this.state.selectedMerchantOffer,
                                                                 this.state.selectedMerchantOrder,
                                                                 'http://stageapi.theworldmarketplace.com:17700',
                                                             )
@@ -5463,3 +5445,14 @@ class WalletHome extends React.Component {
 }
 
 export default withRouter(WalletHome);
+
+
+/**
+ * @typedef {Object} BuyerPurchaseObj
+ * @property api_url Example: "http://stageapi.theworldmarketplace.com:17700"
+ * @property bc_height Example: 139384
+ * @property offer_id Example: "8b620e67edbc330b0d272032da837fdd4a10d14771bbf816b98f57577c920dc1"
+ * @property price Example: 42
+ * @property quantity Example: "1"
+ * @property title Example: "Katana & Holder"
+ */
