@@ -3495,16 +3495,21 @@ class WalletHome extends React.Component {
                                             <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
                                                 {msg.position}
                                             </h1>
-                                            <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> <i>/</i></h2>
-                                            <h2><i>/ <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> <i>/</i></h2>
-                                            <h2><i>/ <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/> <i>/</i></h2>
-                                            <h2><i>/ <u>City:</u></i> <b></b>{parsed_so.city}<b/> <i>/</i></h2>
-                                            <h2><i>/ <u>State:</u></i> <b></b>{parsed_so.s}<b/> <i>/</i></h2>
-                                            <h2><i>/ <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/> <i>/</i></h2>
-                                            <h2><i>/ <u>Country:</u></i> <b></b>{parsed_so.c}<b/> <i>//</i></h2>
-                                            <br/><br/>
-                                            <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
-                                            <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
+                                            
+                                            <Col>
+                                                <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> </h2>
+                                                <h2><i> <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> </h2>
+                                                <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
+                                                <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
+                                            </Col>
+
+                                            <Col>
+                                                <h2><i> <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/> </h2>
+                                                <h2><i> <u>City:</u></i> <b></b>{parsed_so.city}<b/> </h2>
+                                                <h2><i> <u>State:</u></i> <b></b>{parsed_so.s}<b/> </h2>
+                                                <h2><i> <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/> </h2>
+                                                <h2><i> <u>Country:</u></i> <b></b>{parsed_so.c}<b/> </h2>
+                                            </Col>
                                         </Row>
 
 
@@ -4277,28 +4282,6 @@ class WalletHome extends React.Component {
 
                             {this.state.showBuyerOrders ?
                                 <Col className="market-table overflow-y" md={12}>
-                                    {/*<BuyerOrders
-                                        urls = {this.state.buyer_urls.map((url, key) => {
-                                            return (
-                                                <option value={url} key={key}>{url}</option>
-                                            )
-                                        })}
-                                        offers={offerDropdown}
-                                        orders={orderDropdown}
-                                        showMessages={this.state.showMessages}
-                                        handleShowMessages={this.handleShowMessages}
-                                        handleHideMessages={this.handleHideMessages}
-                                        handleOrders={this.handleBuyerOrders}
-                                        getOffers={this.buyer_get_offer_ids_by_url}
-                                        getOrders={this.buyer_get_order_ids_by_offer_id}
-                                        selectedBuyerOffer={this.state.selectedBuyerOffer}
-                                        selectedBuyerOrder={this.state.order}
-                                        selectedBuyerUrl={this.state.url}
-                                        getMessages={this.buyer_get_messages_by_order_id}
-                                        handleMessages={this.handleBuyerMessages}
-                                        handleChange={this.handleBuyerChange}
-                                    />*/
-}
                                     <div className="h-100">
 
                                         <IconContext.Provider value={{color: '#FEB056', size: '20px'}}>
@@ -4424,7 +4407,7 @@ class WalletHome extends React.Component {
                                         </Row>
 
                                         <Row className="m-auto">
-                                            <Col style={{overflowY: 'auto', maxHeight: '50vh'}} sm={12}>
+                                            <Col style={{overflowY: 'auto', maxHeight: '65vh'}} sm={12}>
                                                 {this.state.buyerMessages}
                                             </Col>
 
