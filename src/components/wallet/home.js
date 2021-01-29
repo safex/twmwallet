@@ -5447,14 +5447,3 @@ class WalletHome extends React.Component {
 }
 
 export default withRouter(WalletHome);
-
-
-/**
- * @typedef {Object} BuyerPurchaseObj
- * @property api_url Example: "http://stageapi.theworldmarketplace.com:17700"
- * @property bc_height Example: 139384
- * @property offer_id Example: "8b620e67edbc330b0d272032da837fdd4a10d14771bbf816b98f57577c920dc1"
- * @property price Example: 42
- * @property quantity Example: "1"
- * @property title Example: "Katana & Holder"
- */
