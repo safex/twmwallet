@@ -776,14 +776,13 @@ class WalletHome extends React.Component {
     };
 
     handleBuyerChange = (e) => {
-        let name = e.target.name
-        let value = e.target.value
-        this.setState({[name]: value})
-        console.log(e.target.name)
-        console.log(e.target.value)
-        console.log(this.state.buyerSelectUrl)
+        let name = e.target.name;
+        let value = e.target.value;
+        this.setState({[name]: value});
+        console.log(e.target.name);
+        console.log(e.target.value);
+        console.log(this.state.buyerSelectUrl);
     }
-
 
     //basic send transactions
     token_send = async (e) => {
@@ -1149,7 +1148,12 @@ class WalletHome extends React.Component {
     };
 
     handleBuyerMessages = () => {
-        this.setState({showBuyerMessages: !this.state.showBuyerMessages})
+        const showBuyerMessages = !this.state.showBuyerMessages;
+        this.setState({showBuyerMessages});
+        if (showBuyerMessages) {
+            // Automatically load messages when opening modal
+            this.load_buyers_messages_for_selected_order();
+        }
     }
 
     //show modal of private keys
@@ -2148,128 +2152,135 @@ class WalletHome extends React.Component {
 		return result;
 	};
 
-    buyer_get_messages_by_order_id = async(e) => {
-        e.preventDefault();
+    renderBuyerMessages() {
+        const {buyerSelectUrl, buyerSelectOffer, buyerSelectOrder, twm_file: t_f} = this.state;
+        if (!buyerSelectUrl || !buyerSelectOffer || !buyerSelectOrder || !t_f || !t_f.api || !t_f.api.urls) {
+            return [];
+        }
+
+        const messages = [];
         try {
-            let messages = [];
             let t_f = this.state.twm_file;
-            if (!this.isEmpty(t_f.api.urls[this.state.buyerSelectUrl][this.state.buyerSelectOffer][this.state.buyerSelectOrder])) {
-                let core = t_f.api.urls[this.state.buyerSelectUrl][this.state.buyerSelectOffer][this.state.buyerSelectOrder];
-                for (const msg in core.messages) {
-                    //let tempKey = msg + '--#--' + key;
-                    //console.log(t_f.api.urls[this.state.buyerSelectUrl][this.state.buyerSelectOffer][this.state.buyerSelectOrder].messages[msg]);
 
-                    try {
-                        let t_msg = core.messages[msg];
-                        if (typeof t_msg.message == 'string') {
-                            t_msg.message = JSON.parse(t_msg.message);
-                        }
+            /** @type {BuyerOrder} */
+            const core =  t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder];
+            if (!core) {
+                console.error(`order ${buyerSelectOrder} not found`);
+                return;
+            }
 
-                        if (t_msg.message.n.length > 0) {
-                            console.log(`nft address supplied!`);
-                            messages.push (
-                                <Row style={{justifyContent: 'space-around'}} key={msg}>
-                                    <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
-                                        {t_msg.position}
-                                    </h1>
-                                    <h3>{t_msg.message.n}</h3>
-                                </Row>
-                            );
-                        } else if (t_msg.message.m.length > 0) {
-                            console.log(`this is a direct message open ended`);
-                            messages.push (
-                                <Row className="my-3 w-75 text-break p-1"
-                                    style={ t_msg.message.m === 'seller' ?
-                                        {
-                                            justifyContent: 'space-around',
-                                            alignItems: 'center',
-                                            backgroundColor: '#13D3FD',
-                                            color: 'white',
-                                            marginRight: 'auto',
-                                            borderRadius: 25,
-                                        }
+            for (const msg in core.messages) {
+                //let tempKey = msg + '--#--' + key;
+                //console.log(t_f.api.urls[this.state.buyerSelectUrl][this.state.buyerSelectOffer][this.state.buyerSelectOrder].messages[msg]);
+
+                try {
+                    let t_msg = core.messages[msg];
+                    if (typeof t_msg.message == 'string') {
+                        t_msg.message = JSON.parse(t_msg.message);
+                    }
+
+                    if (t_msg.message.n.length > 0) {
+                        console.log(`nft address supplied!`);
+                        messages.push (
+                            <Row style={{justifyContent: 'space-around'}} key={msg}>
+                                <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
+                                    {t_msg.position}
+                                </h1>
+                                <h3>{t_msg.message.n}</h3>
+                            </Row>
+                        );
+                    } else if (t_msg.message.m.length > 0) {
+                        console.log(`this is a direct message open ended`);
+                        messages.push (
+                            <Row className="my-3 w-75 text-break p-1"
+                                 style={ t_msg.message.m === 'seller' ?
+                                     {
+                                         justifyContent: 'space-around',
+                                         alignItems: 'center',
+                                         backgroundColor: '#13D3FD',
+                                         color: 'white',
+                                         marginRight: 'auto',
+                                         borderRadius: 25,
+                                     }
+                                     :
+                                     {justifyContent: 'space-around', alignItems: 'center', marginLeft: 'auto', borderRadius: 25, border: '2px solid #13D3FD'}
+                                 }
+                                 key={msg}
+                            >
+                                <h1 style={t_msg.message.m === 'seller' ?
+                                    {border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}
                                     :
-                                        {justifyContent: 'space-around', alignItems: 'center', marginLeft: 'auto', borderRadius: 25, border: '2px solid #13D3FD'}
-                                    }
-                                    key={msg}
-                                >
-                                    <h1 style={t_msg.message.m === 'seller' ?
-                                                {border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}
-                                            :
-                                                {border: '2px solid white', borderRadius: 10, padding: '.5rem', margin: '1rem'}
-                                        }
-                                    >
-                                        {t_msg.position}
-                                    </h1>
-                                    <h3 style={{maxWidth: '50vh'}}>{t_msg.message.m}</h3>
-                                </Row>
-                            );
-                        } else if (t_msg.message.hasOwnProperty('so')) {
-                            console.log(t_msg.message.so);
-                            console.log(`found shipping object`);
-                            let parsed_so;
-                            if (typeof t_msg.message.so == 'string') {
-                                console.log(`so is a string`);
-
-                                parsed_so = JSON.parse(t_msg.message.so);
-                                console.log(parsed_so);
-                                console.log(t_msg)
-                                console.log(t_msg.message)
-                            } else {
-                                parsed_so = t_msg.message.so;
-                            }
-                            if (parsed_so.fn.length > 2) {
-                                console.log(`there is a shipping object supplied!`);
-                                try {
-                                    console.log(`parsed the so`);
-                                    messages.push (
-                                        <div key={msg}>
-
-                                            <Row style={{justifyContent: 'space-around'}}>
-                                                <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
-                                                    {t_msg.position}
-                                                </h1>
-
-                                                <Col>
-                                                    <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> </h2>
-                                                    <h2><i> <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> </h2>
-                                                    <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
-                                                    <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
-                                                </Col>
-
-                                                <Col>
-                                                    <h2><i> <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/> </h2>
-                                                    <h2><i> <u>City:</u></i> <b></b>{parsed_so.city}<b/> </h2>
-                                                    <h2><i> <u>State:</u></i> <b></b>{parsed_so.s}<b/> </h2>
-                                                    <h2><i> <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/> </h2>
-                                                    <h2><i> <u>Country:</u></i> <b></b>{parsed_so.c}<b/> </h2>
-                                                </Col>
-                                            </Row>
-
-
-                                        </div>
-                                    );
-                                } catch(err) {
-                                    console.error(err);
-                                    console.error(`error at parsing the shipping object`);
+                                    {border: '2px solid white', borderRadius: 10, padding: '.5rem', margin: '1rem'}
                                 }
+                                >
+                                    {t_msg.position}
+                                </h1>
+                                <h3 style={{maxWidth: '50vh'}}>{t_msg.message.m}</h3>
+                            </Row>
+                        );
+                    } else if (t_msg.message.hasOwnProperty('so')) {
+                        console.log(t_msg.message.so);
+                        console.log(`found shipping object`);
+                        let parsed_so;
+                        if (typeof t_msg.message.so == 'string') {
+                            console.log(`so is a string`);
+
+                            parsed_so = JSON.parse(t_msg.message.so);
+                            console.log(parsed_so);
+                            console.log(t_msg)
+                            console.log(t_msg.message)
+                        } else {
+                            parsed_so = t_msg.message.so;
+                        }
+                        if (parsed_so.fn.length > 2) {
+                            console.log(`there is a shipping object supplied!`);
+                            try {
+                                console.log(`parsed the so`);
+                                messages.push (
+                                    <div key={msg}>
+
+                                        <Row style={{justifyContent: 'space-around'}}>
+                                            <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
+                                                {t_msg.position}
+                                            </h1>
+
+                                            <Col>
+                                                <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> </h2>
+                                                <h2><i> <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> </h2>
+                                                <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
+                                                <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
+                                            </Col>
+
+                                            <Col>
+                                                <h2><i> <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/> </h2>
+                                                <h2><i> <u>City:</u></i> <b></b>{parsed_so.city}<b/> </h2>
+                                                <h2><i> <u>State:</u></i> <b></b>{parsed_so.s}<b/> </h2>
+                                                <h2><i> <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/> </h2>
+                                                <h2><i> <u>Country:</u></i> <b></b>{parsed_so.c}<b/> </h2>
+                                            </Col>
+                                        </Row>
+
+
+                                    </div>
+                                );
+                            } catch(err) {
+                                console.error(err);
+                                console.error(`error at parsing the shipping object`);
                             }
                         }
+                    }
 
                     //messages.push(<h3 key={msg}>{core.messages[msg]}</h3>);
                 } catch(err) {
-                        console.error(err);
-                    }
+                    console.error(err);
                 }
-            } else {
-                console.log(`the object is empty no messages found for ${e.target.order.value}`);
             }
-            this.setState({buyerMessages: messages})
         } catch(err) {
             console.error(err);
             console.error(`error at buyer_get_messages_by_offer_id`);
         }
-    };
+        return messages;
+    }
 
     seller_reply_message = async (e, seller_name, offer_id, order_id, twm_api_url) => {
         e.preventDefault();
@@ -2431,140 +2442,137 @@ class WalletHome extends React.Component {
         return hexStr.toUpperCase();
     };
 
-    fetch_buyers_messages_for_order = async (offer_id, order_id, twm_api_url) => {
-        let t_f = this.state.twm_file;
-        if (t_f.api.urls.hasOwnProperty(twm_api_url)) {
-            if (t_f.api.urls[twm_api_url].hasOwnProperty(offer_id)) {
-                if (t_f.api.urls[twm_api_url][offer_id].hasOwnProperty(order_id)) {
+    load_buyers_messages_for_selected_order = async () => {
+        const {buyerSelectUrl, buyerSelectOffer, buyerSelectOrder, twm_file: t_f} = this.state;
+        if (!buyerSelectUrl || !buyerSelectOffer || !buyerSelectOrder || !t_f || !t_f.api || !t_f.api.urls) {
+            return [];
+        }
+
+        try {
+            console.log(`it has the twmapi in it's file for the fetch messages_of the buyer`);
+
+            let date = new Date(new Date().toUTCString());
+            console.log(date);
+            console.log(date.toString());
+
+            const crypto  = window.require('crypto');
+            let our_key = crypto.createPrivateKey(t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder].pgp_keys.private_key)
+            console.log(our_key);
+            let date_msg = Buffer.from(date.toString());
+            console.log(date_msg);
+
+            let msg_hex = this.byteToHexString(date_msg);
+            const signature = crypto.sign("sha256", date_msg, {
+                key: our_key,
+                padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+            });
+
+            console.log(signature);
+            let verified_sig = crypto.verify(
+                "sha256",
+                date_msg,
+                {
+                    key: our_key,
+                    padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                },
+                signature
+            );
+            console.log(`is verified :::  ${verified_sig}`);
+            let req_payload = {};
+            req_payload.signature = this.byteToHexString(signature);
+            req_payload.pgp_public_key = t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder].pgp_keys.public_key;
+            req_payload.msg = date.toString();
+            req_payload.order_id = buyerSelectOrder;
+            req_payload.msg_hex = msg_hex;
+            let req_msgs = await buyer_get_messages(req_payload, buyerSelectUrl);
+            console.log(req_msgs.to);
+            console.log(req_msgs.from);
+
+            for (const order in req_msgs.to) {
+                console.log(req_msgs.to[order]);
+                for (const msg of req_msgs.to[order]) {
                     try {
-                        console.log(`it has the twmapi in it's file for the fetch messages_of the buyer`);
-
-                        let date = new Date(new Date().toUTCString());
-                        console.log(date);
-                        console.log(date.toString());
-
-                        const crypto  = window.require('crypto');
-                        let our_key = crypto.createPrivateKey(t_f.api.urls[twm_api_url][offer_id][order_id].pgp_keys.private_key)
-                        console.log(our_key);
-                        let date_msg = Buffer.from(date.toString());
-                        console.log(date_msg);
-
-                        let msg_hex = this.byteToHexString(date_msg);
-                        const signature = crypto.sign("sha256", date_msg, {
-                            key: our_key,
-                            padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-                        });
-
-                        console.log(signature);
-                        let verified_sig = crypto.verify(
-                            "sha256",
-                            date_msg,
+                        const decryptedData = crypto.privateDecrypt(
                             {
                                 key: our_key,
-                                padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+                                padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+                                oaepHash: "sha256",
                             },
-                            signature
+                            this.hexStringToByte(msg.message)
                         );
-                        console.log(`is verified :::  ${verified_sig}`);
-                        let req_payload = {};
-                        req_payload.signature = this.byteToHexString(signature);
-                        req_payload.pgp_public_key = t_f.api.urls[twm_api_url][offer_id][order_id].pgp_keys.public_key;
-                        req_payload.msg = date.toString();
-                        req_payload.order_id = order_id;
-                        req_payload.msg_hex = msg_hex;
-                        let req_msgs = await buyer_get_messages(req_payload, twm_api_url);
-                        console.log(req_msgs.to);
-                        console.log(req_msgs.from);
 
-                        for (const order in req_msgs.to) {
-                            console.log(req_msgs.to[order]);
-                            for (const msg of req_msgs.to[order]) {
-                                try {
-                                    const decryptedData = crypto.privateDecrypt(
-                                        {
-                                            key: our_key,
-                                            padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-                                            oaepHash: "sha256",
-                                        },
-                                        this.hexStringToByte(msg.message)
-                                    );
-
-                                    console.log(decryptedData.toString());
-                                    let decomped = zlib.inflateSync(Buffer.from(decryptedData));
-                                    console.log(decomped.toString());
-                                    try {
-                                        let parsed = JSON.parse(decomped.toString());
-                                        msg.message = decomped.toString();
-                                        console.log(parsed);
-                                        if (msg.to === req_payload.pgp_public_key) {
-                                            console.log(msg.message );
-                                            if (t_f.api.urls[twm_api_url][offer_id][order_id].messages.hasOwnProperty(msg.position)) {
-                                                console.log(`duplicate message here for fetch buyer messages`)
-                                            } else {
-                                                t_f.api.urls[twm_api_url][offer_id][order_id].messages[msg.position] = msg;
-                                            }
-                                        }
-                                    } catch(err) {
-                                        console.error(err);
-                                        console.error(`err at parsing the decompressed string at buyer fetch the message`);
-                                    }
-                                } catch(err) {
-                                    console.error(err);
-                                    console.error(`error at decrypting the message at the buyer fetch the message`);
+                        console.log(decryptedData.toString());
+                        let decomped = zlib.inflateSync(Buffer.from(decryptedData));
+                        console.log(decomped.toString());
+                        try {
+                            let parsed = JSON.parse(decomped.toString());
+                            msg.message = decomped.toString();
+                            console.log(parsed);
+                            if (msg.to === req_payload.pgp_public_key) {
+                                console.log(msg.message );
+                                if (t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder].messages.hasOwnProperty(msg.position)) {
+                                    console.log(`duplicate message here for fetch buyer messages`)
+                                } else {
+                                    // WARN! We are mutating the state here!
+                                    t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder].messages[msg.position] = msg;
                                 }
                             }
-                        }
-                        try {
-                            const crypto = window.require('crypto');
-                            const algorithm = 'aes-256-ctr';
-                            console.log(this.state.password);
-                            const cipher = crypto.createCipher(algorithm, this.state.password.toString());
-                            let crypted = cipher.update(JSON.stringify(t_f), 'utf8', 'hex');
-                            crypted += cipher.final('hex');
-
-                            const hash1 = crypto.createHash('sha256');
-                            hash1.update(JSON.stringify(t_f));
-                            console.log(`password ${this.state.password}`);
-                            console.log(JSON.stringify(t_f));
-
-                            let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
-
-                            try {
-                                let opened_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
-                                console.log(opened_twm_file);
-
-                                localStorage.setItem('twm_file', t_f);
-
-                                this.setState({twm_file: t_f});
-
-                            } catch (err) {
-                                this.setState({showLoader: false});
-                                console.error(err);
-                                console.error(`error opening twm file after save to verify`);
-                                alert(`Error at saving to the twm file during account creation verification stage`);
-                            }
-                            console.log(twm_save);
-                            
-                        } catch (err) {
-                            this.setState({showLoader: false});
+                        } catch(err) {
                             console.error(err);
-                            console.error(`error at initial save of the twm file`);
-                            alert(`Error at saving to the twm file during account creation initialization stage`);
+                            console.error(`err at parsing the decompressed string at buyer fetch the message`);
                         }
-
-
                     } catch(err) {
                         console.error(err);
-                        console.error(`error at fetching the messages of the buyer`);
+                        console.error(`error at decrypting the message at the buyer fetch the message`);
                     }
-                } else {
-                    console.log(`this order id was not found in the buyers twm file`);
                 }
-            } else {
-                console.log(`this offer was not found in the buyers twm file`);
             }
-        } else {
-            console.log(`this url is not found in the buyers twm file`);
+
+            // NOTE: Due to mutating state variable, we need to force a reload
+            this.forceUpdate();
+
+            try {
+                const crypto = window.require('crypto');
+                const algorithm = 'aes-256-ctr';
+                console.log(this.state.password);
+                const cipher = crypto.createCipher(algorithm, this.state.password.toString());
+                let crypted = cipher.update(JSON.stringify(t_f), 'utf8', 'hex');
+                crypted += cipher.final('hex');
+
+                const hash1 = crypto.createHash('sha256');
+                hash1.update(JSON.stringify(t_f));
+                console.log(`password ${this.state.password}`);
+                console.log(JSON.stringify(t_f));
+
+                let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
+
+                try {
+                    let opened_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
+                    console.log(opened_twm_file);
+
+                    localStorage.setItem('twm_file', t_f);
+
+                    this.setState({twm_file: t_f});
+
+                } catch (err) {
+                    this.setState({showLoader: false});
+                    console.error(err);
+                    console.error(`error opening twm file after save to verify`);
+                    alert(`Error at saving to the twm file during account creation verification stage`);
+                }
+                console.log(twm_save);
+
+            } catch (err) {
+                this.setState({showLoader: false});
+                console.error(err);
+                console.error(`error at initial save of the twm file`);
+                alert(`Error at saving to the twm file during account creation initialization stage`);
+            }
+
+
+        } catch(err) {
+            console.error(err);
+            console.error(`error at fetching the messages of the buyer`);
         }
     };
 
@@ -4318,7 +4326,7 @@ class WalletHome extends React.Component {
 													</select>
 												</div>
 
-												<form onSubmit={this.buyer_get_messages_by_order_id}>
+												<div>
                                                     <h1>Select Order</h1>
                                                     <select
                                                         className="my-3"
@@ -4333,9 +4341,7 @@ class WalletHome extends React.Component {
 															</option>
 														))}
                                                     </select>
-                                                    
-                                                    <button className="search-button" type="submit">Get Messages</button>
-                                                </form>
+                                                </div>
 
                                                 <button className="search-button mt-3" type="button" onClick={this.handleBuyerMessages}>Show Messages</button>
                                                 
@@ -4358,11 +4364,7 @@ class WalletHome extends React.Component {
 
                                                 <button
                                                     onClick={ () =>
-                                                        this.fetch_buyers_messages_for_order(
-                                                            this.state.buyerSelectOffer,
-                                                            this.state.buyerSelectOrder,
-                                                            'http://stageapi.theworldmarketplace.com:17700'
-                                                        )}
+                                                        this.load_buyers_messages_for_selected_order()}
                                                 >
                                                     Refresh Messages
                                                 </button>
@@ -4380,7 +4382,7 @@ class WalletHome extends React.Component {
 
                                         <Row className="m-auto">
                                             <Col style={{overflowY: 'auto', maxHeight: '65vh'}} sm={12}>
-                                                {this.state.buyerMessages}
+                                                {this.renderBuyerMessages()}
                                             </Col>
 
                                             <Col className="mx-auto my-5" sm={6}>
