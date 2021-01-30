@@ -12,17 +12,17 @@ export default function HomeInfo(props) {
     return (
        
             <div className="home-info-box">
-                <h3>
+                <h4>
                     <FaCubes className="mr-3"/>
                     { props.walletHeight === props.blockHeight ? 
                         props.blockHeight 
                     : 
                         `${props.walletHeight} / ${props.blockHeight}`}
-                </h3>
+                </h4>
 
                 <p>{props.connection}</p>
 
-                <h2 className={!props.firstRefresh ? 'infinity' : ''}>
+                <h4 className={!props.firstRefresh ? 'infinity' : ''}>
                     CASH: &nbsp;{ props.firstRefresh === true ?
                                     (props.cashBalance.toLocaleString() + ' SFX')
                                     :
@@ -39,7 +39,7 @@ export default function HomeInfo(props) {
                     }
                     <br/>
                     {props.pendingTokens > 0 ? `(${props.pendingTokens.toLocaleString()} SFT Pending)` : ''}
-                </h2>
+                </h4>
                 
             </div>
      

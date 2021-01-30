@@ -22,7 +22,7 @@ export default function AccountInfo(props) {
             <div className="account-info-box">
                     <h1>This is your SAFEX Cash and SAFEX Token address:</h1>
 
-                    <h1>{ props.toEllipsis(props.address, 20, 20) }</h1>
+                    <h1>{props.address}</h1>
                     {/*this.state.synced === false ? (
                         <Button variant="warning" onClick={this.check}>
                             Check

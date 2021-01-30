@@ -191,8 +191,6 @@
     }
 
     .home-main-div {
-        width: 95%;
-        margin: 3rem auto;
         display: flex;
         justify-content: start;
     }

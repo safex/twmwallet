@@ -1,17 +1,12 @@
 .home-info-box {
-    height: 25vh;
     max-height: 400px;
-    padding: 2rem;
     width: 75%;
-    margin-bottom: 1rem;
     overflow: auto;
 }
 
-.home-info-box h3 {
+.home-info-box h4 {
     font-family: 'Inter';
-    font-size: 1.5rem;
     font-style: normal;
-    font-weight: 600;
     text-align: center;
     color: #13D3FD;
 }
@@ -22,33 +17,24 @@
     margin-right: auto;
     font-family: 'Inter';
     line-height: initial;
-    font-size: 1.5rem;
     font-style: normal;
-    font-weight: 500;
     text-align: center;
     color: #13D3FD;
 }
 
 .home-info-box h1 {
     font-family: 'Inter';
-    font-size: 2rem;
     font-style: normal;
-    font-weight: 700;
     text-align: center;
     color: #767676;
 }
 
-.home-info-box h2 {
+.home-info-box h4 {
     font-family: 'Inter';
-    font-size: calc(1vw + .5rem);
     font-style: normal;
-    font-weight: 700;
     text-align: center;
     color: #13D3FD;
     white-space: nowrap;
-    line-height: calc(1vw + 1rem);
-
-  
 }
 
 .infinity {

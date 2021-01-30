@@ -983,7 +983,6 @@ class WalletHome extends React.Component {
     load_offers_from_api = async (e) => {
         e.preventDefault();
 
-        //call the api here and load up the offers into the api_offers array.
         try {
             console.log(this.state.api_url);
             let loaded_offers = await get_offers_url(this.state.api_url);
@@ -991,13 +990,10 @@ class WalletHome extends React.Component {
             this.setState({
                 twm_url_offers: loaded_offers.offers,
                 offer_loading_flag: 'twmurl'
-            })
-
+            });
         } catch(err) {
             console.error(err);
         }
-
-
     };
 
     load_offers_from_blockchain = async (e) => {
@@ -1037,7 +1033,6 @@ class WalletHome extends React.Component {
 
 
     handle_change_api_fetch_url = (e) => {
-
         e.preventDefault();
         this.setState({api_url: e.target.value});
     };
@@ -1248,7 +1243,7 @@ class WalletHome extends React.Component {
     };
 
     //merchant
-    load_offers = (username, index) => {
+    select_merchant_user = (username, index) => {
         this.setState({selected_user: {username: username, index: index}});
         this.fetch_messages_seller(username, 'http://stageapi.theworldmarketplace.com:17700');
        /* this.seller_reply_message(username, '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
@@ -2392,6 +2387,7 @@ class WalletHome extends React.Component {
                                     localStorage.setItem('twm_file', twm_file);
 
                                     this.setState({twm_file: twm_file});
+                                    alert(`message has been sent`);
 
                                 } catch (err) {
                                     this.setState({showLoader: false});
@@ -2698,6 +2694,8 @@ class WalletHome extends React.Component {
                                         localStorage.setItem('twm_file', t_f);
 
                                         this.setState({twm_file: t_f});
+
+                                        alert(`message has been sent`);
 
                                     } catch (err) {
                                         this.setState({showLoader: false});
@@ -3679,7 +3677,6 @@ class WalletHome extends React.Component {
                                                         BUY
                                                     </button>)
                                                 }
-                                                <button className="ml-2">CHAT</button>
                                             </p>
                                         </Row>
                                     )
@@ -3743,8 +3740,6 @@ class WalletHome extends React.Component {
                                                         BUY
                                                     </button>)
                                                 }
-
-                                                <button className="ml-2 search-button">CHAT</button>
                                             </p>
                                         </Row>
                                     )
@@ -4139,17 +4134,17 @@ class WalletHome extends React.Component {
                                             >
                                                 <div className="col-sm-6">
                                                     <input className="w-100" type="text"
-                                                            onChange={this.handle_change_api_fetch_url} placeholder="eg. api.theworldmarketplace.com"/>
+                                                            onChange={this.handle_change_api_fetch_url} value="http://stageapi.theworldmarketplace.com:17700"/>
                                                 </div>
 
                                                 <div className="col-sm-4 justify-content-around d-flex">
                                                     <button onClick={this.load_offers_from_api} className="search-button">
-                                                        Set Market API
+                                                        Show Products
                                                     </button>
 
-                                                    <button onClick={this.load_offers_from_blockchain} className="search-button">
+                                                    {/* <button onClick={this.load_offers_from_blockchain} className="search-button">
                                                         Load From Blockchain
-                                                    </button>
+                                                    </button>*/}
 
                                                     <IconContext.Provider value={{color: '#13d3fd', size: '20px'}}>
 
@@ -4183,50 +4178,6 @@ class WalletHome extends React.Component {
                                                             Search
                                                         </button>
                                                     </div>
-                                                </form>
-                                            </div>
-
-                                            <div className="row" id="filter">
-                                                <form>
-                                                    <select data-filter="category"
-                                                            className="">
-                                                        <option value="">Category</option>
-                                                        <option value="">Any</option>
-                                                        <option value="">Books</option>
-                                                        <option value="">Clothes</option>
-                                                        <option value="">Digital</option>
-                                                        <option value="">Toys</option>
-                                                    </select>
-
-                                                    <select data-filter="location"
-                                                            className="">
-                                                        <option value="">Location</option>
-                                                        <option value="">Any</option>
-                                                        <option value="">Africa</option>
-                                                        <option value="">Asia</option>
-                                                        <option value="">Australia</option>
-                                                        <option value="">Europe</option>
-                                                        <option value="">North America</option>
-                                                        <option value="">South America</option>
-                                                    </select>
-
-                                                    <select data-filter="price"
-                                                            className="">
-                                                        <option value="">Price Range</option>
-                                                        <option value="">SFX 0 - SFX 24.99</option>
-                                                        <option value="">SFX 25 - SFX 49.99</option>
-                                                        <option value="">SFX 50 - SFX 199.99</option>
-                                                        <option value="">SFX 200 - SFX 499.99</option>
-                                                        <option value="">SFX 500 - SFX 999.99</option>
-                                                        <option value="">SFX 1000+</option>
-                                                    </select>
-
-                                                    <select data-filter="sort"
-                                                            className="">
-                                                        <option value="">Sort by...</option>
-                                                        <option value="">SFX Asc</option>
-                                                        <option value="">SFX Dec</option>
-                                                    </select>
                                                 </form>
                                             </div>
                                         </Col>
@@ -4407,24 +4358,6 @@ class WalletHome extends React.Component {
                     );
 
                 case "merchant": {
-                    var twm_listings_table = this.state.twm_offers.map((listing, key) => {
-                        console.log(key);
-                        try {
-                            if (listing.seller === this.state.selected_user.username) {
-                                return <tr key={key}>
-                                    <td>{listing.title}</td>
-                                    <td>{listing.price / 10000000000}</td>
-                                    <td>{listing.quantity}</td>
-                                    <td>{listing.seller}</td>
-                                    <td>{listing.offerID}</td>
-                                </tr>
-                            }
-                        } catch (err) {
-                            console.error(`failed to properly parse the user data formatting`);
-                            console.error(err);
-                        }
-
-                    });
                     var accounts_table = this.state.usernames.map((user, key) => {
                         let avatar = '';
                         try {
@@ -4449,7 +4382,7 @@ class WalletHome extends React.Component {
                                         "no-gutters account-element"
                                 }
                                 key={key}
-                                onClick={() => this.load_offers(user.username, key)}
+                                onClick={() => this.select_merchant_user(user.username, key)}
                             >
 
                                 <Col>

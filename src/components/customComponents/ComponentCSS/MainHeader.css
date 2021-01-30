@@ -1,9 +1,5 @@
 .main-header {
-    width: 90vw;
     justify-content: space-between;
-        
-    margin: 2rem 0 2rem auto;
-    border-radius: 15px 0 0 15px;
     
     background: linear-gradient(270deg, #3698F3 0%, #13D3FD 100%, #13D3FD 100%);
     box-shadow: var(--blue-box-shadow);

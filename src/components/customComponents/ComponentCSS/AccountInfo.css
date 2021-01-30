@@ -1,7 +1,7 @@
 .account-info-box {
-    height: 18vh;
+    height: 10vh;
     max-height: 400px;
-    padding: 2rem;
+    padding: 5px;
     margin-bottom: 2vh;
     display: flex;
     flex-direction: column;
@@ -17,18 +17,17 @@
 
 .account-info-box button {
     height: 4rem;
-    width: 25%;
+    width: 180px;
 
     border-radius: 10px;
     border: 3px solid #13D3FD;
     background-color: white;
 
     font-family: 'Inter';
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-style: normal;
     font-weight: 500;
     text-align: center;
-
 }
 
 .account-info-box button:hover {
@@ -38,7 +37,7 @@
 
 .account-info-box h1 {
     font-family: 'Inter';
-    font-size: 2rem;
+    font-size: 1rem;
     font-style: normal;
     font-weight: 500;
     text-align: center;
@@ -69,7 +68,6 @@
     font-weight: 600;
     text-align: center;
     color: #BDBDBD;
-
 }
 
 .password-header {
@@ -93,8 +91,6 @@
     text-align: center;
     color: #767667;
     font-family: 'Inter';
-
-
 }
 
 .keys-modal::-webkit-scrollbar {
@@ -106,7 +102,6 @@
     font-style: normal;
     font-weight: 500;
     text-align: center;
-
 }
 
 .keys-modal h2 {
@@ -155,8 +150,6 @@
     text-align: center;
     color: #767667;
     font-family: 'Inter';
-
-
 }
 
 .buyer-messages-modal::-webkit-scrollbar {
