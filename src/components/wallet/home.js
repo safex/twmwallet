@@ -3317,12 +3317,15 @@ class WalletHome extends React.Component {
         }
     };
 
-    handleBuyerOrders = () => this.setState({
-        showBuyerOrders: !this.state.showBuyerOrders,
-        buyerSelectOffer: '',
-        buyerSelectOrder: '',
-        buyerSelectUrl: ''
-    })
+    handleBuyerOrders = (e) => {
+        e.preventDefault();
+        this.setState({
+            showBuyerOrders: !this.state.showBuyerOrders,
+            buyerSelectOffer: '',
+            buyerSelectOrder: '',
+            buyerSelectUrl: ''
+        })
+    }
 
 
     call_non_listings_table = () => offerRows = this.state.non_offers.map((listing, key) => {
@@ -4141,6 +4144,14 @@ class WalletHome extends React.Component {
                                                     <button onClick={this.load_offers_from_api} className="search-button">
                                                         Show Products
                                                     </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={this.handleBuyerOrders}
+                                                        style={{padding: '1rem', lineHeight: 0, }}
+                                                        className="search-button"
+                                                    >
+                                                        {this.state.showBuyerOrders ? 'Close' : 'My Orders'}
+                                                    </button>
 
                                                     {/* <button onClick={this.load_offers_from_blockchain} className="search-button">
                                                         Load From Blockchain
@@ -4158,41 +4169,6 @@ class WalletHome extends React.Component {
                                                 </div>
                                             </form>
                                         </div>
-
-                                    <Row className="w-100 justify-content-center">
-
-                                        <Col sm={8}>
-                                            <div className="row" id="search">
-                                                <form className="w-75 no-gutters p-2" id="search-form"
-
-                                                        encType="multipart/form-data">
-                                                    <div className="form-group col-sm-9">
-                                                        <input className="" type="text" placeholder="Search"/>
-                                                    </div>
-                                                    <div className="form-group col-sm-3">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => (alert("We are wokring on getting this feature up and running as soon as possible. Thank you for your patience!"))}
-                                                            className="search-button"
-                                                        >
-                                                            Search
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </Col>
-
-                                        <Col className="d-flex justify-content-center align-self-center" sm={4}>
-                                            <button
-                                                onClick={this.handleBuyerOrders}
-                                                style={{padding: '1rem', lineHeight: 0, }}
-                                                className="search-button"
-                                            >
-                                                {this.state.showBuyerOrders ? 'Close' : 'My Orders'}
-                                            </button>
-                                        </Col>
-
-                                    </Row>
 
                                     <Row className="staking-table-row">
                                         <p>Title</p>
