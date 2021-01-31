@@ -3306,16 +3306,13 @@ class WalletHome extends React.Component {
                         handleShowOrders={() => this.setState({selectedOffer: listing.offerID, showMyOrders: !this.state.showMyOrders})}
                         toEllipsis={this.to_ellipsis}
                         getOrders={this.get_seller_order_ids_by_offer}
-                    />
-                )
-
+                    />)
             }
         } catch (err) {
             this.setState({loadingOffers: false})
             console.error(`failed to properly parse the user data formatting`);
             console.error(err);
         }
-
         this.setState({loadingOffers: false})
     });
 
@@ -3642,8 +3639,6 @@ class WalletHome extends React.Component {
 
                                             <p data-tip data-for={`offerID${key}`}>
                                                 {this.to_ellipsis(listing.offer_id, 5, 5)}
-
-                                               
                                             </p>
 
                                             <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
@@ -3651,7 +3646,6 @@ class WalletHome extends React.Component {
                                             </ReactTooltip>
 
                                             <p style={{width: '24rem'}}>
-
                                                 {listing.quantity <= 0 ?
                                                     (<button className="search-button" disabled>
                                                         SOLD OUT
@@ -3664,7 +3658,6 @@ class WalletHome extends React.Component {
                                             </p>
                                         </Row>
                                     )
-
                                 } catch (err) {
                                     console.error(`failed to properly parse the user data formatting`);
                                     console.error(err);
@@ -3677,9 +3670,6 @@ class WalletHome extends React.Component {
 
                     return (
                         <div className="">
-
-                            
-
                                 <ReactModal
                                     isOpen={this.state.show_purchase_form}
                                     closeTimeoutMS={500}
@@ -3706,7 +3696,6 @@ class WalletHome extends React.Component {
                                     }}
                                 >
                                     <h1>PURCHASE {this.state.show_purchase_offer.title}</h1>
-
 
                                     <Form id="purchase_item"
                                             onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
@@ -3998,8 +3987,6 @@ class WalletHome extends React.Component {
                                         ''
                                     }
                                 </p>*/}
-                                
-                                
                                 </div>
                             </ReactModal>
 
@@ -4097,8 +4084,6 @@ class WalletHome extends React.Component {
                                     </Row>
                                 </div>
                             </Col>
-
-                            
 
                             {this.state.showBuyerOrders ?
                                 <Col className="market-table overflow-y" md={12}>
@@ -4245,8 +4230,6 @@ class WalletHome extends React.Component {
                                     {table_of_listings}
                                 </Col>
                             }
-
-
                         </div>
                     );
 
@@ -4377,7 +4360,6 @@ class WalletHome extends React.Component {
                                     />
 
                                     {this.state.merchantTabs === "accounts" ?
-
                                         <MerchantAccounts
                                             handleChange={this.handleChange}
                                             handleNewAccountForm={this.handleNewAccountForm}
@@ -4447,7 +4429,6 @@ class WalletHome extends React.Component {
                                         }}
                                     >
                                             <h1>Create New Offer</h1>
-
 
                                             <Form
                                                 id="list_new_offer"
@@ -4605,7 +4586,6 @@ class WalletHome extends React.Component {
                                                         name="open_message"
                                                     />
                                                 </Row>
-
 
                                                 <Form.Group as={Col}>
                                                     <Form.Label>
@@ -4772,7 +4752,6 @@ class WalletHome extends React.Component {
                                                         </Form.Group>
                                                     </Form.Group>
 
-
                                                     <Form.Group as={Col}>
 
                                                         <Form.Label>Mixins</Form.Label>
@@ -4791,7 +4770,6 @@ class WalletHome extends React.Component {
                                                             </ReactTooltip>
                                                         </IconContext.Provider>
 
-
                                                         <Form.Control
                                                             name="mixins"
                                                             as="select"
@@ -4808,8 +4786,6 @@ class WalletHome extends React.Component {
 
                                                     </Form.Group>
                                                 </Col>
-
-
                                             </Row>
 
                                             <button
@@ -4822,8 +4798,6 @@ class WalletHome extends React.Component {
 
                                                 Create Account
                                             </button>
-
-
                                         </Form>
 
                                         <button
@@ -4833,7 +4807,6 @@ class WalletHome extends React.Component {
                                             Close
                                         </button>
                                     </ReactModal>
-
 
                                     <ReactModal
                                             isOpen={this.state.showMessages}
@@ -4884,13 +4857,11 @@ class WalletHome extends React.Component {
                                             </Row>
                                         </ReactModal>
 
-
                                     <ReactModal
                                         closeTimeoutMS={500}
                                         isOpen={this.state.show_edit_offer_form}
                                         onRequestClose={this.handleCloseEditOfferForm}
                                         className="new-account-modal"
-
                                         style={{
                                             overlay: {
                                             position: 'fixed',
@@ -4910,7 +4881,6 @@ class WalletHome extends React.Component {
                                             }
                                         }}
                                     >
-
                                         <h1>Edit Offer {this.state.show_edit_offer.title}</h1>
 
                                         <Form
@@ -4978,7 +4948,6 @@ class WalletHome extends React.Component {
                                             </Form.Row>
 
                                             <Form.Row>
-
                                                 <Form.Group md="6" as={Col}>
                                                     <Form.Label>Price (SFX)</Form.Label>
 
@@ -4996,7 +4965,6 @@ class WalletHome extends React.Component {
                                                         defaultValue={this.state.show_edit_offer.quantity}
                                                     />
                                                 </Form.Group>
-
                                                 <Form.Group md="6" as={Col}>
                                                     <Form.Label>SKU</Form.Label>
 
@@ -5005,7 +4973,6 @@ class WalletHome extends React.Component {
                                                         defaultValue={data.sku}
                                                     />
                                                 </Form.Group>
-
                                                 <Form.Group md="6" as={Col}>
                                                     <Form.Label>Barcode (ISBN, UPC, GTIN, etc)</Form.Label>
 
@@ -5014,7 +4981,6 @@ class WalletHome extends React.Component {
                                                         defaultValue={data.barcode}
                                                     />
                                                 </Form.Group>
-
                                                 <Form.Group md="6" as={Col}>
                                                     <Form.Label>Weight</Form.Label>
 
@@ -5023,7 +4989,6 @@ class WalletHome extends React.Component {
                                                         defaultValue={data.weight}
                                                     />
                                                 </Form.Group>
-
                                                 <Form.Group md="6" as={Col}>
                                                     <Form.Label>Physical Item?</Form.Label>
 
@@ -5032,12 +4997,8 @@ class WalletHome extends React.Component {
                                                         defaultValue={data.physical}
                                                     />
                                                 </Form.Group>
-
-
                                             </Form.Row>
-
                                             <Form.Row>
-
                                                 <Form.Group md="6" as={Col}>
                                                     <Form.Label>Country of Origin</Form.Label>
 
@@ -5047,7 +5008,6 @@ class WalletHome extends React.Component {
                                                         placedholder="your location"
                                                     />
                                                 </Form.Group>
-
                                                 <Row className="w-100 justify-content-around my-3">
                                                     <Form.Check
                                                         label="Shipping"
@@ -5057,7 +5017,6 @@ class WalletHome extends React.Component {
                                                         id="shipping-switch"
                                                         name="shipping"
                                                     />
-
                                                     <Form.Check
                                                         label="NFT"
                                                         checked={this.state.nft_switch}
@@ -5066,7 +5025,6 @@ class WalletHome extends React.Component {
                                                         id="nft-switch"
                                                         name="nft"
                                                     />
-
                                                     <Form.Check
                                                         label="Open Messages"
                                                         checked={this.state.open_message_switch}
@@ -5077,8 +5035,6 @@ class WalletHome extends React.Component {
                                                     />
                                                 </Row>
                                             </Form.Row>
-
-
                                             <Form.Row>
                                                 <Form.Group md="4" as={Col}>
                                                     <Form.Label>Set Active?</Form.Label>
@@ -5088,7 +5044,6 @@ class WalletHome extends React.Component {
                                                         defaultValue={this.state.show_edit_offer.active}
                                                     />
                                                 </Form.Group>
-
                                                 <Form.Group md="8" as={Col}>
                                                     <Form.Label>
                                                         Mixins
@@ -5107,7 +5062,6 @@ class WalletHome extends React.Component {
                                                             </ReactTooltip>
                                                         </IconContext.Provider>
                                                     </Form.Label>
-
                                                     <Form.Control
                                                         name="mixins"
                                                         as="select"
@@ -5123,13 +5077,10 @@ class WalletHome extends React.Component {
                                                     </Form.Control>
                                                 </Form.Group>
                                             </Form.Row>
-
-
                                             <button type="submit">
                                                 Submit Edit
                                             </button>
                                         </Form>
-
                                         <button
                                             className="close-button my-5"
                                             onClick={this.handleCloseEditOfferForm}
@@ -5137,10 +5088,8 @@ class WalletHome extends React.Component {
                                             Close
                                         </button>
                                     </ReactModal>
-
                                 </Col>
                             </div>);
-
                     } catch (err) {
                         console.log(err);
                         alert(err);
@@ -5178,7 +5127,6 @@ class WalletHome extends React.Component {
                                     pendingTokens={this.state.pending_tokens}
                                     walletHeight={this.state.wallet_height}
                                 />
-
                                 <SendSafex
                                     title="SEND TOKENS"
                                     style="token"
@@ -5186,13 +5134,11 @@ class WalletHome extends React.Component {
                                     id="send_token"
                                 />
                             </Col>
-
                             <Col sm={9} className="no-padding token-main-box">
                                 <Row className="mx-auto w-100">
                                     <StakingTable
                                         stakeRows={this.state.token_stakes}
                                     />
-
                                     <Row className="justify-content-around w-100 mx-auto my-5">
                                         <Stake
                                             style="stake"
@@ -5200,7 +5146,6 @@ class WalletHome extends React.Component {
                                             id="stake_token"
                                             tokenBalance={this.state.tokens.toLocaleString()}
                                         />
-
                                         <StakeInfo
                                             tokenBalance={this.state.tokens.toLocaleString()}
                                             pendingStakeBalance={pending_stake.toLocaleString()}
@@ -5210,7 +5155,6 @@ class WalletHome extends React.Component {
                                             nextInterval={100 - (this.state.blockchain_height % 100)}
                                             totalNetworkStake={this.state.blockchain_tokens_staked.toLocaleString()}
                                         />
-
                                         <Stake
                                             style="unstake"
                                             send={this.make_token_unstake}
@@ -5222,7 +5166,6 @@ class WalletHome extends React.Component {
                         </div>
                     );
                 }
-
                 case "settings": {
                     return (
                         <div>
@@ -5233,7 +5176,6 @@ class WalletHome extends React.Component {
                         </div>
                     );
                 }
-
                 case "loading":
                     return (
                         <Container className="align-items-center justify-content-center d-flex white-text" fluid>
@@ -5245,7 +5187,6 @@ class WalletHome extends React.Component {
                             <h1 className="black-text">Bear with us... we're just loading the correct info...</h1>
                         </Container>
                     );
-
                 default:
                     return <h1>Major Error</h1>
             }
@@ -5255,7 +5196,6 @@ class WalletHome extends React.Component {
             <div className="" >
                 <Image className="entry-scene" src={require("./../../img/loading-scene.svg")}/>
                 <Image className="plant3" src={require("./../../img/plant2.svg")}/>
-
                 <MainHeader
                     view={this.state.interface_view}
                     goHome={this.go_home}
@@ -5265,7 +5205,6 @@ class WalletHome extends React.Component {
                     goToSettings={this.show_settings}
                     logout={this.logout}
                 />
-
                 {twmwallet()}
             </div>
         );
