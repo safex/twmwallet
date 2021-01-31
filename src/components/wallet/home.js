@@ -1639,6 +1639,7 @@ class WalletHome extends React.Component {
                         } catch(err) {
                             console.error(err);
                             console.error(`error at the register_api function`);
+                            alert(`${user.username} has not been registered with the api at this time`)
                         }
                     } catch (err) {
                         console.error(err);
@@ -1766,7 +1767,7 @@ class WalletHome extends React.Component {
                         key: our_key,
                         padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
                     });
-                   sconsole.log(signature);
+                   console.log(signature);
                     let verified_sig = crypto.verify(
                         "sha256",
                         date_msg,
@@ -4183,6 +4184,23 @@ class WalletHome extends React.Component {
                                         closeTimeoutMS={500}
                                         className="buyer-messages-modal"
                                         onRequestClose={this.handleBuyerMessages}
+                                        style={{
+                                            overlay: {
+                                                position: 'fixed',
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                bottom: 0,
+                                                backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                            },
+                                            content: {
+                                                position: 'absolute',
+                                                top: '40px',
+                                                left: '40px',
+                                                right: '40px',
+                                                bottom: '40px'
+                                            }
+                                        }}
                                     >
                                         <Row>
                                             <Col sm={10}>
