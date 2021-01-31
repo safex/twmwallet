@@ -101,25 +101,18 @@ export default class Settings extends React.Component {
         return (
             <div
                 style={{
-                    position: 'relative',
                     fontFamily: 'Inter',
-                    fontSize: '1.5rem',
+                    fontSize: '1rem',
                     whiteSpace: 'nowrap',
-                    maxHeight: '90vh',
-                    overflowY: 'auto'
+                    minHeight: '800px'
                 }}>
-                <Container>
-
-                    <Row>
-                        <Col>
-                        </Col>
-                        <Col>
-                        </Col>
-                    </Row>
-
-
-                    <Row>
-                        <Table>
+                     <Row>
+                        <Table
+                            style={{
+                                marginLeft: '12px',
+                                maxWidth: '95%'
+                            }}
+                        >
                             <thead>
                                 <tr>
                                     <th>TXID</th>
@@ -138,8 +131,6 @@ export default class Settings extends React.Component {
                             </tbody>
                         </Table>
                     </Row>
-                </Container>
-
             </div>
         );
     }
