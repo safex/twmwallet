@@ -170,6 +170,19 @@ export async function buyer_send_message(req_payload, twm_api_url = 'http://127.
     });
 }
 
+export async function is_user_registered(req_payload, twm_api_url = 'http://127.0.0.1:17700') {
+    return axios({
+        method: 'post',
+        url: twm_api_url + '/users/is_registered',
+        data: req_payload,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then((resp) => {
+        return resp.data;
+    });
+}
+
 /*
 export async function create_twm_file(filepath) {
     try {

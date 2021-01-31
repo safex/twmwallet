@@ -70,7 +70,8 @@ import {
     merchant_get_messages,
     merchant_reply_message,
     buyer_get_messages,
-    buyer_send_message
+    buyer_send_message,
+    is_user_registered
 } from "../../utils/twm_actions";
 
 import zlib from 'zlib';
@@ -629,14 +630,12 @@ class WalletHome extends React.Component {
                             let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
 
                             try {
-
                                 let opened_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
                                 console.log(opened_twm_file);
 
                                 localStorage.setItem('twm_file', JSON.stringify(opened_twm_file.contents));
 
                                 console.log("committed transaction");
-
 
                                 alert(`Transaction successfully submitted.
                         Transaction ID: ${this.state.create_account_txn_id}
@@ -646,15 +645,12 @@ class WalletHome extends React.Component {
 
                                 this.setState({twm_file: twm_file});
 
-
-
                             } catch (err) {
                                 console.error(err);
                                 console.error(`error opening twm file after save to verify`);
                                 alert(`error at saving to the twm file during account creation verification stage`);
                             }
                             console.log(twm_save);
-
                         } catch (err) {
                             console.error(err);
                             console.error(`error at initial save of the twm file`);
@@ -674,7 +670,6 @@ class WalletHome extends React.Component {
         e.persist();
         e.preventDefault();
         try {
-
             let d_obj = {};
             d_obj.twm_version = 1;
             if (e.target.new_account_image.value.length > 0) {
@@ -755,7 +750,6 @@ class WalletHome extends React.Component {
             console.error(err);
             console.error("error at the edit account function");
         }
-
     };
 
     edit_account_first_callback = async (error, edit_account_txn) => {
@@ -982,7 +976,6 @@ class WalletHome extends React.Component {
 
     load_offers_from_api = async (e) => {
         e.preventDefault();
-
         try {
             console.log(this.state.api_url);
             let loaded_offers = await get_offers_url(this.state.api_url);
@@ -1000,10 +993,8 @@ class WalletHome extends React.Component {
         this.show_loading();
 
         setTimeout(() => {
-
             var offrs = wallet.listSafexOffers(true);
             let twm_offers = [];
-
             for (var i in offrs) {
                 try {
                     let offer_description = JSON.parse(offrs[i].description);
@@ -1011,37 +1002,30 @@ class WalletHome extends React.Component {
                         offrs[i].descprition = offer_description;
                         offrs[i].price = offrs[i].price / 10000000000;
                         twm_offers.push(offrs[i]);
-
                     }
-
                 } catch (err) {
                     console.error(`error at parsing json from description`);
                     console.error(err);
                 }
             }
-
             console.log(twm_offers);
             this.setState({
                 twm_offers: twm_offers,
                 interface_view: 'market',
                 offer_loading_flag: 'blockchaintwmoffers',
                 offersLoaded: true,
-
             });
         }, 500);
     };
-
 
     handle_change_api_fetch_url = (e) => {
         e.preventDefault();
         this.setState({api_url: e.target.value});
     };
 
-
     //view shifting
     go_home = () => {
         this.setState({interface_view: 'home', keyRequest: false});
-
     };
 
     //Show loading screen
@@ -1063,13 +1047,10 @@ class WalletHome extends React.Component {
 
     //open merchant management view from navigation
     show_merchant = () => {
-
         this.show_loading()
 
         this.setState({keyRequest: false})
-
         setTimeout(() => {
-
             var offrs = wallet.listSafexOffers(true);
             let non_offers = [];
             let twm_offers = [];
@@ -1092,19 +1073,16 @@ class WalletHome extends React.Component {
                     if (offer_description.version > 0) {
                         offrs[i].descprition = offer_description;
                         twm_offers.push(offrs[i]);
-
                     } else {
                         non_offers.push(offrs[i]);
                         console.log("not a twm structured offer");
                     }
-
                 } catch (err) {
                     console.error(`error at parsing json from description`);
                     console.error(err);
                     non_offers.push(offrs[i]);
                 }
             }
-
             this.setState({
                 twm_offers: twm_offers,
                 non_offers: non_offers,
@@ -1182,7 +1160,6 @@ class WalletHome extends React.Component {
     };
 
     // Show order confirmed modal
-
      handleConfirmationModal = () => {
         this.setState({show_purchase_confirm_modal: !this.state.show_purchase_confirm_modal});
     };
@@ -1204,7 +1181,6 @@ class WalletHome extends React.Component {
 
     //show modal of Edit Offer Form
     handleShowEditOfferForm = (listing) => {
-
         let nft_state = false;
         let shipping_state = false;
         let open_message_state = false;
@@ -1243,14 +1219,31 @@ class WalletHome extends React.Component {
     };
 
     //merchant
-    select_merchant_user = (username, index) => {
+    select_merchant_user = async (username, index) => {
         this.setState({selected_user: {username: username, index: index}});
-        this.fetch_messages_seller(username, 'http://stageapi.theworldmarketplace.com:17700');
+        try {
+            let req_payload = {};
+            req_payload.username = username;
+            let is_user = await is_user_registered(req_payload, this.state.api_url);
+
+            if (is_user.error) {
+                console.log(is_user);
+            } else if (is_user.r_msg) {
+                console.log(`user is not registered`);
+                console.log(is_user);
+            } else if (is_user.user) {
+                console.log(is_user);
+                console.log(`turns out user is registered`);
+                this.fetch_messages_seller(username, 'http://stageapi.theworldmarketplace.com:17700');
+            }
+        } catch(err) {
+            console.error(err);
+            console.error(`error at checking if user is registered`);
+            alert(`this user ${username} is not registered with the TWM API`);
+        }
        /* this.seller_reply_message(username, '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
             '064c0f8eb9309a7cb66d017c0278cd12ac5453ff3279fa3dde48159d0807e16d',
             'http://stageapi.theworldmarketplace.com:17700', 'this is my message');*/
-        console.log(username);
-        console.log(index);
     };
 
     list_new_offer = async (e) => {
@@ -1322,7 +1315,6 @@ class WalletHome extends React.Component {
             console.error("Error at listing the offer.");
         }
     };
-
 
     change_shipping_switch = () => {
         this.setState({shipping_switch: !this.state.shipping_switch});
@@ -1404,17 +1396,13 @@ class WalletHome extends React.Component {
                         if (confirmed_fee) {
                             try {
                                 let commit_stake = await this.commit_token_stake_txn_async(staked_token);
-
                             } catch (err) {
                                 console.error(err);
                                 console.error(`error at the token stake committing`);
                             }
-
                         } else {
                             console.log("token staking transaction cancelled");
                         }
-
-
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the token staking transaction formation it was not commited`);
@@ -1507,8 +1495,6 @@ class WalletHome extends React.Component {
                         } else {
                             console.log("token staking transaction cancelled");
                         }
-
-
                     } catch (err) {
                         console.error(err);
                         console.error(`error at the token unstaking transaction formation it was not commited`);
@@ -1670,22 +1656,18 @@ class WalletHome extends React.Component {
     to_ellipsis = (text, firstHalf, secondHalf) => {
         if (typeof text !== "string") {return text} else {
              const ellipse = `${text.substring(0, firstHalf)}.....${text.substring(text.length - secondHalf, text.length)}`
-
             return (ellipse)
         }
-       
     };
 
     hexStringToByte = (str) => {
         if (!str) {
             return new Uint8Array();
         }
-
         var a = [];
         for (var i = 0, len = str.length; i < len; i+=2) {
             a.push(parseInt(str.substr(i,2),16));
         }
-
         return new Uint8Array(a);
     };
 
@@ -1719,16 +1701,12 @@ class WalletHome extends React.Component {
                                 toEllipsis={this.to_ellipsis}
                                 handleShowMessages={this.handleShowMessages}
                                 getMessages={this.get_messages_by_order_id_of_seller}
-                            />
-
-                        )
+                            />)
                     } catch (err) {
                         console.error(`failed to properly parse the user data formatting`);
                         console.error(err);
                     }
-
                 });
-
             } else {
                 console.log(`${offer_id} not found in file`);
                 alert(`There are no orders found for ${offer_id}`)
@@ -1788,7 +1766,7 @@ class WalletHome extends React.Component {
                         key: our_key,
                         padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
                     });
-                   console.log(signature);
+                   sconsole.log(signature);
                     let verified_sig = crypto.verify(
                         "sha256",
                         date_msg,
@@ -1826,11 +1804,9 @@ class WalletHome extends React.Component {
                                     },
                                     this.hexStringToByte(msg.message)
                                 );
-
                                 console.log(decryptedData.toString());
                                 let decomped = zlib.inflateSync(Buffer.from(decryptedData));
                                 console.log(decomped.toString());
-
                                 try {
                                     let parsed = JSON.parse(decomped.toString());
                                     msg.message = decomped.toString();
@@ -1847,8 +1823,6 @@ class WalletHome extends React.Component {
                                                 }
                                             } else {
                                                 //if this is a new order id for the offer
-
-
                                                     let pinfo_obj = {};
                                                     pinfo_obj.buyers_pgp = msg.sender_pgp_pub_key;
                                                     pinfo_obj.purchase_proof = msg.purchase_proof;
@@ -1987,36 +1961,16 @@ class WalletHome extends React.Component {
                                                         console.error(err);
                                                         console.error(`error at parsing the txn retreived`)
                                                     }
-
                                                 } catch(err) {
                                                     console.error(err);
                                                     console.error(`error fetching the transaction`);
                                                 }
-
-
-                                                finalMessage.push(
-                                                    <div key={msg_hex}>
-                                                        <h1>
-                                                            ---------------
-                                                            MESSAGE START
-                                                            ---------------
-                                                        </h1>
-                                                        <h3>{decomped}</h3>
-                                                        <br/><br/>
-                                                        <h1>
-                                                            ------------- --
-                                                            MESSAGE END
-                                                            ---------------
-                                                        </h1>
-                                                        <br/><br/>
-                                                    </div>)
                                             }
                                         }
                                     } else {
                                         console.error(`there is an error with this msg.to doesn't match the username`);
                                     }
                                     try {
-
                                         const crypto = window.require('crypto');
                                         const algorithm = 'aes-256-ctr';
                                         console.log(this.state.password);
@@ -2046,14 +2000,12 @@ class WalletHome extends React.Component {
                                             alert(`Error at saving to the twm file during account creation verification stage`);
                                         }
                                         console.log(twm_save);
-
                                     } catch (err) {
                                         this.setState({showLoader: false});
                                         console.error(err);
                                         console.error(`error at initial save of the twm file`);
                                         alert(`Error at saving to the twm file during account creation initialization stage`);
                                     }
-
                                 } catch(err) {
                                     console.error(err);
                                     console.error(`error at parsing the message`)
@@ -2109,12 +2061,10 @@ class WalletHome extends React.Component {
     	if (!buyerSelectUrl || !twm || !twm.api || !twm.api.urls) {
 			return [];
 		}
-    	
     	const offersAtUrl = this.state.twm_file.api.urls[this.state.buyerSelectUrl];
     	if (!offersAtUrl) {
     		return [];
 		}
-    	
     	return Object.keys(offersAtUrl);
 	};
 	
@@ -2126,17 +2076,14 @@ class WalletHome extends React.Component {
 		if (!buyerSelectUrl || !buyerSelectOffer || !twm || !twm.api || !twm.api.urls) {
 			return [];
 		}
-	
 		const offersAtUrl = this.state.twm_file.api.urls[this.state.buyerSelectUrl];
 		if (!offersAtUrl) {
 			return [];
 		}
-		
 		const ordersAtOffers = offersAtUrl[buyerSelectOffer];
 		if (!ordersAtOffers) {
 			return [];
 		}
-		
 		const result = [];
 		for (const orderId in ordersAtOffers) {
 			result.push({
@@ -2152,7 +2099,6 @@ class WalletHome extends React.Component {
         if (!buyerSelectUrl || !buyerSelectOffer || !buyerSelectOrder || !t_f || !t_f.api || !t_f.api.urls) {
             return [];
         }
-
         const messages = [];
         try {
             let t_f = this.state.twm_file;
@@ -2163,17 +2109,13 @@ class WalletHome extends React.Component {
                 console.error(`order ${buyerSelectOrder} not found`);
                 return;
             }
-
             for (const msg in core.messages) {
-                //let tempKey = msg + '--#--' + key;
                 //console.log(t_f.api.urls[this.state.buyerSelectUrl][this.state.buyerSelectOffer][this.state.buyerSelectOrder].messages[msg]);
-
                 try {
                     let t_msg = core.messages[msg];
                     if (typeof t_msg.message == 'string') {
                         t_msg.message = JSON.parse(t_msg.message);
                     }
-
                     if (t_msg.message.n.length > 0) {
                         console.log(`nft address supplied!`);
                         messages.push (
@@ -2233,19 +2175,16 @@ class WalletHome extends React.Component {
                                 console.log(`parsed the so`);
                                 messages.push (
                                     <div key={msg}>
-
                                         <Row style={{justifyContent: 'space-around'}}>
                                             <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
                                                 {t_msg.position}
                                             </h1>
-
                                             <Col>
                                                 <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> </h2>
                                                 <h2><i> <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> </h2>
                                                 <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
                                                 <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
                                             </Col>
-
                                             <Col>
                                                 <h2><i> <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/> </h2>
                                                 <h2><i> <u>City:</u></i> <b></b>{parsed_so.city}<b/> </h2>
@@ -2254,8 +2193,6 @@ class WalletHome extends React.Component {
                                                 <h2><i> <u>Country:</u></i> <b></b>{parsed_so.c}<b/> </h2>
                                             </Col>
                                         </Row>
-
-
                                     </div>
                                 );
                             } catch(err) {
@@ -2264,8 +2201,6 @@ class WalletHome extends React.Component {
                             }
                         }
                     }
-
-                    //messages.push(<h3 key={msg}>{core.messages[msg]}</h3>);
                 } catch(err) {
                     console.error(err);
                 }
@@ -2354,17 +2289,13 @@ class WalletHome extends React.Component {
                             let hex_enc_sig = this.byteToHexString(enc_signature);
 
                             message_header_obj.encrypted_message_signature = hex_enc_sig;
-
                             message_header_obj.encrypted_message = hex_enc_msg;
 
-
                             let mdispatched = await merchant_reply_message(message_header_obj, this.state.api_url);
-
 
                             message_header_obj.message = pre_sign_message_obj;
                             message_header_obj.position = mdispatched.msg_obj.position;
                             the_order.messages[mdispatched.msg_obj.position] = message_header_obj;
-
                             try {
                                 const crypto = window.require('crypto');
                                 const algorithm = 'aes-256-ctr';
@@ -2443,7 +2374,6 @@ class WalletHome extends React.Component {
         if (!buyerSelectUrl || !buyerSelectOffer || !buyerSelectOrder || !t_f || !t_f.api || !t_f.api.urls) {
             return [];
         }
-
         try {
             console.log(`it has the twmapi in it's file for the fetch messages_of the buyer`);
 
@@ -2564,8 +2494,6 @@ class WalletHome extends React.Component {
                 console.error(`error at initial save of the twm file`);
                 alert(`Error at saving to the twm file during account creation initialization stage`);
             }
-
-
         } catch(err) {
             console.error(err);
             console.error(`error at fetching the messages of the buyer`);
@@ -2660,7 +2588,6 @@ class WalletHome extends React.Component {
                             let hex_enc_sig = this.byteToHexString(enc_signature);
 
                             message_header_obj.encrypted_message_signature = hex_enc_sig;
-
                             message_header_obj.encrypted_message = hex_enc_msg;
 
                             try {
@@ -2704,7 +2631,6 @@ class WalletHome extends React.Component {
                                         alert(`Error at saving to the twm file during account creation verification stage`);
                                     }
                                     console.log(twm_save);
-
                                 } catch (err) {
                                     this.setState({showLoader: false});
                                     console.error(err);
@@ -2812,7 +2738,6 @@ class WalletHome extends React.Component {
                                     purchase_txn_price: listing.price,
                                     purchase_txn_total_cost: total_cost,
                                     showLoader: true
-
                                 });
 
                                 let purchase_txn = await this.purchase_offer_async(
@@ -2833,7 +2758,6 @@ class WalletHome extends React.Component {
 
                                         if (this.state.offer_loading_flag === 'twmurl') {
                                             try {
-
                                                 if (listing.nft === true) {
                                                     confirm_message += ` sent to eth address ${e.target.eth_address.value}`;
                                                     nft_address = va.eth_address.value;
@@ -3115,8 +3039,6 @@ class WalletHome extends React.Component {
         } else {
             alert(`You can not have 0 quantity for purchase.`);
         }
-
-
     };
 
     purchase_offer_async = async (wallet, the_cost, offer_id, quantity, mixins) => {
@@ -3249,7 +3171,6 @@ class WalletHome extends React.Component {
         }
     };
 
-
     edit_offer_async = async (wallet, offerid, username, title, price, quantity, data, active, mixins) => {
         return new Promise((resolve, reject) => {
             try {
@@ -3303,11 +3224,11 @@ class WalletHome extends React.Component {
 
     handleShowMessages = (messageObject) => {
         this.setState({showMessages: true, showMyOrders: true, currentMessage: messageObject})
-    }
+    };
 
     hideMessages = () => {
         this.setState({showMessages: false, currentMessage: {}})
-    }
+    };
 
     handleMyOrders = (id) => {
         this.setState({showMyOrders: !this.state.showMyOrders});
@@ -3325,8 +3246,7 @@ class WalletHome extends React.Component {
             buyerSelectOrder: '',
             buyerSelectUrl: ''
         })
-    }
-
+    };
 
     call_non_listings_table = () => offerRows = this.state.non_offers.map((listing, key) => {
         try {
@@ -3390,7 +3310,6 @@ class WalletHome extends React.Component {
                 )
 
             }
-
         } catch (err) {
             this.setState({loadingOffers: false})
             console.error(`failed to properly parse the user data formatting`);
@@ -3414,7 +3333,6 @@ class WalletHome extends React.Component {
                         msg.message = JSON.parse(msg.message);
                         
                     }
-
                     if (msg.message.n.length > 0) {
                         console.log(`nft address supplied!`);
                         return (
@@ -4123,7 +4041,6 @@ class WalletHome extends React.Component {
                                 :
                                     ""
                                 }
-                            
                             >
                                 <div
                                     className="search-box d-flex flex-column align-items-center"
