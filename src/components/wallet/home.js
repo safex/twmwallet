@@ -154,6 +154,7 @@ class WalletHome extends React.Component {
             showBuyerMessages: false,
             url: '',
             buyer_urls: [],
+            user_registered: null
         };
     }
 
@@ -1144,7 +1145,11 @@ class WalletHome extends React.Component {
 
     //show modal of New Offer
     handleShowNewOfferForm = () => {
-        this.setState({show_new_offer_form: true, nft_switch: false, shipping_switch: false, open_message_switch: false});
+        if (this.state.user_registered) {
+            this.setState({show_new_offer_form: true, nft_switch: false, shipping_switch: false, open_message_switch: false});
+        } else if (!this.state.user_registered) {
+            alert(`user must be successfully approved and registered to use this feature`);
+        }
     };
 
     //close modal of Purchase Form
@@ -1231,15 +1236,18 @@ class WalletHome extends React.Component {
             } else if (is_user.r_msg) {
                 console.log(`user is not registered`);
                 console.log(is_user);
+                this.setState({selected_user: {username: username, index: index},user_registered: false});
             } else if (is_user.user) {
                 console.log(is_user);
                 console.log(`turns out user is registered`);
                 this.fetch_messages_seller(username, 'http://stageapi.theworldmarketplace.com:17700');
+                this.setState({selected_user: {username: username, index: index},user_registered: true});
             }
         } catch(err) {
             console.error(err);
             console.error(`error at checking if user is registered`);
             alert(`this user ${username} is not registered with the TWM API`);
+            this.setState({selected_user: {username: username, index: index},user_registered: false});
         }
        /* this.seller_reply_message(username, '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
             '064c0f8eb9309a7cb66d017c0278cd12ac5453ff3279fa3dde48159d0807e16d',
@@ -2102,7 +2110,6 @@ class WalletHome extends React.Component {
         }
         const messages = [];
         try {
-            let t_f = this.state.twm_file;
 
             /** @type {BuyerOrder} */
             const core =  t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder];
@@ -3441,7 +3448,6 @@ class WalletHome extends React.Component {
 
         const twmwallet = () => {
             switch (this.state.interface_view) {
-
                 case "home": {
                     return (
                         <div className="home-main-div">
@@ -3484,7 +3490,6 @@ class WalletHome extends React.Component {
                         </div>
                     );
                 }
-
                 case "market":
                     var table_of_listings;
                     if (this.state.offer_loading_flag === 'all') {
@@ -4228,7 +4233,7 @@ class WalletHome extends React.Component {
                                         </Row>
 
                                         <Row className="m-auto">
-                                            <Col style={{overflowY: 'auto', maxHeight: '65vh'}} sm={12}>
+                                            <Col style={{overflowY: 'auto', maxHeight: '65vh'}} sm={8}>
                                                 {this.renderBuyerMessages()}
                                             </Col>
 
@@ -4380,6 +4385,7 @@ class WalletHome extends React.Component {
                                     {this.state.merchantTabs === "accounts" ?
                                         <MerchantAccounts
                                             handleChange={this.handleChange}
+                                            userRegistered={this.state.user_registered}
                                             handleNewAccountForm={this.handleNewAccountForm}
                                             showNewAccountForm={this.state.show_new_account_form}
                                             handleEditAccountForm={this.handleEditAccountForm}
