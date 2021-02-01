@@ -48,37 +48,28 @@ export default class IntroScreen extends React.Component {
             console.error(err);
             console.error("error at reading legacy wallet");
         }
-    }
+    }//
+
 
     open_select = (e) => {
         e.preventDefault();
         this.props.history.push({pathname: '/select_entry'});
     };
 
-   
-
     render() {
         return (
             <div className="width100 height100 d-flex flex-column text-center">
-                
+                <Image className="intro-background-image" src={require('./../../img/2-b.png')}/>
                 <Container fluid className="height100 flex-column d-flex justify-content-center">
+                    <Image onClick={() => {alert('Closing Wallet... (TEST)')}} className="entry-off-button" src={require("./../../img/off_black.svg")}/>
 
-                    <Image className="plant" src={require("./../../img/plant.svg")}/>
-                    <Image className="plant2" src={require("./../../img/corner-plant.svg")}/>
-                    <Image className="entry-scene" src={require("./../../img/entry-scene.svg")}/>
-                    <Image onClick={() => {alert('Closing Wallet... (TEST)')}} className="entry-off-button" src={require("./../../img/off.svg")}/>
-                    
-
-                    <Row className="row justify-content-md-center justify-content-center p-3">
-                        <Image className="w-50" src={require("./../../img/safex-home-multi.svg")}/>
+                    <Row className="row justify-content-md justify-content-center p-3 intro-safex-logo">
+                        <Image className="w-50 intro-safex-logo " src={require("./../../img/safex-home-multi.svg")}/>
                     </Row>
 
-                    <button onClick={this.open_select} className="custom-button-entry my-5">
+                    <button onClick={this.open_select} className="custom-button-entry my-5 intro-safex-logo">
                         Get Started
                     </button>
-                    <Row  className="w-100 entry-footer">
-                        <p>THE WORLD MARKETPLACE</p>
-                    </Row>
                 </Container>  
             </div>
         );

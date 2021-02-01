@@ -17,6 +17,8 @@ import './ComponentCSS/MerchantAccounts.css'
 
 export default function MerchantAccounts(props) {
 
+
+
     return (
         <div>
         {props.accounts.length > 0 ?
@@ -59,9 +61,9 @@ export default function MerchantAccounts(props) {
                                 Edit
                             </button>
 
-                            <button className="merchant-mini-buttons" onClick={() => props.registerApi(props.selected)}>
+                            {props.userRegistered == true ? ('User is registered') : (<button className="merchant-mini-buttons" onClick={() => props.registerApi(props.selected)}>
                                 Register API
-                            </button>
+                            </button>) }
 
                             <button className="merchant-mini-buttons">
                                 Remove
