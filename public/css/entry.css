@@ -36,6 +36,11 @@
     z-index: -1;
 }
 
+.intro-background-image {
+    width: 100%;
+    z-index: -1;
+}
+
 .entry-scene1 {
     position: absolute;
     left: 2rem;

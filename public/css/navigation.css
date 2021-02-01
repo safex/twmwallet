@@ -11,7 +11,6 @@ html, body {
 
 body {
     background-color: #e7ebf0;
-    
 }
 
 .center {
@@ -32,13 +31,10 @@ body {
     padding: 0 0px;
     position: relative;
 }
- 
-
 
 .menu-link-active a {
     display: inline-block;
     height: 100%;
-    
     color: #ffaa3b!important;
     border-top: 4px solid #ffaa3b;
     font-weight: 700;
@@ -56,11 +52,6 @@ body {
     background-position: center;
 }
 
-
-
-
-
-
 .overflow-x {
     overflow-x: auto!important;
 }
@@ -69,8 +60,6 @@ ul {
     list-style-type: none;
     padding: 0;
 }
-
-
 
 .account_element {
     margin: 4px;
@@ -96,7 +85,6 @@ td, th {
     padding: 0.5rem;
     text-align: left;
 }
-
 
 li {
     word-wrap: break-word

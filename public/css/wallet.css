@@ -73,7 +73,6 @@
         min-width: 300px;
         border-radius: 10px;
         justify-content: space-around;
-
     }
 
     .menu {
@@ -83,7 +82,6 @@
 
     .menu-logo {
         max-width: fit-content!important;
-    
     }
 
 /* Home CSS Start */
@@ -110,7 +108,6 @@
         height: fit-content;
         min-height: 140px;
         max-height: 800px;
-        
     }
 
     .cash-box {
@@ -121,14 +118,12 @@
         flex-direction: column;
         align-items: center;
         justify-content: space-around;
-    
         border: 2px solid #fff;
         border-radius: 10px;
         background-color: rgba(38, 232, 185, 0.5);
         color: white;
         min-height: 25vh;
         margin: auto 0;
-        
     }
     
     .cash-box ul {
@@ -146,9 +141,7 @@
 
     .cash-box input {
         margin: 1rem 0;
-
     }
-
 
     .carousel-inner {
         border-radius: 10px;
@@ -159,14 +152,9 @@
         border-radius: 25px;
     }
 
-
 /* Home CSS End */
 
-
 /* Market CSS Start */
-
-    
-
     .search-box {
         padding: 1rem;
         background: white;
@@ -190,7 +178,6 @@
         font-style: normal;
         font-weight: 600;
         text-align: center;
-
     }
 
     .search-button:hover {
@@ -206,7 +193,6 @@
         font-style: normal;
         font-weight: 600;
         text-align: center;
-
     }
 
     .search-box select {
@@ -223,7 +209,6 @@
         color: #BDBDBD!important;
         padding: .5rem;
         margin: 0 1rem;
-
     }
 
     .search-box input {
@@ -240,7 +225,6 @@
         color: #BDBDBD!important;
         padding: .5rem;
         margin: 0 1rem;
-
     }
 
     .market-table {
@@ -286,6 +270,7 @@
     .purchase-offer-modal textarea {
         max-height: 100px;
     }
+
     .offer-tooltip {
         display: flex;
         flex-direction: column;
@@ -301,18 +286,15 @@
     }
 
     .offer-tooltip img {
-       
         max-width: 30vh;
         min-width: 30vh;
         min-height: 30vh;
         max-height: 30vh;
-        
     }
 
     .offer-tooltip p {
         word-break: break-word;
     }
-
 
     .offer .offer-image {
         width: 400px;
@@ -337,7 +319,6 @@
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
-
     }
 
     .account-list {
@@ -347,23 +328,17 @@
         flex: 1;
         overflow-y: auto;
         border-radius: 10px;
-        
-
         color:  #fff;
         width: 100%;
         max-height: 35vh;
-        
-        
     }
 
     .accounts-box {
         display: flex;
         flex-direction: row;
         flex: 1;
-
         padding: 1rem;
         margin: 1rem;
-
         border: 2px solid rgb(32, 240, 59);
         border-radius: 10px;
         background-color: #38bdd2;
@@ -372,28 +347,20 @@
 
     #account-edit-buttons {
         width: 75%;
-
     }
 
     #account-edit-buttons button {
         margin-top: 1rem;
     }
 
-    
-
     .merchant-product-view {
-    
         background-color: #38bdd2;
-        
         color: #fff;
         width: 100%;
         min-height: 20vh;
-       
         max-height: 60vh;
         overflow-y: scroll;
     }
-    
-    
 
     .new-account-form {
         color:  black;
@@ -402,7 +369,6 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        
         width: 80vh;
         height: 60vh;
         min-width: 200px;
@@ -410,7 +376,6 @@
         min-height: 100px;
         max-height: 80vh;
     }
-    
 
     .new-account-form textarea {
         max-height: 100px;
@@ -419,7 +384,6 @@
     #new-account-form text {
         margin-top: .5rem;
         margin-bottom: .5rem;
-        
     }
 
     #new-account-form button {
@@ -435,7 +399,6 @@
         display: flex;
         flex-direction: column;
         justify-content: space-around;
-        
         background-color: rgba(255, 255, 255, 0.8);
         border-radius: 50px;
         box-shadow: var(--blue-box-shadow);
@@ -460,25 +423,21 @@
     }
 
     .token-box {
-    
         min-width: 15vw;
         max-width: 20vw;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: space-around;
-
         border: 2px solid #fff;
         border-radius: 10px;
         background-color: rgba(47, 227, 242, 0.9);
         min-height: 40vh;
         margin: auto 0;
-        
     }
 
     .token-box input {
         margin: 1rem 0;
-
     }
 
 /* Tokens CSS End */
