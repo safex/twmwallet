@@ -1052,7 +1052,8 @@ class WalletHome extends React.Component {
 
         this.setState({keyRequest: false})
         setTimeout(() => {
-            var offrs = wallet.listSafexOffers(true);
+
+            var offrs = wallet.getMySafexOffers();
             let non_offers = [];
             let twm_offers = [];
 
