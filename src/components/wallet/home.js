@@ -1048,49 +1048,10 @@ class WalletHome extends React.Component {
 
     //open merchant management view from navigation
     show_merchant = () => {
-        this.show_loading()
-
         this.setState({keyRequest: false})
-        setTimeout(() => {
-
-            var offrs = wallet.getMySafexOffers();
-            let non_offers = [];
-            let twm_offers = [];
-
-            for (var i in offrs) {/*
-                console.log("Safex offer " + i + " title: " + offrs[i].title);
-                console.log("Safex offer description: " + offrs[i].description);
-                console.log("Safex offer quantity: " + offrs[i].quantity);
-                console.log("Safex offer price: " + offrs[i].price);
-                console.log("Safex offer minSfxPrice: " + offrs[i].minSfxPrice);
-                console.log("Safex offer pricePegUsed: " + offrs[i].pricePegUsed);
-                console.log("Safex offer pricePegID: " + offrs[i].pricePegID);
-                console.log("Safex offer seller: " + offrs[i].seller);
-                console.log("Safex offer active: " + offrs[i].active);
-                console.log("Safex offer offerID: " + offrs[i].offerID);
-                console.log("Safex offer currency: " + offrs[i].currency);
-    */
-                try {
-                    let offer_description = JSON.parse(offrs[i].description);
-                    if (offer_description.version > 0) {
-                        offrs[i].descprition = offer_description;
-                        twm_offers.push(offrs[i]);
-                    } else {
-                        non_offers.push(offrs[i]);
-                        console.log("not a twm structured offer");
-                    }
-                } catch (err) {
-                    console.error(`error at parsing json from description`);
-                    console.error(err);
-                    non_offers.push(offrs[i]);
-                }
-            }
             this.setState({
-                twm_offers: twm_offers,
-                non_offers: non_offers,
                 interface_view: 'merchant'
             });
-        }, 500);
     };
 
     //open staking view from navigation
@@ -1241,6 +1202,31 @@ class WalletHome extends React.Component {
             } else if (is_user.user) {
                 console.log(is_user);
                 console.log(`turns out user is registered`);
+
+                var offrs = wallet.getMySafexOffers();
+                let twm_offers = [];
+
+                for (var i in offrs) {
+                    console.log(`checking the offers`);
+                    console.log(offrs[i]);
+                    try {
+                        if (offrs[i].seller == username) {
+                            console.log(`seller matched infact`);
+                            let offer_description = JSON.parse(offrs[i].description);
+                            if (offer_description.twm_version > 0) {
+                                offrs[i].description_obj = offer_description;
+                                twm_offers.push(offrs[i]);
+                            }
+                        }
+                    } catch (err) {
+                        console.error(`error at parsing json from description of ${username} offer list`);
+                        console.error(err);
+                    }
+                }
+                this.setState({
+                    twm_offers: twm_offers
+                });
+
                 this.fetch_messages_seller(username, 'http://stageapi.theworldmarketplace.com:17700');
                 this.setState({selected_user: {username: username, index: index},user_registered: true});
             }
@@ -1281,9 +1267,6 @@ class WalletHome extends React.Component {
         }
         if (vees.country.value.length > 0) {
             o_obj.country = vees.country.value;
-        }
-        if (vees.physical.value.length > 0) {
-            o_obj.physical = vees.physical.value;
         }
 
         o_obj.shipping = this.state.shipping_switch;
@@ -3126,9 +3109,6 @@ class WalletHome extends React.Component {
         if (va.country.value.length > 0) {
             o_obj.country = va.country.value;
         }
-        if (va.physical.value.length > 0) {
-            o_obj.physical = va.physical.value;
-        }
         let active = 0;
         if (va.active.value === 'True' || va.active.value === 'true') {
             active = 1;
@@ -3257,73 +3237,7 @@ class WalletHome extends React.Component {
         })
     };
 
-    call_non_listings_table = () => offerRows = this.state.non_offers.map((listing, key) => {
-        try {
-            this.setState({loadingOffers: true})
-            if (listing.seller === this.state.selected_user.username) {
-                var data = {};
-                data.description = '';
-                data.main_image = '';
-                data.sku = '';
-                data.barcode = '';
-                data.weight = '';
-                data.country = '';
-                data.message_type = '';
-                data.physical = '';
-                try {
-                    let parsed_data = JSON.parse(listing.description);
-                    console.log(parsed_data);
-                    if (parsed_data.twm_version === 1) {
-                        if (parsed_data.hasOwnProperty('main_image')) {
-                            data.main_image = parsed_data.main_image;
-                        }
-                        if (parsed_data.hasOwnProperty('description')) {
-                            data.description = parsed_data.description;
-                        }
-                        if (parsed_data.hasOwnProperty('sku')) {
-                            data.sku = parsed_data.sku;
-                        }
-                        if (parsed_data.hasOwnProperty('barcode')) {
-                            data.barcode = parsed_data.barcode;
-                        }
-                        if (parsed_data.hasOwnProperty('weight')) {
-                            data.weight = parsed_data.weight;
-                        }
-                        if (parsed_data.hasOwnProperty('country')) {
-                            data.country = parsed_data.country;
-                        }
-                        if (parsed_data.hasOwnProperty('message_type')) {
-                            data.message_type = parsed_data.message_type;
-                        }
-                        if (parsed_data.hasOwnProperty('physical')) {
-                            data.physical = parsed_data.physical;
-                        }
-                    }
-                } catch (err) {
-                    console.error(err);
-                }
-                return (
-                    <OfferTableRow
-                        key={key}
-                        myKey={key}
-                        title={listing.title}
-                        price={listing.price / 10000000000}
-                        quantity={listing.quantity}
-                        seller={listing.seller}
-                        id={listing.offerID}
-                        handleEditOfferForm={() => this.handleShowEditOfferForm(listing)}
-                        handleShowOrders={() => this.setState({selectedOffer: listing.offerID, showMyOrders: !this.state.showMyOrders})}
-                        toEllipsis={this.to_ellipsis}
-                        getOrders={this.get_seller_order_ids_by_offer}
-                    />)
-            }
-        } catch (err) {
-            this.setState({loadingOffers: false})
-            console.error(`failed to properly parse the user data formatting`);
-            console.error(err);
-        }
-        this.setState({loadingOffers: false})
-    });
+
 
     render() {
         var message_render;
@@ -3397,7 +3311,6 @@ class WalletHome extends React.Component {
                                 console.log(`parsed the so`);
                                 return (
                                     <div key={key}>
-
                                         <Row style={{justifyContent: 'space-around'}}>
                                             <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
                                                 {msg.position}
@@ -3418,8 +3331,6 @@ class WalletHome extends React.Component {
                                                 <h2><i> <u>Country:</u></i> <b></b>{parsed_so.c}<b/> </h2>
                                             </Col>
                                         </Row>
-
-
                                     </div>
                                 );
                             } catch(err) {
@@ -3434,7 +3345,6 @@ class WalletHome extends React.Component {
                             {msg.msg}
                         </div>
                     );
-
                 } catch(err) {
                     console.error(err);
                     console.error(`error parsing message contents`)
@@ -3525,7 +3435,6 @@ class WalletHome extends React.Component {
                                 data.weight = '';
                                 data.country = '';
                                 data.message_type = '';
-                                data.physical = '';
                                 data.shipping = false;
                                 data.nft = false;
                                 data.open_message = false;
@@ -3550,12 +3459,6 @@ class WalletHome extends React.Component {
                                         }
                                         if (parsed_data.hasOwnProperty('country')) {
                                             data.country = parsed_data.country;
-                                        }
-                                        if (parsed_data.hasOwnProperty('message_type')) {
-                                            data.message_type = parsed_data.message_type;
-                                        }
-                                        if (parsed_data.hasOwnProperty('physical')) {
-                                            data.physical = parsed_data.physical;
                                         }
                                         if (parsed_data.hasOwnProperty('shipping')) {
                                             data.shipping = parsed_data.shipping;
@@ -3625,8 +3528,6 @@ class WalletHome extends React.Component {
                                 data.barcode = '';
                                 data.weight = '';
                                 data.country = '';
-                                data.message_type = '';
-                                data.physical = '';
                                 data.shipping = listing.shipping;
                                 data.nft = listing.nft;
                                 data.open_message = listing.open_message;
@@ -4419,8 +4320,7 @@ class WalletHome extends React.Component {
                                             :
                                                 <MerchantOffers
                                                     handleOrders={this.handleMyOrders}
-                                                    offerRows={offerRows}
-                                                    loadOffers={this.call_non_listings_table}
+                                                    userOffers={this.state.twm_offers}
                                                     loading={this.state.loadingOffers}
                                                 />
                                             }
@@ -4551,24 +4451,6 @@ class WalletHome extends React.Component {
                                                         <Form.Control
                                                             name="weight"
                                                             defaultValue={data.weight}
-                                                        />
-                                                    </Form.Group>
-
-                                                    <Form.Group  md="6" as={Col}>
-                                                        <Form.Label>Physical Item?</Form.Label>
-
-                                                        <Form.Control
-                                                            name="physical"
-                                                            defaultValue="true"
-                                                        />
-                                                    </Form.Group>
-
-                                                    <Form.Group md="6" as={Col}>
-                                                        <Form.Label>Message Types</Form.Label>
-
-                                                        <Form.Control
-                                                            name="shipping_type"
-                                                            defaultValue="Shipping"
                                                         />
                                                     </Form.Group>
 
@@ -5014,14 +4896,7 @@ class WalletHome extends React.Component {
                                                         defaultValue={data.weight}
                                                     />
                                                 </Form.Group>
-                                                <Form.Group md="6" as={Col}>
-                                                    <Form.Label>Physical Item?</Form.Label>
 
-                                                    <Form.Control
-                                                        name="physical"
-                                                        defaultValue={data.physical}
-                                                    />
-                                                </Form.Group>
                                             </Form.Row>
                                             <Form.Row>
                                                 <Form.Group md="6" as={Col}>
