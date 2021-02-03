@@ -383,10 +383,6 @@ class WalletHome extends React.Component {
         if (wallet.connected() !== 'disconnected') {
             console.log(wallet.connected());
             console.log("wallet connected");
-            //m_wallet.on('refreshed', this.refresh_action());
-            this.props.wallet.on('newBlock', (height) => {
-                console.log(height)
-            });
             this.setState({connection_status: 'Connected to the Safex Blockchain Network'});
         } else {
             this.setState({connection_status: 'Unable to connect to the Safex Blockchain Network'});
@@ -1848,7 +1844,7 @@ class WalletHome extends React.Component {
                                                                                 if (field.field === 'offer_id') {
                                                                                     o_id = field.value;
                                                                                 } else if (field.field === 'price') {
-                                                                                    l_price = field.value / 10000000000;
+                                                                                    l_price = parseInt(field.value) / 10000000000;
                                                                                 } else if (field.field === 'quantity') {
                                                                                     l_quant = field.value;
                                                                                 }
@@ -4321,7 +4317,6 @@ class WalletHome extends React.Component {
                                                 <MerchantOffers
                                                     handleOrders={this.handleMyOrders}
                                                     userOffers={this.state.twm_offers}
-                                                    loading={this.state.loadingOffers}
                                                 />
                                             }
 
