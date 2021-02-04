@@ -25,7 +25,6 @@ export async function save_twm_file(filepath, content, password, hash1) {
 
             if (hash_two === hash1) {
                 console.log(`all good hashes confirmed`);
-                console.log(dec);
                 return {success: `saved file to ${filepath}`}
             } else {
                 return {error: `fatal error saving to ${filepath}, ${hash_two}, does not match supplied ${hash1}`}
