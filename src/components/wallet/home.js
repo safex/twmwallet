@@ -371,7 +371,6 @@ class WalletHome extends React.Component {
         }
     };
 
-
     check = () => {
         console.log(`wallet cash balance ${wallet.balance()}`);
         console.log(`wallet daemon blockchain height ${wallet.daemonBlockchainHeight()}`);
@@ -410,10 +409,6 @@ class WalletHome extends React.Component {
         console.log(confirmed);
         if (confirmed) {
             wallet.rescanBlockchainAsync();
-           /* wallet.on('refreshed', () => {
-                console.log();
-                this.refresh_action();
-            });*/
         }
     };
 
@@ -446,8 +441,6 @@ class WalletHome extends React.Component {
                 console.error(`error at trying to remove an account`);
             }
         }
-
-
     };
 
     register_account = async (e) => {
@@ -456,8 +449,6 @@ class WalletHome extends React.Component {
         if (this.state.tokens >= 1000 && this.state.first_refresh === true) {
             try {
                 let vees = e.target;
-
-                console.log(vees);
 
                 let d_obj = {};
                 d_obj.twm_version = 1;
@@ -497,23 +488,12 @@ class WalletHome extends React.Component {
                 console.log(`accounts`);
                 let mixins = e.target.mixins.value - 1;
                 if (account) {
-                    console.log(`let's register it`);
-                    console.log(account);
-                    console.log(accs);
-
-
                     let this_account;
-
                     for (const acc of accs) {
                         if (acc.username === e.target.username.value) {
                             this_account = acc;
                         }
                     }
-
-
-                    console.log(`this_account`);
-                    console.log(this_account);
-                    console.log(`this_account`);
                     this.setState({create_account_txn_account: this_account});
 
                     let create_acc = await this.create_account_async(wallet, e.target.username.value, mixins);
@@ -521,26 +501,22 @@ class WalletHome extends React.Component {
                     let fee = create_acc.fee();
                     let txid = create_acc.transactionsIds();
                     if (confirmed_fee) {
-
                         this.setState({create_account_txn_id: txid, create_account_txn_fee: fee});
                         console.log(this.state.create_account_txn_id);
                         console.log(this.state.create_account_txn_fee);
                         console.log(`before the crash`);
                         let commit_create = await this.commit_create_account_async(create_acc);
                         console.log(commit_create);
-
                     } else {
                         let removed = wallet.removeSafexAccount(this_account.username);
                         console.log(`account ${this_account.username} was cancelled so removed and not made`);
                         alert(`your transaction was cancelled, no account registration was completed`);
                     }
-
                 } else {
                     let removed = wallet.removeSafexAccount(e.target.username.value);
                     console.log(`account ${e.target.username.value} removed and not made`);
                     alert(`The account creation failed, ${e.target.username.value} was not created`);
                 }
-
             } catch (err) {
                 console.error(err);
                 console.error("error at the register account function");
@@ -555,13 +531,11 @@ class WalletHome extends React.Component {
             try {
                 create_account(wallet, username, mixins, (err, res) => {
                     if (err) {
-
                         console.error(err);
                         console.error(`error at the register first callback`);
 
                         let confirm = window.confirm(`this account didn't get created, remove and try again?`)
                         if (confirm) {
-
                             let removed = wallet.removeSafexAccount(username);
                             console.log(`removed ${username} at the first callback`)
                             alert(`removed ${username} during the transaction creation, you should be able to try again`);
@@ -571,7 +545,6 @@ class WalletHome extends React.Component {
                             alert(err);
                         }
                         reject(err);
-
                     } else {
                         resolve(res);
                     }
@@ -587,7 +560,6 @@ class WalletHome extends React.Component {
             try {
                 txn.commit(async (err, res) => {
                     if (err) {
-
                         console.error(err);
                         console.error(`error at the create account commit callback`);
                         alert(`error at the create account commit callback`);
@@ -605,13 +577,7 @@ class WalletHome extends React.Component {
                         twm_file.accounts[this_account.username].safex_public_key = this.state.create_account_txn_account.publicKey;
                         twm_file.accounts[this_account.username].safex_private_key = this.state.create_account_txn_account.privateKey;
                         twm_file.accounts[this_account.username].urls = {};
-
-                        console.log(`before`);
-                        console.log(twm_file.accounts);
-                        console.log(`after`);
-
                         try {
-
                             const crypto = window.require('crypto');
                             const algorithm = 'aes-256-ctr';
                             console.log(this.state.password);
@@ -661,7 +627,6 @@ class WalletHome extends React.Component {
             }
         });
     };
-
 
     make_account_edit = async (e) => {
         e.persist();
@@ -794,7 +759,7 @@ class WalletHome extends React.Component {
                         let token_send = await this.send_tokens_async(wallet, e.target.destination.value.trim(), e.target.amount.value, mixins);
                         try {
                             let confirmed_fee = window.confirm(`the fee to send this token transaction will be:  ${token_send.fee() / 10000000000} SFX Safex Cash
-             sending ${this.state.token_txn_amount} SFT to ${this.state.token_txn_destination}`);
+                                sending ${this.state.token_txn_amount} SFT to ${this.state.token_txn_destination}`);
                             let fee = token_send.fee();
                             let txid = token_send.transactionsIds();
                             let amount = this.state.token_txn_amount;
@@ -893,7 +858,7 @@ class WalletHome extends React.Component {
                         let s_cash = await this.send_cash_async(wallet, e.target.destination.value.trim(), e.target.amount.value, mixins);
                         console.log(s_cash);
                         let confirmed_fee = window.confirm(`The fee to send this transaction will be:  ${s_cash.fee() / 10000000000} SFX (Safex Cash)
-            sending ${this.state.cash_txn_amount} SFX to ${this.state.cash_txn_destination}`);
+                            sending ${this.state.cash_txn_amount} SFX to ${this.state.cash_txn_destination}`);
                         let fee = s_cash.fee();
                         let txid = s_cash.transactionsIds();
                         if (confirmed_fee) {
@@ -1053,7 +1018,6 @@ class WalletHome extends React.Component {
     //open staking view from navigation
     show_tokens = () => {
         let token_stakes = wallet.getMyStake();
-        console.log(token_stakes);
         this.setState({interface_view: 'tokens', keyRequest: false, token_stakes: token_stakes})
     };
 
@@ -1113,7 +1077,6 @@ class WalletHome extends React.Component {
     //close modal of Purchase Form
     handleClosePurchaseForm = () => {
         this.setState({show_purchase_form: false});
-
     };
 
     //show modal of Purchase Form
@@ -1160,13 +1123,10 @@ class WalletHome extends React.Component {
             if (p_data.hasOwnProperty('shipping')) {
                 shipping_state = p_data.shipping;
             }
-            console.log(p_data.hasOwnProperty('nft'));
         } catch(err) {
             console.error(err);
             console.error(`error at the loading of listing data`);
         }
-        console.log(listing.description);
-
         this.setState({
             show_edit_offer_form: true,
             show_edit_offer: listing,
@@ -1232,15 +1192,11 @@ class WalletHome extends React.Component {
             alert(`this user ${username} is not registered with the TWM API`);
             this.setState({selected_user: {username: username, index: index},user_registered: false});
         }
-       /* this.seller_reply_message(username, '39bc27b0d3fd10444fbad65b9c509654e581854a6e91f8c34477d8a5bbbd7aba',
-            '064c0f8eb9309a7cb66d017c0278cd12ac5453ff3279fa3dde48159d0807e16d',
-            'http://stageapi.theworldmarketplace.com:17700', 'this is my message');*/
     };
 
     list_new_offer = async (e) => {
         e.preventDefault();
         e.persist();
-        console.log(`let's list the offer it`);
         let vees = e.target;
 
         let o_obj = {};
@@ -1366,16 +1322,13 @@ class WalletHome extends React.Component {
     make_token_stake = async (e) => {
         e.preventDefault();
         e.persist();
-        console.log(e.target);
         try {
             let mixins = e.target.mixins.value - 1;
             if (mixins >= 0) {
                 let confirmed = window.confirm(`Are you sure you want to stake ${e.target.amount.value} SFT Safex Tokens?`);
-                console.log(confirmed);
                 if (confirmed) {
                     try {
                         this.setState({stake_txn_amount: e.target.amount.value});
-
                         let staked_token = await this.token_stake_async(wallet, e.target.amount.value, mixins);
                         let confirmed_fee = window.confirm(`The network fee to stake ${this.state.stake_txn_amount} SFT will be:  ${staked_token.fee() / 10000000000} SFX (Safex Cash)`);
                         let fee = staked_token.fee();
@@ -1390,6 +1343,7 @@ class WalletHome extends React.Component {
                             }
                         } else {
                             console.log("token staking transaction cancelled");
+                            alert(`the token staking transaction has been successfully cancelled`);
                         }
                     } catch (err) {
                         console.error(err);
@@ -1472,9 +1426,8 @@ class WalletHome extends React.Component {
                             try {
                                 this.setState({unstake_txn_id: txid, unstake_txn_fee: fee});
                                 let commit_unstake = await this.commit_token_unstake_txn_async(unstaked);
-
                                 console.log(`unstake committed`);
-
+                                alert(`stake transaction successfully committed`);
                             } catch (err) {
                                 console.error(err);
                                 console.error(`Error when trying to commit the token unstaking transaction to the blockchain`);
@@ -1482,6 +1435,7 @@ class WalletHome extends React.Component {
                             }
                         } else {
                             console.log("token staking transaction cancelled");
+                            alert(`token unstake transaction successfully cancelled`);
                         }
                     } catch (err) {
                         console.error(err);
@@ -1547,7 +1501,6 @@ class WalletHome extends React.Component {
         console.log(user);
         try {
             let twm_file = this.state.twm_file;
-
             if (twm_file.accounts.hasOwnProperty(user.username)) {
                 console.log(twm_file);
                 console.log(`it has`);
@@ -1586,13 +1539,10 @@ class WalletHome extends React.Component {
                         f_obj.signature = signature;
                         f_obj.pub_key = user.publicKey;
                         let r_obj_string = JSON.stringify(r_obj);
-                        console.log(`string length ${r_obj_string.length}`);
-                        console.log(r_obj_string);
                         f_obj.msg_hash = sfxjs.cn_fast_hash_safex(r_obj_string, r_obj_string.length);
 
                         try {
                             let register_msgg = await register_api(twm_api_url, f_obj);
-                            console.log(register_msgg)
                             let pgp_obj = {};
                             pgp_obj.pub_key = publicKey;
                             pgp_obj.sec_key = privateKey;
@@ -1671,31 +1621,15 @@ class WalletHome extends React.Component {
                 console.log(more_core[offer_id]);
                 let order_ids_array = [];
                 for (const order in more_core[offer_id].orders) {
-                    console.log(order);
-                    order_ids_array.push(order);
+                    var count= Object.keys(more_core[offer_id].orders[order].messages).length;
+                    let o_obj = {};
+                    o_obj.order_id = order;
+                    o_obj.msg_count = count;
+                    o_obj.quantity = more_core[offer_id].orders[order].purchase_info.quantity;
+                    order_ids_array.push(o_obj);
                 }
                 console.log(order_ids_array);
-
-                tableOfOrders = order_ids_array.map((order, key) =>{
-                    console.log(key);
-                    try {
-                        return (
-                            <OrderTableRow
-                                key={key}
-                                myKey={key}
-                                title={order}
-                                id={offer_id}
-
-                                seller={this.state.selected_user.username}
-                                toEllipsis={this.to_ellipsis}
-                                handleShowMessages={this.handleShowMessages}
-                                getMessages={this.get_messages_by_order_id_of_seller}
-                            />)
-                    } catch (err) {
-                        console.error(`failed to properly parse the user data formatting`);
-                        console.error(err);
-                    }
-                });
+                return order_ids_array;
             } else {
                 console.log(`${offer_id} not found in file`);
                 alert(`There are no orders found for ${offer_id}`)
@@ -1962,26 +1896,18 @@ class WalletHome extends React.Component {
                                     try {
                                         const crypto = window.require('crypto');
                                         const algorithm = 'aes-256-ctr';
-                                        console.log(this.state.password);
                                         const cipher = crypto.createCipher(algorithm, this.state.password.toString());
                                         let crypted = cipher.update(JSON.stringify(twm_file), 'utf8', 'hex');
                                         crypted += cipher.final('hex');
-
                                         const hash1 = crypto.createHash('sha256');
                                         hash1.update(JSON.stringify(twm_file));
-                                        console.log(`password ${this.state.password}`);
-                                        console.log(JSON.stringify(twm_file));
-
                                         let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
 
                                         try {
                                             let opened_twm_file = await open_twm_file(this.state.new_path + '.twm', this.state.password);
                                             console.log(opened_twm_file);
-
                                             localStorage.setItem('twm_file', twm_file);
-
                                             this.setState({twm_file: twm_file});
-
                                         } catch (err) {
                                             this.setState({showLoader: false});
                                             console.error(err);
@@ -2004,7 +1930,6 @@ class WalletHome extends React.Component {
                             }
                         }
                     }
-                    console.log(twm_file);
                 }
             }
         } catch(err) {
@@ -2026,7 +1951,6 @@ class WalletHome extends React.Component {
             let urls = [];
             let t_f = this.state.twm_file;
             if (!this.isEmpty(t_f.api.urls)) {
-                console.log(`we have urls for the buyer`);
                 for (const url in t_f.api.urls) {
                     console.log(url);
                     urls.push(url);
@@ -2090,7 +2014,6 @@ class WalletHome extends React.Component {
         }
         const messages = [];
         try {
-
             /** @type {BuyerOrder} */
             const core =  t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder];
             if (!core) {
@@ -2144,16 +2067,9 @@ class WalletHome extends React.Component {
                             </Row>
                         );
                     } else if (t_msg.message.hasOwnProperty('so')) {
-                        console.log(t_msg.message.so);
-                        console.log(`found shipping object`);
                         let parsed_so;
                         if (typeof t_msg.message.so == 'string') {
-                            console.log(`so is a string`);
-
                             parsed_so = JSON.parse(t_msg.message.so);
-                            console.log(parsed_so);
-                            console.log(t_msg)
-                            console.log(t_msg.message)
                         } else {
                             parsed_so = t_msg.message.so;
                         }
@@ -2487,22 +2403,6 @@ class WalletHome extends React.Component {
             console.error(`error at fetching the messages of the buyer`);
         }
     };
-
-    callBuyerOrders = (twm_api_url, offer_id, order_id) => buyerOrders = this.state.twm_file.api.urls[twm_api_url][offer_id][order_id].messages.map((message, key) => {
-        try {
-            //this.setState({loadingOffers: true})
-            
-                return (
-                    <h1 key={key}>{key} ---###--- {message}</h1>
-                )
-
-
-        } catch (err) {
-            this.setState({loadingOffers: false})
-            console.error(`failed to properly parse the user data formatting`);
-            console.error(err);
-        }
-    })
 
     buyer_reply_by_order = async(e, twm_api_url = this.state.buyerSelectUrl, offer_id = this.state.buyerSelectOffer, order_id = this.state.buyerSelectOrder) => {
         e.preventDefault();
@@ -4315,6 +4215,7 @@ class WalletHome extends React.Component {
 
                                             :
                                                 <MerchantOffers
+                                                    loadOrders={this.get_seller_order_ids_by_offer}
                                                     handleOrders={this.handleMyOrders}
                                                     userOffers={this.state.twm_offers}
                                                 />
