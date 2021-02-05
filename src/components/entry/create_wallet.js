@@ -271,7 +271,7 @@ export default class CreateWallet extends React.Component {
                                 <Image onClick={() => {alert('Closing Wallet... (TEST)')}} className="entry-off-button" src={require("./../../img/off.svg")}/>
                                 
                                 <Row className="entry-progress-row">
-                                    <Col onClick={this.backToSelect} className="d-flex align-items-center entry-back-text" md={2}>
+                                    <Col onClick={this.backToSelect} className="d-flex align-items-center entry-back-text pointer" md={2}>
                                         <IconContext.Provider  value={{color: '#13D3FD', size: '3rem'}}>
                                             <IoIosArrowBack/>
                                         </IconContext.Provider>
@@ -514,7 +514,7 @@ export default class CreateWallet extends React.Component {
                                 }
 
                                 <Row  className="w-100 entry-footer">
-                                    <p>THE WORLD MARKETPLACE</p>
+                                    <p className="user-select-none">THE WORLD MARKETPLACE</p>
                                 </Row>
                             </Container>
                         }
