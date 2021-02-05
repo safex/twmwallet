@@ -3389,8 +3389,7 @@ class WalletHome extends React.Component {
                                         bottom: '40px',
                                         overflow: 'auto',
                                         }
-                                    }}
-                                >
+                                    }}>
                                     <h1>PURCHASE {this.state.show_purchase_offer.title}</h1>
 
                                     <Form id="purchase_item"
@@ -3648,10 +3647,7 @@ class WalletHome extends React.Component {
                                 
                                 <h2>Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX</h2>
 
-                                <div
-                                    
-                                    style={{display: 'none'}}
-                                >
+                                <div style={{display: 'none'}}>
                                     <h1 id="receipt" style={{textAlign: 'center'}}>
                                         Purchase Confirmed: {this.state.show_purchase_offer.title}
                                         <br/><br/>
