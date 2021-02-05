@@ -1645,7 +1645,6 @@ class WalletHome extends React.Component {
     };
 
     get_messages_by_order_id_of_seller = async (offer_id, username, twm_api_url, order_id) => {
-        this.setState({selectedMerchantOrder: order_id})
         try {
             let twm_file = this.state.twm_file;
             let more_core = twm_file.accounts[username].urls[twm_api_url].messages[offer_id].orders;
@@ -1657,8 +1656,7 @@ class WalletHome extends React.Component {
                     console.log(more_core[order_id].messages[message])
                     messages_array.push(more_core[order_id].messages[message]);
                 }
-                console.log(messages_array);
-                this.setState({messages_selected: messages_array});
+                return messages_array;
             } else {
                 console.log(`${order_id} not found in file`);
             }
@@ -2709,7 +2707,6 @@ class WalletHome extends React.Component {
                                                     if (o_m.length > 0 && o_m < 400) {
                                                         confirm_message += ` ${e.target.open_message.value}`;
                                                         open_message = e.target.open_message.value;
-
                                                     } else {
                                                         //too many characters
                                                     }
@@ -4071,16 +4068,14 @@ class WalletHome extends React.Component {
                             console.error(`there is no user data to parse it is not properly formatted`);
                         }
                         return (
-                            <Row
-                                className={
+                            <Row className={
                                     this.state.selected_user.username === user.username ?
                                         "no-gutters account-element selected-account"
                                     :
                                         "no-gutters account-element"
                                 }
                                 key={key}
-                                onClick={() => this.select_merchant_user(user.username, key)}
-                            >
+                                onClick={() => this.select_merchant_user(user.username, key)}>
 
                                 <Col>
                                     <Image
@@ -4088,8 +4083,7 @@ class WalletHome extends React.Component {
                                         height={50}
                                         src={avatar}
                                         roundedCircle
-                                        className="border border-white grey-back"
-                                    />
+                                        className="border border-white grey-back"/>
                                 </Col>
 
                                 <Col>
@@ -4099,16 +4093,13 @@ class WalletHome extends React.Component {
                                 {user.status == 0 ?
                                     <button
                                         className="merchant-mini-buttons"
-                                        onClick={(e) => this.remove_account(e, user.username, key)}
-                                    >
+                                        onClick={(e) => this.remove_account(e, user.username, key)}>
                                         Remove
                                     </button>
-
                                 :
                                     ''
                                 }
-                            </Row>
-                        )
+                            </Row>)
                     });
                     try {
                         var selected = this.state.usernames[this.state.selected_user.index];
@@ -4117,9 +4108,7 @@ class WalletHome extends React.Component {
                         if (selected) {
                             try {
                                 let selected_data = JSON.parse(selected.data);
-
                                 console.log(selected);
-
                                 data = selected_data;
                             } catch (err) {
                                 console.error(err);
@@ -4216,6 +4205,7 @@ class WalletHome extends React.Component {
                                             :
                                                 <MerchantOffers
                                                     loadOrders={this.get_seller_order_ids_by_offer}
+                                                    loadMessages={this.get_messages_by_order_id_of_seller}
                                                     handleOrders={this.handleMyOrders}
                                                     userOffers={this.state.twm_offers}
                                                 />
@@ -4229,7 +4219,6 @@ class WalletHome extends React.Component {
                                         isOpen={this.state.show_new_offer_form}
                                         onRequestClose={this.handleCloseNewOfferForm}
                                         className="new-account-modal"
-
                                         style={{
                                             overlay: {
                                             position: 'fixed',
@@ -4247,14 +4236,9 @@ class WalletHome extends React.Component {
                                             bottom: '40px',
                                             overflow: 'auto',
                                             }
-                                        }}
-                                    >
+                                        }}>
                                             <h1>Create New Offer</h1>
-
-                                            <Form
-                                                id="list_new_offer"
-                                                onSubmit={this.list_new_offer}
-                                            >
+                                            <Form id="list_new_offer" onSubmit={this.list_new_offer}>
                                                 <Row className="no-gutters justify-content-between w-100">
                                                     <Col md="8">
                                                         <Form.Group as={Col}>
@@ -4277,7 +4261,6 @@ class WalletHome extends React.Component {
                                                             />
                                                         </Form.Group>
                                                     </Col>
-
                                                     <Col md="4">
                                                         <Image
                                                             className="border border-white grey-back"
@@ -4288,7 +4271,6 @@ class WalletHome extends React.Component {
                                                         />
                                                     </Col>
                                                 </Row>
-
                                                 <Row  md="8">
                                                     <Form.Group md="6" as={Col}>
                                                         <Form.Label>Title</Form.Label>
@@ -4426,10 +4408,7 @@ class WalletHome extends React.Component {
                                                 </button>
                                             </Form>
 
-                                            <Button
-                                                className="close-button"
-                                                onClick={this.handleCloseNewOfferForm}
-                                            >
+                                            <Button className="close-button" onClick={this.handleCloseNewOfferForm}>
                                                 Close
                                             </Button>
                                         </ReactModal>
@@ -4457,8 +4436,7 @@ class WalletHome extends React.Component {
                                             bottom: '40px',
                                             overflow: 'auto',
                                             }
-                                        }}
-                                    >
+                                        }}>
 
                                         <h1>Make New Account</h1>
 
@@ -4556,7 +4534,6 @@ class WalletHome extends React.Component {
                                                     </Form.Group>
 
                                                     <Form.Group as={Col}>
-
                                                         <Form.Label>Mixins</Form.Label>
                                                         <IconContext.Provider
                                                             value={{color: 'white', size: '20px'}}>
@@ -4603,63 +4580,10 @@ class WalletHome extends React.Component {
                                             </button>
                                         </Form>
 
-                                        <button
-                                            className="close-button"
-                                            onClick={this.handleNewAccountForm}
-                                        >
+                                        <button className="close-button" onClick={this.handleNewAccountForm}>
                                             Close
                                         </button>
                                     </ReactModal>
-
-                                    <ReactModal
-                                            isOpen={this.state.showMessages}
-                                            closeTimeoutMS={500}
-                                            className="buyer-messages-modal"
-                                            onRequestClose={this.hideMessages}
-                                        >
-                                            <Row>
-                                                <Col sm={10}>
-                                                    <h1>
-                                                        Merchant Messages for
-                                                    </h1>
-
-                                                    <h2>Order: { this.state.selectedMerchantOrder }</h2>
-
-                                                </Col>
-                                                <Col sm={2}>
-                                                    <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
-                                                        <CgCloseR
-                                                            className="mx-auto"
-                                                            onClick={this.hideMessages}
-                                                        />
-                                                    </IconContext.Provider>
-                                                </Col>
-                                            </Row>
-
-                                            <Row className="m-auto">
-                                                <Col style={{overflowY: 'auto', maxHeight: '50vh'}} sm={12}>
-                                                    {message_render}
-                                                </Col>
-
-
-                                                <Col className="mx-auto my-5" sm={6}>
-                                                    <form onSubmit={(e) => this.seller_reply_message(
-                                                                e,
-                                                                this.state.selected_user.username,
-                                                                this.state.selectedMerchantOffer,
-                                                                this.state.selectedMerchantOrder,
-                                                                'http://stageapi.theworldmarketplace.com:17700',
-                                                            )
-                                                        }
-                                                    >
-                                                        <textarea style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', fontSize: '1.5rem' }} rows="6" cols="50" name="merchantMessageBox"></textarea>
-                                                        
-                                                        <button className="my-3 search-button" type="submit">Send</button>
-                                                    </form>
-                                                </Col>
-                                            </Row>
-                                        </ReactModal>
-
                                     <ReactModal
                                         closeTimeoutMS={500}
                                         isOpen={this.state.show_edit_offer_form}
@@ -4682,14 +4606,11 @@ class WalletHome extends React.Component {
                                             bottom: '40px',
                                             overflow: 'auto',
                                             }
-                                        }}
-                                    >
+                                        }}>
                                         <h1>Edit Offer {this.state.show_edit_offer.title}</h1>
 
-                                        <Form
-                                            id="edit_offer"
-                                            onSubmit={(e) => this.make_edit_offer(e, this.state.show_edit_offer)}
-                                        >
+                                        <Form id="edit_offer"
+                                            onSubmit={(e) => this.make_edit_offer(e, this.state.show_edit_offer)}>
                                             <Form.Row>
                                                 <Col md="8">
                                                     <Form.Group as={Col}>
@@ -4858,11 +4779,7 @@ class WalletHome extends React.Component {
                                                             </ReactTooltip>
                                                         </IconContext.Provider>
                                                     </Form.Label>
-                                                    <Form.Control
-                                                        name="mixins"
-                                                        as="select"
-                                                        defaultValue="7"
-                                                    >
+                                                    <Form.Control name="mixins" as="select" defaultValue="7">
                                                         <option>1</option>
                                                         <option>2</option>
                                                         <option>3</option>
@@ -4877,10 +4794,7 @@ class WalletHome extends React.Component {
                                                 Submit Edit
                                             </button>
                                         </Form>
-                                        <button
-                                            className="close-button my-5"
-                                            onClick={this.handleCloseEditOfferForm}
-                                        >
+                                        <button className="close-button my-5" onClick={this.handleCloseEditOfferForm}>
                                             Close
                                         </button>
                                     </ReactModal>

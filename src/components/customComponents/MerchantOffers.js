@@ -37,10 +37,21 @@ export default class MerchantOffers extends React.Component {
         this.setState({selected_offer: listing, selected_offer_orders: my_table});
     }
 
+    select_the_order = async (e, order) => {
+        e.preventDefault();
+        console.log(order);
+        let show_messages = await this.props.loadMessages(
+            this.state.selected_offer.offerID,
+            this.state.selected_offer.seller,
+            'http://stageapi.theworldmarketplace.com:17700',
+            order.order_id);
+        console.log(show_messages);
+        this.setState({selected_order: order, selected_messages: show_messages});
+    }
+
     //top level if not selected offer, then show
     //also top level if not selected order, then show
     render() {
-
         let the_view;
         if (this.state.selected_offer === '') {
             the_view = (<Row className="w-100">
@@ -62,15 +73,6 @@ export default class MerchantOffers extends React.Component {
                             <p data-tip data-for='offerID'>
                                 {listing.offerID.slice(0, 8)}
                             </p>
-                            <ReactTooltip
-                                className="entry-tooltip-container"
-                                id='offerID'
-                                effect='solid'
-                                place="top">
-                        <span>
-                            {listing.offerID}
-                        </span>
-                            </ReactTooltip>
                             <p>
                                 <button onClick={() => this.state.getOrders(
                                     listing.offerID,
@@ -112,7 +114,7 @@ export default class MerchantOffers extends React.Component {
                                 <p>{order.msg_count}</p>
                                 <p>
                                     <button
-                                        onClick={}
+                                        onClick={(e) => this.select_the_order(e, order)}
                                         className="orders-button">
                                         Open Messaging
                                     </button>
@@ -122,54 +124,24 @@ export default class MerchantOffers extends React.Component {
                     </Col>
                 </Row>)
             } else if (this.state.selected_order !== '') {
-               /* <ReactModal
-                    isOpen={this.state.showMessages}
-                    closeTimeoutMS={500}
-                    className="buyer-messages-modal"
-                    onRequestClose={this.hideMessages}
-                >
-                    <Row>
-                        <Col sm={10}>
-                            <h1>
-                                Merchant Messages for
-                            </h1>
-
-                            <h2>Order: { this.state.selectedMerchantOrder }</h2>
-
-                        </Col>
-                        <Col sm={2}>
-                            <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
-                                <CgCloseR
-                                    className="mx-auto"
-                                    onClick={this.hideMessages}
-                                />
-                            </IconContext.Provider>
-                        </Col>
-                    </Row>
-
-                    <Row className="m-auto">
-                        <Col style={{overflowY: 'auto', maxHeight: '50vh'}} sm={12}>
-                            {message_render}
-                        </Col>
-
-
-                        <Col className="mx-auto my-5" sm={6}>
-                            <form onSubmit={(e) => this.seller_reply_message(
-                                e,
-                                this.state.selected_user.username,
-                                this.state.selectedMerchantOffer,
-                                this.state.selectedMerchantOrder,
-                                'http://stageapi.theworldmarketplace.com:17700',
-                            )
-                            }
-                            >
-                                <textarea style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', fontSize: '1.5rem' }} rows="6" cols="50" name="merchantMessageBox"></textarea>
-
-                                <button className="my-3 search-button" type="submit">Send</button>
-                            </form>
-                        </Col>
-                    </Row>
-                </ReactModal>*/
+                the_view = (<Row className="w-100">
+                    <h1>{this.state.selected_offer.title} {this.state.selected_offer.offerID}</h1>
+                    <Col className="pt-3 staking-table-table">
+                        <Row className="staking-table-header no-gutters">
+                            <p>Order ID</p>
+                            <p>Quantity</p>
+                            <p>Message Count</p>
+                            <p></p>
+                        </Row>
+                        {this.state.selected_messages.map((message, key) => (
+                            <Row key={key} className="staking-table-row">
+                               <p>
+                                   {JSON.stringify(message)}
+                               </p>
+                            </Row>)
+                        )}
+                    </Col>
+                </Row>)
             }
         }
 
