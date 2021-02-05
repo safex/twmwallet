@@ -548,7 +548,7 @@ export default class RecoverSeed extends React.Component {
                                         }
 
                         <Row  className="w-100 entry-footer">
-                            <p>THE WORLD MARKETPLACE</p>
+                            <p className="user-select-none">THE WORLD MARKETPLACE</p>
                         </Row>
                     </Container>)
             }

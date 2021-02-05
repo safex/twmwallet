@@ -7,6 +7,14 @@ import {BiCog, BiPowerOff} from 'react-icons/bi'
 import './ComponentCSS/MainHeader.css'
 
 export default function MainHeader(props) {
+    const renderMenuItem = (activeOnView, label, onClick) => {
+        const isActive = props.view === activeOnView;
+        return (<Col className={isActive ? "menu-link-active" : ""}>
+        <p className="pointer" onClick={() => onClick()}>
+            {label}
+        </p>
+    </Col>)
+    }
 
     return (
         <Row id="header" className="main-header">
@@ -16,34 +24,16 @@ export default function MainHeader(props) {
             
 
                 <Col sm={6} className="d-flex">
-                    
-                        <Col className={props.view === 'home' ? "menu-link-active" : ""}>
-                            <p tabIndex={0} onClick={props.goHome}>
-                                Home
-                            </p>
-                        </Col>
-                        <Col className={props.view === 'market' ? "menu-link-active" : ""}>
-                            <p onClick={props.goToMarket}>
-                                Market
-                            </p>
-                        </Col>
-                        <Col className={props.view === 'merchant' ? "menu-link-active" : ""}>
-                            <p onClick={props.goToMerchant}>
-                                Merchant
-                            </p>
-                        </Col>
-                        <Col className={props.view === 'tokens' ? "menu-link-active" : ""}>
-                            <p onClick={props.goToTokens}>
-                                Tokens
-                            </p>
-                        </Col>
-                    
+                    {renderMenuItem('home', 'Home', props.goHome)}
+                    {renderMenuItem('market', 'Market', props.goToMarket)}
+                    {renderMenuItem('merchant', 'Merchant', props.goToMerchant)}
+                    {renderMenuItem('tokens', 'Tokens', props.goToTokens)}                
                 </Col>
 
                 <Col sm={2} className="">
-                    <BiCog tabIndex={4} size={40} className="m-3" onClick={props.goToSettings}/>
+                    <BiCog tabIndex={4} size={40} className="m-3 pointer" onClick={props.goToSettings}/>
 
-                    <BiPowerOff tabIndex={5} size={40} className="m-3" onClick={props.logout}/>
+                    <BiPowerOff tabIndex={5} size={40} className="m-3 pointer" onClick={props.logout}/>
                 </Col>
         </Row>
     )
