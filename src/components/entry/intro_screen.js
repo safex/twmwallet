@@ -58,8 +58,7 @@ export default class IntroScreen extends React.Component {
 
     render() {
         return (
-            <div className="width100 height100 d-flex flex-column text-center">
-                <Image className="intro-background-image" src={require('./../../img/2-b.png')}/>
+            <div className="width100 height100 d-flex flex-column text-center intro-background-image">
                 <Container fluid className="height100 flex-column d-flex justify-content-center">
                     <Image onClick={() => {alert('Closing Wallet... (TEST)')}} className="entry-off-button" src={require("./../../img/off_black.svg")}/>
 

@@ -37,8 +37,8 @@
 }
 
 .intro-background-image {
-    width: 100%;
-    z-index: -1;
+    background: url(./../images/intro-background.png) no-repeat center center fixed; 
+    background-size: cover
 }
 
 .entry-scene1 {
