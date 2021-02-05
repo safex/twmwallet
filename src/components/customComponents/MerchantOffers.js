@@ -124,22 +124,143 @@ export default class MerchantOffers extends React.Component {
                     </Col>
                 </Row>)
             } else if (this.state.selected_order !== '') {
+                let inner_view = this.state.selected_messages.map((msg, key) => {
+                    console.log(`messages rendered`);
+                    console.log(msg);
+                    console.log(key);
+                    try {
+                        console.log(msg.message);
+                        if (typeof msg.message == 'string') {
+                            msg.message = JSON.parse(msg.message);
+                        }
+                        if (msg.message.n.length > 0) {
+                            console.log(`nft address supplied!`);
+                            return (
+                                <Row style={{justifyContent: 'space-around'}} key={key}>
+                                    <h1 style={{
+                                        border: '2px solid #13D3FD',
+                                        borderRadius: 10,
+                                        padding: '.5rem',
+                                        margin: '1rem'
+                                    }}>
+                                        {msg.position}
+                                    </h1>
+                                    <h3 className="mx-auto">{msg.message.n}</h3>
+                                </Row>
+                            );
+                        } else if (msg.message.m.length > 0) {
+                            console.log(`this is a direct message open ended`);
+                            return (
+                                <Row className="my-3 w-75 text-break p-1"
+                                     style={msg.message.m === 'seller' ?
+                                         {
+                                             justifyContent: 'space-around',
+                                             alignItems: 'center',
+                                             backgroundColor: '#13D3FD',
+                                             color: 'white',
+                                             marginRight: 'auto',
+                                             borderRadius: 25,
+                                         }
+                                         :
+                                         {
+                                             justifyContent: 'space-around',
+                                             alignItems: 'center',
+                                             marginLeft: 'auto',
+                                             borderRadius: 25,
+                                             border: '2px solid #13D3FD'
+                                         }
+                                     }
+                                     key={key}>
+                                    <h1
+                                        style={msg.message.m === 'seller' ?
+                                            {
+                                                border: '2px solid #13D3FD',
+                                                borderRadius: 10,
+                                                padding: '.5rem',
+                                                margin: '1rem'
+                                            }
+                                            :
+                                            {
+                                                border: '2px solid white',
+                                                borderRadius: 10,
+                                                padding: '.5rem',
+                                                margin: '1rem'
+                                            }
+                                        }>
+                                        {msg.position}
+                                    </h1>
+                                    <h3 style={{maxWidth: '50vh'}} className="mx-auto">{msg.message.m}</h3>
+                                </Row>
+                            );
+                        } else if (msg.message.hasOwnProperty('so')) {
+                            console.log(msg.message.so);
+                            console.log(`found shipping object`);
+                            let parsed_so;
+                            if (typeof msg.message.so == 'string') {
+                                console.log(`so is a string`);
+
+                                parsed_so = JSON.parse(msg.message.so);
+                                console.log(parsed_so);
+                            } else {
+                                parsed_so = msg.message.so;
+                            }
+                            if (parsed_so.fn.length > 2) {
+                                console.log(`there is a shipping object supplied!`);
+                                try {
+                                    console.log(`parsed the so`);
+                                    return (
+                                        <div key={key}>
+                                            <Row style={{justifyContent: 'space-around'}}>
+                                                <h1 style={{
+                                                    border: '2px solid #13D3FD',
+                                                    borderRadius: 10,
+                                                    padding: '.5rem',
+                                                    margin: '1rem'
+                                                }}>
+                                                    {msg.position}
+                                                </h1>
+                                                <Col>
+                                                    <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/></h2>
+                                                    <h2><i> <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/></h2>
+                                                    <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
+                                                    <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
+                                                </Col>
+                                                <Col>
+                                                    <h2><i> <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/></h2>
+                                                    <h2><i> <u>City:</u></i> <b></b>{parsed_so.city}<b/></h2>
+                                                    <h2><i> <u>State:</u></i> <b></b>{parsed_so.s}<b/></h2>
+                                                    <h2><i> <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/></h2>
+                                                    <h2><i> <u>Country:</u></i> <b></b>{parsed_so.c}<b/></h2>
+                                                </Col>
+                                            </Row>
+                                        </div>
+                                    );
+                                } catch (err) {
+                                    console.error(err);
+                                    console.error(`error at parsing the shipping object`);
+                                }
+                            }
+                        }
+                        return (
+                            <div key={key}>
+                                {msg.position}
+                                {msg.msg}
+                            </div>
+                        );
+                    } catch (err) {
+                        console.error(err);
+                        console.error(`error parsing message contents`)
+                    }
+
+                });
                 the_view = (<Row className="w-100">
                     <h1>{this.state.selected_offer.title} {this.state.selected_offer.offerID}</h1>
                     <Col className="pt-3 staking-table-table">
                         <Row className="staking-table-header no-gutters">
-                            <p>Order ID</p>
-                            <p>Quantity</p>
-                            <p>Message Count</p>
-                            <p></p>
                         </Row>
-                        {this.state.selected_messages.map((message, key) => (
-                            <Row key={key} className="staking-table-row">
-                               <p>
-                                   {JSON.stringify(message)}
-                               </p>
-                            </Row>)
-                        )}
+                        {
+                            inner_view
+                        }
                     </Col>
                 </Row>)
             }
