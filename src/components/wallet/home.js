@@ -159,7 +159,6 @@ class WalletHome extends React.Component {
     }
 
     async componentWillUnmount() {
-
         localStorage.removeItem('twm_file');
         localStorage.removeItem('encrypted_wallet');
         localStorage.removeItem('wallet');
@@ -167,7 +166,6 @@ class WalletHome extends React.Component {
 
     async componentDidMount() {
         try {
-            console.log(this.props.wallet);
             wallet = this.props.wallet;
             try {
                 let twm_ls = localStorage.getItem('twm_file');
@@ -182,7 +180,6 @@ class WalletHome extends React.Component {
 
                 let s_hash = storage_hash.digest('hex');
 
-
                 const parse_hash = crypto.createHash('sha256');
                 parse_hash.update(JSON.stringify(twm_file));
 
@@ -190,8 +187,6 @@ class WalletHome extends React.Component {
 
                 if (p_hash === s_hash) {
                     this.setState({twm_file: twm_file});
-
-
                 } else {
                     alert(`have an issue with the twm file!`);
                 }
@@ -249,8 +244,7 @@ class WalletHome extends React.Component {
                         //this.check();
                     }
                 }, 1000);
-                this.setState({timer: timer});
-                this.setState({synced: false});
+                this.setState({timer: timer, synced: false});
             }
             wallet.on('refreshed', () => {
                 this.refresh_action();
@@ -277,7 +271,6 @@ class WalletHome extends React.Component {
 
     refresh_history = async() => {
         let txnhistory = wallet.history();
-
         txnhistory.sort(function(a, b) {
             return parseFloat(b.timestamp) - parseFloat(a.timestamp);
         });
@@ -285,7 +278,6 @@ class WalletHome extends React.Component {
     }
 
     refresh_action = async () => {
-        let m_wallet = wallet;
         console.log("refreshing rn");
         try {
             let height = wallet.daemonBlockchainHeight();
@@ -337,14 +329,6 @@ class WalletHome extends React.Component {
         } catch (err) {
             console.error(err);
             console.error(`error at getting the staked tokens from the blockchain`);
-        }
-        try {
-            //m_wallet.store(this.wallet_store_callback);
-
-
-        } catch (err) {
-            console.error(err);
-            console.error("error getting height");
         }
     };
 
