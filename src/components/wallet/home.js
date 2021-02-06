@@ -1374,7 +1374,6 @@ class WalletHome extends React.Component {
                                         transaction id: ${this.state.stake_txn_id}
                                         staking ${this.state.stake_txn_amount} SFT
                                         fee: ${this.state.stake_txn_fee / 10000000000} SFX`);
-
                         this.setState({stake_txn_id: '', stake_txn_fee: 0, stake_txn_amount: 0});
                         resolve(res);
                     }
@@ -1481,12 +1480,9 @@ class WalletHome extends React.Component {
     };
 
     register_twmapi = async (user, twm_api_url = 'http://stageapi.theworldmarketplace.com:17700') => {
-        console.log(user);
         try {
             let twm_file = this.state.twm_file;
             if (twm_file.accounts.hasOwnProperty(user.username)) {
-                console.log(twm_file);
-                console.log(`it has`);
                 if (twm_file.accounts[user.username].urls.hasOwnProperty(twm_api_url)) {
                     alert(`this account is already registered with the api`);
                 } else {
@@ -1540,11 +1536,8 @@ class WalletHome extends React.Component {
 
                             const hash1 = crypto.createHash('sha256');
                             hash1.update(JSON.stringify(twm_file));
-                            console.log(`password ${this.state.password}`);
 
                             let twm_save = await save_twm_file(this.state.new_path + '.twm', crypted, this.state.password, hash1.digest('hex'));
-
-                            console.log(twm_save);
                             try {
                                 let twm_file2 = await open_twm_file(this.state.new_path + '.twm', this.state.password);
                                 console.log(twm_file2);
@@ -1556,14 +1549,18 @@ class WalletHome extends React.Component {
                                 this.setState({loading: false})
                                 console.error(err);
                                 console.error(`error opening twm file after save to verify`);
+                                alert(`there was an error saving the contents to the twm file at registering`);
                             }
                         } catch(err) {
                             console.error(err);
                             console.error(`error at the register_api function`);
-                            alert(`${user.username} has not been registered with the api at this time`)
+                            alert(`${user.username} has not been registered with the api at this time`);
+                            alert(err);
                         }
                     } catch (err) {
                         console.error(err);
+                        alert(`there was an error at the registrion to api function`);
+                        alert(err);
                     }
                 }
             }
@@ -1611,16 +1608,11 @@ class WalletHome extends React.Component {
                     o_obj.quantity = more_core[offer_id].orders[order].purchase_info.quantity;
                     order_ids_array.push(o_obj);
                 }
-                console.log(order_ids_array);
                 return order_ids_array;
             } else {
                 console.log(`${offer_id} not found in file`);
                 alert(`There are no orders found for ${offer_id}`)
             }
-            this.setState({tableOfTables: {...this.state.tableOfTables, [offer_id]: tableOfOrders}})
-                console.log(this.state.tableOfTables)
-                console.log(this.state.tableOfTables[offer_id])
-                tableOfOrders=[]
         } catch(err) {
             console.error(err);
             alert(`error user and/or url are not in this file, no messages`);
@@ -1631,7 +1623,6 @@ class WalletHome extends React.Component {
         try {
             let twm_file = this.state.twm_file;
             let more_core = twm_file.accounts[username].urls[twm_api_url].messages[offer_id].orders;
-            console.log(more_core);
             if (more_core.hasOwnProperty(order_id)) {
                 let messages_array = [];
                 for (const message in more_core[order_id].messages) {
@@ -1642,6 +1633,7 @@ class WalletHome extends React.Component {
                 return messages_array;
             } else {
                 console.log(`${order_id} not found in file`);
+                alert(`this order was not found ${order_id}`);
             }
         } catch(err) {
             console.error(err);
@@ -1651,26 +1643,20 @@ class WalletHome extends React.Component {
 
     fetch_messages_seller = async (username, twm_api_url) => {
         try {
-            console.log(this.state.twm_file);
             if (this.state.twm_file.accounts.hasOwnProperty(username)) {
                 if (this.state.twm_file.accounts[username].urls.hasOwnProperty(twm_api_url)) {
                     console.log(`it has the twmapi in it's file for the fetch messages_seller`);
                     let date = new Date(new Date().toUTCString());
-                    console.log(date);
-                    console.log(date.toString());
 
                     const crypto  = window.require('crypto');
                     let our_key = crypto.createPrivateKey(this.state.twm_file.accounts[username].urls[twm_api_url].pgp_key.sec_key)
-                    console.log(our_key);
                     let date_msg = Buffer.from(date.toString());
-                    console.log(date_msg);
 
                     let msg_hex = this.byteToHexString(date_msg);
                    const signature = crypto.sign("sha256", date_msg, {
                         key: our_key,
                         padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
                     });
-                   console.log(signature);
                     let verified_sig = crypto.verify(
                         "sha256",
                         date_msg,
@@ -1680,7 +1666,6 @@ class WalletHome extends React.Component {
                         },
                         signature
                     );
-                    console.log(`is verified :::  ${verified_sig}`);
                     let req_payload = {};
                     req_payload.signature = this.byteToHexString(signature);
                     req_payload.username = username;
@@ -1688,17 +1673,12 @@ class WalletHome extends React.Component {
                     req_payload.msg_hex = msg_hex;
 
                     let req_msgs = await merchant_get_messages(req_payload, twm_api_url);
-                    console.log(req_msgs.to);
-                    console.log(req_msgs.from);
 
                     let twm_file = this.state.twm_file;
 
                     for (const order in req_msgs.to) {
                         console.log(req_msgs.to[order]);
                         for (const msg of req_msgs.to[order]) {
-
-                            console.log(msg);
-                            console.log(msg.message);
                             try {
                                 const decryptedData = crypto.privateDecrypt(
                                     {
@@ -1708,12 +1688,11 @@ class WalletHome extends React.Component {
                                     },
                                     this.hexStringToByte(msg.message)
                                 );
-                                console.log(decryptedData.toString());
                                 let decomped = zlib.inflateSync(Buffer.from(decryptedData));
-                                console.log(decomped.toString());
                                 try {
                                     let parsed = JSON.parse(decomped.toString());
                                     msg.message = decomped.toString();
+                                    console.log(`this is the decryped parsed message`);
                                     console.log(parsed);
                                     if (msg.to === username) {
                                         if (twm_file.accounts[username].urls[twm_api_url].messages.hasOwnProperty(parsed.o)) {
@@ -1734,7 +1713,6 @@ class WalletHome extends React.Component {
                                                         let gt_obj = {};
                                                         gt_obj.daemon_host = this.state.daemon_host;
                                                         gt_obj.daemon_port = this.state.daemon_port;
-                                                        console.log(`purchase proof ${msg.purchase_proof}`);
                                                         console.log(msg.purchase_proof);
                                                         console.log(`purchase proof ${msg.purchase_proof}`);
                                                         let txn = await get_transactions(gt_obj, msg.purchase_proof);
@@ -1895,7 +1873,6 @@ class WalletHome extends React.Component {
                                             console.error(`error opening twm file after save to verify`);
                                             alert(`Error at saving to the twm file during account creation verification stage`);
                                         }
-                                        console.log(twm_save);
                                     } catch (err) {
                                         this.setState({showLoader: false});
                                         console.error(err);
