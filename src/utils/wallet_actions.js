@@ -49,13 +49,14 @@ export async function create_offer(wallet, username, title, price, quantity, des
     }, callback);
 }
 
-export async function unstake_tokens(wallet, amount, mixin, callback) {
+export async function unstake_tokens(wallet, amount, block_height, mixin, callback) {
     let mixi = mixin >= 0 ? mixin : 6;
     let amount2 = amount * 10000000000;
     wallet.createAdvancedTransaction({
         tx_type: '4', //unstake tokens transaction
         address: wallet.address(),
         amount: amount2.toString(),
+        safex_staked_token_height: block_height,
         mixin: mixi
     }, callback);
 }
