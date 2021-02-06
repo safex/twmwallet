@@ -225,32 +225,10 @@ class WalletHome extends React.Component {
                 gst_obj.daemon_host = this.props.daemon_host;
                 gst_obj.daemon_port = this.props.daemon_port;
                 let gst = await get_staked_tokens(gst_obj);
-                try {
-                    let height = wallet.daemonBlockchainHeight();
-                    console.log(height);
-                    if (height === 0) {
-                        height = 95000;
-                    }
-                    let previous_interval = (height - (height % 100)) / 100;
-                    let gim_obj = {};
-                    gim_obj.begin_interval = previous_interval - 3;
-                    gim_obj.end_interval = previous_interval + 1;
-                    gim_obj.daemon_host = this.props.daemon_host;
-                    gim_obj.daemon_port = this.props.daemon_port;
-
-                    console.log(`gim object`);
-                    console.log(gim_obj);
-                    let gim = await get_interest_map(gim_obj);
-
-                    this.setState({
-                        blockchain_tokens_staked: gst.pairs[0].amount / 10000000000,
-                        blockchain_interest_history: gim.interest_per_interval.slice(0, 4),
-                        blockchain_current_interest: gim.interest_per_interval[4]
-                    });
-                } catch (err) {
-                    console.error(err);
-                    console.error(`error at getting the period interest`);
-                }
+                console.log(gst);
+                this.setState({
+                    blockchain_tokens_staked: gst.pairs[0].amount / 10000000000
+                });
             } catch (err) {
                 console.error(err);
                 console.error(`error at getting the staked tokens from the blockchain`);
@@ -4095,6 +4073,7 @@ class WalletHome extends React.Component {
 
                                             :
                                                 <MerchantOffers
+                                                    merchantReply={this.seller_reply_message}
                                                     loadOrders={this.get_seller_order_ids_by_offer}
                                                     loadMessages={this.get_messages_by_order_id_of_seller}
                                                     handleOrders={this.handleMyOrders}

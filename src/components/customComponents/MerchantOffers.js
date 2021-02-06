@@ -255,13 +255,24 @@ export default class MerchantOffers extends React.Component {
                 });
                 the_view = (<Row className="w-100">
                     <h1>{this.state.selected_offer.title} {this.state.selected_offer.offerID}</h1>
-                    <Col className="pt-3 staking-table-table">
                         <Row className="staking-table-header no-gutters">
                         </Row>
                         {
                             inner_view
                         }
-                    </Col>
+                        <Row className="staking-table-header no-gutters">
+                            <form onSubmit={(e) => this.props.merchantReply(
+                                e,
+                                this.state.selected_offer.seller,
+                                this.state.selected_offer.offerID,
+                                this.state.selected_order.order_id,
+                                'http://stageapi.theworldmarketplace.com:17700',
+                            )}>
+                                <textarea style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', fontSize: '1.5rem' }} rows="6" cols="50" name="merchantMessageBox"></textarea>
+
+                                <button className="my-3 search-button" type="submit">Send</button>
+                            </form>
+                    </Row>
                 </Row>)
             }
         }
