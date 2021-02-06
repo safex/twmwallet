@@ -1396,7 +1396,12 @@ class WalletHome extends React.Component {
                 if (confirmed) {
                     try {
                         this.setState({unstake_txn_amount: e.target.amount.value});
-                        let unstaked = await this.token_unstake_async(wallet, e.target.amount.value, mixins);
+                        let unstaked = await this.token_unstake_async(
+                            wallet,
+                            e.target.amount.value,
+                            e.target.block_height.value,
+                            mixins
+                        );
                         let confirmed_fee = window.confirm(`The network fee to unstake ${this.state.unstake_txn_amount} SFT will be:  ${unstaked.fee() / 10000000000} SFX Safex Cash`);
                         let fee = unstaked.fee();
                         let txid = unstaked.transactionsIds();
@@ -1431,10 +1436,10 @@ class WalletHome extends React.Component {
         }
     };
 
-    token_unstake_async = async (wallet, amount, mixins) => {
+    token_unstake_async = async (wallet, amount, block_height, mixins) => {
         return new Promise((resolve, reject) => {
             try {
-                unstake_tokens(wallet, amount, mixins, (err, res) => {
+                unstake_tokens(wallet, amount, block_height, mixins, (err, res) => {
                     if (err) {
                         console.error(err);
                         console.error(`error at the unstake first callback`);
