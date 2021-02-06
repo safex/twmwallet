@@ -57,8 +57,14 @@ export default function Stake(props) {
                     <div className="stake-label-div">
                         <h5>Staked: {props.stakedBalance}</h5>
                         
-                        <select name="">
-                            <option>Choose Stake ID</option>
+                        <select name="selected_stake">
+                            {props.tokenStakes.map((staked, key) => {
+                                return (
+                                    <option key={key}>{staked.tokenStaked / 10000000000}
+                                    | at height {staked.blockHeight}
+                                    | SFX accrued {staked.collectedInterest / 10000000000}</option>
+                                )
+                            })}
                         </select>
                     </div>
                 }

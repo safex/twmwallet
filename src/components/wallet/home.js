@@ -154,7 +154,8 @@ class WalletHome extends React.Component {
             showBuyerMessages: false,
             url: '',
             buyer_urls: [],
-            user_registered: null
+            user_registered: null,
+            token_stakes: []
         };
     }
 
@@ -1370,18 +1371,23 @@ class WalletHome extends React.Component {
     make_token_unstake = async (e) => {
         e.preventDefault();
         e.persist();
+        console.log(e.target.selected_stake.value);
+        let selected_stake_index = e.target.selected_stake.selectedIndex;
+        console.log(selected_stake_index);
+        let stake_is = this.state.token_stakes[selected_stake_index];
         try {
             let mixins = e.target.mixins.value - 1;
             if (mixins >= 0) {
-                let confirmed = window.confirm(`Are you sure you want to stake ${e.target.amount.value} SFT Safex Tokens?`);
+                let confirmed = window.confirm(`Are you sure you want to stake ${stake_is.tokenStaked / 10000000000} SFT Safex Tokens, 
+                from height: ${stake_is.blockHeight}, and collect ${stake_is.collectedInterest} SFX`);
                 console.log(confirmed);
                 if (confirmed) {
                     try {
-                        this.setState({unstake_txn_amount: e.target.amount.value});
+                        this.setState({unstake_txn_amount: stake_is.tokenStaked / 10000000000});
                         let unstaked = await this.token_unstake_async(
                             wallet,
-                            e.target.amount.value,
-                            e.target.block_height.value,
+                            stake_is.tokenStaked / 10000000000,
+                            stake_is.blockHeight,
                             mixins
                         );
                         let confirmed_fee = window.confirm(`The network fee to unstake ${this.state.unstake_txn_amount} SFT will be:  ${unstaked.fee() / 10000000000} SFX Safex Cash`);
@@ -1453,6 +1459,8 @@ class WalletHome extends React.Component {
                                         transaction id: ${this.state.unstake_txn_id}
                                         amount: ${this.state.unstake_txn_amount} SFT
                                         fee: ${this.state.unstake_txn_fee / 10000000000} SFX`);
+                        let token_stakes = wallet.getMyStakes();
+                        this.setState({token_stakes: token_stakes});
                         resolve(res);
                     }
                 });
@@ -4648,7 +4656,7 @@ class WalletHome extends React.Component {
                         }
                     } catch (err) {
                         console.error(err);
-                        console.error(`error at the interval loading of stacking`);
+                        console.error(`error at the interval loading of staking`);
                     }
                     return (
                         <div className="home-main-div">
@@ -4681,6 +4689,7 @@ class WalletHome extends React.Component {
                                             send={this.make_token_stake}
                                             id="stake_token"
                                             tokenBalance={this.state.tokens.toLocaleString()}
+                                            tokenStakes={this.state.token_stakes}
                                         />
                                         <StakeInfo
                                             tokenBalance={this.state.tokens.toLocaleString()}
@@ -4695,6 +4704,7 @@ class WalletHome extends React.Component {
                                             style="unstake"
                                             send={this.make_token_unstake}
                                             id="stake_token"
+                                            tokenStakes={this.state.token_stakes}
                                         />
                                     </Row>
                                 </Row>
