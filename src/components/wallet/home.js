@@ -269,7 +269,6 @@ class WalletHome extends React.Component {
             console.log(`accounts`);
             this.refresh_action();
             this.buyer_get_offer_ids_by_api();
-            //this.setState({usernames: accs, selected_user: {index: 0, username: accs[0].username}});
         } catch (err) {
             console.error(err);
             console.log("errors on startup");
@@ -289,14 +288,14 @@ class WalletHome extends React.Component {
         let m_wallet = wallet;
         console.log("refreshing rn");
         try {
+            let height = wallet.daemonBlockchainHeight();
             let gst_obj = {};
             gst_obj.interval = 0;
             gst_obj.daemon_host = this.state.daemon_host;
             gst_obj.daemon_port = this.state.daemon_port;
-            //let gst = await get_staked_tokens(gst_obj);
+            let gst = await get_staked_tokens(gst_obj);
             try {
-                let height = wallet.daemonBlockchainHeight();
-                console.log(height);
+                /*console.log(height);
                 let previous_interval = (height - (height % 100)) / 100;
                 let gim_obj = {};
                 gim_obj.begin_interval = previous_interval - 3;
@@ -304,13 +303,12 @@ class WalletHome extends React.Component {
                 gim_obj.daemon_host = this.state.daemon_host;
                 gim_obj.daemon_port = this.state.daemon_port;
 
-                console.log(`gim object`);
                 console.log(gim_obj);
                 console.log(`refresh get`);
                 console.log(wallet.getRefreshFromBlockHeight())
-                //let gim = await get_interest_map(gim_obj);
+                let gim = await get_interest_map(gim_obj);
 
-                /* this.setState({
+                 this.setState({
                      blockchain_tokens_staked: gst.pairs[0].amount / 10000000000,
                      blockchain_interest_history: gim.interest_per_interval.slice(0, 4),
                      blockchain_current_interest: gim.interest_per_interval[4]
@@ -329,6 +327,7 @@ class WalletHome extends React.Component {
                     pending_tokens: normalize_8decimals(wallet.tokenBalance() - wallet.unlockedTokenBalance()),
                     tokens: normalize_8decimals(wallet.unlockedTokenBalance()),
                     first_refresh: true,
+                    blockchain_tokens_staked: gst.pairs[0].amount / 10000000000,
                     usernames: accs
                 });
             } catch (err) {
@@ -2011,8 +2010,7 @@ class WalletHome extends React.Component {
                                      :
                                      {justifyContent: 'space-around', alignItems: 'center', marginLeft: 'auto', borderRadius: 25, border: '2px solid #13D3FD'}
                                  }
-                                 key={msg}
-                            >
+                                 key={msg}>
                                 <h1 style={t_msg.message.m === 'seller' ?
                                     {border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}
                                     :
@@ -2376,8 +2374,6 @@ class WalletHome extends React.Component {
                             const crypto = window.require('crypto');
                             console.log(`hey buyer, you're gonna be able to reply :)`);
 
-                            
-
                             let buyer_pub = the_order.pgp_keys.public_key;
                             let buyer_pri = the_order.pgp_keys.private_key;
 
@@ -2714,7 +2710,6 @@ class WalletHome extends React.Component {
                                                         let api_file_url = twm_file.api.urls[this.state.api_url];
                                                         api_file_url[listing.offer_id] = {};
                                                         api_file_url_offer_id = api_file_url[listing.offer_id];
-
                                                     }
 
                                                     let order_id_string = publicKey + listing.offer_id + this.state.blockchain_height;
@@ -2827,8 +2822,6 @@ class WalletHome extends React.Component {
                                                             console.error(`error opening twm file after save to verify`);
                                                             alert(`Error at saving to the twm file during account creation verification stage`);
                                                         }
-                                                        console.log(twm_save);
-
                                                     } catch (err) {
                                                         this.setState({showLoader: false});
                                                         console.error(err);
@@ -2836,9 +2829,7 @@ class WalletHome extends React.Component {
                                                         alert(`Error at saving to the twm file during account creation initialization stage`);
                                                     }
                                                     console.log(`payments from twm_url`);
-
                                                     let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
-
                                                     console.log(`purchase transaction committed`);
                                                     alert(`The purchase has been submitted`);
                                                 }
@@ -2850,7 +2841,6 @@ class WalletHome extends React.Component {
                                             }
                                         } else {
                                             let commit_purchase = this.commit_purchase_offer_async(purchase_txn);
-
                                             console.log(`purchase transaction committed`);
                                         }
                                     } catch (err) {
