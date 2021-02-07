@@ -31,9 +31,9 @@ import {
 } from '../../utils/safexd_calls';
 
 // Icon Imports
-import { FaInfoCircle, FaCopy} from 'react-icons/fa'
+import {FaInfoCircle, FaCopy} from 'react-icons/fa'
 import {IconContext} from 'react-icons'
-import { CgCloseR } from 'react-icons/cg'
+import {CgCloseR} from 'react-icons/cg'
 
 import copy from "copy-to-clipboard"
 import ReactTooltip from "react-tooltip";
@@ -191,14 +191,14 @@ class WalletHome extends React.Component {
                 } else {
                     alert(`have an issue with the twm file!`);
                 }
-            } catch(err) {
+            } catch (err) {
                 console.error(err);
                 console.error(`error at mounting with the twm file`);
             }
 
             let txnhistory = wallet.history();
 
-            txnhistory.sort(function(a, b) {
+            txnhistory.sort(function (a, b) {
                 return parseFloat(b.timestamp) - parseFloat(a.timestamp);
             });
 
@@ -252,7 +252,7 @@ class WalletHome extends React.Component {
                 wallet.store(this.wallet_store_callback)
             });
             wallet.on('updated', () => {
-               console.log('updated?');
+                console.log('updated?');
             });
             console.log(wallet.synchronized());
 
@@ -270,9 +270,9 @@ class WalletHome extends React.Component {
         }
     };
 
-    refresh_history = async() => {
+    refresh_history = async () => {
         let txnhistory = wallet.history();
-        txnhistory.sort(function(a, b) {
+        txnhistory.sort(function (a, b) {
             return parseFloat(b.timestamp) - parseFloat(a.timestamp);
         });
         this.setState({txnhistory: txnhistory});
@@ -281,56 +281,57 @@ class WalletHome extends React.Component {
     refresh_action = async () => {
         console.log("refreshing rn");
         try {
-            let height = wallet.daemonBlockchainHeight();
             let gst_obj = {};
             gst_obj.interval = 0;
             gst_obj.daemon_host = this.state.daemon_host;
             gst_obj.daemon_port = this.state.daemon_port;
             let gst = await get_staked_tokens(gst_obj);
-            try {
-                /*console.log(height);
-                let previous_interval = (height - (height % 100)) / 100;
-                let gim_obj = {};
-                gim_obj.begin_interval = previous_interval - 3;
-                gim_obj.end_interval = previous_interval + 1;
-                gim_obj.daemon_host = this.state.daemon_host;
-                gim_obj.daemon_port = this.state.daemon_port;
-
-                console.log(gim_obj);
-                console.log(`refresh get`);
-                console.log(wallet.getRefreshFromBlockHeight())
-                let gim = await get_interest_map(gim_obj);
-
-                 this.setState({
-                     blockchain_tokens_staked: gst.pairs[0].amount / 10000000000,
-                     blockchain_interest_history: gim.interest_per_interval.slice(0, 4),
-                     blockchain_current_interest: gim.interest_per_interval[4]
-                 });*/
-                var accs = wallet.getSafexAccounts();
-
-                this.setState({
-                    address: wallet.address(),
-                    pending_cash: normalize_8decimals(
-                        Math.abs(wallet.balance() - wallet.unlockedBalance())
-                    ),
-                    synced: wallet.synchronized() ? true : false,
-                    wallet_height: wallet.blockchainHeight(),
-                    blockchain_height: height,
-                    cash: normalize_8decimals(wallet.unlockedBalance()),
-                    pending_tokens: normalize_8decimals(wallet.tokenBalance() - wallet.unlockedTokenBalance()),
-                    tokens: normalize_8decimals(wallet.unlockedTokenBalance()),
-                    first_refresh: true,
-                    blockchain_tokens_staked: gst.pairs[0].amount / 10000000000,
-                    usernames: accs
-                });
-            } catch (err) {
-                console.error(err);
-                console.error(`error at getting the period interest`);
-            }
+            this.setState({blockchain_tokens_staked: gst.pairs[0].amount / 10000000000})
         } catch (err) {
             console.error(err);
-            console.error(`error at getting the staked tokens from the blockchain`);
+            console.error(`error at checking the staked tokens from the blockchain`);
         }
+        try {
+            let height = wallet.daemonBlockchainHeight();
+            /*console.log(height);
+            let previous_interval = (height - (height % 100)) / 100;
+            let gim_obj = {};
+            gim_obj.begin_interval = previous_interval - 3;
+            gim_obj.end_interval = previous_interval + 1;
+            gim_obj.daemon_host = this.state.daemon_host;
+            gim_obj.daemon_port = this.state.daemon_port;
+
+            console.log(gim_obj);
+            console.log(`refresh get`);
+            console.log(wallet.getRefreshFromBlockHeight())
+            let gim = await get_interest_map(gim_obj);
+
+             this.setState({
+                 blockchain_tokens_staked: gst.pairs[0].amount / 10000000000,
+                 blockchain_interest_history: gim.interest_per_interval.slice(0, 4),
+                 blockchain_current_interest: gim.interest_per_interval[4]
+             });*/
+            var accs = wallet.getSafexAccounts();
+
+            this.setState({
+                address: wallet.address(),
+                pending_cash: normalize_8decimals(
+                    Math.abs(wallet.balance() - wallet.unlockedBalance())
+                ),
+                synced: wallet.synchronized() ? true : false,
+                wallet_height: wallet.blockchainHeight(),
+                blockchain_height: height,
+                cash: normalize_8decimals(wallet.unlockedBalance()),
+                pending_tokens: normalize_8decimals(wallet.tokenBalance() - wallet.unlockedTokenBalance()),
+                tokens: normalize_8decimals(wallet.unlockedTokenBalance()),
+                first_refresh: true,
+                usernames: accs
+            });
+        } catch (err) {
+            console.error(err);
+            console.error(`error at updating balances on refresh`);
+        }
+
     };
 
     check = () => {
@@ -620,56 +621,56 @@ class WalletHome extends React.Component {
             if (e.target.location.value.length > 0) {
                 d_obj.location = e.target.location.value;
             }
-           /* let account = wallet.createSafexAccount(e.target.username.value, JSON.stringify(d_obj));
-            console.log(account);
-            console.log(`account registered`);
+            /* let account = wallet.createSafexAccount(e.target.username.value, JSON.stringify(d_obj));
+             console.log(account);
+             console.log(`account registered`);
 
-            var accs = wallet.getSafexAccounts();
+             var accs = wallet.getSafexAccounts();
 
-            console.log(accs);
-            console.log(`accounts`);
-            let mixins = e.target.mixins.value - 1;
-            if (account) {
-                console.log(`let's register it`);
-                console.log(account);
-                console.log(accs);
-
-
-                let this_account;
-
-                for (const acc of accs) {
-                    if (acc.username === e.target.username.value) {
-                        this_account = acc;
-                    }
-                }
+             console.log(accs);
+             console.log(`accounts`);
+             let mixins = e.target.mixins.value - 1;
+             if (account) {
+                 console.log(`let's register it`);
+                 console.log(account);
+                 console.log(accs);
 
 
-                console.log(`this_account`);
-                console.log(this_account);
-                console.log(`this_account`);
-                this.setState({create_account_txn_account: this_account});
+                 let this_account;
 
-                let create_acc = await this.create_account_async(wallet, e.target.username.value, mixins);
-                let confirmed_fee = window.confirm(`the network fee to register this account ${this.state.create_account_txn_account.username} will be:  ${create_acc.fee() / 10000000000} SFX Safex Cash`);
-                let fee = create_acc.fee();
-                let txid = create_acc.transactionsIds();
-                if (confirmed_fee) {
+                 for (const acc of accs) {
+                     if (acc.username === e.target.username.value) {
+                         this_account = acc;
+                     }
+                 }
 
-                    this.setState({create_account_txn_id: txid, create_account_txn_fee: fee});
-                    console.log(this.state.create_account_txn_id);
-                    console.log(this.state.create_account_txn_fee);
-                    console.log(`before the crash`);
-                    let commit_create = await this.commit_create_account_async(create_acc);
-                    console.log(commit_create);
 
-                } else {
-                    alert(`your transaction was cancelled, no account registration was completed`);
-                }
+                 console.log(`this_account`);
+                 console.log(this_account);
+                 console.log(`this_account`);
+                 this.setState({create_account_txn_account: this_account});
 
-            } else {
-                alert(`Not enough tokens for making an account`);
-            }
-*/
+                 let create_acc = await this.create_account_async(wallet, e.target.username.value, mixins);
+                 let confirmed_fee = window.confirm(`the network fee to register this account ${this.state.create_account_txn_account.username} will be:  ${create_acc.fee() / 10000000000} SFX Safex Cash`);
+                 let fee = create_acc.fee();
+                 let txid = create_acc.transactionsIds();
+                 if (confirmed_fee) {
+
+                     this.setState({create_account_txn_id: txid, create_account_txn_fee: fee});
+                     console.log(this.state.create_account_txn_id);
+                     console.log(this.state.create_account_txn_fee);
+                     console.log(`before the crash`);
+                     let commit_create = await this.commit_create_account_async(create_acc);
+                     console.log(commit_create);
+
+                 } else {
+                     alert(`your transaction was cancelled, no account registration was completed`);
+                 }
+
+             } else {
+                 alert(`Not enough tokens for making an account`);
+             }
+ */
         } catch (err) {
             console.error(err);
             console.error("error at the edit account function");
@@ -908,7 +909,7 @@ class WalletHome extends React.Component {
                 twm_url_offers: loaded_offers.offers,
                 offer_loading_flag: 'twmurl'
             });
-        } catch(err) {
+        } catch (err) {
             console.error(err);
         }
     };
@@ -972,9 +973,9 @@ class WalletHome extends React.Component {
     //open merchant management view from navigation
     show_merchant = () => {
         this.setState({keyRequest: false})
-            this.setState({
-                interface_view: 'merchant'
-            });
+        this.setState({
+            interface_view: 'merchant'
+        });
     };
 
     //open staking view from navigation
@@ -1030,7 +1031,12 @@ class WalletHome extends React.Component {
     //show modal of New Offer
     handleShowNewOfferForm = () => {
         if (this.state.user_registered) {
-            this.setState({show_new_offer_form: true, nft_switch: false, shipping_switch: false, open_message_switch: false});
+            this.setState({
+                show_new_offer_form: true,
+                nft_switch: false,
+                shipping_switch: false,
+                open_message_switch: false
+            });
         } else if (!this.state.user_registered) {
             alert(`user must be successfully approved and registered to use this feature`);
         }
@@ -1048,7 +1054,7 @@ class WalletHome extends React.Component {
     };
 
     // Show order confirmed modal
-     handleConfirmationModal = () => {
+    handleConfirmationModal = () => {
         this.setState({show_purchase_confirm_modal: !this.state.show_purchase_confirm_modal});
     };
 
@@ -1085,7 +1091,7 @@ class WalletHome extends React.Component {
             if (p_data.hasOwnProperty('shipping')) {
                 shipping_state = p_data.shipping;
             }
-        } catch(err) {
+        } catch (err) {
             console.error(err);
             console.error(`error at the loading of listing data`);
         }
@@ -1116,7 +1122,7 @@ class WalletHome extends React.Component {
             } else if (is_user.r_msg) {
                 console.log(`user is not registered`);
                 console.log(is_user);
-                this.setState({selected_user: {username: username, index: index},user_registered: false});
+                this.setState({selected_user: {username: username, index: index}, user_registered: false});
             } else if (is_user.user) {
                 console.log(is_user);
                 console.log(`turns out user is registered`);
@@ -1146,13 +1152,13 @@ class WalletHome extends React.Component {
                 });
 
                 this.fetch_messages_seller(username, 'http://stageapi.theworldmarketplace.com:17700');
-                this.setState({selected_user: {username: username, index: index},user_registered: true});
+                this.setState({selected_user: {username: username, index: index}, user_registered: true});
             }
-        } catch(err) {
+        } catch (err) {
             console.error(err);
             console.error(`error at checking if user is registered`);
             alert(`this user ${username} is not registered with the TWM API`);
-            this.setState({selected_user: {username: username, index: index},user_registered: false});
+            this.setState({selected_user: {username: username, index: index}, user_registered: false});
         }
     };
 
@@ -1478,9 +1484,9 @@ class WalletHome extends React.Component {
                     alert(`this account is already registered with the api`);
                 } else {
                     try {
-                        const crypto  = window.require('crypto');
+                        const crypto = window.require('crypto');
 
-                        const { privateKey, publicKey } = await crypto.generateKeyPairSync('rsa', {
+                        const {privateKey, publicKey} = await crypto.generateKeyPairSync('rsa', {
                             modulusLength: 4096,
                             publicKeyEncoding: {
                                 type: 'pkcs1',
@@ -1542,7 +1548,7 @@ class WalletHome extends React.Component {
                                 console.error(`error opening twm file after save to verify`);
                                 alert(`there was an error saving the contents to the twm file at registering`);
                             }
-                        } catch(err) {
+                        } catch (err) {
                             console.error(err);
                             console.error(`error at the register_api function`);
                             alert(`${user.username} has not been registered with the api at this time`);
@@ -1555,7 +1561,7 @@ class WalletHome extends React.Component {
                     }
                 }
             }
-        } catch(err) {
+        } catch (err) {
             console.error(err);
             console.error(`error at the twm_file at register api`);
             alert(`there was an error registering with the api`);
@@ -1564,8 +1570,10 @@ class WalletHome extends React.Component {
     };
 
     to_ellipsis = (text, firstHalf, secondHalf) => {
-        if (typeof text !== "string") {return text} else {
-             const ellipse = `${text.substring(0, firstHalf)}.....${text.substring(text.length - secondHalf, text.length)}`
+        if (typeof text !== "string") {
+            return text
+        } else {
+            const ellipse = `${text.substring(0, firstHalf)}.....${text.substring(text.length - secondHalf, text.length)}`
             return (ellipse)
         }
     };
@@ -1575,8 +1583,8 @@ class WalletHome extends React.Component {
             return new Uint8Array();
         }
         var a = [];
-        for (var i = 0, len = str.length; i < len; i+=2) {
-            a.push(parseInt(str.substr(i,2),16));
+        for (var i = 0, len = str.length; i < len; i += 2) {
+            a.push(parseInt(str.substr(i, 2), 16));
         }
         return new Uint8Array(a);
     };
@@ -1592,7 +1600,7 @@ class WalletHome extends React.Component {
                 console.log(more_core[offer_id]);
                 let order_ids_array = [];
                 for (const order in more_core[offer_id].orders) {
-                    var count= Object.keys(more_core[offer_id].orders[order].messages).length;
+                    var count = Object.keys(more_core[offer_id].orders[order].messages).length;
                     let o_obj = {};
                     o_obj.order_id = order;
                     o_obj.msg_count = count;
@@ -1604,7 +1612,7 @@ class WalletHome extends React.Component {
                 console.log(`${offer_id} not found in file`);
                 alert(`There are no orders found for ${offer_id}`)
             }
-        } catch(err) {
+        } catch (err) {
             console.error(err);
             alert(`error user and/or url are not in this file, no messages`);
         }
@@ -1626,7 +1634,7 @@ class WalletHome extends React.Component {
                 console.log(`${order_id} not found in file`);
                 alert(`this order was not found ${order_id}`);
             }
-        } catch(err) {
+        } catch (err) {
             console.error(err);
             alert(`error user and/or url are not in this file, no messages`);
         }
@@ -1639,12 +1647,12 @@ class WalletHome extends React.Component {
                     console.log(`it has the twmapi in it's file for the fetch messages_seller`);
                     let date = new Date(new Date().toUTCString());
 
-                    const crypto  = window.require('crypto');
+                    const crypto = window.require('crypto');
                     let our_key = crypto.createPrivateKey(this.state.twm_file.accounts[username].urls[twm_api_url].pgp_key.sec_key)
                     let date_msg = Buffer.from(date.toString());
 
                     let msg_hex = this.byteToHexString(date_msg);
-                   const signature = crypto.sign("sha256", date_msg, {
+                    const signature = crypto.sign("sha256", date_msg, {
                         key: our_key,
                         padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
                     });
@@ -1697,73 +1705,73 @@ class WalletHome extends React.Component {
                                                 }
                                             } else {
                                                 //if this is a new order id for the offer
-                                                    let pinfo_obj = {};
-                                                    pinfo_obj.buyers_pgp = msg.sender_pgp_pub_key;
-                                                    pinfo_obj.purchase_proof = msg.purchase_proof;
+                                                let pinfo_obj = {};
+                                                pinfo_obj.buyers_pgp = msg.sender_pgp_pub_key;
+                                                pinfo_obj.purchase_proof = msg.purchase_proof;
+                                                try {
+                                                    let gt_obj = {};
+                                                    gt_obj.daemon_host = this.state.daemon_host;
+                                                    gt_obj.daemon_port = this.state.daemon_port;
+                                                    console.log(msg.purchase_proof);
+                                                    console.log(`purchase proof ${msg.purchase_proof}`);
+                                                    let txn = await get_transactions(gt_obj, msg.purchase_proof);
                                                     try {
-                                                        let gt_obj = {};
-                                                        gt_obj.daemon_host = this.state.daemon_host;
-                                                        gt_obj.daemon_port = this.state.daemon_port;
-                                                        console.log(msg.purchase_proof);
-                                                        console.log(`purchase proof ${msg.purchase_proof}`);
-                                                        let txn = await get_transactions(gt_obj, msg.purchase_proof);
-                                                        try {
-                                                            console.log(txn);
-                                                            let the_txn = JSON.parse(txn.txs[0].as_json);
-                                                            console.log(`gotten txn ${the_txn}`);
-                                                            console.log(the_txn);
-                                                            console.log(`the txn ^^^`);
-                                                            for (const vout of the_txn.vout) {
-                                                                if (vout.target.script) {
-                                                                    if (vout.target.script.output_type === 30) {
-                                                                        console.log(`we found the purchase txn here`);
-                                                                        try {
-                                                                            let parsed_txn = await daemon_parse_transaction(gt_obj, vout.target.script.data, 30);
-                                                                            console.log(parsed_txn);
-                                                                            console.log(`daemon parsed txn ^^`)
-                                                                            let o_id = '';
-                                                                            let l_price = 0;
-                                                                            let l_quant = 0;
-                                                                            for (const field of parsed_txn.parsed_fields) {
-                                                                                if (field.field === 'offer_id') {
-                                                                                    o_id = field.value;
-                                                                                } else if (field.field === 'price') {
-                                                                                    l_price = parseInt(field.value) / 10000000000;
-                                                                                } else if (field.field === 'quantity') {
-                                                                                    l_quant = field.value;
-                                                                                }
+                                                        console.log(txn);
+                                                        let the_txn = JSON.parse(txn.txs[0].as_json);
+                                                        console.log(`gotten txn ${the_txn}`);
+                                                        console.log(the_txn);
+                                                        console.log(`the txn ^^^`);
+                                                        for (const vout of the_txn.vout) {
+                                                            if (vout.target.script) {
+                                                                if (vout.target.script.output_type === 30) {
+                                                                    console.log(`we found the purchase txn here`);
+                                                                    try {
+                                                                        let parsed_txn = await daemon_parse_transaction(gt_obj, vout.target.script.data, 30);
+                                                                        console.log(parsed_txn);
+                                                                        console.log(`daemon parsed txn ^^`)
+                                                                        let o_id = '';
+                                                                        let l_price = 0;
+                                                                        let l_quant = 0;
+                                                                        for (const field of parsed_txn.parsed_fields) {
+                                                                            if (field.field === 'offer_id') {
+                                                                                o_id = field.value;
+                                                                            } else if (field.field === 'price') {
+                                                                                l_price = parseInt(field.value) / 10000000000;
+                                                                            } else if (field.field === 'quantity') {
+                                                                                l_quant = field.value;
                                                                             }
-                                                                            if (o_id === parsed.o) {
-                                                                                pinfo_obj.quantity = l_quant;
-                                                                                pinfo_obj.price = l_price;
-
-                                                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id] = {};
-                                                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages = {};
-                                                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].purchase_info = {};
-
-                                                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].purchase_info = pinfo_obj;
-
-                                                                                twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
-                                                                                alert(`just recorded transaction ${msg.order_id} order for ${parsed.o}`);
-                                                                            } else {
-                                                                                console.log(`retrieved purchase proof does not match the offer id on the message something is wrong here.`);
-                                                                            }
-                                                                        } catch(err) {
-                                                                            console.error(err);
-                                                                            console.error(`error getting the parsed transaction contents`);
                                                                         }
+                                                                        if (o_id === parsed.o) {
+                                                                            pinfo_obj.quantity = l_quant;
+                                                                            pinfo_obj.price = l_price;
+
+                                                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id] = {};
+                                                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages = {};
+                                                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].purchase_info = {};
+
+                                                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].purchase_info = pinfo_obj;
+
+                                                                            twm_file.accounts[username].urls[twm_api_url].messages[parsed.o].orders[msg.order_id].messages[msg.position] = msg;
+                                                                            alert(`just recorded transaction ${msg.order_id} order for ${parsed.o}`);
+                                                                        } else {
+                                                                            console.log(`retrieved purchase proof does not match the offer id on the message something is wrong here.`);
+                                                                        }
+                                                                    } catch (err) {
+                                                                        console.error(err);
+                                                                        console.error(`error getting the parsed transaction contents`);
                                                                     }
                                                                 }
                                                             }
-                                                        } catch(err) {
-                                                            console.error(err);
-                                                            console.error(`error at parsing the txn retreived`)
                                                         }
-
-                                                    } catch(err) {
+                                                    } catch (err) {
                                                         console.error(err);
-                                                        console.error(`error fetching the transaction`);
+                                                        console.error(`error at parsing the txn retreived`)
                                                     }
+
+                                                } catch (err) {
+                                                    console.error(err);
+                                                    console.error(`error fetching the transaction`);
+                                                }
                                             }
                                         } else {
                                             //in case this offer hasn't been seen before
@@ -1823,18 +1831,18 @@ class WalletHome extends React.Component {
                                                                         } else {
                                                                             console.log(`retrieved purchase proof does not match the offer id on the message something is wrong here.`);
                                                                         }
-                                                                    } catch(err) {
+                                                                    } catch (err) {
                                                                         console.error(err);
                                                                         console.error(`error getting the parsed transaction contents`);
                                                                     }
                                                                 }
                                                             }
                                                         }
-                                                    } catch(err) {
+                                                    } catch (err) {
                                                         console.error(err);
                                                         console.error(`error at parsing the txn retreived`)
                                                     }
-                                                } catch(err) {
+                                                } catch (err) {
                                                     console.error(err);
                                                     console.error(`error fetching the transaction`);
                                                 }
@@ -1870,32 +1878,32 @@ class WalletHome extends React.Component {
                                         console.error(`error at initial save of the twm file`);
                                         alert(`Error at saving to the twm file during account creation initialization stage`);
                                     }
-                                } catch(err) {
+                                } catch (err) {
                                     console.error(err);
                                     console.error(`error at parsing the message`)
                                 }
-                            } catch(err) {
+                            } catch (err) {
                                 console.error(err);
                             }
                         }
                     }
                 }
             }
-        } catch(err) {
+        } catch (err) {
             console.error(err);
             console.error(`error at the fetch_messages_seller`);
         }
     };
 
     isEmpty(obj) {
-        for(var prop in obj) {
-            if(obj.hasOwnProperty(prop))
+        for (var prop in obj) {
+            if (obj.hasOwnProperty(prop))
                 return false;
         }
         return true;
     };
 
-    buyer_get_offer_ids_by_api = async() => {
+    buyer_get_offer_ids_by_api = async () => {
         try {
             let urls = [];
             let t_f = this.state.twm_file;
@@ -1909,52 +1917,52 @@ class WalletHome extends React.Component {
                 console.log(`there are no urls to parse from`);
             }
             console.log(this.state.buyer_urls)
-        } catch(err) {
+        } catch (err) {
             console.error(err);
             console.error(`error at the checking of the urls of the buyer_get_offer_ids_by_api`)
         }
     };
-	
-	/**
-	 * @return {string[]}
-	 */
-	buyer_get_offer_ids = () => {
-    	const {buyerSelectUrl, twm_file: twm} = this.state;
-    	if (!buyerSelectUrl || !twm || !twm.api || !twm.api.urls) {
-			return [];
-		}
-    	const offersAtUrl = this.state.twm_file.api.urls[this.state.buyerSelectUrl];
-    	if (!offersAtUrl) {
-    		return [];
-		}
-    	return Object.keys(offersAtUrl);
-	};
-	
-	/**
-	 * @return {Array<BuyerPurchaseObj & { order_id }>}
-	 */
+
+    /**
+     * @return {string[]}
+     */
+    buyer_get_offer_ids = () => {
+        const {buyerSelectUrl, twm_file: twm} = this.state;
+        if (!buyerSelectUrl || !twm || !twm.api || !twm.api.urls) {
+            return [];
+        }
+        const offersAtUrl = this.state.twm_file.api.urls[this.state.buyerSelectUrl];
+        if (!offersAtUrl) {
+            return [];
+        }
+        return Object.keys(offersAtUrl);
+    };
+
+    /**
+     * @return {Array<BuyerPurchaseObj & { order_id }>}
+     */
     buyer_get_orders = () => {
-    	const {buyerSelectUrl,buyerSelectOffer, twm_file: twm} = this.state;
-		if (!buyerSelectUrl || !buyerSelectOffer || !twm || !twm.api || !twm.api.urls) {
-			return [];
-		}
-		const offersAtUrl = this.state.twm_file.api.urls[this.state.buyerSelectUrl];
-		if (!offersAtUrl) {
-			return [];
-		}
-		const ordersAtOffers = offersAtUrl[buyerSelectOffer];
-		if (!ordersAtOffers) {
-			return [];
-		}
-		const result = [];
-		for (const orderId in ordersAtOffers) {
-			result.push({
-				...ordersAtOffers[orderId].purchase_obj,
-				order_id: orderId
-			});
-		}
-		return result;
-	};
+        const {buyerSelectUrl, buyerSelectOffer, twm_file: twm} = this.state;
+        if (!buyerSelectUrl || !buyerSelectOffer || !twm || !twm.api || !twm.api.urls) {
+            return [];
+        }
+        const offersAtUrl = this.state.twm_file.api.urls[this.state.buyerSelectUrl];
+        if (!offersAtUrl) {
+            return [];
+        }
+        const ordersAtOffers = offersAtUrl[buyerSelectOffer];
+        if (!ordersAtOffers) {
+            return [];
+        }
+        const result = [];
+        for (const orderId in ordersAtOffers) {
+            result.push({
+                ...ordersAtOffers[orderId].purchase_obj,
+                order_id: orderId
+            });
+        }
+        return result;
+    };
 
     renderBuyerMessages() {
         const {buyerSelectUrl, buyerSelectOffer, buyerSelectOrder, twm_file: t_f} = this.state;
@@ -1964,7 +1972,7 @@ class WalletHome extends React.Component {
         const messages = [];
         try {
             /** @type {BuyerOrder} */
-            const core =  t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder];
+            const core = t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder];
             if (!core) {
                 console.error(`order ${buyerSelectOrder} not found`);
                 return;
@@ -1978,9 +1986,14 @@ class WalletHome extends React.Component {
                     }
                     if (t_msg.message.n.length > 0) {
                         console.log(`nft address supplied!`);
-                        messages.push (
+                        messages.push(
                             <Row style={{justifyContent: 'space-around'}} key={msg}>
-                                <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
+                                <h1 style={{
+                                    border: '2px solid #13D3FD',
+                                    borderRadius: 10,
+                                    padding: '.5rem',
+                                    margin: '1rem'
+                                }}>
                                     {t_msg.position}
                                 </h1>
                                 <h3>{t_msg.message.n}</h3>
@@ -1988,9 +2001,9 @@ class WalletHome extends React.Component {
                         );
                     } else if (t_msg.message.m.length > 0) {
                         console.log(`this is a direct message open ended`);
-                        messages.push (
+                        messages.push(
                             <Row className="my-3 w-75 text-break p-1"
-                                 style={ t_msg.message.m === 'seller' ?
+                                 style={t_msg.message.m === 'seller' ?
                                      {
                                          justifyContent: 'space-around',
                                          alignItems: 'center',
@@ -2000,7 +2013,13 @@ class WalletHome extends React.Component {
                                          borderRadius: 25,
                                      }
                                      :
-                                     {justifyContent: 'space-around', alignItems: 'center', marginLeft: 'auto', borderRadius: 25, border: '2px solid #13D3FD'}
+                                     {
+                                         justifyContent: 'space-around',
+                                         alignItems: 'center',
+                                         marginLeft: 'auto',
+                                         borderRadius: 25,
+                                         border: '2px solid #13D3FD'
+                                     }
                                  }
                                  key={msg}>
                                 <h1 style={t_msg.message.m === 'seller' ?
@@ -2025,39 +2044,44 @@ class WalletHome extends React.Component {
                             console.log(`there is a shipping object supplied!`);
                             try {
                                 console.log(`parsed the so`);
-                                messages.push (
+                                messages.push(
                                     <div key={msg}>
                                         <Row style={{justifyContent: 'space-around'}}>
-                                            <h1 style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}}>
+                                            <h1 style={{
+                                                border: '2px solid #13D3FD',
+                                                borderRadius: 10,
+                                                padding: '.5rem',
+                                                margin: '1rem'
+                                            }}>
                                                 {t_msg.position}
                                             </h1>
                                             <Col>
-                                                <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/> </h2>
-                                                <h2><i> <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/> </h2>
+                                                <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/></h2>
+                                                <h2><i> <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/></h2>
                                                 <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
                                                 <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
                                             </Col>
                                             <Col>
-                                                <h2><i> <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/> </h2>
-                                                <h2><i> <u>City:</u></i> <b></b>{parsed_so.city}<b/> </h2>
-                                                <h2><i> <u>State:</u></i> <b></b>{parsed_so.s}<b/> </h2>
-                                                <h2><i> <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/> </h2>
-                                                <h2><i> <u>Country:</u></i> <b></b>{parsed_so.c}<b/> </h2>
+                                                <h2><i> <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/></h2>
+                                                <h2><i> <u>City:</u></i> <b></b>{parsed_so.city}<b/></h2>
+                                                <h2><i> <u>State:</u></i> <b></b>{parsed_so.s}<b/></h2>
+                                                <h2><i> <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/></h2>
+                                                <h2><i> <u>Country:</u></i> <b></b>{parsed_so.c}<b/></h2>
                                             </Col>
                                         </Row>
                                     </div>
                                 );
-                            } catch(err) {
+                            } catch (err) {
                                 console.error(err);
                                 console.error(`error at parsing the shipping object`);
                             }
                         }
                     }
-                } catch(err) {
+                } catch (err) {
                     console.error(err);
                 }
             }
-        } catch(err) {
+        } catch (err) {
             console.error(err);
             console.error(`error at buyer_get_messages_by_offer_id`);
         }
@@ -2197,7 +2221,7 @@ class WalletHome extends React.Component {
                 console.log(`user is not present in the twm file`);
                 alert(`unable to send message, could not find your username in the twm file`);
             }
-        } catch(err) {
+        } catch (err) {
             console.error(err);
             console.error(`error at the seller reply message function call`);
         }
@@ -2228,7 +2252,7 @@ class WalletHome extends React.Component {
             console.log(date);
             console.log(date.toString());
 
-            const crypto  = window.require('crypto');
+            const crypto = window.require('crypto');
             let our_key = crypto.createPrivateKey(t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder].pgp_keys.private_key)
             console.log(our_key);
             let date_msg = Buffer.from(date.toString());
@@ -2282,7 +2306,7 @@ class WalletHome extends React.Component {
                             msg.message = decomped.toString();
                             console.log(parsed);
                             if (msg.to === req_payload.pgp_public_key) {
-                                console.log(msg.message );
+                                console.log(msg.message);
                                 if (t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder].messages.hasOwnProperty(msg.position)) {
                                     console.log(`duplicate message here for fetch buyer messages`)
                                 } else {
@@ -2290,11 +2314,11 @@ class WalletHome extends React.Component {
                                     t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder].messages[msg.position] = msg;
                                 }
                             }
-                        } catch(err) {
+                        } catch (err) {
                             console.error(err);
                             console.error(`err at parsing the decompressed string at buyer fetch the message`);
                         }
-                    } catch(err) {
+                    } catch (err) {
                         console.error(err);
                         console.error(`error at decrypting the message at the buyer fetch the message`);
                     }
@@ -2341,13 +2365,13 @@ class WalletHome extends React.Component {
                 console.error(`error at initial save of the twm file`);
                 alert(`Error at saving to the twm file during account creation initialization stage`);
             }
-        } catch(err) {
+        } catch (err) {
             console.error(err);
             console.error(`error at fetching the messages of the buyer`);
         }
     };
 
-    buyer_reply_by_order = async(e, twm_api_url = this.state.buyerSelectUrl, offer_id = this.state.buyerSelectOffer, order_id = this.state.buyerSelectOrder) => {
+    buyer_reply_by_order = async (e, twm_api_url = this.state.buyerSelectUrl, offer_id = this.state.buyerSelectOffer, order_id = this.state.buyerSelectOrder) => {
         e.preventDefault();
         let messageToSend = e.target.messageBox.value
         let t_f = this.state.twm_file;
@@ -2466,11 +2490,11 @@ class WalletHome extends React.Component {
                                     console.error(`error at initial save of the twm file`);
                                     alert(`Error at saving to the twm file during account creation initialization stage`);
                                 }
-                            } catch(err) {
+                            } catch (err) {
                                 console.error(err);
                                 console.error(`error at submitting the message to the seller`);
                             }
-                        } catch(err) {
+                        } catch (err) {
                             console.error(err);
                             console.error(`error at fetching the users pub key from the api for buyer_reply_by_order`);
                         }
@@ -2483,7 +2507,7 @@ class WalletHome extends React.Component {
             } else {
                 console.log(`missing twm_api_url : ${twm_api_url}`);
             }
-        } catch(err) {
+        } catch (err) {
             console.error(err);
             console.error(`error at the buyer_reply_by_order`);
         }
@@ -2664,9 +2688,9 @@ class WalletHome extends React.Component {
 
                                                     console.log(seller_pubkey);
 
-                                                    const crypto  = window.require('crypto');
+                                                    const crypto = window.require('crypto');
 
-                                                    const { privateKey, publicKey } = await crypto.generateKeyPairSync('rsa', {
+                                                    const {privateKey, publicKey} = await crypto.generateKeyPairSync('rsa', {
                                                         modulusLength: 4096,
                                                         publicKeyEncoding: {
                                                             type: 'pkcs1',
@@ -2773,13 +2797,16 @@ class WalletHome extends React.Component {
                                                     purchase_obj.price = listing.price;
                                                     purchase_obj.quantity = quant;
                                                     purchase_obj.bc_height = message_header_obj.bc_height;
-                                                    api_file_url_offer_id[order_id_hash].pgp_keys = {private_key: privateKey, public_key: publicKey};
+                                                    api_file_url_offer_id[order_id_hash].pgp_keys = {
+                                                        private_key: privateKey,
+                                                        public_key: publicKey
+                                                    };
                                                     api_file_url_offer_id[order_id_hash].messages = {};
                                                     api_file_url_offer_id[order_id_hash].purchase_obj = purchase_obj;
                                                     api_file_url_offer_id[order_id_hash].messages['1'] = message_header_obj;
 
                                                     console.log(twm_file);
-                                                   try {
+                                                    try {
 
                                                         const crypto = window.require('crypto');
                                                         const algorithm = 'aes-256-ctr';
@@ -2820,8 +2847,8 @@ class WalletHome extends React.Component {
                                                     console.log(`purchase transaction committed`);
                                                     alert(`The purchase has been submitted`);
                                                 }
-                                        } catch (err) {
-                                            this.setState({showLoader: false});
+                                            } catch (err) {
+                                                this.setState({showLoader: false});
                                                 alert(`Error at getting the sellers public key from the api server`);
                                                 console.error(err);
                                                 console.error(`error at getting the sellers public key from the api server`);
@@ -3053,7 +3080,7 @@ class WalletHome extends React.Component {
         this.setState({showMyOrders: !this.state.showMyOrders});
 
         if (this.state.showMyOrders === false) {
-            offerRows=[]
+            offerRows = []
         }
     };
 
@@ -3068,7 +3095,6 @@ class WalletHome extends React.Component {
     };
 
 
-
     render() {
         var message_render;
 
@@ -3076,7 +3102,7 @@ class WalletHome extends React.Component {
             message_render = this.state.messages_selected.map((msg, key) => {
 
             });
-        } catch(err) {
+        } catch (err) {
             console.error(err);
         }
 
@@ -3087,7 +3113,8 @@ class WalletHome extends React.Component {
                 case "home": {
                     return (
                         <div className="home-main-div">
-                            <Col sm={4} className="no-padding d-flex flex-column align-items-center justify-content-between">
+                            <Col sm={4}
+                                 className="no-padding d-flex flex-column align-items-center justify-content-between">
                                 <HomeInfo
                                     blockHeight={this.state.blockchain_height}
                                     connection={this.state.connection_status}
@@ -3112,7 +3139,9 @@ class WalletHome extends React.Component {
                                     rescan={this.rescan}
                                     handleShow={this.handleKeys}
                                     show={this.state.show_keys}
-                                    handleKeyRequest={() => {this.setState({keyRequest: !this.state.keyRequest})}}
+                                    handleKeyRequest={() => {
+                                        this.setState({keyRequest: !this.state.keyRequest})
+                                    }}
                                     keyRequest={this.state.keyRequest}
                                     address={this.props.wallet.address()}
                                     spendKey={this.props.wallet.secretSpendKey()}
@@ -3132,7 +3161,7 @@ class WalletHome extends React.Component {
                         table_of_listings = this.state.non_offers.map((listing, key) => {
                             console.log(key);
                             listing.offer_id = listing.offerID;
-                            listing.price = listing.price  / 10000000000;
+                            listing.price = listing.price / 10000000000;
                             try {
                                 return (
                                     <Row className="staking-table-row" key={key}>
@@ -3214,10 +3243,10 @@ class WalletHome extends React.Component {
                                             <p data-tip data-for={`offerID${key}`}>
                                                 {this.to_ellipsis(listing.offer_id, 5, 5)}
 
-                                               
+
                                             </p> <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
-                                                    <span>{listing.offer_id}</span>
-                                                </ReactTooltip>
+                                            <span>{listing.offer_id}</span>
+                                        </ReactTooltip>
 
                                             <p style={{width: '24rem'}}>
 
@@ -3284,7 +3313,8 @@ class WalletHome extends React.Component {
                                                         SOLD OUT
                                                     </button>)
                                                     :
-                                                    (<button className="search-button" onClick={() => this.handleShowPurchaseForm(listing, data)}>
+                                                    (<button className="search-button"
+                                                             onClick={() => this.handleShowPurchaseForm(listing, data)}>
                                                         BUY
                                                     </button>)
                                                 }
@@ -3303,243 +3333,243 @@ class WalletHome extends React.Component {
 
                     return (
                         <div className="">
-                                <ReactModal
-                                    isOpen={this.state.show_purchase_form}
-                                    closeTimeoutMS={500}
-                                    className="keys-modal"
-                                    onRequestClose={this.handleClosePurchaseForm}
+                            <ReactModal
+                                isOpen={this.state.show_purchase_form}
+                                closeTimeoutMS={500}
+                                className="keys-modal"
+                                onRequestClose={this.handleClosePurchaseForm}
 
-                                    style={{
-                                        overlay: {
+                                style={{
+                                    overlay: {
                                         position: 'fixed',
                                         top: 0,
                                         left: 0,
                                         right: 0,
                                         bottom: 0,
                                         backgroundColor: 'rgba(255, 255, 255, 0.75)'
-                                        },
-                                        content: {
+                                    },
+                                    content: {
                                         position: 'absolute',
                                         top: '40px',
                                         left: '40px',
                                         right: '40px',
                                         bottom: '40px',
                                         overflow: 'auto',
-                                        }
-                                    }}>
-                                    <h1>PURCHASE {this.state.show_purchase_offer.title}</h1>
+                                    }
+                                }}>
+                                <h1>PURCHASE {this.state.show_purchase_offer.title}</h1>
 
-                                    <Form id="purchase_item"
-                                            onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
+                                <Form id="purchase_item"
+                                      onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
 
-                                            <div className="d-flex flex-column justify-content-around p-3">
-                                                <Image className="border border-dark"
-                                                        src={this.state.show_purchase_offer_data.main_image}></Image>
+                                    <div className="d-flex flex-column justify-content-around p-3">
+                                        <Image className="border border-dark"
+                                               src={this.state.show_purchase_offer_data.main_image}></Image>
 
-                                                <div className="p-5 d-flex flex-column justify-content-center"></div>
-                                                    <hr className="border border-dark w-100"></hr>
-                                                        <h2>Price: {this.state.show_purchase_offer.price} SFX</h2>
-                                                        <h2>Seller: {this.state.show_purchase_offer.seller}</h2>
-                                                        <h2 data-tip data-for='offerID'>
-                                                            Offer
-                                                            ID: {this.to_ellipsis(this.state.show_purchase_offer.offer_id, 10, 10)}
-                                                            <ReactTooltip id='offerID' type='light' effect='solid'>
-                                                                {this.state.show_purchase_offer.offer_id}
-                                                            </ReactTooltip>
-                                                            <FaCopy
-                                                                className="ml-4"
-                                                                data-tip data-for='copyIDInfo'
-                                                                onClick={() => copy(this.state.show_purchase_offer.offer_id)}
-                                                            />
+                                        <div className="p-5 d-flex flex-column justify-content-center"></div>
+                                        <hr className="border border-dark w-100"></hr>
+                                        <h2>Price: {this.state.show_purchase_offer.price} SFX</h2>
+                                        <h2>Seller: {this.state.show_purchase_offer.seller}</h2>
+                                        <h2 data-tip data-for='offerID'>
+                                            Offer
+                                            ID: {this.to_ellipsis(this.state.show_purchase_offer.offer_id, 10, 10)}
+                                            <ReactTooltip id='offerID' type='light' effect='solid'>
+                                                {this.state.show_purchase_offer.offer_id}
+                                            </ReactTooltip>
+                                            <FaCopy
+                                                className="ml-4"
+                                                data-tip data-for='copyIDInfo'
+                                                onClick={() => copy(this.state.show_purchase_offer.offer_id)}
+                                            />
 
-                                                            <ReactTooltip id='copyIDInfo' type='info'
-                                                                            effect='solid'>
+                                            <ReactTooltip id='copyIDInfo' type='info'
+                                                          effect='solid'>
                                                                         <span>
                                                                             Copy Offer ID
                                                                         </span>
-                                                            </ReactTooltip>
-                                                        </h2>
+                                            </ReactTooltip>
+                                        </h2>
 
-                                                    <div className="h-25 oflow-y-auto">
-                                                        <p>{this.state.show_purchase_offer_data.description}</p>
-                                                    </div>
+                                        <div className="h-25 oflow-y-auto">
+                                            <p>{this.state.show_purchase_offer_data.description}</p>
+                                        </div>
 
-                                                <Form.Group as={Row}>
-                                                    <Form.Label column sm={3}>
-                                                        {this.state.show_purchase_offer.quantity} available
+                                        <Form.Group as={Row}>
+                                            <Form.Label column sm={3}>
+                                                {this.state.show_purchase_offer.quantity} available
+                                            </Form.Label>
+                                            <Col sm={9}>
+                                                <Form.Control
+                                                    className="light-blue-back"
+                                                    id="quantity"
+                                                    name="quantity"
+                                                    max={this.state.show_purchase_offer.quantity}
+                                                />
+                                            </Col>
+                                        </Form.Group>
+
+                                        {this.state.show_purchase_offer_data.nft ?
+                                            (<Form.Group as={Row}>
+                                                <Form.Label column sm={4}>
+                                                    NFT Ethereum Address
+                                                </Form.Label>
+                                                <Col sm={8}>
+                                                    <Form.Control name="eth_address" rows="3"/>
+                                                </Col>
+                                            </Form.Group>)
+                                            :
+                                            ''
+                                        }
+
+                                        {this.state.show_purchase_offer_data.shipping ?
+                                            <div>
+                                                <Form.Group name="names" as={Row}>
+
+                                                    <Form.Label column sm={4}>
+                                                        First Name
                                                     </Form.Label>
-                                                    <Col sm={9}>
-                                                        <Form.Control
-                                                            className="light-blue-back"
-                                                            id="quantity"
-                                                            name="quantity"
-                                                            max={this.state.show_purchase_offer.quantity}
-                                                        />
+                                                    <Col sm={6}>
+                                                        <Form.Control name="first_name" rows="3"/>
+                                                    </Col>
+
+                                                    <Form.Label column sm={4}>
+                                                        Last Name
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="last_name" rows="3"/>
                                                     </Col>
                                                 </Form.Group>
 
-                                                {this.state.show_purchase_offer_data.nft ?
-                                                    (<Form.Group as={Row}>
-                                                        <Form.Label column sm={4}>
-                                                            NFT Ethereum Address
-                                                        </Form.Label>
-                                                        <Col sm={8}>
-                                                            <Form.Control name="eth_address" rows="3"/>
-                                                        </Col>
-                                                    </Form.Group>)
-                                                :
-                                                    ''
-                                                }
-                                                
-                                                {this.state.show_purchase_offer_data.shipping ?
-                                                    <div>
-                                                        <Form.Group name="names" as={Row}>
+                                                <Form.Group name="streets" as={Row}>
+                                                    <Form.Label column sm={4}>
+                                                        Address Line 1
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="address1" rows="3"/>
+                                                    </Col>
+                                                    <Form.Label column sm={4}>
+                                                        Address Line 2
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="address2" rows="3"/>
+                                                    </Col>
+                                                </Form.Group>
 
-                                                            <Form.Label column sm={4}>
-                                                                First Name
-                                                            </Form.Label>
-                                                            <Col sm={6}>
-                                                                <Form.Control name="first_name" rows="3"/>
-                                                            </Col>
+                                                <Form.Group name="place" as={Row}>
+                                                    <Form.Label column sm={4}>
+                                                        City
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="city" rows="3"/>
+                                                    </Col>
+                                                    <Form.Label column sm={4}>
+                                                        State/County
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="state" rows="3"/>
+                                                    </Col>
+                                                </Form.Group>
 
-                                                            <Form.Label column sm={4}>
-                                                                Last Name
-                                                            </Form.Label>
-                                                            <Col sm={6}>
-                                                                <Form.Control name="last_name" rows="3"/>
-                                                            </Col>
-                                                        </Form.Group>
+                                                <Form.Group name="countrycodes" as={Row}>
+                                                    <Form.Label column sm={4}>
+                                                        Zip/Area Code
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="zipcode" rows="3"/>
+                                                    </Col>
+                                                    <Form.Label column sm={4}>
+                                                        Country
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="country" rows="3"/>
+                                                    </Col>
+                                                </Form.Group>
 
-                                                        <Form.Group name="streets" as={Row}>
-                                                            <Form.Label column sm={4}>
-                                                            Address Line 1
-                                                            </Form.Label>
-                                                            <Col sm={6}>
-                                                                <Form.Control name="address1" rows="3"/>
-                                                            </Col>
-                                                            <Form.Label column sm={4}>
-                                                                Address Line 2
-                                                            </Form.Label>
-                                                            <Col sm={6}>
-                                                                <Form.Control name="address2" rows="3"/>
-                                                            </Col>
-                                                        </Form.Group>
-
-                                                        <Form.Group name="place" as={Row}>
-                                                            <Form.Label column sm={4}>
-                                                                City
-                                                            </Form.Label>
-                                                            <Col sm={6}>
-                                                                <Form.Control name="city" rows="3"/>
-                                                            </Col>
-                                                            <Form.Label column sm={4}>
-                                                                State/County
-                                                            </Form.Label>
-                                                            <Col sm={6}>
-                                                                <Form.Control name="state" rows="3"/>
-                                                            </Col>
-                                                        </Form.Group>
-
-                                                        <Form.Group name="countrycodes" as={Row}>
-                                                            <Form.Label column sm={4}>
-                                                                Zip/Area Code
-                                                            </Form.Label>
-                                                            <Col sm={6}>
-                                                                <Form.Control name="zipcode" rows="3"/>
-                                                            </Col>
-                                                            <Form.Label column sm={4}>
-                                                                Country
-                                                            </Form.Label>
-                                                            <Col sm={6}>
-                                                                <Form.Control name="country" rows="3"/>
-                                                            </Col>
-                                                        </Form.Group>
-
-                                                        <Form.Group as={Row}>
-                                                            <Form.Label column sm={4}>
-                                                                Email
-                                                            </Form.Label>
-                                                            <Col sm={6}>
-                                                                <Form.Control type="email" name="email_address" rows="3"/>
-                                                            </Col>
-                                                            <Form.Label column sm={4}>
-                                                                Phone
-                                                            </Form.Label>
-                                                            <Col sm={6}>
-                                                                <Form.Control name="phone_number" rows="3"/>
-                                                            </Col>
-                                                        </Form.Group>
-                                                    </div>
-                                                :
-                                                    ''
-                                                }
-
-                                                {this.state.show_purchase_offer_data.open_message ?
-                                                    <Form.Group as={Row}>
-                                                        <Form.Label column sm={4}>
-                                                            NFT Ethereum Address
-                                                        </Form.Label>
-                                                        <Col sm={8}>
-                                                            <Form.Control name="message" rows="3"/>
-                                                        </Col>
-                                                    </Form.Group>
-                                                :
-                                                    ''
-                                                }
+                                                <Form.Group as={Row}>
+                                                    <Form.Label column sm={4}>
+                                                        Email
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control type="email" name="email_address" rows="3"/>
+                                                    </Col>
+                                                    <Form.Label column sm={4}>
+                                                        Phone
+                                                    </Form.Label>
+                                                    <Col sm={6}>
+                                                        <Form.Control name="phone_number" rows="3"/>
+                                                    </Col>
+                                                </Form.Group>
                                             </div>
+                                            :
+                                            ''
+                                        }
 
-                                        <Form.Group as={Row} className="w-50">
-                                            <Form.Label column sm={3}>
-                                                Mixins
-                                                <IconContext.Provider value={{color: 'black', size: '20px'}}>
-                                                    <FaInfoCircle data-tip data-for='apiInfo'
-                                                                    className="blockchain-icon mx-4"/>
+                                        {this.state.show_purchase_offer_data.open_message ?
+                                            <Form.Group as={Row}>
+                                                <Form.Label column sm={4}>
+                                                    NFT Ethereum Address
+                                                </Form.Label>
+                                                <Col sm={8}>
+                                                    <Form.Control name="message" rows="3"/>
+                                                </Col>
+                                            </Form.Group>
+                                            :
+                                            ''
+                                        }
+                                    </div>
 
-                                                    <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                    <Form.Group as={Row} className="w-50">
+                                        <Form.Label column sm={3}>
+                                            Mixins
+                                            <IconContext.Provider value={{color: 'black', size: '20px'}}>
+                                                <FaInfoCircle data-tip data-for='apiInfo'
+                                                              className="blockchain-icon mx-4"/>
+
+                                                <ReactTooltip id='apiInfo' type='info' effect='solid'>
                                                                 <span>
                                                                     Mixins are transactions that have also been sent on the Safex blockchain. <br/>
                                                                     They are combined with yours for private transactions.<br/>
                                                                     Changing this from the default could hurt your privacy.<br/>
                                                                 </span>
-                                                    </ReactTooltip>
-                                                </IconContext.Provider>
-                                            </Form.Label>
-                                            <Col sm={9}>
-                                                <Form.Control
-                                                    name="mixins"
-                                                    as="select"
-                                                    defaultValue="7"
-                                                >
-                                                    <option>1</option>
-                                                    <option>2</option>
-                                                    <option>3</option>
-                                                    <option>4</option>
-                                                    <option>5</option>
-                                                    <option>6</option>
-                                                    <option>7</option>
-                                                </Form.Control>
-                                            </Col>
-                                        </Form.Group>
+                                                </ReactTooltip>
+                                            </IconContext.Provider>
+                                        </Form.Label>
+                                        <Col sm={9}>
+                                            <Form.Control
+                                                name="mixins"
+                                                as="select"
+                                                defaultValue="7"
+                                            >
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                                <option>5</option>
+                                                <option>6</option>
+                                                <option>7</option>
+                                            </Form.Control>
+                                        </Col>
+                                    </Form.Group>
 
-                                        {this.state.showLoader ?
-                                            <Loader
-                                                className="justify-content-center align-content-center"
-                                                type="Bars"
-                                                color="#00BFFF"
-                                                height={50}
-                                                width={50}
-                                            />
-                                            :
-                                            <button>
-                                                Buy
-                                            </button>
-                                        }
-                                    </Form>
+                                    {this.state.showLoader ?
+                                        <Loader
+                                            className="justify-content-center align-content-center"
+                                            type="Bars"
+                                            color="#00BFFF"
+                                            height={50}
+                                            width={50}
+                                        />
+                                        :
+                                        <button>
+                                            Buy
+                                        </button>
+                                    }
+                                </Form>
 
-                                    <Button className="close-button" onClick={this.handleClosePurchaseForm}>
-                                        Close
-                                    </Button>
-                                </ReactModal>
+                                <Button className="close-button" onClick={this.handleClosePurchaseForm}>
+                                    Close
+                                </Button>
+                            </ReactModal>
 
                             <ReactModal
                                 isOpen={this.state.show_purchase_confirm_modal}
@@ -3549,25 +3579,25 @@ class WalletHome extends React.Component {
 
                                 style={{
                                     overlay: {
-                                    position: 'fixed',
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                        position: 'fixed',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: 'rgba(255, 255, 255, 0.75)'
                                     },
                                     content: {
-                                    position: 'absolute',
-                                    top: '40px',
-                                    left: '40px',
-                                    right: '40px',
-                                    bottom: '40px',
-                                    overflow: 'auto',
+                                        position: 'absolute',
+                                        top: '40px',
+                                        left: '40px',
+                                        right: '40px',
+                                        bottom: '40px',
+                                        overflow: 'auto',
                                     }
                                 }}
                             >
                                 <h1>Purchase Confirmed: {this.state.show_purchase_offer.title}</h1>
-                            
+
                                 <button onClick={() => print('receipt', 'html')}>Print</button>
 
                                 <h2>Purchase transaction committed.</h2>
@@ -3581,7 +3611,7 @@ class WalletHome extends React.Component {
                                 <h2>Amount: {this.state.purchase_txn_quantity}</h2>
 
                                 <h2>Price: {this.state.purchase_txn_price} SFX</h2>
-                                
+
                                 <h2>Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX</h2>
 
                                 <div style={{display: 'none'}}>
@@ -3608,7 +3638,7 @@ class WalletHome extends React.Component {
                                         <br/><br/>
                                         Thank You For Shopping With Safex!
                                     </h1>
-                                    
+
                                     {/*<p>
                                     Public Key: {this.state.show_purchase_confirm_modal ?
                                         this.state.twm_file.api.urls[this.state.api_url][this.state.show_purchase_offer.offer_id][this.state.purchase_txn_id].pgp_keys.public_key
@@ -3619,7 +3649,8 @@ class WalletHome extends React.Component {
                                 </div>
                             </ReactModal>
 
-                            <Col sm={4} className="no-padding d-flex flex-column align-items-center justify-content-between">
+                            <Col sm={4}
+                                 className="no-padding d-flex flex-column align-items-center justify-content-between">
                                 <HomeInfo
                                     blockHeight={this.state.blockchain_height}
                                     connection={this.state.connection_status}
@@ -3640,7 +3671,9 @@ class WalletHome extends React.Component {
                                     rescan={this.rescan}
                                     handleShow={this.handleKeys}
                                     show={this.state.show_keys}
-                                    handleKeyRequest={() => {this.setState({keyRequest: !this.state.keyRequest})}}
+                                    handleKeyRequest={() => {
+                                        this.setState({keyRequest: !this.state.keyRequest})
+                                    }}
                                     keyRequest={this.state.keyRequest}
                                     address={this.props.wallet.address()}
                                     spendKey={this.props.wallet.secretSpendKey()}
@@ -3652,9 +3685,9 @@ class WalletHome extends React.Component {
 
                             <Col
                                 sm={12}
-                                className={ this.state.showBuyerOrders ?
+                                className={this.state.showBuyerOrders ?
                                     "display-none"
-                                :
+                                    :
                                     ""
                                 }
                             >
@@ -3662,46 +3695,47 @@ class WalletHome extends React.Component {
                                     className="search-box d-flex flex-column align-items-center"
                                 >
 
-                                        <div className="row width100 border-bottom border-white" id="search">
-                                            <form
-                                                className="w-100 no-gutters p-2 align-items-baseline d-flex justify-content-center"
-                                                id="search-form" action=""
-                                                method=""
-                                            >
-                                                <div className="col-sm-6">
-                                                    <input className="w-100" type="text"
-                                                            onChange={this.handle_change_api_fetch_url} value="http://stageapi.theworldmarketplace.com:17700"/>
-                                                </div>
+                                    <div className="row width100 border-bottom border-white" id="search">
+                                        <form
+                                            className="w-100 no-gutters p-2 align-items-baseline d-flex justify-content-center"
+                                            id="search-form" action=""
+                                            method=""
+                                        >
+                                            <div className="col-sm-6">
+                                                <input className="w-100" type="text"
+                                                       onChange={this.handle_change_api_fetch_url}
+                                                       value="http://stageapi.theworldmarketplace.com:17700"/>
+                                            </div>
 
-                                                <div className="col-sm-4 justify-content-around d-flex">
-                                                    <button onClick={this.load_offers_from_api} className="search-button">
-                                                        Show Products
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={this.handleBuyerOrders}
-                                                        style={{padding: '1rem', lineHeight: 0, }}
-                                                        className="search-button"
-                                                    >
-                                                        {this.state.showBuyerOrders ? 'Close' : 'My Orders'}
-                                                    </button>
+                                            <div className="col-sm-4 justify-content-around d-flex">
+                                                <button onClick={this.load_offers_from_api} className="search-button">
+                                                    Show Products
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={this.handleBuyerOrders}
+                                                    style={{padding: '1rem', lineHeight: 0,}}
+                                                    className="search-button"
+                                                >
+                                                    {this.state.showBuyerOrders ? 'Close' : 'My Orders'}
+                                                </button>
 
-                                                    {/* <button onClick={this.load_offers_from_blockchain} className="search-button">
+                                                {/* <button onClick={this.load_offers_from_blockchain} className="search-button">
                                                         Load From Blockchain
                                                     </button>*/}
 
-                                                    <IconContext.Provider value={{color: '#13d3fd', size: '20px'}}>
+                                                <IconContext.Provider value={{color: '#13d3fd', size: '20px'}}>
 
-                                                        <FaInfoCircle data-tip data-for='apiInfo'
-                                                                        className=""/>
+                                                    <FaInfoCircle data-tip data-for='apiInfo'
+                                                                  className=""/>
 
-                                                        <ReactTooltip id='apiInfo' type='light' effect='solid'>
-                                                            <span>This is info about setting a market API. Lorem Ipsum.</span>
-                                                        </ReactTooltip>
-                                                    </IconContext.Provider>
-                                                </div>
-                                            </form>
-                                        </div>
+                                                    <ReactTooltip id='apiInfo' type='light' effect='solid'>
+                                                        <span>This is info about setting a market API. Lorem Ipsum.</span>
+                                                    </ReactTooltip>
+                                                </IconContext.Provider>
+                                            </div>
+                                        </form>
+                                    </div>
 
                                     <Row className="staking-table-row">
                                         <p>Title</p>
@@ -3730,20 +3764,20 @@ class WalletHome extends React.Component {
                                                 sm={4}
                                                 style={{wordBreak: 'break-all', fontFamily: 'Inter'}}
                                             >
-                                                    <div>
-                                                        <h2>Selected URL:</h2>
-                                                        <h3>{this.state.buyerSelectUrl}</h3>
-                                                    </div>
+                                                <div>
+                                                    <h2>Selected URL:</h2>
+                                                    <h3>{this.state.buyerSelectUrl}</h3>
+                                                </div>
 
-                                                    <div className="my-3">
-                                                        <h2>Selected Offer:</h2>
-                                                        <h3>{this.state.buyerSelectOffer}</h3>
-                                                    </div>
+                                                <div className="my-3">
+                                                    <h2>Selected Offer:</h2>
+                                                    <h3>{this.state.buyerSelectOffer}</h3>
+                                                </div>
 
-                                                    <div>
-                                                        <h2>Selected Order:</h2>
-                                                        <h3>{this.state.buyerSelectOrder}</h3>
-                                                    </div>
+                                                <div>
+                                                    <h2>Selected Order:</h2>
+                                                    <h3>{this.state.buyerSelectOrder}</h3>
+                                                </div>
                                             </Col>
 
                                             <Col
@@ -3751,40 +3785,41 @@ class WalletHome extends React.Component {
                                                 className="pt-3 staking-table-table"
                                                 style={{maxHeight: '60vh'}}
                                             >
-	
-												<div>
-													<h1>Select URL</h1>
-													
-													<select
-														className="my-3"
-														value={this.state.buyerSelectUrl}
-														name="buyerSelectUrl"
-														onChange={this.handleBuyerChange}
-													>
-														<option>Please Select</option>
-														{this.state.buyer_urls.map((url, key) => {
-															return (
-																<option value={url} key={key}>{url}</option>
-															)
-														})}
-													</select>
-												</div>
+
+                                                <div>
+                                                    <h1>Select URL</h1>
+
+                                                    <select
+                                                        className="my-3"
+                                                        value={this.state.buyerSelectUrl}
+                                                        name="buyerSelectUrl"
+                                                        onChange={this.handleBuyerChange}
+                                                    >
+                                                        <option>Please Select</option>
+                                                        {this.state.buyer_urls.map((url, key) => {
+                                                            return (
+                                                                <option value={url} key={key}>{url}</option>
+                                                            )
+                                                        })}
+                                                    </select>
+                                                </div>
 
                                                 <div className="my-5">
-													<h1>Select Offer</h1>
-	
-													<select
-														className="my-3"
-														value={this.state.buyerSelectOffer}
-														name="buyerSelectOffer"
-														onChange={this.handleBuyerChange}
-													>
-														<option>Please Select</option>
-														{this.buyer_get_offer_ids().map(offerId => <option key={offerId}>{offerId}</option>)}
-													</select>
-												</div>
+                                                    <h1>Select Offer</h1>
 
-												<div>
+                                                    <select
+                                                        className="my-3"
+                                                        value={this.state.buyerSelectOffer}
+                                                        name="buyerSelectOffer"
+                                                        onChange={this.handleBuyerChange}
+                                                    >
+                                                        <option>Please Select</option>
+                                                        {this.buyer_get_offer_ids().map(offerId => <option
+                                                            key={offerId}>{offerId}</option>)}
+                                                    </select>
+                                                </div>
+
+                                                <div>
                                                     <h1>Select Order</h1>
                                                     <select
                                                         className="my-3"
@@ -3793,16 +3828,18 @@ class WalletHome extends React.Component {
                                                         onChange={this.handleBuyerChange}
                                                     >
                                                         <option>Please Select</option>
-														{this.buyer_get_orders().map(order => (
-															<option key={order.order_id} value={order.order_id}>
-																{order.quantity} {order.title} ({order.order_id.slice(0, 6)})
-															</option>
-														))}
+                                                        {this.buyer_get_orders().map(order => (
+                                                            <option key={order.order_id} value={order.order_id}>
+                                                                {order.quantity} {order.title} ({order.order_id.slice(0, 6)})
+                                                            </option>
+                                                        ))}
                                                     </select>
                                                 </div>
 
-                                                <button className="search-button mt-3" type="button" onClick={this.handleBuyerMessages}>Show Messages</button>
-                                                
+                                                <button className="search-button mt-3" type="button"
+                                                        onClick={this.handleBuyerMessages}>Show Messages
+                                                </button>
+
                                             </Col>
                                         </Row>
                                     </div>
@@ -3838,7 +3875,7 @@ class WalletHome extends React.Component {
                                                 <h3>Order: {this.state.buyerSelectOrder}</h3>
 
                                                 <button
-                                                    onClick={ () =>
+                                                    onClick={() =>
                                                         this.load_buyers_messages_for_selected_order()}
                                                 >
                                                     Refresh Messages
@@ -3862,8 +3899,13 @@ class WalletHome extends React.Component {
 
                                             <Col className="mx-auto my-5" sm={6}>
                                                 <form onSubmit={this.buyer_reply_by_order}>
-                                                    <textarea style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', fontSize: '1.5rem'}} rows="6" cols="50" name="messageBox"></textarea>
-                                                    
+                                                    <textarea style={{
+                                                        border: '2px solid #13D3FD',
+                                                        borderRadius: 10,
+                                                        padding: '.5rem',
+                                                        fontSize: '1.5rem'
+                                                    }} rows="6" cols="50" name="messageBox"></textarea>
+
                                                     <button className="my-3 search-button" type="submit">Send</button>
                                                 </form>
                                             </Col>
@@ -3871,7 +3913,7 @@ class WalletHome extends React.Component {
                                     </ReactModal>
                                 </Col>
 
-                            :
+                                :
                                 <Col className="market-table overflow-y" md={12}>
                                     {table_of_listings}
                                 </Col>
@@ -3897,13 +3939,13 @@ class WalletHome extends React.Component {
                         }
                         return (
                             <Row className={
-                                    this.state.selected_user.username === user.username ?
-                                        "no-gutters account-element selected-account"
+                                this.state.selected_user.username === user.username ?
+                                    "no-gutters account-element selected-account"
                                     :
-                                        "no-gutters account-element"
-                                }
-                                key={key}
-                                onClick={() => this.select_merchant_user(user.username, key)}>
+                                    "no-gutters account-element"
+                            }
+                                 key={key}
+                                 onClick={() => this.select_merchant_user(user.username, key)}>
 
                                 <Col>
                                     <Image
@@ -3924,7 +3966,7 @@ class WalletHome extends React.Component {
                                         onClick={(e) => this.remove_account(e, user.username, key)}>
                                         Remove
                                     </button>
-                                :
+                                    :
                                     ''
                                 }
                             </Row>)
@@ -3954,7 +3996,8 @@ class WalletHome extends React.Component {
                     try {
                         return (
                             <div className="home-main-div">
-                                <Col sm={4} className="no-padding d-flex flex-column align-items-center justify-content-between">
+                                <Col sm={4}
+                                     className="no-padding d-flex flex-column align-items-center justify-content-between">
                                     <HomeInfo
                                         blockHeight={this.state.blockchain_height}
                                         connection={this.state.connection_status}
@@ -3988,7 +4031,9 @@ class WalletHome extends React.Component {
                                         rescan={this.rescan}
                                         handleShow={this.handleKeys}
                                         show={this.state.show_keys}
-                                        handleKeyRequest={() => {this.setState({keyRequest: !this.state.keyRequest})}}
+                                        handleKeyRequest={() => {
+                                            this.setState({keyRequest: !this.state.keyRequest})
+                                        }}
                                         keyRequest={this.state.keyRequest}
                                         address={this.props.wallet.address()}
                                         spendKey={this.props.wallet.secretSpendKey()}
@@ -4014,7 +4059,7 @@ class WalletHome extends React.Component {
                                             data={data}
                                             selected={selected}
                                         />
-                                    :
+                                        :
                                         <Row className="merchant-accounts-box">
                                             {this.state.showMyOrders ?
                                                 <Row className="h-100">
@@ -4030,7 +4075,7 @@ class WalletHome extends React.Component {
                                                     </div>
                                                 </Row>
 
-                                            :
+                                                :
                                                 <MerchantOffers
                                                     merchantReply={this.seller_reply_message}
                                                     loadOrders={this.get_seller_order_ids_by_offer}
@@ -4040,7 +4085,7 @@ class WalletHome extends React.Component {
                                                 />
                                             }
 
-                                        </Row >
+                                        </Row>
                                     }
 
                                     <ReactModal
@@ -4050,197 +4095,198 @@ class WalletHome extends React.Component {
                                         className="new-account-modal"
                                         style={{
                                             overlay: {
-                                            position: 'fixed',
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            bottom: 0,
-                                            backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                                position: 'fixed',
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                bottom: 0,
+                                                backgroundColor: 'rgba(255, 255, 255, 0.75)'
                                             },
                                             content: {
-                                            position: 'absolute',
-                                            top: '40px',
-                                            left: '40px',
-                                            right: '40px',
-                                            bottom: '40px',
-                                            overflow: 'auto',
+                                                position: 'absolute',
+                                                top: '40px',
+                                                left: '40px',
+                                                right: '40px',
+                                                bottom: '40px',
+                                                overflow: 'auto',
                                             }
                                         }}>
-                                            <h1>Create New Offer</h1>
-                                            <Form id="list_new_offer" onSubmit={this.list_new_offer}>
-                                                <Row className="no-gutters justify-content-between w-100">
-                                                    <Col md="8">
-                                                        <Form.Group as={Col}>
-                                                            <Form.Label>Username</Form.Label>
-
-                                                            <Form.Control
-                                                                disabled
-                                                                name="username"
-                                                                value={selected.username}
-                                                            />
-                                                        </Form.Group>
-
-                                                        <Form.Group  as={Col}>
-                                                            <Form.Label>Image URL</Form.Label>
-
-                                                            <Form.Control
-                                                                name="new_account_image"
-                                                                defaultValue={data.main_image}
-                                                                onChange={this.handleChange}
-                                                            />
-                                                        </Form.Group>
-                                                    </Col>
-                                                    <Col md="4">
-                                                        <Image
-                                                            className="border border-white grey-back"
-                                                            width={150}
-                                                            height={150}
-                                                            src={this.state.new_account_image}
-                                                            roundedCircle
-                                                        />
-                                                    </Col>
-                                                </Row>
-                                                <Row  md="8">
-                                                    <Form.Group md="6" as={Col}>
-                                                        <Form.Label>Title</Form.Label>
-
-                                                        <Form.Control name="title"
-                                                                        defaultValue={this.state.show_edit_offer.title}/>
-                                                    </Form.Group>
-
-                                                    <Form.Group md="6" as={Col}>
-                                                        <Form.Label>Description</Form.Label>
-
-                                                        <Form.Control maxLength="2000" as="textarea"
-                                                                            name="description"
-                                                                            defaultValue={data.description}/>
-                                                    </Form.Group>
-
-                                                    <Form.Group  md="6" as={Col}>
-                                                        <Form.Label>Price (SFX)</Form.Label>
+                                        <h1>Create New Offer</h1>
+                                        <Form id="list_new_offer" onSubmit={this.list_new_offer}>
+                                            <Row className="no-gutters justify-content-between w-100">
+                                                <Col md="8">
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Username</Form.Label>
 
                                                         <Form.Control
-                                                            name="price"
-                                                            defaultValue={1}
+                                                            disabled
+                                                            name="username"
+                                                            value={selected.username}
                                                         />
                                                     </Form.Group>
 
-                                                    <Form.Group  md="6" as={Col}>
-                                                        <Form.Label>Available Quantity</Form.Label>
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Image URL</Form.Label>
 
                                                         <Form.Control
-                                                            name="quantity"
-                                                            defaultValue={1}
+                                                            name="new_account_image"
+                                                            defaultValue={data.main_image}
+                                                            onChange={this.handleChange}
                                                         />
                                                     </Form.Group>
-
-                                                    <Form.Group  md="6" as={Col}>
-                                                        <Form.Label>SKU</Form.Label>
-
-                                                        <Form.Control
-                                                            name="sku"
-                                                            defaultValue={data.sku}
-                                                        />
-                                                    </Form.Group>
-
-                                                    <Form.Group  md="6" as={Col}>
-                                                        <Form.Label>Barcode (ISBN, UPC, GTIN, etc)</Form.Label>
-
-                                                        <Form.Control
-                                                            name="barcode"
-                                                            defaultValue={data.barcode}
-                                                        />
-                                                    </Form.Group>
-
-                                                    <Form.Group  md="6" as={Col}>
-                                                        <Form.Label>Weight</Form.Label>
-
-                                                        <Form.Control
-                                                            name="weight"
-                                                            defaultValue={data.weight}
-                                                        />
-                                                    </Form.Group>
-
-                                                    <Form.Group md="6" as={Col}>
-                                                        <Form.Label>Country of Origin</Form.Label>
-
-                                                        <Form.Control
-                                                            name="country"
-                                                            defaultValue={data.country}
-                                                            placedholder="your location"
-                                                        />
-                                                    </Form.Group>
-                                                </Row>
-
-                                                <Row className="w-100 justify-content-around my-3">
-                                                    <Form.Check
-                                                        label="Shipping"
-                                                        checked={this.state.shipping_switch}
-                                                        onChange={this.change_shipping_switch}
-                                                        type="switch"
-                                                        id="shipping-switch"
-                                                        name="shipping"
+                                                </Col>
+                                                <Col md="4">
+                                                    <Image
+                                                        className="border border-white grey-back"
+                                                        width={150}
+                                                        height={150}
+                                                        src={this.state.new_account_image}
+                                                        roundedCircle
                                                     />
+                                                </Col>
+                                            </Row>
+                                            <Row md="8">
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Title</Form.Label>
 
-                                                    <Form.Check
-                                                        label="NFT"
-                                                        checked={this.state.nft_switch}
-                                                        onChange={this.change_nft_switch}
-                                                        type="switch"
-                                                        id="nft-switch"
-                                                        name="nft"
+                                                    <Form.Control name="title"
+                                                                  defaultValue={this.state.show_edit_offer.title}/>
+                                                </Form.Group>
+
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Description</Form.Label>
+
+                                                    <Form.Control maxLength="2000" as="textarea"
+                                                                  name="description"
+                                                                  defaultValue={data.description}/>
+                                                </Form.Group>
+
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Price (SFX)</Form.Label>
+
+                                                    <Form.Control
+                                                        name="price"
+                                                        defaultValue={1}
                                                     />
+                                                </Form.Group>
 
-                                                    <Form.Check
-                                                        label="Open Messages"
-                                                        checked={this.state.open_message_switch}
-                                                        onChange={this.change_open_message_switch}
-                                                        type="switch"
-                                                        id="open-switch"
-                                                        name="open_message"
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Available Quantity</Form.Label>
+
+                                                    <Form.Control
+                                                        name="quantity"
+                                                        defaultValue={1}
                                                     />
-                                                </Row>
+                                                </Form.Group>
 
-                                                <Form.Group as={Col}>
-                                                    <Form.Label>
-                                                        Mixins
-                                                        <IconContext.Provider  value={{color: 'black', size: '20px'}}>
-                                                            <FaInfoCircle data-tip data-for='apiInfo' className="blockchain-icon mx-4 white-text"/>
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>SKU</Form.Label>
 
-                                                            <ReactTooltip id='apiInfo' type='info' effect='solid'>
+                                                    <Form.Control
+                                                        name="sku"
+                                                        defaultValue={data.sku}
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Barcode (ISBN, UPC, GTIN, etc)</Form.Label>
+
+                                                    <Form.Control
+                                                        name="barcode"
+                                                        defaultValue={data.barcode}
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Weight</Form.Label>
+
+                                                    <Form.Control
+                                                        name="weight"
+                                                        defaultValue={data.weight}
+                                                    />
+                                                </Form.Group>
+
+                                                <Form.Group md="6" as={Col}>
+                                                    <Form.Label>Country of Origin</Form.Label>
+
+                                                    <Form.Control
+                                                        name="country"
+                                                        defaultValue={data.country}
+                                                        placedholder="your location"
+                                                    />
+                                                </Form.Group>
+                                            </Row>
+
+                                            <Row className="w-100 justify-content-around my-3">
+                                                <Form.Check
+                                                    label="Shipping"
+                                                    checked={this.state.shipping_switch}
+                                                    onChange={this.change_shipping_switch}
+                                                    type="switch"
+                                                    id="shipping-switch"
+                                                    name="shipping"
+                                                />
+
+                                                <Form.Check
+                                                    label="NFT"
+                                                    checked={this.state.nft_switch}
+                                                    onChange={this.change_nft_switch}
+                                                    type="switch"
+                                                    id="nft-switch"
+                                                    name="nft"
+                                                />
+
+                                                <Form.Check
+                                                    label="Open Messages"
+                                                    checked={this.state.open_message_switch}
+                                                    onChange={this.change_open_message_switch}
+                                                    type="switch"
+                                                    id="open-switch"
+                                                    name="open_message"
+                                                />
+                                            </Row>
+
+                                            <Form.Group as={Col}>
+                                                <Form.Label>
+                                                    Mixins
+                                                    <IconContext.Provider value={{color: 'black', size: '20px'}}>
+                                                        <FaInfoCircle data-tip data-for='apiInfo'
+                                                                      className="blockchain-icon mx-4 white-text"/>
+
+                                                        <ReactTooltip id='apiInfo' type='info' effect='solid'>
                                                                 <span>
                                                                     Mixins are transactions that have also been sent on the Safex blockchain. <br/>
                                                                     They are combined with yours for private transactions.<br/>
                                                                     Changing this from the default could hurt your privacy.<br/>
                                                                 </span>
-                                                            </ReactTooltip>
-                                                        </IconContext.Provider>
-                                                    </Form.Label>
+                                                        </ReactTooltip>
+                                                    </IconContext.Provider>
+                                                </Form.Label>
 
-                                                    <Form.Control
-                                                        name="mixins"
-                                                        as="select"
-                                                        defaultValue="7"
-                                                    >
-                                                        <option>1</option>
-                                                        <option>2</option>
-                                                        <option>3</option>
-                                                        <option>4</option>
-                                                        <option>5</option>
-                                                        <option>6</option>
-                                                        <option>7</option>
-                                                    </Form.Control>
-                                                </Form.Group>
+                                                <Form.Control
+                                                    name="mixins"
+                                                    as="select"
+                                                    defaultValue="7"
+                                                >
+                                                    <option>1</option>
+                                                    <option>2</option>
+                                                    <option>3</option>
+                                                    <option>4</option>
+                                                    <option>5</option>
+                                                    <option>6</option>
+                                                    <option>7</option>
+                                                </Form.Control>
+                                            </Form.Group>
 
-                                                <button className="my-5" type="submit">
-                                                    List Offer
-                                                </button>
-                                            </Form>
+                                            <button className="my-5" type="submit">
+                                                List Offer
+                                            </button>
+                                        </Form>
 
-                                            <Button className="close-button" onClick={this.handleCloseNewOfferForm}>
-                                                Close
-                                            </Button>
-                                        </ReactModal>
+                                        <Button className="close-button" onClick={this.handleCloseNewOfferForm}>
+                                            Close
+                                        </Button>
+                                    </ReactModal>
 
                                     <ReactModal
                                         closeTimeoutMS={500}
@@ -4250,20 +4296,20 @@ class WalletHome extends React.Component {
 
                                         style={{
                                             overlay: {
-                                            position: 'fixed',
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            bottom: 0,
-                                            backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                                position: 'fixed',
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                bottom: 0,
+                                                backgroundColor: 'rgba(255, 255, 255, 0.75)'
                                             },
                                             content: {
-                                            position: 'absolute',
-                                            top: '40px',
-                                            left: '40px',
-                                            right: '40px',
-                                            bottom: '40px',
-                                            overflow: 'auto',
+                                                position: 'absolute',
+                                                top: '40px',
+                                                left: '40px',
+                                                right: '40px',
+                                                bottom: '40px',
+                                                overflow: 'auto',
                                             }
                                         }}>
 
@@ -4367,10 +4413,10 @@ class WalletHome extends React.Component {
                                                         <IconContext.Provider
                                                             value={{color: 'white', size: '20px'}}>
                                                             <FaInfoCircle data-tip data-for='apiInfo'
-                                                                            className="blockchain-icon mx-4 white-text"/>
+                                                                          className="blockchain-icon mx-4 white-text"/>
 
                                                             <ReactTooltip id='apiInfo' type='info'
-                                                                            effect='solid'>
+                                                                          effect='solid'>
                                                                 <span>
                                                                     Mixins are transactions that have also been sent on the Safex blockchain. <br/>
                                                                     They are combined with yours for private transactions.<br/>
@@ -4420,26 +4466,26 @@ class WalletHome extends React.Component {
                                         className="new-account-modal"
                                         style={{
                                             overlay: {
-                                            position: 'fixed',
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            bottom: 0,
-                                            backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                                position: 'fixed',
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                bottom: 0,
+                                                backgroundColor: 'rgba(255, 255, 255, 0.75)'
                                             },
                                             content: {
-                                            position: 'absolute',
-                                            top: '40px',
-                                            left: '40px',
-                                            right: '40px',
-                                            bottom: '40px',
-                                            overflow: 'auto',
+                                                position: 'absolute',
+                                                top: '40px',
+                                                left: '40px',
+                                                right: '40px',
+                                                bottom: '40px',
+                                                overflow: 'auto',
                                             }
                                         }}>
                                         <h1>Edit Offer {this.state.show_edit_offer.title}</h1>
 
                                         <Form id="edit_offer"
-                                            onSubmit={(e) => this.make_edit_offer(e, this.state.show_edit_offer)}>
+                                              onSubmit={(e) => this.make_edit_offer(e, this.state.show_edit_offer)}>
                                             <Form.Row>
                                                 <Col md="8">
                                                     <Form.Group as={Col}>
@@ -4488,15 +4534,15 @@ class WalletHome extends React.Component {
                                                     <Form.Label>Title</Form.Label>
 
                                                     <Form.Control name="title"
-                                                                    defaultValue={this.state.show_edit_offer.title}/>
+                                                                  defaultValue={this.state.show_edit_offer.title}/>
                                                 </Form.Group>
 
                                                 <Form.Group as={Col}>
                                                     <Form.Label>Description</Form.Label>
 
                                                     <Form.Control maxLength="2000" as="textarea"
-                                                                    name="description"
-                                                                    defaultValue={data.description}/>
+                                                                  name="description"
+                                                                  defaultValue={data.description}/>
                                                 </Form.Group>
                                             </Form.Row>
 
@@ -4596,10 +4642,10 @@ class WalletHome extends React.Component {
                                                         <IconContext.Provider
                                                             value={{color: 'black', size: '20px'}}>
                                                             <FaInfoCircle data-tip data-for='apiInfo'
-                                                                            className="blockchain-icon mx-4 white-text"/>
+                                                                          className="blockchain-icon mx-4 white-text"/>
 
                                                             <ReactTooltip id='apiInfo' type='info'
-                                                                            effect='solid'>
+                                                                          effect='solid'>
                                                                     <span>
                                                                         Mixins are transactions that have also been sent on the Safex blockchain. <br/>
                                                                         They are combined with yours for private transactions.<br/>
@@ -4655,7 +4701,8 @@ class WalletHome extends React.Component {
                     }
                     return (
                         <div className="home-main-div">
-                            <Col sm={3} className="no-padding d-flex flex-column justify-content-around align-items-center">
+                            <Col sm={3}
+                                 className="no-padding d-flex flex-column justify-content-around align-items-center">
                                 <HomeInfo
                                     blockHeight={this.state.blockchain_height}
                                     connection={this.state.connection_status}
@@ -4711,8 +4758,8 @@ class WalletHome extends React.Component {
                     return (
                         <div>
                             <Settings
-                                txnhistory = {this.state.txnhistory}
-                                updateHistory = {this.refresh_history}
+                                txnhistory={this.state.txnhistory}
+                                updateHistory={this.refresh_history}
                             />
                         </div>
                     );
@@ -4734,7 +4781,7 @@ class WalletHome extends React.Component {
         };
 
         return (
-            <div className="" >
+            <div className="">
                 <Image className="entry-scene" src={require("./../../img/loading-scene.svg")}/>
                 <Image className="plant3" src={require("./../../img/plant2.svg")}/>
                 <MainHeader
