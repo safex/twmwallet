@@ -35,7 +35,7 @@ export default class MerchantOffers extends React.Component {
         let my_table = await this.props.loadOrders(listing.offerID, listing.seller, 'http://stageapi.theworldmarketplace.com:17700');
         console.log(my_table);
         this.setState({selected_offer: listing, selected_offer_orders: my_table});
-    }
+    };
 
     select_the_order = async (e, order) => {
         e.preventDefault();
@@ -47,7 +47,35 @@ export default class MerchantOffers extends React.Component {
             order.order_id);
         console.log(show_messages);
         this.setState({selected_order: order, selected_messages: show_messages});
-    }
+    };
+
+    local_merchant_reply = async (e) => {
+        e.preventDefault();
+        try {
+            await this.props.merchantReply(e,
+                this.state.selected_offer.seller,
+                this.state.selected_offer.offerID,
+                this.state.selected_order.order_id,
+                e.target.message_box.value,
+                'http://stageapi.theworldmarketplace.com:17700');
+            try {
+                let show_messages = await this.props.loadMessages(
+                    this.state.selected_offer.offerID,
+                    this.state.selected_offer.seller,
+                    'http://stageapi.theworldmarketplace.com:17700',
+                    this.state.selected_order.order_id);
+                console.log(show_messages);
+                this.setState({selected_messages: show_messages});
+            } catch(err) {
+                console.error(err);
+            }
+        } catch(err) {
+            console.error(err);
+            console.error(`error at sending the message`);
+            alert(`error at sending the message`);
+            alert(err);
+        }
+    };
 
     //top level if not selected offer, then show
     //also top level if not selected order, then show
@@ -261,14 +289,9 @@ export default class MerchantOffers extends React.Component {
                             inner_view
                         }
                         <Row className="staking-table-header no-gutters">
-                            <form onSubmit={(e) => this.props.merchantReply(
-                                e,
-                                this.state.selected_offer.seller,
-                                this.state.selected_offer.offerID,
-                                this.state.selected_order.order_id,
-                                'http://stageapi.theworldmarketplace.com:17700',
-                            )}>
-                                <textarea style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', fontSize: '1.5rem' }} rows="6" cols="50" name="merchantMessageBox"></textarea>
+                            <form onSubmit={(e) => this.local_merchant_reply(e)}>
+
+                                <textarea style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', fontSize: '1.5rem' }} rows="6" cols="50" name="message_box"></textarea>
 
                                 <button className="my-3 search-button" type="submit">Send</button>
                             </form>

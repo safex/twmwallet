@@ -2064,13 +2064,8 @@ class WalletHome extends React.Component {
         return messages;
     }
 
-    seller_reply_message = async (e, seller_name, offer_id, order_id, twm_api_url) => {
+    seller_reply_message = async (e, seller_name, offer_id, order_id, message, twm_api_url) => {
         e.preventDefault();
-        console.log(seller_name)
-        console.log(offer_id)
-        console.log(order_id)
-        console.log(twm_api_url)
-        console.log(e.target.merchantMessageBox.value)
         try {
             //let's get the order we want to reply to
             let twm_file = this.state.twm_file;
@@ -2098,7 +2093,7 @@ class WalletHome extends React.Component {
                             let pre_sign_message_obj = {};
                             pre_sign_message_obj.s = ''; //subject
                             pre_sign_message_obj.o = offer_id; //offer_id
-                            pre_sign_message_obj.m = e.target.merchantMessageBox.value; //open_message contents
+                            pre_sign_message_obj.m = message; //open_message contents
                             pre_sign_message_obj.n = ''; //nft address
                             pre_sign_message_obj.so = ''; //shipping object
 
