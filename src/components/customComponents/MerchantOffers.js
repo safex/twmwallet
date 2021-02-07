@@ -102,13 +102,6 @@ export default class MerchantOffers extends React.Component {
                                 {listing.offerID.slice(0, 8)}
                             </p>
                             <p>
-                                <button onClick={() => this.state.getOrders(
-                                    listing.offerID,
-                                    listing.seller,
-                                    'http://stageapi.theworldmarketplace.com:17700'
-                                )} className="edit-button">
-                                    Load
-                                </button>
                                 <button
                                     onClick={this.state.handleEditOfferForm}
                                     className="edit-button">
