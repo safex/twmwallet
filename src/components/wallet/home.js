@@ -1157,7 +1157,7 @@ class WalletHome extends React.Component {
         } catch (err) {
             console.error(err);
             console.error(`error at checking if user is registered`);
-            alert(`this user ${username} is not registered with the TWM API`);
+            alert(`this user ${username} is not yet approved with the TWM API`);
             this.setState({selected_user: {username: username, index: index}, user_registered: false});
         }
     };
