@@ -468,8 +468,13 @@ class WalletHome extends React.Component {
                         console.log(this.state.create_account_txn_id);
                         console.log(this.state.create_account_txn_fee);
                         console.log(`before the crash`);
-                        let commit_create = await this.commit_create_account_async(create_acc);
-                        console.log(commit_create);
+                        try {
+                            let commit_create = await this.commit_create_account_async(create_acc);
+                            console.log(commit_create);
+                        } catch (err) {
+                            console.error(err);
+                            alert(`there was an error committing the account creation`);
+                        }
                     } else {
                         let removed = wallet.removeSafexAccount(this_account.username);
                         console.log(`account ${this_account.username} was cancelled so removed and not made`);
