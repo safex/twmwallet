@@ -17,7 +17,7 @@ export default function SendSafex(props) {
        
             <form className={`send-safex-box ${props.style}`} id={props.id} onSubmit={props.send}>
 
-                <div className>
+                <div>
 
                     { props.title }
 
