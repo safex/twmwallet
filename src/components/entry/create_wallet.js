@@ -33,8 +33,7 @@ export default class CreateWallet extends React.Component {
       wallet: null,
       wallet_made: false,
       loading: false,
-      freshStart: true,
-      pageNumber: "",
+      pageNumber: 1,
     };
     this.wallet_meta = null;
   }
@@ -356,7 +355,7 @@ export default class CreateWallet extends React.Component {
                 </a>
               </Row>
 
-              {this.state.wallet_made ? (
+              {this.state.wallet_made && (
                 <Container fluid className="height100 justify-content-between">
                   <WalletHome
                     wallet={this.state.wallet}
@@ -366,29 +365,6 @@ export default class CreateWallet extends React.Component {
                     wallet_path={this.state.new_path}
                   />
                 </Container>
-              ) : (
-                <div
-                  className={
-                    this.state.freshStart === false
-                      ? "display-none"
-                      : " entry-container"
-                  }
-                >
-                  <Col className="justify-content-around d-flex flex-column">
-                    <p>
-                      This path creates a new set of keys and a Safex Wallet
-                    </p>
-
-                    <button
-                      onClick={() =>
-                        this.setState({ freshStart: false, pageNumber: 1 })
-                      }
-                      className="mx-auto custom-button-entry orange-border"
-                    >
-                      Next
-                    </button>
-                  </Col>
-                </div>
               )}
 
               {this.state.pageNumber === 1 ? (
