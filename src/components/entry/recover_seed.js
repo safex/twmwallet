@@ -169,9 +169,18 @@ export default class RecoverSeed extends React.Component {
     });
   };
 
-  backToSelect = (e) => {
-    e.preventDefault();
+  backToSelect = () => {
     this.props.history.push({ pathname: "/select_entry" });
+  };
+
+  goBack = (e) => {
+    e.preventDefault();
+    if (this.state.pageNumber > 0) {
+      console.log(this.state.pageNumber);
+      return this.setState({ pageNumber: this.state.pageNumber - 1 });
+    }
+
+    this.backToSelect();
   };
 
   exit_home = (e) => {
@@ -237,8 +246,8 @@ export default class RecoverSeed extends React.Component {
 
               <Row className="entry-progress-row">
                 <Col
-                  onClick={this.backToSelect}
-                  className="d-flex align-items-center entry-back-text"
+                  onClick={this.goBack}
+                  className="d-flex align-items-center entry-back-text pointer"
                   md={2}
                 >
                   <IconContext.Provider
@@ -362,7 +371,7 @@ export default class RecoverSeed extends React.Component {
                 </div>
               )}
 
-              {this.state.seed_set === false && this.state.pageNumber === 0 ? (
+              {this.state.pageNumber === 0 ? (
                 <div className="entry-container">
                   <p>Enter your Seed Phrase</p>
 

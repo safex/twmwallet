@@ -238,9 +238,17 @@ export default class OpenWallet extends React.Component {
     }
   };
 
-  backToSelect = (e) => {
-    e.preventDefault();
+  backToSelect = () => {
     this.props.history.push({ pathname: "/select_entry" });
+  };
+
+  goBack = (e) => {
+    e.preventDefault();
+    if (this.state.pageNumber > 1) {
+        return this.setState({pageNumber: this.state.pageNumber - 1});
+    } 
+
+    this.backToSelect();
   };
 
   exit_home = (e) => {
@@ -304,7 +312,7 @@ export default class OpenWallet extends React.Component {
 
               <Row className="entry-progress-row">
                 <Col
-                  onClick={this.backToSelect}
+                  onClick={this.goBack}
                   className="d-flex align-items-center entry-back-text pointer"
                   md={2}
                 >

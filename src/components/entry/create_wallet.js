@@ -187,40 +187,17 @@ export default class CreateWallet extends React.Component {
     }
   };
 
-  set_to_testnet = (e) => {
-    e.preventDefault();
-    const target = e.target;
-    if (target.checked === true) {
-      this.setState({
-        testnet: true,
-        network: "testnet",
-      });
-    } else {
-      this.setState({
-        testnet: false,
-        network: "mainnet",
-      });
-    }
-  };
-
-  show_password = (e) => {
-    e.preventDefault();
-    alert(this.state.password);
+  backToSelect = () => {
+    this.props.history.push({ pathname: "/select_entry" });
   };
 
   goBack = (e) => {
     e.preventDefault();
-    this.props.history.goBack();
-  };
+    if (this.state.pageNumber > 1) {
+        return this.setState({pageNumber: this.state.pageNumber - 1});
+    } 
 
-  backToSelect = (e) => {
-    e.preventDefault();
-    this.props.history.push({ pathname: "/select_entry" });
-  };
-
-  exit_home = (e) => {
-    e.preventDefault();
-    this.props.history.push({ pathname: "/" });
+    this.backToSelect();
   };
 
   get isLoading() {
@@ -288,7 +265,7 @@ export default class CreateWallet extends React.Component {
 
               <Row className="entry-progress-row">
                 <Col
-                  onClick={this.backToSelect}
+                  onClick={this.goBack}
                   className="d-flex align-items-center entry-back-text pointer"
                   md={2}
                 >
