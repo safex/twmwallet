@@ -235,18 +235,6 @@ class WalletHome extends React.Component {
             } else {
                 this.setState({connection_status: 'Unable to connect to the Safex Blockchain Network'});
             }
-            if (wallet.synchronized()) {
-                this.setState({synced: true});
-            } else {
-                const timer = setInterval(() => {
-                    if (wallet.synchronized()) {
-                        clearInterval(this.state.timer);
-                    } else {
-                        //this.check();
-                    }
-                }, 1000);
-                this.setState({timer: timer, synced: false});
-            }
             wallet.on('refreshed', () => {
                 this.refresh_action();
                 wallet.store(this.wallet_store_callback)
@@ -318,7 +306,6 @@ class WalletHome extends React.Component {
                 pending_cash: normalize_8decimals(
                     Math.abs(wallet.balance() - wallet.unlockedBalance())
                 ),
-                synced: wallet.synchronized() ? true : false,
                 wallet_height: wallet.blockchainHeight(),
                 blockchain_height: height,
                 cash: normalize_8decimals(wallet.unlockedBalance()),
@@ -355,14 +342,12 @@ class WalletHome extends React.Component {
         if (wallet.synchronized()) {
             console.log("wallet synchronized");
             this.setState({
-                synced: true,
                 cash: normalize_8decimals(wallet.unlockedBalance()),
                 blockchain_height: wallet.daemonBlockchainHeight(),
                 wallet_height: wallet.blockchainHeight()
             });
         } else {
             this.setState({
-                synced: false,
                 blockchain_height: wallet.daemonBlockchainHeight(),
                 wallet_height: wallet.blockchainHeight()
             });
@@ -374,7 +359,29 @@ class WalletHome extends React.Component {
             "This will halt the wallet operation while the rescan is in progress.");
         console.log(confirmed);
         if (confirmed) {
+            wallet.off();
             wallet.rescanBlockchainAsync();
+            const timer = setInterval(() => {
+                console.log(wallet.blockchainHeight());
+               if (wallet.blockchainHeight() === wallet.daemonBlockchainHeight()) {
+                    console.log(`looks like we're synced heights match`);
+                    clearInterval(this.state.timer);
+                    wallet.on('refreshed', () => {
+                        this.refresh_action();
+                        wallet.store(this.wallet_store_callback)
+                    });
+                    this.setState({
+                        timer: '', wallet_height: wallet.blockchainHeight(),
+                        blockchain_height: wallet.daemonBlockchainHeight()
+                    })
+                } else {
+                   this.setState({
+                       wallet_height: wallet.blockchainHeight(),
+                       blockchain_height: wallet.daemonBlockchainHeight()
+                   })
+               }
+            }, 1000);
+            this.setState({timer: timer});
         }
     };
 

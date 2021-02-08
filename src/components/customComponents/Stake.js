@@ -37,8 +37,10 @@ export default function Stake(props) {
                                     `The amount that you are staking has to be less than your token balance: ${props.tokenBalance}.
                                     `
                                 :
-                                    `The amount that you are unstaking has to be greater than the amount you have staked.
-                                    The transaction fee will be added on to the amount you are unstaking.`
+                                    `This section is for staking tokens to the network, 5% of each sale is awarded to the 
+                                    revenue pool. The amount of tokens you stake will redeem your proportion of the accrued pool.
+                                    Each 1000 blocks a new interval is formed, and you must have staked ahead of the interval to
+                                    count towards that pools accrual.`
                                 }
                             </span>
                         </ReactTooltip>
