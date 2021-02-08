@@ -363,7 +363,7 @@ class WalletHome extends React.Component {
             wallet.rescanBlockchainAsync();
             const timer = setInterval(() => {
                 console.log(wallet.blockchainHeight());
-               if (wallet.blockchainHeight() === wallet.daemonBlockchainHeight()) {
+                if (wallet.blockchainHeight() === wallet.daemonBlockchainHeight()) {
                     console.log(`looks like we're synced heights match`);
                     clearInterval(this.state.timer);
                     wallet.on('refreshed', () => {
@@ -375,11 +375,11 @@ class WalletHome extends React.Component {
                         blockchain_height: wallet.daemonBlockchainHeight()
                     })
                 } else {
-                   this.setState({
-                       wallet_height: wallet.blockchainHeight(),
-                       blockchain_height: wallet.daemonBlockchainHeight()
-                   })
-               }
+                    this.setState({
+                        wallet_height: wallet.blockchainHeight(),
+                        blockchain_height: wallet.daemonBlockchainHeight()
+                    })
+                }
             }, 1000);
             this.setState({timer: timer});
         }
@@ -1244,15 +1244,39 @@ class WalletHome extends React.Component {
     };
 
     change_shipping_switch = () => {
-        this.setState({shipping_switch: !this.state.shipping_switch});
+        if (!this.state.shipping_switch) {
+            this.setState({
+                nft_switch: false,
+                open_message_switch: false,
+                shipping_switch: true
+            });
+        } else {
+            this.setState({shipping_switch: false});
+        }
     };
 
     change_nft_switch = () => {
-        this.setState({nft_switch: !this.state.nft_switch});
+        if (!this.state.nft_switch) {
+            this.setState({
+                nft_switch: true,
+                open_message_switch: false,
+                shipping_switch: false
+            });
+        } else {
+            this.setState({nft_switch: false});
+        }
     };
 
     change_open_message_switch = () => {
-        this.setState({open_message_switch: !this.state.open_message_switch});
+        if (!this.state.open_message_switch) {
+            this.setState({
+                nft_switch: false,
+                open_message_switch: true,
+                shipping_switch: false
+            });
+        } else {
+            this.setState({open_message_switch: false});
+        }
     };
 
     list_offer_async = async (wallet, username, title, price, quantity, data, mixins) => {
