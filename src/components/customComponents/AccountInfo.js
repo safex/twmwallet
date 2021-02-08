@@ -17,8 +17,8 @@ import copy from "copy-to-clipboard";
 
 export default function AccountInfo(props) {
   return props.keyRequest === false ? (
-    <div className="account-info-box p-4">
-        <div className="account-info-box--header">
+    <div className="account-info-box p-4 mt-4">
+        <div className="d-flex align-items-center justify-content-between mb-2">
         <label for="safexAddress" class="form-label">
           SAFEX Cash and SAFEX Token address
         </label>

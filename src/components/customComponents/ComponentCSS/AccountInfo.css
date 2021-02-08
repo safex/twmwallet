@@ -1,25 +1,8 @@
 .account-info-box {
-    margin-top: 20px;
     height: 10vh;
     max-height: 400px;
-    padding: 5px;
-    /* margin-bottom: 2vh; */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-content: center;
-
     background-color: #fff;
     border-radius: 10px;
-
-    color: #767676;
-    box-shadow: var(--blue-box-shadow);
-}
-
-.account-info-box--header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 }
 
 .account-info-box h1 {
@@ -28,10 +11,6 @@
     font-style: normal;
     font-weight: 500;
     text-align: center;
-}
-
-.account-info-box .row {
-    justify-content: space-around;
 }
 
 .show-keys-password-box {
