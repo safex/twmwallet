@@ -164,7 +164,7 @@ form {
 }
 
 .entry-container {
-    border-radius: 50px;
+    border-radius: 10px;
     background: #fff;
     height: 50vh;
     width: 60vw;
@@ -205,7 +205,7 @@ form {
 
 .entry-tooltip-container {
     color: #767676!important;
-    border-radius: 50px!important;
+    border-radius: 10px!important;
     background: #fff!important;
     display: flex!important;
     flex-direction: column!important;
