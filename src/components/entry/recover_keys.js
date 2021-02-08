@@ -92,7 +92,7 @@ export default class RecoverKeys extends React.Component {
         if (error) {
 
         } else {
-            this.setState({wallet_made: true, wallet: wallet});
+            this.setState({wallet_made: true, wallet: wallet, loading: false});
         }
     };
 
@@ -169,7 +169,6 @@ export default class RecoverKeys extends React.Component {
         })
     };
 
-
     backToSelect = (e) => {
         e.preventDefault();
         this.props.history.push({pathname: '/select_entry'});
@@ -199,37 +198,6 @@ export default class RecoverKeys extends React.Component {
                 :
                 (
                 <Container fluid className="height100 d-flex flex-column justify-content-center align-items-center">
-                    {this.state.loading ? 
-                    (
-                        <div className="mx-auto h-100 welcome d-flex flex-column justify-content-center">
-                            {this.state.wallet_made ? 
-                            (<Container fluid className="height100 d-flex flex-column justify-content-center align-items-center">
-                                <Image className="entry-mini-logo" src={require("./../../img/safex-multi-small.svg")}/>
-                                <Image onClick={() => {alert('Closing Wallet... (TEST)')}} className="entry-off-button" src={require("./../../img/off.svg")}/>
-                                <Image className="entry-scene" src={require("./../../img/loading-scene.svg")}/>
-                                <Image className="plant3" src={require("./../../img/plant2.svg")}/>
-                                <p>Welcome to </p>
-                                <p>Safex </p>
-                                <p>World </p>
-                                <p>Marketplace</p>
-
-                                <button className="mx-auto custom-button-entry orange-border mt5" onClick={() => this.setState({loading: false})} >
-                                    Enter
-                                </button>
-                            </Container>
-                            )
-                            :
-                            (<Loader 
-                                className="justify-content-center align-content-center" 
-                                type="TailSpin"
-                                color="#13D3FD"
-                                height={200}
-                                width={200}
-                            />
-                            )}
-                        </div>
-                    ) 
-                    :
                     (
                         <Container className="h-100 d-flex flex-column justify-content-center align-items-center">
 
@@ -605,7 +573,6 @@ export default class RecoverKeys extends React.Component {
                             <p className="user-select-none">THE WORLD MARKETPLACE</p>
                         </Row>
                     </Container>)
-            }
         </Container>)}
 
         </Container>);
