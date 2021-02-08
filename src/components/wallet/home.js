@@ -325,7 +325,10 @@ class WalletHome extends React.Component {
                 pending_tokens: normalize_8decimals(wallet.tokenBalance() - wallet.unlockedTokenBalance()),
                 tokens: normalize_8decimals(wallet.unlockedTokenBalance()),
                 first_refresh: true,
-                usernames: accs
+                usernames: accs,
+                staked_tokens: wallet.stakedTokenBalance() / 10000000000,
+                unlocked_stake: wallet.unlockedStakedTokenBalance() / 10000000000,
+                pending_stake: (wallet.stakedTokenBalance() - wallet.unlockedStakedTokenBalance()) / 10000000000
             });
         } catch (err) {
             console.error(err);
@@ -4688,9 +4691,6 @@ class WalletHome extends React.Component {
                 }
 
                 case "tokens": {
-                    let staked_tokens = wallet.stakedTokenBalance() / 10000000000;
-                    let unlocked_tokens = wallet.unlockedStakedTokenBalance() / 10000000000;
-                    let pending_stake = (staked_tokens - unlocked_tokens);
                     let interval = [0, 0, 0, 0];
                     let interest = [0, 0, 0, 0];
 
@@ -4740,8 +4740,8 @@ class WalletHome extends React.Component {
                                         />
                                         <StakeInfo
                                             tokenBalance={this.state.tokens.toLocaleString()}
-                                            pendingStakeBalance={pending_stake.toLocaleString()}
-                                            stakedBalance={unlocked_tokens.toLocaleString()}
+                                            pendingStakeBalance={this.state.pending_stake.toLocaleString()}
+                                            stakedBalance={this.state.unlocked_stake.toLocaleString()}
                                             interest={this.state.blockchain_current_interest.cash_per_token / 10000000000}
                                             blockHeight={this.state.blockchain_height.toLocaleString()}
                                             nextInterval={100 - (this.state.blockchain_height % 100)}
