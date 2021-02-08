@@ -1,6 +1,8 @@
 import React from 'react';
 import {Col, Container, Row, Image, Alert, Collapse} from 'react-bootstrap'
 
+import {get_api_info} from '../../utils/twm_actions';
+
 const os = window.require('os');
 const fs = window.require('fs').promises;
 const libPath = window.require('path');
@@ -8,6 +10,7 @@ const crypto = window.require('crypto');
 var walley;
 const WALLET_FILENAME = 'safexwallet.dat';
 const DEFAULT_WALLET_PATH = libPath.resolve(os.homedir(), WALLET_FILENAME);
+
 
 
 async function read_legacy_wallet(wallet_path) {
@@ -35,21 +38,29 @@ export default class SelectEntry extends React.Component {
     async componentDidMount() {
         try {
             localStorage.clear();
-            let wallet = await read_legacy_wallet(DEFAULT_WALLET_PATH);
+            let legacy_wallet = await read_legacy_wallet(DEFAULT_WALLET_PATH);
 
             //if there is an error loading the file, perhaps it doesn't exist
-            if (wallet.e) {
+            if (legacy_wallet.e) {
                 console.log("legacy wallet was not found");
             } else {
-                this.setState({legacy_wallet: wallet, legacy_detected: true});
+                this.setState({legacy_wallet: legacy_wallet, legacy_detected: true});
             }
         } catch (err) {
             console.error(err);
             console.error("error at reading legacy wallet");
         }
+        try {
+            let api_info = await get_api_info();
+            if (api_info.update === true) {
+                alert(`there is a newer version of the wallet`);
+                alert(api_info.update_message);
+            }
+        } catch(err) {
+            console.error(err);
+            console.error(`error at getting the info about the api`);
+        }
     };
-
-
 
     back = (e) => {
         e.preventDefault();
