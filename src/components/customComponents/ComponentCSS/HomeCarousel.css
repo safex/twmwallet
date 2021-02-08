@@ -1,9 +1,9 @@
 .home-carousel {
     height: 50vh;
     max-height: 600px;
+    margin-top: 20px;
 }
 
 .home-carousel .carousel-inner {
     box-shadow: var(--blue-box-shadow);
-    border-radius: 50px!important;
 }

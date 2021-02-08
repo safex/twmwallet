@@ -1,7 +1,7 @@
 import React from 'react';
 import {Container, Row, Image} from 'react-bootstrap'
 
-
+const {app} = window.require("electron").remote;
 const os = window.require('os');
 const fs = window.require('fs').promises;
 const libPath = window.require('path');
@@ -60,7 +60,7 @@ export default class IntroScreen extends React.Component {
         return (
             <div className="width100 height100 d-flex flex-column text-center intro-background-image">
                 <Container fluid className="height100 flex-column d-flex justify-content-center">
-                    <Image onClick={() => {alert('Closing Wallet... (TEST)')}} className="entry-off-button" src={require("./../../img/off_black.svg")}/>
+                    <Image onClick={() => app.quit()} className="entry-off-button pointer" src={require("./../../img/off_black.svg")}/>
 
                     <Row className="row justify-content-md justify-content-center p-3 intro-safex-logo">
                         <Image className="w-50 intro-safex-logo " src={require("./../../img/safex-home-multi.svg")}/>

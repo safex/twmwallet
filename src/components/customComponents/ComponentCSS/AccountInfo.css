@@ -1,38 +1,8 @@
 .account-info-box {
     height: 10vh;
     max-height: 400px;
-    padding: 5px;
-    margin-bottom: 2vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-content: center;
-
     background-color: #fff;
-    border-radius: 50px;
-
-    color: #767676;
-    box-shadow: var(--blue-box-shadow);
-}
-
-.account-info-box button {
-    height: 4rem;
-    width: 180px;
-
     border-radius: 10px;
-    border: 3px solid #13D3FD;
-    background-color: white;
-
-    font-family: 'Inter';
-    font-size: 1rem;
-    font-style: normal;
-    font-weight: 500;
-    text-align: center;
-}
-
-.account-info-box button:hover {
-    background: linear-gradient(90deg, #13D3FD 0%, #26B3F8 54.79%, #3698F3 100%);
-    color: #fff;
 }
 
 .account-info-box h1 {
@@ -41,10 +11,6 @@
     font-style: normal;
     font-weight: 500;
     text-align: center;
-}
-
-.account-info-box .row {
-    justify-content: space-around;
 }
 
 .show-keys-password-box {
@@ -87,7 +53,7 @@
 
     background-color: white;
     box-shadow: var(--blue-box-shadow);
-    border-radius: 50px;
+    border-radius: 10px;
     text-align: center;
     color: #767667;
     font-family: 'Inter';

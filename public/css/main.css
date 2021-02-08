@@ -127,8 +127,8 @@
     :root {
         --safex-cash-green: rgb(38, 232, 185);
         --light-blue-gradient: linear-gradient(90deg, #13D3FD 0%, #13D3FD 100%);
-        --blue-box-shadow: 0px 0px 44px -14px rgba(19,211,253,1);
-        --green-box-shadow: 0px 0px 44px -14px rgba(84,233,183,1);
+        --blue-box-shadow: 0px 0px 17px -8px rgba(19,211,253,1);
+        --green-box-shadow: 0px 0px 17px -8px rgba(84,233,183,1);
     }
 
 
