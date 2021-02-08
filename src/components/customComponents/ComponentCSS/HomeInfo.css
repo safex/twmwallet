@@ -4,39 +4,6 @@
     overflow: auto;
 }
 
-.home-info-box h4 {
-    font-family: 'Inter';
-    font-style: normal;
-    text-align: center;
-    color: #13D3FD;
-}
-
-.home-info-box p {
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-    font-family: 'Inter';
-    line-height: initial;
-    font-style: normal;
-    text-align: center;
-    color: #13D3FD;
-}
-
-.home-info-box h1 {
-    font-family: 'Inter';
-    font-style: normal;
-    text-align: center;
-    color: #767676;
-}
-
-.home-info-box h4 {
-    font-family: 'Inter';
-    font-style: normal;
-    text-align: center;
-    color: #13D3FD;
-    white-space: nowrap;
-}
-
 .infinity {
     animation: loading 2s infinite;
   }
