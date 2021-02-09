@@ -3220,13 +3220,13 @@ class WalletHome extends React.Component {
                             listing.price = listing.price / 10000000000;
                             try {
                                 return (
-                                    <tr>
-                                        <td>{listing.title}</td>
-                                        <td>{listing.price}</td>
-                                        <td>{listing.quantity}</td>
-                                        <td>{listing.seller}</td>
-                                        <td>{listing.offerID}</td>
-                                    </tr>
+                                    <div className="products-table-row d-flex">
+                                        <div style={{width: '200px'}}>{listing.title}</div>
+                                        <div style={{width: '150px'}}>{listing.price}</div>
+                                        <div style={{width: '150px'}}>{listing.quantity}</div>
+                                        <div style={{width: '100px'}}>{listing.seller}</div>
+                                        <div style={{width: '100px'}}>{listing.offerID}</div>
+                                    </div>
                                 )
                             } catch (err) {
                                 console.error(`failed to properly parse the user data formatting`);
@@ -3285,27 +3285,27 @@ class WalletHome extends React.Component {
                                 }
                                 try {
                                     return (
-                                        <tr key={key}>
-                                            <td data-tip data-for={`offerTitle${key}`}>
+                                        <div className="products-table-row d-flex" key={key}>
+                                            <div style={{width: '200px'}} data-tip data-for={`offerTitle${key}`}>
                                                 {listing.title}
-                                            </td>
+                                            </div>
 
-                                            <td>{listing.price}</td>
+                                            <div style={{width: '150px'}}>{listing.price}</div>
 
-                                            <td>{listing.quantity}</td>
+                                            <div style={{width: '150px'}}>{listing.quantity}</div>
 
-                                            <td>{listing.seller}</td>
+                                            <div style={{width: '100px'}}>{listing.seller}</div>
 
-                                            <td data-tip data-for={`offerID${key}`}>
+                                            <div style={{width: '100px'}} data-tip data-for={`offerID${key}`}>
                                                 {this.to_ellipsis(listing.offer_id, 5, 5)}
 
 
-                                            </td> 
+                                            </div> 
                                             <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
                                               <span>{listing.offer_id}</span>
                                             </ReactTooltip>
 
-                                            <td style={{width: '24rem'}}>
+                                            <div style={{width: '100px'}}>
 
                                                 {listing.quantity <= 0 ?
                                                     (<button disabled>
@@ -3316,8 +3316,8 @@ class WalletHome extends React.Component {
                                                         BUY
                                                     </button>)
                                                 }
-                                            </td>
-                                        </tr>
+                                            </div>
+                                        </div>
                                     )
                                 } catch (err) {
                                     console.error(`failed to properly parse the user data formatting`);
@@ -3348,25 +3348,25 @@ class WalletHome extends React.Component {
 
                                 try {
                                     return (
-                                        <tr key={key}>
-                                            <td data-tip data-for={`offerTitle${key}`}>
+                                        <div className="products-table-row d-flex" key={key}>
+                                            <div className="p-2" style={{width: '200px'}} data-tip data-for={`offerTitle${key}`}>
                                                 {listing.title}
-                                            </td>
+                                            </div>
 
-                                            <td>{listing.price}</td>
+                                            <div style={{width: '150px'}}>{listing.price}</div>
 
-                                            <td>{listing.quantity}</td>
+                                            <div style={{width: '150px'}}>{listing.quantity}</div>
 
-                                            <td>{listing.username}</td>
+                                            <div style={{width: '100px'}}>{listing.username}</div>
 
-                                            <td data-tip data-for={`offerID${key}`}>
+                                            <div style={{width: '100px'}} data-tip data-for={`offerID${key}`}>
                                                 {this.to_ellipsis(listing.offer_id, 5, 5)}
                                                 <ReactTooltip id={`offerID${key}`} type='info' effect='solid'>
                                                 <span>{listing.offer_id}</span>
                                             </ReactTooltip>
-                                            </td>
+                                            </div>
 
-                                            <td>
+                                            <div style={{width: '100px'}}>
                                                 {listing.quantity <= 0 ?
                                                     (<button className="search-button" disabled>
                                                         SOLD OUT
@@ -3377,8 +3377,8 @@ class WalletHome extends React.Component {
                                                         BUY
                                                     </button>)
                                                 }
-                                            </td>
-                                        </tr>
+                                            </div>
+                                        </div>
                                     )
                                 } catch (err) {
                                     console.error(`failed to properly parse the user data formatting`);
@@ -3753,7 +3753,7 @@ class WalletHome extends React.Component {
 
                                 <div
                                     className="d-flex align-items-center py-3"
-                                    style={{width: '90%', margin: '0 auto', backgroundColor: 'white'}}
+                                    style={{width: '800px', marginLeft: '61px', backgroundColor: 'white'}}
                                 >
                                         <form
                                             className="flex-row"
@@ -3957,21 +3957,17 @@ class WalletHome extends React.Component {
                                 </Col>
 
                                 :
-                                <table style={{width: "90%", margin: '0 auto'}} className="table table-light market-products-table">
-                                    <thead>
-                                        <tr>
-                                        <th>Title</th>
-                                        <th>Price (SFX)</th>
-                                        <th>Quantity</th>
-                                        <th>Seller</th>
-                                        <th>Offer ID</th>
-                                        <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    {table_of_listings || <tr><td className="p-4 text-align-center" colSpan="6">Click "Show Products" to load products.</td></tr>}
-                                    </tbody>
-                                </table>
+                                <div style={{width: "800px", marginLeft: '61px'}} className="">
+                                    <div style={{height: '25px', backgroundColor: 'white'}} className="d-flex">
+                                        <label style={{width: '200px'}}>Title</label>
+                                        <label style={{width: '150px'}}>Price (SFX)</label>
+                                        <label style={{width: '150px'}}>Quantity</label>
+                                        <label style={{width: '100px'}}>Seller</label>
+                                        <label style={{width: '100px'}}>Offer ID</label>
+                                        <label style={{width: '100px'}}>Actions</label>
+                                    </div>
+                                    {table_of_listings || <div className="products-table-row p-4 text-align-center">Click "Show Products" to load products.</div>}
+                                </div>
                             }
                         </div>
                     );

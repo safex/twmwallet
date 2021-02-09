@@ -197,6 +197,15 @@
 
 /* Custom Components End */
 
+.products-table-row {
+    height: 50px;
+    align-items: center;
+    background-color: white;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #80808026;
+}
+
 .tx-row:nth-of-type(even){
     background: lightblue;
   }
