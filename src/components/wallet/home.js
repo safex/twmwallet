@@ -75,6 +75,7 @@ import {
 } from "../../utils/twm_actions";
 
 import zlib from 'zlib';
+import { AiOutlineInfoCircle } from 'react-icons/ai';
 
 const cryptoRandomString = require('crypto-random-string');
 
@@ -3219,13 +3220,13 @@ class WalletHome extends React.Component {
                             listing.price = listing.price / 10000000000;
                             try {
                                 return (
-                                    <Row className="staking-table-row" key={key}>
-                                        <p>{listing.title}</p>
-                                        <p>{listing.price}</p>
-                                        <p>{listing.quantity}</p>
-                                        <p>{listing.seller}</p>
-                                        <p>{listing.offerID}</p>
-                                    </Row>
+                                    <tr>
+                                        <td>{listing.title}</td>
+                                        <td>{listing.price}</td>
+                                        <td>{listing.quantity}</td>
+                                        <td>{listing.seller}</td>
+                                        <td>{listing.offerID}</td>
+                                    </tr>
                                 )
                             } catch (err) {
                                 console.error(`failed to properly parse the user data formatting`);
@@ -3284,26 +3285,27 @@ class WalletHome extends React.Component {
                                 }
                                 try {
                                     return (
-                                        <Row className="staking-table-row" key={key}>
-                                            <p data-tip data-for={`offerTitle${key}`}>
+                                        <tr key={key}>
+                                            <td data-tip data-for={`offerTitle${key}`}>
                                                 {listing.title}
-                                            </p>
+                                            </td>
 
-                                            <p>{listing.price}</p>
+                                            <td>{listing.price}</td>
 
-                                            <p>{listing.quantity}</p>
+                                            <td>{listing.quantity}</td>
 
-                                            <p>{listing.seller}</p>
+                                            <td>{listing.seller}</td>
 
-                                            <p data-tip data-for={`offerID${key}`}>
+                                            <td data-tip data-for={`offerID${key}`}>
                                                 {this.to_ellipsis(listing.offer_id, 5, 5)}
 
 
-                                            </p> <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
-                                            <span>{listing.offer_id}</span>
-                                        </ReactTooltip>
+                                            </td> 
+                                            <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
+                                              <span>{listing.offer_id}</span>
+                                            </ReactTooltip>
 
-                                            <p style={{width: '24rem'}}>
+                                            <td style={{width: '24rem'}}>
 
                                                 {listing.quantity <= 0 ?
                                                     (<button disabled>
@@ -3314,8 +3316,8 @@ class WalletHome extends React.Component {
                                                         BUY
                                                     </button>)
                                                 }
-                                            </p>
-                                        </Row>
+                                            </td>
+                                        </tr>
                                     )
                                 } catch (err) {
                                     console.error(`failed to properly parse the user data formatting`);
@@ -3346,26 +3348,25 @@ class WalletHome extends React.Component {
 
                                 try {
                                     return (
-                                        <Row className="staking-table-row" key={key}>
-                                            <p data-tip data-for={`offerTitle${key}`}>
+                                        <tr key={key}>
+                                            <td data-tip data-for={`offerTitle${key}`}>
                                                 {listing.title}
-                                            </p>
+                                            </td>
 
-                                            <p>{listing.price}</p>
+                                            <td>{listing.price}</td>
 
-                                            <p>{listing.quantity}</p>
+                                            <td>{listing.quantity}</td>
 
-                                            <p>{listing.username}</p>
+                                            <td>{listing.username}</td>
 
-                                            <p data-tip data-for={`offerID${key}`}>
+                                            <td data-tip data-for={`offerID${key}`}>
                                                 {this.to_ellipsis(listing.offer_id, 5, 5)}
-                                            </p>
-
-                                            <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
+                                                <ReactTooltip id={`offerID${key}`} type='info' effect='solid'>
                                                 <span>{listing.offer_id}</span>
                                             </ReactTooltip>
+                                            </td>
 
-                                            <p style={{width: '24rem'}}>
+                                            <td>
                                                 {listing.quantity <= 0 ?
                                                     (<button className="search-button" disabled>
                                                         SOLD OUT
@@ -3376,8 +3377,8 @@ class WalletHome extends React.Component {
                                                         BUY
                                                     </button>)
                                                 }
-                                            </p>
-                                        </Row>
+                                            </td>
+                                        </tr>
                                     )
                                 } catch (err) {
                                     console.error(`failed to properly parse the user data formatting`);
@@ -3750,39 +3751,31 @@ class WalletHome extends React.Component {
                                 />
                             </Col>
 
-                            <Col
-                                sm={12}
-                                className={this.state.showBuyerOrders ?
-                                    "display-none"
-                                    :
-                                    ""
-                                }
-                            >
                                 <div
-                                    className="search-box d-flex flex-column align-items-center"
+                                    className="d-flex align-items-center py-3"
+                                    style={{width: '90%', margin: '0 auto', backgroundColor: 'white'}}
                                 >
-
-                                    <div className="row width100 border-bottom border-white" id="search">
                                         <form
-                                            className="w-100 no-gutters p-2 align-items-baseline d-flex justify-content-center"
+                                            className="flex-row"
                                             id="search-form" action=""
                                             method=""
                                         >
-                                            <div className="col-sm-6">
-                                                <input className="w-100" type="text"
+                                                <input
+                                                style={{height: '30px', width: '300px', paddingLeft: '10px'}}
+                                                type="text"
                                                        onChange={this.handle_change_api_fetch_url}
                                                        value="http://stageapi.theworldmarketplace.com:17700"/>
-                                            </div>
-
-                                            <div className="col-sm-4 justify-content-around d-flex">
-                                                <button onClick={this.load_offers_from_api} className="search-button">
+                                            
+                                                <button
+                                                style={{padding: '1rem', lineHeight: 0}} 
+                                                onClick={this.load_offers_from_api} className="search-button ml-3">
                                                     Show Products
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={this.handleBuyerOrders}
-                                                    style={{padding: '1rem', lineHeight: 0,}}
-                                                    className="search-button"
+                                                    style={{padding: '1rem', lineHeight: 0}}
+                                                    className="search-button ml-3"
                                                 >
                                                     {this.state.showBuyerOrders ? 'Close' : 'My Orders'}
                                                 </button>
@@ -3791,29 +3784,12 @@ class WalletHome extends React.Component {
                                                         Load From Blockchain
                                                     </button>*/}
 
-                                                <IconContext.Provider value={{color: '#13d3fd', size: '20px'}}>
-
-                                                    <FaInfoCircle data-tip data-for='apiInfo'
-                                                                  className=""/>
-
-                                                    <ReactTooltip id='apiInfo' type='light' effect='solid'>
+                                                    <AiOutlineInfoCircle className="ml-2" size={20} data-tip data-for='apiInfo' />
+                                                    <ReactTooltip id='apiInfo' type='info' effect='solid'>
                                                         <span>This is info about setting a market API. Lorem Ipsum.</span>
                                                     </ReactTooltip>
-                                                </IconContext.Provider>
-                                            </div>
                                         </form>
                                     </div>
-
-                                    <Row className="staking-table-row">
-                                        <p>Title</p>
-                                        <p>Price (SFX)</p>
-                                        <p>Quantity</p>
-                                        <p>Seller</p>
-                                        <p>Offer ID</p>
-                                        <p style={{width: '24rem'}}>Actions</p>
-                                    </Row>
-                                </div>
-                            </Col>
 
                             {this.state.showBuyerOrders ?
                                 <Col className="market-table overflow-y" md={12}>
@@ -3981,9 +3957,21 @@ class WalletHome extends React.Component {
                                 </Col>
 
                                 :
-                                <Col className="market-table overflow-y" md={12}>
-                                    {table_of_listings}
-                                </Col>
+                                <table style={{width: "90%", margin: '0 auto'}} className="table table-light market-products-table">
+                                    <thead>
+                                        <tr>
+                                        <th>Title</th>
+                                        <th>Price (SFX)</th>
+                                        <th>Quantity</th>
+                                        <th>Seller</th>
+                                        <th>Offer ID</th>
+                                        <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {table_of_listings || <tr><td className="p-4 text-align-center" colSpan="6">Click "Show Products" to load products.</td></tr>}
+                                    </tbody>
+                                </table>
                             }
                         </div>
                     );
