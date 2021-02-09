@@ -3170,7 +3170,7 @@ class WalletHome extends React.Component {
                     return (
                         <div className="home-main-div">
                             <Col sm={4}
-                                 className="no-padding d-flex flex-column align-items-center justify-content-between">
+                                 className="no-padding d-flex flex-column align-items-center">
                                 <HomeInfo
                                     blockHeight={this.state.blockchain_height}
                                     connection={this.state.connection_status}
@@ -3184,7 +3184,6 @@ class WalletHome extends React.Component {
 
                                 <SendSafex
                                     title="SEND SAFEX"
-                                    style="cash"
                                     send={this.cash_send}
                                     id="send_cash"
                                 />

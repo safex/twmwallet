@@ -61,11 +61,6 @@
     background: white;
 }
 
-
-.stake-token-box select, input {
-    border: 3px solid #3698F3;
-}
-
 h5 + select {
     width: 100%;
 }
