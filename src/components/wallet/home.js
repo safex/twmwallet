@@ -703,7 +703,7 @@ class WalletHome extends React.Component {
 
     handleChange = (event) => {
         if (event.target.name === 'main_image') {
-            this.setState({new_offer_image: event.target.value});
+            this.setState({[event.target.name]: event.target.value});
         } else {
             this.setState({[event.target.name]: event.target.value});
         }
@@ -1188,8 +1188,17 @@ class WalletHome extends React.Component {
         if (vees.description.value.length > 0) {
             o_obj.description = vees.description.value;
         }
-        if (vees.new_account_image.value.length > 0) {
-            o_obj.main_image = vees.new_account_image.value;
+        if (vees.main_image.value.length > 0) {
+            o_obj.main_image = vees.main_image.value;
+        }
+        if (vees.image_2.value.length > 0) {
+            o_obj.image_2 = vees.image_2.value;
+        }
+        if (vees.image_3.value.length > 0) {
+            o_obj.image_3 = vees.image_3.value;
+        }
+        if (vees.image_4.value.length > 0) {
+            o_obj.image_4 = vees.image_4.value;
         }
         if (vees.sku.value.length > 0) {
             o_obj.sku = vees.sku.value;
@@ -3107,6 +3116,14 @@ class WalletHome extends React.Component {
         });
     };
 
+    handleShowOffers = () => {
+        if (this.state.merchantTabs === 'offers') {
+            this.setState({merchantTabs: 'accounts'});
+        } else {
+            this.setState({merchantTabs: 'offers'});
+        }
+    }
+
     handleShowMessages = (messageObject) => {
         this.setState({showMessages: true, showMyOrders: true, currentMessage: messageObject})
     };
@@ -3317,6 +3334,9 @@ class WalletHome extends React.Component {
                                 var data = {};
                                 data.description = listing.description;
                                 data.main_image = listing.main_image;
+                                data.image_2 = listing.image_2;
+                                data.image_3 = listing.image_3;
+                                data.image_4 = listing.image_4;
                                 data.sku = '';
                                 data.barcode = '';
                                 data.weight = '';
@@ -3404,6 +3424,15 @@ class WalletHome extends React.Component {
                                     <div className="d-flex flex-column justify-content-around p-3">
                                         <Image className="border border-dark"
                                                src={this.state.show_purchase_offer_data.main_image}></Image>
+
+                                        <Image className="border border-dark"
+                                               src={this.state.show_purchase_offer_data.image_2}></Image>
+
+                                        <Image className="border border-dark"
+                                               src={this.state.show_purchase_offer_data.image_3}></Image>
+
+                                        <Image className="border border-dark"
+                                               src={this.state.show_purchase_offer_data.image_4}></Image>
 
                                         <div className="p-5 d-flex flex-column justify-content-center"></div>
                                         <hr className="border border-dark w-100"></hr>
@@ -4061,7 +4090,7 @@ class WalletHome extends React.Component {
                                         newOfferImage={this.state.newOfferImage}
 
                                         offersImage={this.state.offersImage}
-                                        showOffers={() => this.setState({merchantTabs: 'offers'})}
+                                        showOffers={this.handleShowOffers}
                                     />
                                 </Col>
 
@@ -4168,8 +4197,31 @@ class WalletHome extends React.Component {
                                                         <Form.Label>Image URL</Form.Label>
 
                                                         <Form.Control
-                                                            name="new_account_image"
-                                                            defaultValue={data.main_image}
+                                                            name="main_image"
+                                                            onChange={this.handleChange}
+                                                        />
+                                                    </Form.Group>
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Image 2</Form.Label>
+
+                                                        <Form.Control
+                                                            name="image_2"
+                                                            onChange={this.handleChange}
+                                                        />
+                                                    </Form.Group>
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Image 3</Form.Label>
+
+                                                        <Form.Control
+                                                            name="image_3"
+                                                            onChange={this.handleChange}
+                                                        />
+                                                    </Form.Group>
+                                                    <Form.Group as={Col}>
+                                                        <Form.Label>Image 4</Form.Label>
+
+                                                        <Form.Control
+                                                            name="image_4"
                                                             onChange={this.handleChange}
                                                         />
                                                     </Form.Group>
@@ -4179,7 +4231,7 @@ class WalletHome extends React.Component {
                                                         className="border border-white grey-back"
                                                         width={150}
                                                         height={150}
-                                                        src={this.state.new_account_image}
+                                                        src={this.state.main_offer_image}
                                                         roundedCircle
                                                     />
                                                 </Col>
