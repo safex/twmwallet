@@ -3394,14 +3394,12 @@ class WalletHome extends React.Component {
                                         </div>
                                         </div>
                                         {this.state.show_purchase_offer_data.nft ?
-                                            (<Form.Group as={Row}>
-                                                <Form.Label column sm={4}>
+                                            (<div className="d-flex flex-column mt-2">
+                                                <label>
                                                     NFT Ethereum Address
-                                                </Form.Label>
-                                                <Col sm={8}>
+                                                </label>
                                                     <Form.Control name="eth_address" rows="3"/>
-                                                </Col>
-                                            </Form.Group>)
+                                            </div>)
                                             :
                                             ''
                                         }
