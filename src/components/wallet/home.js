@@ -2047,7 +2047,6 @@ class WalletHome extends React.Component {
                         );
                     } else if (t_msg.message.m.length > 0) {
                         console.log(`this is a direct message open ended`);
-                        console.error('message: ', t_msg)
                         messages.push(
                             <div className="d-flex align-items-center mt-3" key={msg}>
                                 <span style={{color: '#0000004d'}}>
@@ -3233,12 +3232,11 @@ class WalletHome extends React.Component {
                                 if (listing.shipping == true) { offer_type = 'shipped';}
                                 else if (listing.nft == true) { offer_type = 'nft';}
                                 else if (listing.open_message == true) { offer_type = 'open';}
-
                                 try {
                                     return (
                                         <div className="products-table-row d-flex" key={key}>
                                             {/*add thumbnail image here 128x128?*/}
-
+                                            <div style={{width: '128px'}}>{listing.main_image && <img width="128px" height="128px" src={listing.main_image} />}</div>
                                             <div className="p-2" style={{width: '200px'}} data-tip data-for={`offerTitle${key}`}>
                                                 {listing.title}
                                             </div>
@@ -3644,7 +3642,7 @@ class WalletHome extends React.Component {
 
                                 <div
                                     className="d-flex align-items-center py-3"
-                                    style={{width: '800px', marginLeft: '61px', backgroundColor: 'white'}}
+                                    style={{width: '1028px', marginLeft: '61px', backgroundColor: 'white'}}
                                 >
                                         <form
                                             className="flex-row"
@@ -3678,8 +3676,8 @@ class WalletHome extends React.Component {
                                     </div>
 
                             {this.state.showBuyerOrders ?
-                                <div style={{width: '800px', marginLeft: '61px'}}>
-                                    <div style={{height: '25px', backgroundColor: 'white'}} className="d-flex">
+                                <div style={{width: '1028px', marginLeft: '61px'}}>
+                                    <div style={{height: '25px', backgroundColor: 'white', borderBottom: '3px solid #d3d3d369'}} className="d-flex">
                                         <label style={{width: '200px'}}>Title</label>
                                         <label style={{width: '100px'}}>Price (SFX)</label>
                                         <label style={{width: '100px'}}>Quantity</label>
@@ -3771,8 +3769,9 @@ class WalletHome extends React.Component {
                                 </div>
 
                                 :
-                                <div style={{width: "800px", marginLeft: '61px'}} className="">
-                                    <div style={{height: '25px', backgroundColor: 'white'}} className="d-flex">
+                                <div style={{width: "1028px", marginLeft: '61px'}} className="">
+                                    <div style={{height: '25px', backgroundColor: 'white', borderBottom: '3px solid #d3d3d369'}} className="d-flex">
+                                        <label style={{width: '128px'}}>Image</label>
                                         <label style={{width: '200px'}}>Title</label>
                                         <label style={{width: '100px'}}>Type</label>
                                         <label style={{width: '150px'}}>Price (SFX)</label>
@@ -3781,7 +3780,10 @@ class WalletHome extends React.Component {
                                         <label style={{width: '100px'}}>Offer ID</label>
                                         <label style={{width: '100px'}}>Actions</label>
                                     </div>
+                                    <div style={{width: '100%', maxHeight: '550px', overflow: 'overlay'}}>
                                     {table_of_listings || <div className="products-table-row p-4 text-align-center">Click "Show Products" to load products.</div>}
+                                    </div>
+                                    
                                 </div>
                             }
                         </div>
