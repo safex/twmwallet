@@ -34,7 +34,7 @@ import {
 // Icon Imports
 import {FaInfoCircle, FaCopy} from 'react-icons/fa'
 import {IconContext} from 'react-icons'
-import {CgCopy} from 'react-icons/cg'
+import {CgCopy, CgClose} from 'react-icons/cg'
 
 import copy from "copy-to-clipboard"
 import ReactTooltip from "react-tooltip";
@@ -3301,19 +3301,24 @@ class WalletHome extends React.Component {
                                     content: {
                                         position: 'absolute',
                                         top: '40px',
-                                        left: '40px',
-                                        right: '40px',
-                                        bottom: '40px',
-                                        overflow: 'auto',
+                                        left: '30%',
                                     }
                                 }}>
-                                <h1>PURCHASE {this.state.show_purchase_offer.title}</h1>
+                                <div className="modal-title">
+                                    BUY 
+                                    <CgClose
+                                        className="pointer"
+                                        style={{position: 'absolute', right: '15px', color: 'red'}} 
+                                        size={20} 
+                                        onClick={this.handleClosePurchaseForm} /></div>
 
                                 <Form id="purchase_item"
                                       onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
 
                                     <div className="d-flex flex-column justify-content-around p-3">
-                                        <Image className="border border-dark"
+                                        <Image
+                                        width="100%" 
+                                            className="border border-dark"
                                                src={this.state.show_purchase_offer_data.main_image}></Image>
 
                                         <Image className="border border-dark"
@@ -3327,46 +3332,67 @@ class WalletHome extends React.Component {
 
                                         <div className="p-5 d-flex flex-column justify-content-center"></div>
                                         <hr className="border border-dark w-100"></hr>
-                                        <h2>Price: {this.state.show_purchase_offer.price} SFX</h2>
-                                        <h2>Seller: {this.state.show_purchase_offer.seller}</h2>
-                                        <h2 data-tip data-for='offerID'>
-                                            Offer
-                                            ID: {this.to_ellipsis(this.state.show_purchase_offer.offer_id, 10, 10)}
-                                            <ReactTooltip id='offerID' type='light' effect='solid'>
-                                                {this.state.show_purchase_offer.offer_id}
-                                            </ReactTooltip>
-                                            <FaCopy
-                                                className="ml-4"
-                                                data-tip data-for='copyIDInfo'
-                                                onClick={() => copy(this.state.show_purchase_offer.offer_id)}
-                                            />
 
-                                            <ReactTooltip id='copyIDInfo' type='info'
-                                                          effect='solid'>
-                                                                        <span>
-                                                                            Copy Offer ID
-                                                                        </span>
-                                            </ReactTooltip>
-                                        </h2>
-
-                                        <div className="h-25 oflow-y-auto">
-                                            <p>{this.state.show_purchase_offer_data.description}</p>
+                                        <div className="d-flex">
+                                            <label>Title:</label>
+                                            <span className="ml-2">{this.state.show_purchase_offer.title}</span>
                                         </div>
 
-                                        <Form.Group as={Row}>
-                                            <Form.Label column sm={3}>
-                                                {this.state.show_purchase_offer.quantity} available
-                                            </Form.Label>
-                                            <Col sm={9}>
-                                                <Form.Control
-                                                    className="light-blue-back"
-                                                    id="quantity"
-                                                    name="quantity"
-                                                    max={this.state.show_purchase_offer.quantity}
-                                                />
-                                            </Col>
-                                        </Form.Group>
+                                        <div className="d-flex">
+                                            <label>Seller:</label>
+                                            <span className="ml-2">{this.state.show_purchase_offer.seller}</span>
+                                        </div>
 
+                                        <div className="d-flex align-items-center">
+                                            <label className="mb-0">Offer ID:</label>
+                                            <span className="ml-2">{this.state.show_purchase_offer.offer_id}</span>
+                                            <FaCopy
+                                                className="ml-4 pointer"
+                                                data-tip data-for='copyIDInfo'
+                                                onClick={() => {
+                                                    copy(this.state.show_purchase_offer.offer_id);
+                                                    alert("Copied offer ID to clipboard");
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div className="d-flex flex-column mt-2">
+                                            <label>Description:</label>
+                                            <span>{this.state.show_purchase_offer.descprition}</span>
+                                        </div>
+
+                                        <div className="d-flex flex-column">
+                                            <label>Quantity:</label>
+                                            <div className="d-flex align-items-center">
+                                            <Form.Control
+                                            style={{width: "60px"}}
+                                            className="light-blue-back"
+                                            id="quantity"
+                                            name="quantity"
+                                            type="number"
+                                            onChange={e => this.setState({quantity_input: e.target.value})}
+                                            max={this.state.show_purchase_offer.quantity} />
+                                            <span className="ml-2"> / {this.state.show_purchase_offer.quantity} available</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="d-flex mt-3">
+                                        <div className="d-flex align-items-center">
+                                            <label className="mb-0">Price:</label>
+                                            <div className="d-flex align-items-center">
+                                            <span className="ml-2">{this.state.show_purchase_offer.price} SFX</span>
+                                            <img className="ml-2" width="20px" className="ml-2" src={sfxLogo} />
+                                            </div>
+                                        </div>
+
+                                        <div className="d-flex align-items-center ml-3">
+                                            <label className="mb-0">Total:</label>
+                                            <div className="d-flex align-items-center">
+                                            <span className="ml-2">{this.state.show_purchase_offer.price * (this.state.quantity_input || 0)} SFX</span>
+                                            <img className="ml-2" width="20px" className="ml-2" src={sfxLogo} />
+                                            </div>
+                                        </div>
+                                        </div>
                                         {this.state.show_purchase_offer_data.nft ?
                                             (<Form.Group as={Row}>
                                                 <Form.Label column sm={4}>
@@ -3380,106 +3406,69 @@ class WalletHome extends React.Component {
                                             ''
                                         }
 
-                                        {this.state.show_purchase_offer_data.shipping ?
-                                            <div>
-                                                <Form.Group name="names" as={Row}>
-
-                                                    <Form.Label column sm={4}>
-                                                        First Name
-                                                    </Form.Label>
-                                                    <Col sm={6}>
-                                                        <Form.Control name="first_name" rows="3"/>
-                                                    </Col>
-
-                                                    <Form.Label column sm={4}>
-                                                        Last Name
-                                                    </Form.Label>
-                                                    <Col sm={6}>
-                                                        <Form.Control name="last_name" rows="3"/>
-                                                    </Col>
-                                                </Form.Group>
-
-                                                <Form.Group name="streets" as={Row}>
-                                                    <Form.Label column sm={4}>
-                                                        Address Line 1
-                                                    </Form.Label>
-                                                    <Col sm={6}>
-                                                        <Form.Control name="address1" rows="3"/>
-                                                    </Col>
-                                                    <Form.Label column sm={4}>
-                                                        Address Line 2
-                                                    </Form.Label>
-                                                    <Col sm={6}>
-                                                        <Form.Control name="address2" rows="3"/>
-                                                    </Col>
-                                                </Form.Group>
-
-                                                <Form.Group name="place" as={Row}>
-                                                    <Form.Label column sm={4}>
-                                                        City
-                                                    </Form.Label>
-                                                    <Col sm={6}>
-                                                        <Form.Control name="city" rows="3"/>
-                                                    </Col>
-                                                    <Form.Label column sm={4}>
-                                                        State/County
-                                                    </Form.Label>
-                                                    <Col sm={6}>
-                                                        <Form.Control name="state" rows="3"/>
-                                                    </Col>
-                                                </Form.Group>
-
-                                                <Form.Group name="countrycodes" as={Row}>
-                                                    <Form.Label column sm={4}>
-                                                        Zip/Area Code
-                                                    </Form.Label>
-                                                    <Col sm={6}>
-                                                        <Form.Control name="zipcode" rows="3"/>
-                                                    </Col>
-                                                    <Form.Label column sm={4}>
-                                                        Country
-                                                    </Form.Label>
-                                                    <Col sm={6}>
-                                                        <Form.Control name="country" rows="3"/>
-                                                    </Col>
-                                                </Form.Group>
-
-                                                <Form.Group as={Row}>
-                                                    <Form.Label column sm={4}>
-                                                        Email
-                                                    </Form.Label>
-                                                    <Col sm={6}>
-                                                        <Form.Control type="email" name="email_address" rows="3"/>
-                                                    </Col>
-                                                    <Form.Label column sm={4}>
-                                                        Phone
-                                                    </Form.Label>
-                                                    <Col sm={6}>
-                                                        <Form.Control name="phone_number" rows="3"/>
-                                                    </Col>
-                                                </Form.Group>
-                                            </div>
-                                            :
-                                            ''
-                                        }
-
-                                        {this.state.show_purchase_offer_data.open_message ?
-                                            <Form.Group as={Row}>
-                                                <Form.Label column sm={4}>
-                                                    NFT Ethereum Address
-                                                </Form.Label>
-                                                <Col sm={8}>
-                                                    <Form.Control name="message" rows="3"/>
-                                                </Col>
-                                            </Form.Group>
-                                            :
-                                            ''
-                                        }
+                                        {this.state.show_purchase_offer_data.shipping &&
+                                        <>
+                                        <div className="d-flex flex-column mt-3">
+                                        <label>First Name:</label>
+                                        <Form.Control name="first_name" />
                                     </div>
 
-                                    <Form.Group as={Row} className="w-50">
-                                        <Form.Label column sm={3}>
-                                            Mixins
+                                    <div className="d-flex flex-column mt-3">
+                                        <label>Last Name:</label>
+                                        <Form.Control name="last_name" />
+                                    </div>
+
+                                    <div className="d-flex flex-column mt-3">
+                                        <label>Address Line 1:</label>
+                                        <Form.Control name="address1" />
+                                    </div>
+
+                                    <div className="d-flex flex-column mt-3">
+                                        <label>Address Line 2:</label>
+                                        <Form.Control name="address2" />
+                                    </div>
+
+                                    <div className="d-flex flex-column mt-3">
+                                        <label>City:</label>
+                                        <Form.Control name="city" />
+                                    </div>
+
+                                    <div className="d-flex flex-column mt-3">
+                                        <label>State/Country:</label>
+                                        <Form.Control name="state" />
+                                    </div>
+
+                                    <div className="d-flex flex-column mt-3">
+                                        <label>Zip/Area code:</label>
+                                        <Form.Control name="zipcode" />
+                                    </div>
+
+                                    <div className="d-flex flex-column mt-3">
+                                        <label>Country:</label>
+                                        <Form.Control name="country" />
+                                    </div>
+
+                                    <div className="d-flex flex-column mt-3">
+                                        <label>Email:</label>
+                                        <Form.Control type="email" name="email_address" />
+                                    </div>
+
+                                    <div className="d-flex flex-column mt-3">
+                                        <label>Phone:</label>
+                                        <Form.Control name="phone_number" />
+                                    </div>
+                                    </>
+                                        }
+                                        {this.state.show_purchase_offer_data.open_message &&
+                                        <div className="d-flex flex-column mt-3">
+                                        <label>NFT Ethereum Address:</label>
+                                        <Form.Control name="message" />
+                                    </div>
+                                        }
+
+                                        <div className="d-flex align-items-center mt-3">
+                                        <label className="d-flex align-items-center">
+                                            Mixins:
                                             <IconContext.Provider value={{color: 'black', size: '20px'}}>
                                                 <FaInfoCircle data-tip data-for='apiInfo'
                                                               className="blockchain-icon mx-4"/>
@@ -3492,9 +3481,10 @@ class WalletHome extends React.Component {
                                                                 </span>
                                                 </ReactTooltip>
                                             </IconContext.Provider>
-                                        </Form.Label>
-                                        <Col sm={9}>
+                                        </label>
                                             <Form.Control
+                                                className="ml-2"
+                                                style={{width: "50px"}}
                                                 name="mixins"
                                                 as="select"
                                                 defaultValue="7"
@@ -3507,8 +3497,8 @@ class WalletHome extends React.Component {
                                                 <option>6</option>
                                                 <option>7</option>
                                             </Form.Control>
-                                        </Col>
-                                    </Form.Group>
+                                    </div>
+                                    </div>
 
                                     {this.state.showLoader ?
                                         <Loader
@@ -3524,10 +3514,6 @@ class WalletHome extends React.Component {
                                         </button>
                                     }
                                 </Form>
-
-                                <Button className="close-button" onClick={this.handleClosePurchaseForm}>
-                                    Close
-                                </Button>
                             </ReactModal>
 
                             <ReactModal
