@@ -33,7 +33,7 @@ import {
 // Icon Imports
 import {FaInfoCircle, FaCopy} from 'react-icons/fa'
 import {IconContext} from 'react-icons'
-import {CgCloseR} from 'react-icons/cg'
+import {CgCopy} from 'react-icons/cg'
 
 import copy from "copy-to-clipboard"
 import ReactTooltip from "react-tooltip";
@@ -3235,7 +3235,6 @@ class WalletHome extends React.Component {
                                 try {
                                     return (
                                         <div className="products-table-row d-flex" key={key}>
-                                            {/*add thumbnail image here 128x128?*/}
                                             <div style={{width: '128px'}}>{listing.main_image && <img width="128px" height="128px" src={listing.main_image} />}</div>
                                             <div className="p-2" style={{width: '200px'}} data-tip data-for={`offerTitle${key}`}>
                                                 {listing.title}
@@ -3248,8 +3247,9 @@ class WalletHome extends React.Component {
 
                                             <div style={{width: '100px'}}>{listing.username}</div>
 
-                                            <div style={{width: '100px'}} data-tip data-for={`offerID${key}`}>
+                                            <div className="d-flex align-items-center" style={{width: '100px'}} data-tip data-for={`offerID${key}`}>
                                                 {this.to_ellipsis(listing.offer_id, 5, 5)}
+                                                    <CgCopy className="ml-1" onClick={() => {copy(listing.offer_id); alert('Offer ID has been copied to clipboard')}} size={15} />
                                                 <ReactTooltip id={`offerID${key}`} type='info' effect='solid'>
                                                 <span>{listing.offer_id}</span>
                                             </ReactTooltip>
