@@ -36,7 +36,7 @@ export default function HomeInfo(props) {
           {props.firstRefresh === true
             ? props.tokenBalance.toLocaleString() + " SFT"
             : "∞"}
-            <img className="ml-2" src={sftLogo} width={18} alt="Safex Cash" />
+            <img src={sftLogo} width={30} alt="Safex Cash" />
           <br />
           {props.pendingTokens > 0
             ? `(${props.pendingTokens.toLocaleString()} SFT Pending)`
