@@ -3264,7 +3264,7 @@ class WalletHome extends React.Component {
                                                         SOLD OUT
                                                     </button>)
                                                     :
-                                                    (<button className="search-button"
+                                                    (<button style={{fontSize: '1.5rem'}} className="search-button"
                                                              onClick={() => this.handleShowPurchaseForm(listing, data)}>
                                                         BUY
                                                     </button>)
