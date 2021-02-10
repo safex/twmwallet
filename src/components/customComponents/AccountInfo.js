@@ -40,7 +40,7 @@ export default function AccountInfo(props) {
           type="button"
           data-tip="Copy address"
           id="button-addon2"
-          onClick={() => copy(props.address)}
+          onClick={() => {copy(props.address); alert('Wallet address has been copied to clipboard')}}
         >
          <CgCopy size={20} />
         </button>

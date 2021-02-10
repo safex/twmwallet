@@ -198,7 +198,7 @@
 /* Custom Components End */
 
 .products-table-row {
-    height: 50px;
+    min-height: 50px;
     align-items: center;
     background-color: white;
     margin-top: 5px;

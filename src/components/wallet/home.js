@@ -7,6 +7,7 @@ import {withRouter} from 'react-router-dom';
 import Settings from './Settings';
 
 import {normalize_8decimals} from '../../utils/wallet_creation';
+import sfxLogo from "../../img/sfx.svg";
 
 import {
     send_cash,
@@ -33,7 +34,7 @@ import {
 // Icon Imports
 import {FaInfoCircle, FaCopy} from 'react-icons/fa'
 import {IconContext} from 'react-icons'
-import {CgCloseR} from 'react-icons/cg'
+import {CgCopy} from 'react-icons/cg'
 
 import copy from "copy-to-clipboard"
 import ReactTooltip from "react-tooltip";
@@ -2047,7 +2048,6 @@ class WalletHome extends React.Component {
                         );
                     } else if (t_msg.message.m.length > 0) {
                         console.log(`this is a direct message open ended`);
-                        console.error('message: ', t_msg)
                         messages.push(
                             <div className="d-flex align-items-center mt-3" key={msg}>
                                 <span style={{color: '#0000004d'}}>
@@ -3233,25 +3233,25 @@ class WalletHome extends React.Component {
                                 if (listing.shipping == true) { offer_type = 'shipped';}
                                 else if (listing.nft == true) { offer_type = 'nft';}
                                 else if (listing.open_message == true) { offer_type = 'open';}
-
                                 try {
                                     return (
                                         <div className="products-table-row d-flex" key={key}>
-                                            {/*add thumbnail image here 128x128?*/}
-
+                                            <div style={{width: '128px'}}>{listing.main_image && <img width="128px" height="128px" src={listing.main_image} />}</div>
                                             <div className="p-2" style={{width: '200px'}} data-tip data-for={`offerTitle${key}`}>
                                                 {listing.title}
                                             </div>
                                             <div style={{width: '100px'}}>{offer_type}</div>
 
-                                            <div style={{width: '150px'}}>{listing.price}</div>
+                                            <div className="d-flex align-items-center" style={{width: '150px'}}>
+                                                {listing.price} <img width="20px" className="ml-2" src={sfxLogo} /></div>
 
                                             <div style={{width: '150px'}}>{listing.quantity}</div>
 
                                             <div style={{width: '100px'}}>{listing.username}</div>
 
-                                            <div style={{width: '100px'}} data-tip data-for={`offerID${key}`}>
+                                            <div className="d-flex align-items-center" style={{width: '100px'}} data-tip data-for={`offerID${key}`}>
                                                 {this.to_ellipsis(listing.offer_id, 5, 5)}
+                                                    <CgCopy className="ml-1" onClick={() => {copy(listing.offer_id); alert('Offer ID has been copied to clipboard')}} size={15} />
                                                 <ReactTooltip id={`offerID${key}`} type='info' effect='solid'>
                                                 <span>{listing.offer_id}</span>
                                             </ReactTooltip>
@@ -3644,7 +3644,7 @@ class WalletHome extends React.Component {
 
                                 <div
                                     className="d-flex align-items-center py-3"
-                                    style={{width: '800px', marginLeft: '61px', backgroundColor: 'white'}}
+                                    style={{width: '1028px', marginLeft: '61px', backgroundColor: 'white'}}
                                 >
                                         <form
                                             className="flex-row"
@@ -3678,8 +3678,8 @@ class WalletHome extends React.Component {
                                     </div>
 
                             {this.state.showBuyerOrders ?
-                                <div style={{width: '800px', marginLeft: '61px'}}>
-                                    <div style={{height: '25px', backgroundColor: 'white'}} className="d-flex">
+                                <div style={{width: '1028px', marginLeft: '61px'}}>
+                                    <div style={{height: '25px', backgroundColor: 'white', borderBottom: '3px solid #d3d3d369'}} className="d-flex">
                                         <label style={{width: '200px'}}>Title</label>
                                         <label style={{width: '100px'}}>Price (SFX)</label>
                                         <label style={{width: '100px'}}>Quantity</label>
@@ -3690,7 +3690,7 @@ class WalletHome extends React.Component {
                                     {this.buyer_get_orders().map(order => 
                                     <div key={order.order_id} className="products-table-row d-flex">
                                         <div className="p-2" style={{width: '200px'}}>{order.title}</div>
-                                        <div style={{width: '100px'}}>{order.price}</div>
+                                        <div className="d-flex align-items-center" style={{width: '100px'}}>{order.price} <img width="20px" className="ml-2" src={sfxLogo} /></div>
                                         <div style={{width: '100px'}}>{order.quantity}</div>
                                         <div style={{width: '120px'}}>
                                         {this.to_ellipsis(order.order_id, 5, 5)}
@@ -3698,8 +3698,9 @@ class WalletHome extends React.Component {
                                                 <span>{order.order_id}</span>
                                             </ReactTooltip>
                                         </div>
-                                        <div style={{width: '120px'}}>
+                                        <div className="d-flex align-items-center" style={{width: '120px'}}>
                                         {this.to_ellipsis(order.offer_id, 5, 5)}
+                                        <CgCopy className="ml-1" onClick={() => {copy(order.offer_id); alert('Offer ID has been copied to clipboard')}} size={15} />
                                                 <ReactTooltip id={`${order.offer_id}`} type='info' effect='solid'>
                                                 <span>{order.offer_id}</span>
                                             </ReactTooltip>
@@ -3771,8 +3772,9 @@ class WalletHome extends React.Component {
                                 </div>
 
                                 :
-                                <div style={{width: "800px", marginLeft: '61px'}} className="">
-                                    <div style={{height: '25px', backgroundColor: 'white'}} className="d-flex">
+                                <div style={{width: "1028px", marginLeft: '61px'}} className="">
+                                    <div style={{height: '25px', backgroundColor: 'white', borderBottom: '3px solid #d3d3d369'}} className="d-flex">
+                                        <label style={{width: '128px'}}>Image</label>
                                         <label style={{width: '200px'}}>Title</label>
                                         <label style={{width: '100px'}}>Type</label>
                                         <label style={{width: '150px'}}>Price (SFX)</label>
@@ -3781,7 +3783,10 @@ class WalletHome extends React.Component {
                                         <label style={{width: '100px'}}>Offer ID</label>
                                         <label style={{width: '100px'}}>Actions</label>
                                     </div>
+                                    <div style={{width: '100%', maxHeight: '550px', overflow: 'overlay'}}>
                                     {table_of_listings || <div className="products-table-row p-4 text-align-center">Click "Show Products" to load products.</div>}
+                                    </div>
+                                    
                                 </div>
                             }
                         </div>
