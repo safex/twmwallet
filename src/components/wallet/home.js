@@ -1022,12 +1022,12 @@ class WalletHome extends React.Component {
         }
     };
 
-    handleBuyerMessages = () => {
+    handleBuyerMessages = (offerId, orderId) => {
         const showBuyerMessages = !this.state.showBuyerMessages;
-        this.setState({showBuyerMessages});
+        this.setState({showBuyerMessages, buyerSelectOffer: offerId, buyerSelectOrder: orderId});
         if (showBuyerMessages) {
             // Automatically load messages when opening modal
-            this.load_buyers_messages_for_selected_order();
+            this.load_buyers_messages_for_selected_order(offerId, orderId);
         }
     }
 
@@ -1976,11 +1976,11 @@ class WalletHome extends React.Component {
      * @return {string[]}
      */
     buyer_get_offer_ids = () => {
-        const {buyerSelectUrl, twm_file: twm} = this.state;
-        if (!buyerSelectUrl || !twm || !twm.api || !twm.api.urls) {
+        const {api_url, twm_file: twm} = this.state;
+        if (!api_url || !twm || !twm.api || !twm.api.urls) {
             return [];
         }
-        const offersAtUrl = this.state.twm_file.api.urls[this.state.buyerSelectUrl];
+        const offersAtUrl = this.state.twm_file.api.urls[api_url];
         if (!offersAtUrl) {
             return [];
         }
@@ -1991,43 +1991,45 @@ class WalletHome extends React.Component {
      * @return {Array<BuyerPurchaseObj & { order_id }>}
      */
     buyer_get_orders = () => {
-        const {buyerSelectUrl, buyerSelectOffer, twm_file: twm} = this.state;
-        if (!buyerSelectUrl || !buyerSelectOffer || !twm || !twm.api || !twm.api.urls) {
+        const {api_url, twm_file: twm} = this.state;
+        if (!api_url || !twm || !twm.api || !twm.api.urls) {
             return [];
         }
-        const offersAtUrl = this.state.twm_file.api.urls[this.state.buyerSelectUrl];
-        if (!offersAtUrl) {
+        const offers = this.state.twm_file.api.urls[api_url];
+        if (!offers) {
             return [];
         }
-        const ordersAtOffers = offersAtUrl[buyerSelectOffer];
-        if (!ordersAtOffers) {
-            return [];
-        }
+
         const result = [];
-        for (const orderId in ordersAtOffers) {
-            result.push({
-                ...ordersAtOffers[orderId].purchase_obj,
-                order_id: orderId
-            });
+
+        for (const offerId in offers) {
+            const offerOrders = offers[offerId];
+            for (const orderId in offerOrders) {
+                const order = offerOrders[orderId];
+                result.push({
+                    ...order.purchase_obj,
+                    order_id: orderId
+                });
+            }
         }
         return result;
     };
 
     renderBuyerMessages() {
-        const {buyerSelectUrl, buyerSelectOffer, buyerSelectOrder, twm_file: t_f} = this.state;
-        if (!buyerSelectUrl || !buyerSelectOffer || !buyerSelectOrder || !t_f || !t_f.api || !t_f.api.urls) {
+        const {api_url, buyerSelectOffer, buyerSelectOrder, twm_file: t_f} = this.state;
+        if (!api_url || !buyerSelectOffer || !buyerSelectOrder || !t_f || !t_f.api || !t_f.api.urls) {
             return [];
         }
         const messages = [];
         try {
             /** @type {BuyerOrder} */
-            const core = t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder];
+            const core = t_f.api.urls[api_url][buyerSelectOffer][buyerSelectOrder];
             if (!core) {
                 console.error(`order ${buyerSelectOrder} not found`);
                 return;
             }
             for (const msg in core.messages) {
-                //console.log(t_f.api.urls[this.state.buyerSelectUrl][this.state.buyerSelectOffer][this.state.buyerSelectOrder].messages[msg]);
+                //console.log(t_f.api.urls[this.state.api_url][this.state.buyerSelectOffer][this.state.buyerSelectOrder].messages[msg]);
                 try {
                     let t_msg = core.messages[msg];
                     if (typeof t_msg.message == 'string') {
@@ -2289,9 +2291,9 @@ class WalletHome extends React.Component {
         return hexStr.toUpperCase();
     };
 
-    load_buyers_messages_for_selected_order = async () => {
-        const {buyerSelectUrl, buyerSelectOffer, buyerSelectOrder, twm_file: t_f} = this.state;
-        if (!buyerSelectUrl || !buyerSelectOffer || !buyerSelectOrder || !t_f || !t_f.api || !t_f.api.urls) {
+    load_buyers_messages_for_selected_order = async (offerId, orderId) => {
+        const {api_url, twm_file: t_f} = this.state;
+        if (!api_url || !offerId || !orderId || !t_f || !t_f.api || !t_f.api.urls) {
             return [];
         }
         try {
@@ -2302,7 +2304,7 @@ class WalletHome extends React.Component {
             console.log(date.toString());
 
             const crypto = window.require('crypto');
-            let our_key = crypto.createPrivateKey(t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder].pgp_keys.private_key)
+            let our_key = crypto.createPrivateKey(t_f.api.urls[api_url][offerId][orderId].pgp_keys.private_key)
             console.log(our_key);
             let date_msg = Buffer.from(date.toString());
             console.log(date_msg);
@@ -2326,11 +2328,11 @@ class WalletHome extends React.Component {
             console.log(`is verified :::  ${verified_sig}`);
             let req_payload = {};
             req_payload.signature = this.byteToHexString(signature);
-            req_payload.pgp_public_key = t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder].pgp_keys.public_key;
+            req_payload.pgp_public_key = t_f.api.urls[api_url][offerId][orderId].pgp_keys.public_key;
             req_payload.msg = date.toString();
-            req_payload.order_id = buyerSelectOrder;
+            req_payload.order_id = orderId;
             req_payload.msg_hex = msg_hex;
-            let req_msgs = await buyer_get_messages(req_payload, buyerSelectUrl);
+            let req_msgs = await buyer_get_messages(req_payload, api_url);
             console.log(req_msgs.to);
             console.log(req_msgs.from);
 
@@ -2356,11 +2358,11 @@ class WalletHome extends React.Component {
                             console.log(parsed);
                             if (msg.to === req_payload.pgp_public_key) {
                                 console.log(msg.message);
-                                if (t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder].messages.hasOwnProperty(msg.position)) {
+                                if (t_f.api.urls[api_url][offerId][orderId].messages.hasOwnProperty(msg.position)) {
                                     console.log(`duplicate message here for fetch buyer messages`)
                                 } else {
                                     // WARN! We are mutating the state here!
-                                    t_f.api.urls[buyerSelectUrl][buyerSelectOffer][buyerSelectOrder].messages[msg.position] = msg;
+                                    t_f.api.urls[api_url][offerId][orderId].messages[msg.position] = msg;
                                 }
                             }
                         } catch (err) {
@@ -3145,9 +3147,6 @@ class WalletHome extends React.Component {
         e.preventDefault();
         this.setState({
             showBuyerOrders: !this.state.showBuyerOrders,
-            buyerSelectOffer: '',
-            buyerSelectOrder: '',
-            buyerSelectUrl: ''
         })
     };
 
@@ -3670,7 +3669,7 @@ class WalletHome extends React.Component {
                                                     style={{padding: '1rem', lineHeight: 0}}
                                                     className="search-button ml-3"
                                                 >
-                                                    {this.state.showBuyerOrders ? 'Close' : 'My Orders'}
+                                                    {this.state.showBuyerOrders ? 'Close Orders' : 'My Orders'}
                                                 </button>
                                                     <AiOutlineInfoCircle className="ml-2" size={20} data-tip data-for='apiInfo' />
                                                     <ReactTooltip id='apiInfo' type='info' effect='solid'>
@@ -3680,106 +3679,44 @@ class WalletHome extends React.Component {
                                     </div>
 
                             {this.state.showBuyerOrders ?
-                                <Col className="market-table overflow-y" md={12}>
-                                    <div className="h-100">
-
-                                        <IconContext.Provider value={{color: '#FEB056', size: '20px'}}>
-                                            <CgCloseR
-                                                className="ml-5"
-                                                onClick={this.handleBuyerOrders}
-                                            />
-                                        </IconContext.Provider>
-
-                                        <Row className="p-5 justify-content-center">
-                                            <Col
-                                                sm={4}
-                                                style={{wordBreak: 'break-all', fontFamily: 'Inter'}}
-                                            >
-                                                <div>
-                                                    <h2>Selected URL:</h2>
-                                                    <h3>{this.state.buyerSelectUrl}</h3>
-                                                </div>
-
-                                                <div className="my-3">
-                                                    <h2>Selected Offer:</h2>
-                                                    <h3>{this.state.buyerSelectOffer}</h3>
-                                                </div>
-
-                                                <div>
-                                                    <h2>Selected Order:</h2>
-                                                    <h3>{this.state.buyerSelectOrder}</h3>
-                                                </div>
-                                            </Col>
-
-                                            <Col
-                                                sm={8}
-                                                className="pt-3 staking-table-table"
-                                                style={{maxHeight: '60vh'}}
-                                            >
-
-                                                <div>
-                                                    <h1>Select URL</h1>
-
-                                                    <select
-                                                        className="my-3"
-                                                        value={this.state.buyerSelectUrl}
-                                                        name="buyerSelectUrl"
-                                                        onChange={this.handleBuyerChange}
-                                                    >
-                                                        <option>Please Select</option>
-                                                        {this.state.buyer_urls.map((url, key) => {
-                                                            return (
-                                                                <option value={url} key={key}>{url}</option>
-                                                            )
-                                                        })}
-                                                    </select>
-                                                </div>
-
-                                                <div className="my-5">
-                                                    <h1>Select Offer</h1>
-
-                                                    <select
-                                                        className="my-3"
-                                                        value={this.state.buyerSelectOffer}
-                                                        name="buyerSelectOffer"
-                                                        onChange={this.handleBuyerChange}
-                                                    >
-                                                        <option>Please Select</option>
-                                                        {this.buyer_get_offer_ids().map(offerId => <option
-                                                            key={offerId}>{offerId}</option>)}
-                                                    </select>
-                                                </div>
-
-                                                <div>
-                                                    <h1>Select Order</h1>
-                                                    <select
-                                                        className="my-3"
-                                                        value={this.state.buyerSelectOrder}
-                                                        name="buyerSelectOrder"
-                                                        onChange={this.handleBuyerChange}
-                                                    >
-                                                        <option>Please Select</option>
-                                                        {this.buyer_get_orders().map(order => (
-                                                            <option key={order.order_id} value={order.order_id}>
-                                                                {order.quantity} {order.title} ({order.order_id.slice(0, 6)})
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                </div>
-
-                                                <button className="search-button mt-3" type="button"
-                                                        onClick={this.handleBuyerMessages}>Show Messages
-                                                </button>
-
-                                            </Col>
-                                        </Row>
+                                <div style={{width: '800px', marginLeft: '61px'}}>
+                                    <div style={{height: '25px', backgroundColor: 'white'}} className="d-flex">
+                                        <label style={{width: '200px'}}>Title</label>
+                                        <label style={{width: '100px'}}>Price (SFX)</label>
+                                        <label style={{width: '100px'}}>Quantity</label>
+                                        <label style={{width: '120px'}}>Order ID</label>
+                                        <label style={{width: '120px'}}>Offer ID</label>
+                                        <label style={{width: '160px'}}>Actions</label>
                                     </div>
+                                    {this.buyer_get_orders().map(order => 
+                                    <div key={order.order_id} className="products-table-row d-flex">
+                                        <div className="p-2" style={{width: '200px'}}>{order.title}</div>
+                                        <div style={{width: '100px'}}>{order.price}</div>
+                                        <div style={{width: '100px'}}>{order.quantity}</div>
+                                        <div style={{width: '120px'}}>
+                                        {this.to_ellipsis(order.order_id, 5, 5)}
+                                                <ReactTooltip type='info' effect='solid'>
+                                                <span>{order.order_id}</span>
+                                            </ReactTooltip>
+                                        </div>
+                                        <div style={{width: '120px'}}>
+                                        {this.to_ellipsis(order.offer_id, 5, 5)}
+                                                <ReactTooltip id={`${order.offer_id}`} type='info' effect='solid'>
+                                                <span>{order.offer_id}</span>
+                                            </ReactTooltip>
+                                        </div>
+                                        <div style={{width: '160px'}}>
+                                                <button style={{fontSize: '1.5rem'}} className="search-button" type="button"
+                                                        onClick={() => this.handleBuyerMessages(order.offer_id, order.order_id)}>Show Messages
+                                                </button>
+                                    </div>
+                                    </div>)}
 
                                     <ReactModal
                                         isOpen={this.state.showBuyerMessages}
                                         closeTimeoutMS={500}
                                         className="buyer-messages-modal"
-                                        onRequestClose={this.handleBuyerMessages}
+                                        onRequestClose={() => this.handleBuyerMessages()}
                                         style={{
                                             overlay: {
                                                 position: 'fixed',
@@ -3812,15 +3749,6 @@ class WalletHome extends React.Component {
                                                     Refresh Messages
                                                 </button>
                                             </Col>
-
-                                            <Col sm={2}>
-                                                <IconContext.Provider value={{color: '#FEB056', size: '30px'}}>
-                                                    <CgCloseR
-                                                        className="mx-auto"
-                                                        onClick={this.handleBuyerMessages}
-                                                    />
-                                                </IconContext.Provider>
-                                            </Col>
                                         </Row>
 
                                         <Row className="m-auto">
@@ -3842,7 +3770,7 @@ class WalletHome extends React.Component {
                                             </Col>
                                         </Row>
                                     </ReactModal>
-                                </Col>
+                                </div>
 
                                 :
                                 <div style={{width: "800px", marginLeft: '61px'}} className="">
