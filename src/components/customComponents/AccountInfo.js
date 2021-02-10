@@ -27,7 +27,7 @@ export default function AccountInfo(props) {
         
       <div class="input-group">
         <input
-          style={{height: "30px", textOverflow: "ellipsis"}}
+          style={{height: "30px", textOverflow: "ellipsis", zIndex: '0'}}
           id="safexAddress"
           readOnly={true}
           value={props.address}
