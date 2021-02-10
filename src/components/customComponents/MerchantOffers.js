@@ -84,24 +84,27 @@ export default class MerchantOffers extends React.Component {
         if (this.state.selected_offer === '') {
             the_view = (<Row className="w-100">
                 <h1>Offers</h1>
-                <Col className="pt-3 staking-table-table">
-                    <Row className="staking-table-header no-gutters">
-                        <p>Title</p>
-                        <p>Price</p>
-                        <p>Quantity</p>
-                        <p>Seller</p>
-                        <p>Offer ID</p>
-                        <p>Actions</p>
-                    </Row>
+                <table className="table">
+                    <thead>
+                        <tr>
+                        <th>Title</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Seller</th>
+                        <th>Offer ID</th>
+                        <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                     {this.state.user_offers.map((listing, key) => (
-                        <Row key={key} className="staking-table-row">
-                            <p style={{wordBreak: 'break-word'}}>{listing.title}</p>
-                            <p>{listing.price / 10000000000}</p>
-                            <p>{listing.quantity}</p>
-                            <p data-tip data-for='offerID'>
+                        <tr>
+                            <td>{listing.title}</td>
+                            <td>{listing.price / 10000000000}</td>
+                            <td>{listing.quantity}</td>
+                            <td data-tip data-for='offerID'>
                                 {listing.offerID.slice(0, 8)}
-                            </p>
-                            <p>
+                            </td>
+                            <td>
                                 <button
                                     onClick={this.state.handleEditOfferForm}
                                     className="edit-button">
@@ -112,10 +115,12 @@ export default class MerchantOffers extends React.Component {
                                     className="orders-button">
                                     Orders
                                 </button>
-                            </p>
-                        </Row>)
+                            </td>
+                        </tr>
+                        )
                     )}
-                </Col>
+                    </tbody>
+                </table>
             </Row>)
         } else if (this.state.selected_offer !== '') {
             if (this.state.selected_order === '') {
