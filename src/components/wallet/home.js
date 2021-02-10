@@ -3213,121 +3213,7 @@ class WalletHome extends React.Component {
                 }
                 case "market":
                     var table_of_listings;
-                    if (this.state.offer_loading_flag === 'all') {
-                        table_of_listings = this.state.non_offers.map((listing, key) => {
-                            console.log(key);
-                            listing.offer_id = listing.offerID;
-                            listing.price = listing.price / 10000000000;
-                            try {
-                                return (
-                                    <div className="products-table-row d-flex">
-                                        <div style={{width: '200px'}}>{listing.title}</div>
-                                        <div style={{width: '150px'}}>{listing.price}</div>
-                                        <div style={{width: '150px'}}>{listing.quantity}</div>
-                                        <div style={{width: '100px'}}>{listing.seller}</div>
-                                        <div style={{width: '100px'}}>{listing.offerID}</div>
-                                    </div>
-                                )
-                            } catch (err) {
-                                console.error(`failed to properly parse the user data formatting`);
-                                console.error(err);
-                            }
-                        });
-                    } else if (this.state.offer_loading_flag === 'blockchaintwmoffers') {
-                        table_of_listings = this.state.twm_offers.map((listing, key) => {
-                            try {
-                                var data = {};
-                                listing.offer_id = listing.offerID;
-                                data.description = listing.description;
-                                data.main_image = '';
-                                data.sku = '';
-                                data.barcode = '';
-                                data.weight = '';
-                                data.country = '';
-                                data.message_type = '';
-                                data.shipping = false;
-                                data.nft = false;
-                                data.open_message = false;
-
-                                try {
-                                    let parsed_data = JSON.parse(listing.description);
-                                    if (parsed_data.twm_version === 1) {
-                                        if (parsed_data.hasOwnProperty('main_image')) {
-                                            data.main_image = parsed_data.main_image;
-                                        }
-                                        if (parsed_data.hasOwnProperty('description')) {
-                                            data.description = parsed_data.description;
-                                        }
-                                        if (parsed_data.hasOwnProperty('sku')) {
-                                            data.sku = parsed_data.sku;
-                                        }
-                                        if (parsed_data.hasOwnProperty('barcode')) {
-                                            data.barcode = parsed_data.barcode;
-                                        }
-                                        if (parsed_data.hasOwnProperty('weight')) {
-                                            data.weight = parsed_data.weight;
-                                        }
-                                        if (parsed_data.hasOwnProperty('country')) {
-                                            data.country = parsed_data.country;
-                                        }
-                                        if (parsed_data.hasOwnProperty('shipping')) {
-                                            data.shipping = parsed_data.shipping;
-                                        }
-                                        if (parsed_data.hasOwnProperty('nft')) {
-                                            data.nft = parsed_data.nft;
-                                        }
-                                        if (parsed_data.hasOwnProperty('open_message')) {
-                                            data.open_message = parsed_data.open_message;
-                                        }
-                                    }
-                                } catch (err) {
-                                    console.error(err);
-                                }
-                                try {
-                                    return (
-                                        <div className="products-table-row d-flex" key={key}>
-                                            <div style={{width: '200px'}} data-tip data-for={`offerTitle${key}`}>
-                                                {listing.title}
-                                            </div>
-
-                                            <div style={{width: '150px'}}>{listing.price}</div>
-
-                                            <div style={{width: '150px'}}>{listing.quantity}</div>
-
-                                            <div style={{width: '100px'}}>{listing.seller}</div>
-
-                                            <div style={{width: '100px'}} data-tip data-for={`offerID${key}`}>
-                                                {this.to_ellipsis(listing.offer_id, 5, 5)}
-
-
-                                            </div> 
-                                            <ReactTooltip id={`offerID${key}`} type='light' effect='solid'>
-                                              <span>{listing.offer_id}</span>
-                                            </ReactTooltip>
-
-                                            <div style={{width: '100px'}}>
-
-                                                {listing.quantity <= 0 ?
-                                                    (<button disabled>
-                                                        SOLD OUT
-                                                    </button>)
-                                                    :
-                                                    (<button onClick={() => this.handleShowPurchaseForm(listing, data)}>
-                                                        BUY
-                                                    </button>)
-                                                }
-                                            </div>
-                                        </div>
-                                    )
-                                } catch (err) {
-                                    console.error(`failed to properly parse the user data formatting`);
-                                    console.error(err);
-                                }
-                            } catch (err) {
-                                console.error(err);
-                            }
-                        });
-                    } else if (this.state.offer_loading_flag === 'twmurl') {
+                    if (this.state.offer_loading_flag === 'twmurl') {
                         table_of_listings = this.state.twm_url_offers.map((listing, key) => {
                             listing.offerID = listing.offer_id;
 
@@ -3345,13 +3231,20 @@ class WalletHome extends React.Component {
                                 data.shipping = listing.shipping;
                                 data.nft = listing.nft;
                                 data.open_message = listing.open_message;
+                                let offer_type = 'none';
+                                if (listing.shipping == true) { offer_type = 'shipped';}
+                                else if (listing.nft == true) { offer_type = 'nft';}
+                                else if (listing.open_message == true) { offer_type = 'open';}
 
                                 try {
                                     return (
                                         <div className="products-table-row d-flex" key={key}>
+                                            {/*add thumbnail image here 128x128?*/}
+
                                             <div className="p-2" style={{width: '200px'}} data-tip data-for={`offerTitle${key}`}>
                                                 {listing.title}
                                             </div>
+                                            <div style={{width: '100px'}}>{offer_type}</div>
 
                                             <div style={{width: '150px'}}>{listing.price}</div>
 
@@ -3779,11 +3672,6 @@ class WalletHome extends React.Component {
                                                 >
                                                     {this.state.showBuyerOrders ? 'Close' : 'My Orders'}
                                                 </button>
-
-                                                {/* <button onClick={this.load_offers_from_blockchain} className="search-button">
-                                                        Load From Blockchain
-                                                    </button>*/}
-
                                                     <AiOutlineInfoCircle className="ml-2" size={20} data-tip data-for='apiInfo' />
                                                     <ReactTooltip id='apiInfo' type='info' effect='solid'>
                                                         <span>This is info about setting a market API. Lorem Ipsum.</span>
@@ -3960,6 +3848,7 @@ class WalletHome extends React.Component {
                                 <div style={{width: "800px", marginLeft: '61px'}} className="">
                                     <div style={{height: '25px', backgroundColor: 'white'}} className="d-flex">
                                         <label style={{width: '200px'}}>Title</label>
+                                        <label style={{width: '100px'}}>Type</label>
                                         <label style={{width: '150px'}}>Price (SFX)</label>
                                         <label style={{width: '150px'}}>Quantity</label>
                                         <label style={{width: '100px'}}>Seller</label>
