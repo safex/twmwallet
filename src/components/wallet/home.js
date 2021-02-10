@@ -2038,51 +2038,23 @@ class WalletHome extends React.Component {
                     if (t_msg.message.n.length > 0) {
                         console.log(`nft address supplied!`);
                         messages.push(
-                            <Row style={{justifyContent: 'space-around'}} key={msg}>
-                                <h1 style={{
-                                    border: '2px solid #13D3FD',
-                                    borderRadius: 10,
-                                    padding: '.5rem',
-                                    margin: '1rem'
-                                }}>
+                            <div className="d-flex align-items-center justify-content-between mt-3" key={msg}>
+                                <span>
                                     {t_msg.position}
-                                </h1>
-                                <h3>{t_msg.message.n}</h3>
-                            </Row>
+                                </span>
+                                <span>{t_msg.message.n}</span>
+                            </div>
                         );
                     } else if (t_msg.message.m.length > 0) {
                         console.log(`this is a direct message open ended`);
+                        console.error('message: ', t_msg)
                         messages.push(
-                            <Row className="my-3 w-75 text-break p-1"
-                                 style={t_msg.message.m === 'seller' ?
-                                     {
-                                         justifyContent: 'space-around',
-                                         alignItems: 'center',
-                                         backgroundColor: '#13D3FD',
-                                         color: 'white',
-                                         marginRight: 'auto',
-                                         borderRadius: 25,
-                                     }
-                                     :
-                                     {
-                                         justifyContent: 'space-around',
-                                         alignItems: 'center',
-                                         marginLeft: 'auto',
-                                         borderRadius: 25,
-                                         border: '2px solid #13D3FD'
-                                     }
-                                 }
-                                 key={msg}>
-                                <h1 style={t_msg.message.m === 'seller' ?
-                                    {border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', margin: '1rem'}
-                                    :
-                                    {border: '2px solid white', borderRadius: 10, padding: '.5rem', margin: '1rem'}
-                                }
-                                >
+                            <div className="d-flex align-items-center mt-3" key={msg}>
+                                <span style={{color: '#0000004d'}}>
                                     {t_msg.position}
-                                </h1>
-                                <h3 style={{maxWidth: '50vh'}}>{t_msg.message.m}</h3>
-                            </Row>
+                                </span>
+                                <span className={`message message--mine`}>{t_msg.message.m}</span>
+                            </div>
                         );
                     } else if (t_msg.message.hasOwnProperty('so')) {
                         let parsed_so;
@@ -2097,29 +2069,56 @@ class WalletHome extends React.Component {
                                 console.log(`parsed the so`);
                                 messages.push(
                                     <div key={msg}>
-                                        <Row style={{justifyContent: 'space-around'}}>
-                                            <h1 style={{
-                                                border: '2px solid #13D3FD',
-                                                borderRadius: 10,
-                                                padding: '.5rem',
-                                                margin: '1rem'
-                                            }}>
+                                        <div>
+                                            <span>
                                                 {t_msg.position}
-                                            </h1>
-                                            <Col>
-                                                <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/></h2>
-                                                <h2><i> <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/></h2>
-                                                <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
-                                                <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
-                                            </Col>
-                                            <Col>
-                                                <h2><i> <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/></h2>
-                                                <h2><i> <u>City:</u></i> <b></b>{parsed_so.city}<b/></h2>
-                                                <h2><i> <u>State:</u></i> <b></b>{parsed_so.s}<b/></h2>
-                                                <h2><i> <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/></h2>
-                                                <h2><i> <u>Country:</u></i> <b></b>{parsed_so.c}<b/></h2>
-                                            </Col>
-                                        </Row>
+                                            </span>
+                                            <div class="d-flex flex-column"
+                                            style={{
+                                                backgroundColor: '#d3d3d345',
+                                                padding: '10px',
+                                                borderRadius: '10px'}}>
+                                                <div class="d-flex">
+                                                <label>First name:</label>
+                                                <span className="ml-2">{parsed_so.fn}</span>
+                                                </div>
+                                                
+                                                <div class="d-flex">
+                                                <label>Last name:</label>
+                                                <span className="ml-2">{parsed_so.ln}</span>
+                                                </div>
+
+                                                <div class="d-flex">
+                                                <label>Email:</label>
+                                                <span className="ml-2">{parsed_so.ea}</span>
+                                                </div>
+
+                                                <div class="d-flex">
+                                                <label>Phone:</label>
+                                                <span className="ml-2">{parsed_so.ph}</span>
+                                                </div>
+                                            <div>
+                                                <label>Street Address:</label>
+                                                <span className="ml-2">{parsed_so.a1}</span>
+                                                </div>
+                                                <div class="d-flex">
+                                                <label>City:</label>
+                                                <span className="ml-2">{parsed_so.city}</span>
+                                                </div>
+                                                <div class="d-flex">
+                                                <label>State:</label>
+                                                <span className="ml-2">{parsed_so.s}</span>
+                                                </div>
+                                                <div class="d-flex">
+                                                <label>Area code:</label>
+                                                <span className="ml-2">{parsed_so.z}</span>
+                                                </div>
+                                                <div class="d-flex">
+                                                <label>Country:</label>
+                                                <span className="ml-2">{parsed_so.c}</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 );
                             } catch (err) {
@@ -2422,7 +2421,7 @@ class WalletHome extends React.Component {
         }
     };
 
-    buyer_reply_by_order = async (e, twm_api_url = this.state.buyerSelectUrl, offer_id = this.state.buyerSelectOffer, order_id = this.state.buyerSelectOrder) => {
+    buyer_reply_by_order = async (e, twm_api_url = this.state.api_url, offer_id = this.state.buyerSelectOffer, order_id = this.state.buyerSelectOrder) => {
         e.preventDefault();
         let messageToSend = e.target.messageBox.value
         let t_f = this.state.twm_file;
@@ -3715,7 +3714,7 @@ class WalletHome extends React.Component {
                                     <ReactModal
                                         isOpen={this.state.showBuyerMessages}
                                         closeTimeoutMS={500}
-                                        className="buyer-messages-modal"
+                                        className="buyer-messages-modal p-4"
                                         onRequestClose={() => this.handleBuyerMessages()}
                                         style={{
                                             overlay: {
@@ -3728,47 +3727,46 @@ class WalletHome extends React.Component {
                                             },
                                             content: {
                                                 position: 'absolute',
-                                                top: '40px',
-                                                left: '40px',
-                                                right: '40px',
-                                                bottom: '40px'
+                                                top: '12%',
+                                                left: '30%',
                                             }
                                         }}
                                     >
-                                        <Row>
-                                            <Col sm={10}>
-                                                <h1>
-                                                    Buyer Messages for
-                                                </h1>
-                                                <h3>Order: {this.state.buyerSelectOrder}</h3>
+                                        <div 
+                                           className="d-flex flex-column"
+                                           style={{
+                                            borderBottom: '1px solid #e2e2e2',
+                                            paddingBottom: '18px'
+                                        }}>
+                                            <div>
+                                            <label>
+                                                Order ID:
+                                                </label>
+                                            </div>
+                                                <span>{this.state.buyerSelectOrder}</span>
+                                        </div>
 
+                                        <div className="mt-4 flex-grow-1">
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <label>Messages</label>
                                                 <button
                                                     onClick={() =>
                                                         this.load_buyers_messages_for_selected_order()}
                                                 >
                                                     Refresh Messages
                                                 </button>
-                                            </Col>
-                                        </Row>
-
-                                        <Row className="m-auto">
-                                            <Col style={{overflowY: 'auto', maxHeight: '65vh'}} sm={8}>
+                                            </div>
+                                            <div style={{maxHeight: '370px', overflow: 'overlay', marginTop: '10px'}}>
                                                 {this.renderBuyerMessages()}
-                                            </Col>
-
-                                            <Col className="mx-auto my-5" sm={6}>
-                                                <form onSubmit={this.buyer_reply_by_order}>
+                                                </div>
+                                        </div>
+                                        <form onSubmit={this.buyer_reply_by_order}>
                                                     <textarea style={{
-                                                        border: '2px solid #13D3FD',
-                                                        borderRadius: 10,
-                                                        padding: '.5rem',
                                                         fontSize: '1.5rem'
-                                                    }} rows="6" cols="50" name="messageBox"></textarea>
+                                                    }} rows="6" cols="30" name="messageBox"></textarea>
 
-                                                    <button className="my-3 search-button" type="submit">Send</button>
+                                                    <button style={{height: '45px'}} className="my-3 search-button" type="submit">Send</button>
                                                 </form>
-                                            </Col>
-                                        </Row>
                                     </ReactModal>
                                 </div>
 

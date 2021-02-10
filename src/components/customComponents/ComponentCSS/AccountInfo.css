@@ -101,19 +101,45 @@
 }
 
 .buyer-messages-modal {
+    width: 500px;
     height: 80%;
     max-height: 80%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     background-color: white;
-    box-shadow: var(--blue-box-shadow);
-    border-radius: 50px;
-    text-align: center;
-    color: #767667;
-    font-family: 'Inter';
+    border-radius: 10px;
+    box-shadow: 0 1px 14px -7px #7b7b7b;
+}
+
+.buyer-messages-modal form {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.buyer-messages-modal form textarea {
+    width: 100%;
+}
+
+.buyer-messages-modal form button {
+    width: 100%;
 }
 
 .buyer-messages-modal::-webkit-scrollbar {
     display: none;
+}
+
+.message {
+    border-radius: 20px;
+    padding: 8px 15px;
+    margin: 5px;
+    display: inline-block;
+}
+
+.message--mine {
+    background: linear-gradient(to bottom, #00D0EA 0%, #0085D1 100%);
+    color: white;
+}
+
+.message--yours {
+    background-color: #eee;
 }
