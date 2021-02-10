@@ -7,6 +7,7 @@ import {withRouter} from 'react-router-dom';
 import Settings from './Settings';
 
 import {normalize_8decimals} from '../../utils/wallet_creation';
+import sfxLogo from "../../img/sfx.svg";
 
 import {
     send_cash,
@@ -3241,7 +3242,8 @@ class WalletHome extends React.Component {
                                             </div>
                                             <div style={{width: '100px'}}>{offer_type}</div>
 
-                                            <div style={{width: '150px'}}>{listing.price}</div>
+                                            <div className="d-flex align-items-center" style={{width: '150px'}}>
+                                                {listing.price} <img width="20px" className="ml-2" src={sfxLogo} /></div>
 
                                             <div style={{width: '150px'}}>{listing.quantity}</div>
 
@@ -3688,7 +3690,7 @@ class WalletHome extends React.Component {
                                     {this.buyer_get_orders().map(order => 
                                     <div key={order.order_id} className="products-table-row d-flex">
                                         <div className="p-2" style={{width: '200px'}}>{order.title}</div>
-                                        <div style={{width: '100px'}}>{order.price}</div>
+                                        <div className="d-flex align-items-center" style={{width: '100px'}}>{order.price} <img width="20px" className="ml-2" src={sfxLogo} /></div>
                                         <div style={{width: '100px'}}>{order.quantity}</div>
                                         <div style={{width: '120px'}}>
                                         {this.to_ellipsis(order.order_id, 5, 5)}
@@ -3696,8 +3698,9 @@ class WalletHome extends React.Component {
                                                 <span>{order.order_id}</span>
                                             </ReactTooltip>
                                         </div>
-                                        <div style={{width: '120px'}}>
+                                        <div className="d-flex align-items-center" style={{width: '120px'}}>
                                         {this.to_ellipsis(order.offer_id, 5, 5)}
+                                        <CgCopy className="ml-1" onClick={() => {copy(order.offer_id); alert('Offer ID has been copied to clipboard')}} size={15} />
                                                 <ReactTooltip id={`${order.offer_id}`} type='info' effect='solid'>
                                                 <span>{order.offer_id}</span>
                                             </ReactTooltip>
