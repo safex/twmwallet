@@ -119,6 +119,8 @@
     padding: 8px 15px;
     margin: 5px;
     display: inline-block;
+    word-break: break-word;
+    margin-right: 20px;
 }
 
 .message--mine {
