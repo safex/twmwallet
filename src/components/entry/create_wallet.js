@@ -558,10 +558,6 @@ export default class CreateWallet extends React.Component {
               ) : (
                 ""
               )}
-
-              <Row className="w-100 entry-footer">
-                <p className="user-select-none">THE WORLD MARKETPLACE</p>
-              </Row>
             </div>
           </div>
         )}
