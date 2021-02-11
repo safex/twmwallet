@@ -3707,7 +3707,7 @@ class WalletHome extends React.Component {
                                     <ReactModal
                                         isOpen={this.state.showBuyerMessages}
                                         closeTimeoutMS={500}
-                                        className="buyer-messages-modal p-4"
+                                        className="buyer-messages-modal"
                                         onRequestClose={() => this.handleBuyerMessages()}
                                         style={{
                                             overlay: {
@@ -3721,10 +3721,19 @@ class WalletHome extends React.Component {
                                             content: {
                                                 position: 'absolute',
                                                 top: '12%',
-                                                left: '30%',
+                                                left: '30%'
                                             }
                                         }}
                                     >
+                                        <>
+                                        <div className="modal-title">
+                                    MESSAGES 
+                                    <CgClose
+                                        className="pointer"
+                                        style={{position: 'absolute', right: '15px', color: 'red'}} 
+                                        size={20} 
+                                        onClick={this.handleBuyerMessages} /></div>
+                                        <div className="p-4">
                                         <div 
                                            className="d-flex flex-column"
                                            style={{
@@ -3749,7 +3758,7 @@ class WalletHome extends React.Component {
                                                     Refresh Messages
                                                 </button>
                                             </div>
-                                            <div style={{maxHeight: '370px', overflow: 'overlay', marginTop: '10px'}}>
+                                            <div style={{height: '325px', overflow: 'overlay', marginTop: '10px'}}>
                                                 {this.renderBuyerMessages()}
                                                 </div>
                                         </div>
@@ -3760,6 +3769,9 @@ class WalletHome extends React.Component {
 
                                                     <button style={{height: '45px'}} className="my-3 search-button" type="submit">Send</button>
                                                 </form>
+                                        </div>
+                                        
+                                                </>
                                     </ReactModal>
                                 </div>
 
