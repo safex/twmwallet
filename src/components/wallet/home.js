@@ -2053,7 +2053,7 @@ class WalletHome extends React.Component {
                                 <span style={{color: '#0000004d'}}>
                                     {t_msg.position}
                                 </span>
-                                <span className={`message message--mine`}>{t_msg.message.m}</span>
+                                <span className={`message ${t_msg.from.startsWith('-----BEGIN') ? 'message--mine' : 'message--yours'}`}>{t_msg.message.m}</span>
                             </div>
                         );
                     } else if (t_msg.message.hasOwnProperty('so')) {
