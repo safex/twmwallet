@@ -218,12 +218,12 @@ export default class CreateWallet extends React.Component {
       }
 
     return (
-      <Container
+      <div
         fluid
-        className={`h-100 ${this.state.wallet_made ? "background-entry-fix" : ""}`}
+        className={`w-100 h-100 ${this.state.wallet_made ? "background-entry-fix" : ""}`}
       >
         {this.state.wallet_made ? (
-          <Container fluid className="height100 justify-content-between">
+          <div fluid className="w-100 height100 justify-content-between">
             <WalletHome
               wallet={this.state.wallet}
               daemon_host={this.state.daemon_host}
@@ -231,13 +231,13 @@ export default class CreateWallet extends React.Component {
               password={this.state.password}
               wallet_path={this.state.new_path}
             />
-          </Container>
+          </div>
         ) : (
-          <Container
+          <div
             fluid
-            className="height100 d-flex flex-column justify-content-center align-items-center"
+            className="w-100 h-100 d-flex flex-column justify-content-center align-items-center"
           >
-            <Container className="start-background-image h-100 d-flex flex-column justify-content-center align-items-center">
+            <div className="start-background-image h-100 w-100 d-flex flex-column justify-content-center align-items-center">
               <Image
                 className="entry-mini-logo"
                 src={require("./../../img/safex-multi-small.svg")}
@@ -562,10 +562,10 @@ export default class CreateWallet extends React.Component {
               <Row className="w-100 entry-footer">
                 <p className="user-select-none">THE WORLD MARKETPLACE</p>
               </Row>
-            </Container>
-          </Container>
+            </div>
+          </div>
         )}
-      </Container>
+      </div>
     );
   }
 }
