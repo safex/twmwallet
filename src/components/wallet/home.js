@@ -4676,9 +4676,8 @@ class WalletHome extends React.Component {
         };
 
         return (
-            <div className="">
-                <Image className="entry-scene" src={require("./../../img/loading-scene.svg")}/>
-                <Image className="plant3" src={require("./../../img/plant2.svg")}/>
+            <div className="height100 home-background-image">
+                
                 <MainHeader
                     view={this.state.interface_view}
                     goHome={this.go_home}

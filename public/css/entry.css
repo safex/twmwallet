@@ -41,6 +41,16 @@
     background-size: cover
 }
 
+.start-background-image {
+    background: url(./../images/start-background.png) no-repeat center center fixed; 
+    background-size: cover
+}
+
+.home-background-image {
+    background: url(./../images/home-background.png) no-repeat center center fixed; 
+    background-size: cover
+}
+
 .entry-scene1 {
     position: absolute;
     left: 2rem;
