@@ -82,29 +82,23 @@ export default class MerchantOffers extends React.Component {
     render() {
         let the_view;
         if (this.state.selected_offer === '') {
-            the_view = (<Row className="w-100">
-                <h1>Offers</h1>
-                <table className="table">
-                    <thead>
-                        <tr>
-                        <th>Title</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Seller</th>
-                        <th>Offer ID</th>
-                        <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            the_view = (<div>
+                <h2>Offers</h2>
+                <div>
+                        <label style={{width: '200px'}}>Title</label>
+                        <label style={{width: '120px'}}>Price</label>
+                        <label style={{width: '100px'}}>Quantity</label>
+                        <label style={{width: '120px'}}>Offer ID</label>
+                        <label style={{width: '100px'}}>Actions</label>
                     {this.state.user_offers.map((listing, key) => (
-                        <tr>
-                            <td>{listing.title}</td>
-                            <td>{listing.price / 10000000000}</td>
-                            <td>{listing.quantity}</td>
-                            <td data-tip data-for='offerID'>
+                        <div className="d-flex mb-2 align-items-center">
+                            <div style={{width: '200px'}}>{listing.title}</div>
+                            <div style={{width: '120px'}}>{listing.price / 10000000000}</div>
+                            <div style={{width: '100px'}}>{listing.quantity}</div>
+                            <div style={{width: '120px'}} data-tip data-for='offerID'>
                                 {listing.offerID.slice(0, 8)}
-                            </td>
-                            <td>
+                            </div>
+                            <div style={{width: '100px'}}>
                                 <button
                                     onClick={this.state.handleEditOfferForm}
                                     className="edit-button">
@@ -115,40 +109,49 @@ export default class MerchantOffers extends React.Component {
                                     className="orders-button">
                                     Orders
                                 </button>
-                            </td>
-                        </tr>
+                            </div>
+                        </div>
                         )
                     )}
-                    </tbody>
-                </table>
-            </Row>)
+                </div>
+            </div>)
         } else if (this.state.selected_offer !== '') {
             if (this.state.selected_order === '') {
-                the_view = (<Row className="w-100">
-                    <h1>{this.state.selected_offer.title} {this.state.selected_offer.offerID}</h1>
-                    <Col className="pt-3 staking-table-table">
-                        <Row className="staking-table-header no-gutters">
-                            <p>Order ID</p>
-                            <p>Quantity</p>
-                            <p>Message Count</p>
-                            <p></p>
-                        </Row>
+                the_view = (<div>
+                    <div>
+                    <label>Offer ID</label>
+                    <span className="ml-3">{this.state.selected_offer.offerID}</span>
+                    </div>
+
+                    <div>
+                    <label>Title</label>
+                    <span className="ml-3 mb-3">{this.state.selected_offer.title}</span>
+                    </div>
+
+                    <span style={{fontSize: "1.5rem"}}>Orders</span>
+                    <div className="d-flex flex-column">
+                        <div className="d-flex align-items-center mb-3">
+                            <label style={{width: '360px'}}>Order ID</label>
+                            <label style={{width: '120px'}}>Quantity</label>
+                            <label style={{width: '100px'}}>Message Count</label>
+                            <label style={{width: '150px'}}>Actions</label>
+                        </div>
                         {this.state.selected_offer_orders.map((order, key) => (
-                            <Row key={key} className="staking-table-row">
-                                <p style={{wordBreak: 'break-word'}}>{order.order_id}</p>
-                                <p>{order.quantity}</p>
-                                <p>{order.msg_count}</p>
-                                <p>
+                            <div key={key} className="d-flex align-items-center mb-3">
+                                <div style={{width: '360px'}}>{order.order_id}</div>
+                                <div style={{width: '120px'}}>{order.quantity}</div>
+                                <div style={{width: '100px'}}>{order.msg_count}</div>
+                                <div style={{width: '150px'}}>
                                     <button
                                         onClick={(e) => this.select_the_order(e, order)}
                                         className="orders-button">
                                         Open Messaging
                                     </button>
-                                </p>
-                            </Row>)
+                                </div>
+                            </div>)
                         )}
-                    </Col>
-                </Row>)
+                    </div>
+                </div>)
             } else if (this.state.selected_order !== '') {
                 let inner_view = this.state.selected_messages.map((msg, key) => {
                     console.log(`messages rendered`);
