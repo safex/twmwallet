@@ -2053,7 +2053,7 @@ class WalletHome extends React.Component {
                                 <span style={{color: '#0000004d'}}>
                                     {t_msg.position}
                                 </span>
-                                <span className={`message message--mine`}>{t_msg.message.m}</span>
+                                <span className={`message ${t_msg.from.startsWith('-----BEGIN') ? 'message--mine' : 'message--yours'}`}>{t_msg.message.m}</span>
                             </div>
                         );
                     } else if (t_msg.message.hasOwnProperty('so')) {
@@ -3300,8 +3300,8 @@ class WalletHome extends React.Component {
                                     },
                                     content: {
                                         position: 'absolute',
-                                        top: '40px',
-                                        left: '30%',
+                                        top: '20%',
+                                        left: '12%',
                                     }
                                 }}>
                                 <div className="modal-title">
@@ -3314,87 +3314,10 @@ class WalletHome extends React.Component {
 
                                 <Form id="purchase_item"
                                       onSubmit={(e) => this.purchase_item(e, this.state.show_purchase_offer)}>
-
-                                    <div className="d-flex flex-column justify-content-around p-3">
-                                        <Image
-                                        width="100%" 
-                                            className="border border-dark"
-                                               src={this.state.show_purchase_offer_data.main_image}></Image>
-
-                                        <Image className="border border-dark"
-                                               src={this.state.show_purchase_offer_data.image_2}></Image>
-
-                                        <Image className="border border-dark"
-                                               src={this.state.show_purchase_offer_data.image_3}></Image>
-
-                                        <Image className="border border-dark"
-                                               src={this.state.show_purchase_offer_data.image_4}></Image>
-
-                                        <div className="p-5 d-flex flex-column justify-content-center"></div>
-                                        <hr className="border border-dark w-100"></hr>
-
-                                        <div className="d-flex">
-                                            <label>Title:</label>
-                                            <span className="ml-2">{this.state.show_purchase_offer.title}</span>
-                                        </div>
-
-                                        <div className="d-flex">
-                                            <label>Seller:</label>
-                                            <span className="ml-2">{this.state.show_purchase_offer.seller}</span>
-                                        </div>
-
-                                        <div className="d-flex align-items-center">
-                                            <label className="mb-0">Offer ID:</label>
-                                            <span className="ml-2">{this.state.show_purchase_offer.offer_id}</span>
-                                            <FaCopy
-                                                className="ml-4 pointer"
-                                                data-tip data-for='copyIDInfo'
-                                                onClick={() => {
-                                                    copy(this.state.show_purchase_offer.offer_id);
-                                                    alert("Copied offer ID to clipboard");
-                                                }}
-                                            />
-                                        </div>
-
-                                        <div className="d-flex flex-column mt-2">
-                                            <label>Description:</label>
-                                            <span>{this.state.show_purchase_offer.descprition}</span>
-                                        </div>
-
-                                        <div className="d-flex flex-column">
-                                            <label>Quantity:</label>
-                                            <div className="d-flex align-items-center">
-                                            <Form.Control
-                                            style={{width: "60px"}}
-                                            className="light-blue-back"
-                                            id="quantity"
-                                            name="quantity"
-                                            type="number"
-                                            onChange={e => this.setState({quantity_input: e.target.value})}
-                                            max={this.state.show_purchase_offer.quantity} />
-                                            <span className="ml-2"> / {this.state.show_purchase_offer.quantity} available</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="d-flex mt-3">
-                                        <div className="d-flex align-items-center">
-                                            <label className="mb-0">Price:</label>
-                                            <div className="d-flex align-items-center">
-                                            <span className="ml-2">{this.state.show_purchase_offer.price} SFX</span>
-                                            <img className="ml-2" width="20px" className="ml-2" src={sfxLogo} />
-                                            </div>
-                                        </div>
-
-                                        <div className="d-flex align-items-center ml-3">
-                                            <label className="mb-0">Total:</label>
-                                            <div className="d-flex align-items-center">
-                                            <span className="ml-2">{this.state.show_purchase_offer.price * (this.state.quantity_input || 0)} SFX</span>
-                                            <img className="ml-2" width="20px" className="ml-2" src={sfxLogo} />
-                                            </div>
-                                        </div>
-                                        </div>
+                                    <div className="d-flex flex-column p-3">
+                                        
                                         {this.state.show_purchase_offer_data.nft ?
-                                            (<div className="d-flex flex-column mt-2">
+                                            (<div style={{width: '300px'}} className="d-flex flex-column mt-2">
                                                 <label>
                                                     NFT Ethereum Address
                                                 </label>
@@ -3406,15 +3329,18 @@ class WalletHome extends React.Component {
 
                                         {this.state.show_purchase_offer_data.shipping &&
                                         <>
-                                        <div className="d-flex flex-column mt-3">
+                                        <h2>Shipping Info</h2>
+                                        <div className="d-flex justify-content-between mt-3">
+                                        <div style={{width: '45%'}} className="d-flex flex-column">
                                         <label>First Name:</label>
                                         <Form.Control name="first_name" />
-                                    </div>
+                                        </div>
 
-                                    <div className="d-flex flex-column mt-3">
+                                    <div style={{width: '45%'}} className="d-flex flex-column">
                                         <label>Last Name:</label>
                                         <Form.Control name="last_name" />
                                     </div>
+                                        </div>
 
                                     <div className="d-flex flex-column mt-3">
                                         <label>Address Line 1:</label>
@@ -3426,19 +3352,21 @@ class WalletHome extends React.Component {
                                         <Form.Control name="address2" />
                                     </div>
 
-                                    <div className="d-flex flex-column mt-3">
+                                    <div className="d-flex justify-content-between mt-3">
+                                    <div style={{width: '30%'}} className="d-flex flex-column">
                                         <label>City:</label>
                                         <Form.Control name="city" />
                                     </div>
 
-                                    <div className="d-flex flex-column mt-3">
+                                    <div style={{width: '30%'}} className="d-flex flex-column">
                                         <label>State/Country:</label>
                                         <Form.Control name="state" />
                                     </div>
 
-                                    <div className="d-flex flex-column mt-3">
+                                    <div style={{width: '30%'}} className="d-flex flex-column">
                                         <label>Zip/Area code:</label>
                                         <Form.Control name="zipcode" />
+                                    </div>
                                     </div>
 
                                     <div className="d-flex flex-column mt-3">
@@ -3458,7 +3386,7 @@ class WalletHome extends React.Component {
                                     </>
                                         }
                                         {this.state.show_purchase_offer_data.open_message &&
-                                        <div className="d-flex flex-column mt-3">
+                                        <div style={{width: '300px'}} className="d-flex flex-column mt-3">
                                         <label>NFT Ethereum Address:</label>
                                         <Form.Control name="message" />
                                     </div>
@@ -3497,8 +3425,87 @@ class WalletHome extends React.Component {
                                             </Form.Control>
                                     </div>
                                     </div>
+                                          <div className="d-flex flex-column">
+                                              <div style={{width: '128px', height: '128px', backgroundColor: '#d3d3d329'}}>
+                                              <Image
+                                            className="product-image border border-dark"
+                                               src={this.state.show_purchase_offer_data.main_image}></Image>
+                                              </div>
+                                          
 
-                                    {this.state.showLoader ?
+                                        <Image className="product-image border border-dark"
+                                               src={this.state.show_purchase_offer_data.image_2}></Image>
+
+                                        <Image className="product-image border border-dark"
+                                               src={this.state.show_purchase_offer_data.image_3}></Image>
+
+                                        <Image className="product-image border border-dark"
+                                               src={this.state.show_purchase_offer_data.image_4}></Image>
+
+                                        <hr className="border border-light w-100"></hr>
+
+                                        <div className="d-flex mt-3">
+                                            <label>Title:</label>
+                                            <span className="ml-2">{this.state.show_purchase_offer.title}</span>
+                                        </div>
+
+                                        <div className="d-flex mt-3">
+                                            <label>Seller:</label>
+                                            <span className="ml-2">{this.state.show_purchase_offer.username}</span>
+                                        </div>
+
+                                        <div className="d-flex align-items-center mt-3">
+                                            <label className="mb-0">Offer ID:</label>
+                                            <span className="ml-2">{this.state.show_purchase_offer.offer_id}</span>
+                                            <FaCopy
+                                                className="ml-4 pointer"
+                                                data-tip data-for='copyIDInfo'
+                                                onClick={() => {
+                                                    copy(this.state.show_purchase_offer.offer_id);
+                                                    alert("Copied offer ID to clipboard");
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div className="d-flex flex-column mt-3">
+                                            <label>Description:</label>
+                                            <span>{this.state.show_purchase_offer.descprition}</span>
+                                        </div>
+
+                                        <div className="d-flex flex-column mt-3">
+                                            <label>Quantity:</label>
+                                            <div className="d-flex align-items-center">
+                                            <Form.Control
+                                            style={{width: "60px"}}
+                                            className="light-blue-back"
+                                            id="quantity"
+                                            name="quantity"
+                                            type="number"
+                                            onChange={e => this.setState({quantity_input: e.target.value})}
+                                            max={this.state.show_purchase_offer.quantity} />
+                                            <span className="ml-2"> / {this.state.show_purchase_offer.quantity} available</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="d-flex mt-3">
+                                        <div className="d-flex align-items-center">
+                                            <label className="mb-0">Price:</label>
+                                            <div className="d-flex align-items-center">
+                                            <span className="ml-2">{this.state.show_purchase_offer.price} SFX</span>
+                                            <img className="ml-2" width="20px" className="ml-2" src={sfxLogo} />
+                                            </div>
+                                        </div>
+
+                                        <div className="d-flex align-items-center ml-3">
+                                            <label className="mb-0">Total:</label>
+                                            <div className="d-flex align-items-center">
+                                            <span className="ml-2">{this.state.show_purchase_offer.price * (this.state.quantity_input || 0)} SFX</span>
+                                            <img className="ml-2" width="20px" className="ml-2" src={sfxLogo} />
+                                            </div>
+                                        </div>
+                                        </div>
+
+                                        {this.state.showLoader ?
                                         <Loader
                                             className="justify-content-center align-content-center"
                                             type="Bars"
@@ -3507,10 +3514,11 @@ class WalletHome extends React.Component {
                                             width={50}
                                         />
                                         :
-                                        <button>
+                                        <button className="mt-3">
                                             Buy
                                         </button>
                                     }
+                                          </div>
                                 </Form>
                             </ReactModal>
 
@@ -3628,7 +3636,7 @@ class WalletHome extends React.Component {
 
                                 <div
                                     className="d-flex align-items-center py-3"
-                                    style={{width: '1028px', marginLeft: '61px', backgroundColor: 'white'}}
+                                    style={{width: '1028px', margin: '0 auto', backgroundColor: 'white'}}
                                 >
                                         <form
                                             className="flex-row"
@@ -3650,7 +3658,7 @@ class WalletHome extends React.Component {
                                                     type="button"
                                                     onClick={this.handleBuyerOrders}
                                                     style={{padding: '1rem', lineHeight: 0}}
-                                                    className="search-button ml-3"
+                                                    className={`search-button ml-3 ${this.state.showBuyerOrders ? 'search-button--red' : ''}`}
                                                 >
                                                     {this.state.showBuyerOrders ? 'Close Orders' : 'My Orders'}
                                                 </button>
@@ -3662,7 +3670,7 @@ class WalletHome extends React.Component {
                                     </div>
 
                             {this.state.showBuyerOrders ?
-                                <div style={{width: '1028px', marginLeft: '61px'}}>
+                                <div style={{width: '1028px', margin: '0 auto'}}>
                                     <div style={{height: '25px', backgroundColor: 'white', borderBottom: '3px solid #d3d3d369'}} className="d-flex">
                                         <label style={{width: '200px'}}>Title</label>
                                         <label style={{width: '100px'}}>Price (SFX)</label>
@@ -3699,7 +3707,7 @@ class WalletHome extends React.Component {
                                     <ReactModal
                                         isOpen={this.state.showBuyerMessages}
                                         closeTimeoutMS={500}
-                                        className="buyer-messages-modal p-4"
+                                        className="buyer-messages-modal"
                                         onRequestClose={() => this.handleBuyerMessages()}
                                         style={{
                                             overlay: {
@@ -3713,10 +3721,19 @@ class WalletHome extends React.Component {
                                             content: {
                                                 position: 'absolute',
                                                 top: '12%',
-                                                left: '30%',
+                                                left: '30%'
                                             }
                                         }}
                                     >
+                                        <>
+                                        <div className="modal-title">
+                                    MESSAGES 
+                                    <CgClose
+                                        className="pointer"
+                                        style={{position: 'absolute', right: '15px', color: 'red'}} 
+                                        size={20} 
+                                        onClick={this.handleBuyerMessages} /></div>
+                                        <div className="p-4">
                                         <div 
                                            className="d-flex flex-column"
                                            style={{
@@ -3741,7 +3758,7 @@ class WalletHome extends React.Component {
                                                     Refresh Messages
                                                 </button>
                                             </div>
-                                            <div style={{maxHeight: '370px', overflow: 'overlay', marginTop: '10px'}}>
+                                            <div style={{height: '325px', overflow: 'overlay', marginTop: '10px'}}>
                                                 {this.renderBuyerMessages()}
                                                 </div>
                                         </div>
@@ -3752,11 +3769,14 @@ class WalletHome extends React.Component {
 
                                                     <button style={{height: '45px'}} className="my-3 search-button" type="submit">Send</button>
                                                 </form>
+                                        </div>
+                                        
+                                                </>
                                     </ReactModal>
                                 </div>
 
                                 :
-                                <div style={{width: "1028px", marginLeft: '61px'}} className="">
+                                <div style={{width: "1028px", margin: '0 auto'}} className="">
                                     <div style={{height: '25px', backgroundColor: 'white', borderBottom: '3px solid #d3d3d369'}} className="d-flex">
                                         <label style={{width: '128px'}}>Image</label>
                                         <label style={{width: '200px'}}>Title</label>
@@ -4656,9 +4676,8 @@ class WalletHome extends React.Component {
         };
 
         return (
-            <div className="">
-                <Image className="entry-scene" src={require("./../../img/loading-scene.svg")}/>
-                <Image className="plant3" src={require("./../../img/plant2.svg")}/>
+            <div className="height100 home-background-image">
+                
                 <MainHeader
                     view={this.state.interface_view}
                     goHome={this.go_home}

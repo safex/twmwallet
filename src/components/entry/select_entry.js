@@ -96,16 +96,14 @@ export default class SelectEntry extends React.Component {
         return (
             <div className="width100 height100 d-flex flex-column text-center">
                 
-                <Container fluid className="height100 flex-column d-flex justify-content-center">
+                <Container fluid className="height100 flex-column d-flex justify-content-center start-background-image">
 
-                    <Image className="plant" src={require("./../../img/plant.svg")}/>
-                    <Image className="plant2" src={require("./../../img/corner-plant.svg")}/>
-                    <Image className="entry-scene" src={require("./../../img/entry-scene.svg")}/>
-                    <Image onClick={this.back} className="entry-off-button" src={require("./../../img/off.svg")}/>
+                    
+                    <Image onClick={this.back} className="entry-off-button" src={require("./../../img/off_black.svg")}/>
                     
 
                     <Row className="rowjustify-content-md-center justify-content-center p-3">
-                        <Image className="w-25" src={require("./../../img/safex-home-multi.svg")}/>
+                        <Image className="w-25" src={require("./../../img/safex-home-multi.png")}/>
                     </Row>
 
                     <Col className="my-5">

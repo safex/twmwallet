@@ -237,23 +237,10 @@ export default class CreateWallet extends React.Component {
             fluid
             className="height100 d-flex flex-column justify-content-center align-items-center"
           >
-            <Container className="h-100 d-flex flex-column justify-content-center align-items-center">
+            <Container className="start-background-image h-100 d-flex flex-column justify-content-center align-items-center">
               <Image
                 className="entry-mini-logo"
                 src={require("./../../img/safex-multi-small.svg")}
-              />
-              <Image className="plant" src={require("./../../img/plant.svg")} />
-              <Image
-                className="plant2"
-                src={require("./../../img/corner-plant.svg")}
-              />
-              <Image
-                className="entry-scene"
-                src={require("./../../img/entry-scene.svg")}
-              />
-              <Image
-                className="entry-scene1"
-                src={require("./../../img/entry-scene1.svg")}
               />
               <Image
                 onClick={() => {

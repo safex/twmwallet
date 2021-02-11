@@ -2,6 +2,8 @@
     width: 75%;
     align-items: unset;
     justify-content: unset;
+    background: white;
+    border-radius: 10px;
 }
 
 .send-safex-box form {

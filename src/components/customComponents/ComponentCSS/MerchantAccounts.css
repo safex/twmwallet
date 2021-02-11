@@ -5,12 +5,12 @@
     margin: 0 auto;
     padding:1rem;
 
-    justify-content: space-around;
-    align-content: center;
+    /* justify-content: space-around; */
+    /* align-content: center; */
 
     background-color: white;
     box-shadow: var(--blue-box-shadow);
-    border-radius: 50px!important;
+    border-radius: 10px!important;
 }
 
 .merchant-accounts-box h1 {
