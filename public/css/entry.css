@@ -311,6 +311,7 @@ form {
     display: flex;
     justify-content: space-around;
     align-items: center;
+    flex-wrap: nowrap !important;
 }
 
 .entry-back-text {
