@@ -36,7 +36,7 @@ export default class RecoverSeed extends React.Component {
       seed_set: false,
       loading: false,
       freshStart: true,
-      pageNumber: -1,
+      pageNumber: 0,
     };
   }
 
@@ -194,16 +194,16 @@ export default class RecoverSeed extends React.Component {
 
   render() {
     return (
-      <Container
+      <div
         fluid
         className={
           this.state.wallet_made && this.state.loading === false
-            ? "h-100"
-            : "h-100 background-entry-fix"
+            ? "w-100 h-100"
+            : "w-100 h-100 background-entry-fix"
         }
       >
         {this.state.wallet_made && this.state.loading === false ? (
-          <Container fluid className="height100 justify-content-between">
+          <div fluid className="w-100 height100 justify-content-between">
             <WalletHome
               wallet={this.state.wallet}
               daemon_host={this.state.daemon_host}
@@ -211,20 +211,13 @@ export default class RecoverSeed extends React.Component {
               password={this.state.password}
               wallet_path={this.state.new_path}
             />
-          </Container>
+          </div>
         ) : (
-          <Container
+          <div
             fluid
-            className="height100 d-flex flex-column justify-content-center align-items-center"
+            className="w-100 height100 d-flex flex-column justify-content-center align-items-center"
           >
-            (
-            <Container className="start-background-image h-100 d-flex flex-column justify-content-center align-items-center">
-              <Image
-                className="entry-mini-logo"
-                src={require("./../../img/safex-multi-small.svg")}
-              />
-              
-              />
+            <div className="start-background-image w-100 h-100 d-flex flex-column justify-content-center align-items-center">
               <Image
                 onClick={() => {
                   alert("Closing Wallet... (TEST)");
@@ -300,8 +293,8 @@ export default class RecoverSeed extends React.Component {
                 />
               </Row>
 
-              {this.state.wallet_made ? (
-                <Container fluid className="height100 justify-content-between">
+              {this.state.wallet_made && (
+                <div className="w-100 height100 justify-content-between">
                   <WalletHome
                     wallet={this.state.wallet}
                     daemon_host={this.state.daemon_host}
@@ -309,54 +302,6 @@ export default class RecoverSeed extends React.Component {
                     password={this.state.password}
                     wallet_path={this.state.new_path}
                   />
-                </Container>
-              ) : (
-                <div
-                  className={
-                    this.state.pageNumber >= 0
-                      ? "display-none"
-                      : " entry-container"
-                  }
-                >
-                  <div className="entry-info-div">
-                    <IconContext.Provider
-                      value={{ color: "#767676", size: "30px" }}
-                    >
-                      <AiOutlineInfoCircle data-tip data-for="seedPhraseInfo" />
-
-                      <ReactTooltip
-                        className="entry-tooltip-container"
-                        id="seedPhraseInfo"
-                        effect="solid"
-                        place="bottom"
-                      >
-                        <span>
-                          Using this path you will recreate and access your{" "}
-                          <b>Safex Wallet</b>.<br />
-                          <br />
-                          You will need your <b>25 Word Mnemonic Key</b>.<br />
-                          <br />
-                          In the future, make sure to keep your{" "}
-                          <b>Safex Wallet Files</b> and remember your new
-                          password.
-                        </span>
-                      </ReactTooltip>
-                    </IconContext.Provider>
-                  </div>
-
-                  <Col className="justify-content-around d-flex flex-column">
-                    <p>
-                      This path recovers an existing Safex Wallet from a 25 word
-                      seed phrase
-                    </p>
-
-                    <button
-                      onClick={() => this.setState({ pageNumber: 0 })}
-                      className="mx-auto custom-button-entry orange-border"
-                    >
-                      Next
-                    </button>
-                  </Col>
                 </div>
               )}
 
@@ -611,15 +556,10 @@ export default class RecoverSeed extends React.Component {
               ) : (
                 ""
               )}
-
-              <Row className="w-100 entry-footer">
-                <p className="user-select-none">THE WORLD MARKETPLACE</p>
-              </Row>
-            </Container>
-            )
-          </Container>
+            </div>
+          </div>
         )}
-      </Container>
+      </div>
     );
   }
 }

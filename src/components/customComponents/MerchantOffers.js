@@ -82,7 +82,7 @@ export default class MerchantOffers extends React.Component {
     render() {
         let the_view;
         if (this.state.selected_offer === '') {
-            the_view = (<div>
+            the_view = (<div className="w-100">
                 <h2>Offers</h2>
                 <div>
                         <label style={{width: '200px'}}>Title</label>
@@ -100,7 +100,7 @@ export default class MerchantOffers extends React.Component {
                             </div>
                             <div style={{width: '100px'}}>
                                 <button
-                                    onClick={this.state.handleEditOfferForm}
+                                    onClick={() => this.props.handleShowEditOfferForm(listing)}
                                     className="edit-button">
                                     Edit
                                 </button>
@@ -117,7 +117,7 @@ export default class MerchantOffers extends React.Component {
             </div>)
         } else if (this.state.selected_offer !== '') {
             if (this.state.selected_order === '') {
-                the_view = (<div>
+                the_view = (<div className="w-100">
                     <div>
                     <label>Offer ID</label>
                     <span className="ml-3">{this.state.selected_offer.offerID}</span>
@@ -129,19 +129,23 @@ export default class MerchantOffers extends React.Component {
                     </div>
 
                     <span style={{fontSize: "1.5rem"}}>Orders</span>
-                    <div className="d-flex flex-column">
+                    <div style={{
+                        height: '375px',
+                        overflow: 'overlay'
+                        }} 
+                        className="d-flex flex-column">
                         <div className="d-flex align-items-center mb-3">
                             <label style={{width: '360px'}}>Order ID</label>
                             <label style={{width: '120px'}}>Quantity</label>
                             <label style={{width: '100px'}}>Message Count</label>
-                            <label style={{width: '150px'}}>Actions</label>
+                            <label style={{width: '140px'}}>Actions</label>
                         </div>
                         {this.state.selected_offer_orders.map((order, key) => (
                             <div key={key} className="d-flex align-items-center mb-3">
                                 <div style={{width: '360px'}}>{order.order_id}</div>
                                 <div style={{width: '120px'}}>{order.quantity}</div>
                                 <div style={{width: '100px'}}>{order.msg_count}</div>
-                                <div style={{width: '150px'}}>
+                                <div style={{width: '140px'}}>
                                     <button
                                         onClick={(e) => this.select_the_order(e, order)}
                                         className="orders-button">
@@ -282,7 +286,7 @@ export default class MerchantOffers extends React.Component {
                     }
 
                 });
-                the_view = (<Row className="w-100">
+                the_view = (<div className="w-100">
                     <h1>{this.state.selected_offer.title} {this.state.selected_offer.offerID}</h1>
                         <Row className="staking-table-header no-gutters">
                         </Row>
@@ -297,7 +301,7 @@ export default class MerchantOffers extends React.Component {
                                 <button className="my-3 search-button" type="submit">Send</button>
                             </form>
                     </Row>
-                </Row>)
+                </div>)
             }
         }
 
