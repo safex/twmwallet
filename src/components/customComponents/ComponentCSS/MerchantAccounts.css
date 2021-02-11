@@ -4,12 +4,8 @@
     width: 100%;
     margin: 0 auto;
     padding:1rem;
-
-    /* justify-content: space-around; */
-    /* align-content: center; */
-
     background-color: white;
-    box-shadow: var(--blue-box-shadow);
+    box-shadow: 0 1px 14px -7px #7b7b7b;
     border-radius: 10px!important;
 }
 
