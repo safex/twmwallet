@@ -3658,7 +3658,7 @@ class WalletHome extends React.Component {
                                                     type="button"
                                                     onClick={this.handleBuyerOrders}
                                                     style={{padding: '1rem', lineHeight: 0}}
-                                                    className="search-button ml-3"
+                                                    className={`search-button ml-3 ${this.state.showBuyerOrders ? 'search-button--red' : ''}`}
                                                 >
                                                     {this.state.showBuyerOrders ? 'Close Orders' : 'My Orders'}
                                                 </button>

@@ -161,7 +161,7 @@
         border-radius: 10px 10px 0 0;
         box-shadow: var(--blue-box-shadow);
     }
-    
+
     .search-box form {
         flex-direction: row;
     }
@@ -182,6 +182,17 @@
     .search-button:hover {
         background: white;
         color: #13D3FD;
+        border: 0;
+    }
+
+    .search-button--red {
+        background: linear-gradient(90deg, #ff897d 0%, #ff1f1f 100%);
+        border: 3px solid #ffb0ad !important;
+    }
+
+    .search-button--red:hover {
+        background-color: white !important;
+        color: #ff1f1f;
         border: 0;
     }
 
