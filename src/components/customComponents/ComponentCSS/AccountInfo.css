@@ -52,7 +52,7 @@
 }
 
 .keys-modal {
-    width: 500px;
+    width: 1000px;
     background-color: white;
     display: flex;
     flex-direction: column;
@@ -62,9 +62,16 @@
 }
 
 .keys-modal form {
-    width: 450px;
+    width: 100%;
+    padding: 15px;
+    flex-direction: row;
     max-height: 749px;
     overflow: overlay;
+    align-items: unset !important;
+}
+
+.keys-modal form .product-image {
+    width: 128px;
 }
 
 .keys-modal button {
