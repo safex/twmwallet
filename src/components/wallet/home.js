@@ -3636,7 +3636,7 @@ class WalletHome extends React.Component {
 
                                 <div
                                     className="d-flex align-items-center py-3"
-                                    style={{width: '1028px', marginLeft: '61px', backgroundColor: 'white'}}
+                                    style={{width: '1028px', margin: '0 auto', backgroundColor: 'white'}}
                                 >
                                         <form
                                             className="flex-row"
@@ -3670,7 +3670,7 @@ class WalletHome extends React.Component {
                                     </div>
 
                             {this.state.showBuyerOrders ?
-                                <div style={{width: '1028px', marginLeft: '61px'}}>
+                                <div style={{width: '1028px', margin: '0 auto'}}>
                                     <div style={{height: '25px', backgroundColor: 'white', borderBottom: '3px solid #d3d3d369'}} className="d-flex">
                                         <label style={{width: '200px'}}>Title</label>
                                         <label style={{width: '100px'}}>Price (SFX)</label>
@@ -3776,7 +3776,7 @@ class WalletHome extends React.Component {
                                 </div>
 
                                 :
-                                <div style={{width: "1028px", marginLeft: '61px'}} className="">
+                                <div style={{width: "1028px", margin: '0 auto'}} className="">
                                     <div style={{height: '25px', backgroundColor: 'white', borderBottom: '3px solid #d3d3d369'}} className="d-flex">
                                         <label style={{width: '128px'}}>Image</label>
                                         <label style={{width: '200px'}}>Title</label>
