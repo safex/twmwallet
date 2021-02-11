@@ -5,5 +5,5 @@
 }
 
 .home-carousel .carousel-inner {
-    box-shadow: var(--blue-box-shadow);
+    box-shadow: 0 1px 14px -7px #7b7b7b;
 }

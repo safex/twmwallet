@@ -578,7 +578,7 @@ export default class RecoverKeys extends React.Component {
                 ""
               )}
 
-              {this.state.pageNumber === 3 ? (
+              {this.state.pageNumber === 3 && (
                 <div className="entry-container">
                   <form
                     id="set_password"
@@ -616,11 +616,9 @@ export default class RecoverKeys extends React.Component {
                     </button>
                   </form>
                 </div>
-              ) : (
-                ""
               )}
 
-              {this.state.pageNumber === 4 ? (
+              {this.state.pageNumber === 4 && (
                 <div className="entry-container">
                   <p>
                     This file will be saved to: <i>{this.state.new_path}</i>
@@ -633,11 +631,8 @@ export default class RecoverKeys extends React.Component {
                     Restore Wallet
                   </button>
                 </div>
-              ) : (
-                ""
               )}
             </div>
-            )
           </div>
         )}
       </div>

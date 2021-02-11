@@ -557,7 +557,6 @@ export default class RecoverSeed extends React.Component {
                 ""
               )}
             </div>
-            )
           </div>
         )}
       </div>
