@@ -3956,6 +3956,7 @@ class WalletHome extends React.Component {
                                                     loadOrders={this.get_seller_order_ids_by_offer}
                                                     loadMessages={this.get_messages_by_order_id_of_seller}
                                                     handleOrders={this.handleMyOrders}
+                                                    handleShowEditOfferForm={this.handleShowEditOfferForm}
                                                     userOffers={this.state.twm_offers}
                                                 />
                                             }

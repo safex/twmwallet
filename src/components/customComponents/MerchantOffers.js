@@ -100,7 +100,7 @@ export default class MerchantOffers extends React.Component {
                             </div>
                             <div style={{width: '100px'}}>
                                 <button
-                                    onClick={this.state.handleEditOfferForm}
+                                    onClick={() => this.props.handleShowEditOfferForm(listing)}
                                     className="edit-button">
                                     Edit
                                 </button>
