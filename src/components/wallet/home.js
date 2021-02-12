@@ -3236,7 +3236,9 @@ class WalletHome extends React.Component {
                                 try {
                                     return (
                                         <div className="products-table-row d-flex" key={key}>
-                                            <div style={{width: '128px'}}>{listing.main_image && <img width="128px" height="128px" src={listing.main_image} />}</div>
+                                            <div className="d-flex align-items-center justify-content-center" style={{width: '128px', height: '128px', backgroundColor: '#d3d3d34a'}}>
+                                                {listing.main_image ? <img width="128px" height="128px" src={listing.main_image} /> : <span style={{color: '#afafaf'}}>no product image</span>}
+                                            </div>
                                             <div className="p-2" style={{width: '200px'}} data-tip data-for={`offerTitle${key}`}>
                                                 {listing.title}
                                             </div>
