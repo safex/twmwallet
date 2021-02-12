@@ -21,6 +21,10 @@ export default class MerchantOffers extends React.Component {
         this.setState({selected_offer: listing, selected_offer_orders: my_table});
     };
 
+    backToOffers = () => {
+        this.setState({selected_offer: '', selected_offer_orders: null})
+    }
+
     showMessagesModal = async (e, order) => {
         e.preventDefault();
         console.log(order);
@@ -102,6 +106,7 @@ export default class MerchantOffers extends React.Component {
         } else if (this.state.selected_offer !== '') {
             if (this.state.selected_order === '') {
                 the_view = (<div className="w-100">
+                    <span style={{color: '#13D3FD'}} className="mb-2 pointer" onClick={() => this.backToOffers()}>← BACK TO OFFERS</span>
                     <div>
                     <label>Offer ID</label>
                     <span className="ml-3">{this.state.selected_offer.offerID}</span>
@@ -114,7 +119,7 @@ export default class MerchantOffers extends React.Component {
 
                     <span style={{fontSize: "1.5rem"}}>Orders</span>
                     <div style={{
-                        height: '375px',
+                        height: '350px',
                         overflow: 'overlay'
                         }} 
                         className="d-flex flex-column">
@@ -124,7 +129,7 @@ export default class MerchantOffers extends React.Component {
                             <label style={{width: '100px'}}>Message Count</label>
                             <label style={{width: '140px'}}>Actions</label>
                         </div>
-                        {this.state.selected_offer_orders.map((order, key) => (
+                        {this.state.selected_offer_orders && this.state.selected_offer_orders.map((order, key) => (
                             <div key={key} className="d-flex align-items-center mb-3">
                                 <div style={{width: '360px'}}>{order.order_id}</div>
                                 <div style={{width: '120px'}}>{order.quantity}</div>

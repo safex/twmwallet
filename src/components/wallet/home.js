@@ -3120,11 +3120,7 @@ class WalletHome extends React.Component {
     };
 
     handleShowOffers = () => {
-        if (this.state.merchantTabs === 'offers') {
-            this.setState({merchantTabs: 'accounts'});
-        } else {
             this.setState({merchantTabs: 'offers'});
-        }
     }
 
     handleShowMessages = (messageObject) => {
