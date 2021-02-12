@@ -77,6 +77,7 @@ import {
 
 import zlib from 'zlib';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
+import MessagesModal from '../customComponents/MessagesModal';
 
 const cryptoRandomString = require('crypto-random-string');
 
@@ -3706,75 +3707,13 @@ class WalletHome extends React.Component {
                                     </div>
                                     </div>)}
 
-                                    <ReactModal
+                                    <MessagesModal 
                                         isOpen={this.state.showBuyerMessages}
-                                        closeTimeoutMS={500}
-                                        className="buyer-messages-modal"
-                                        onRequestClose={() => this.handleBuyerMessages()}
-                                        style={{
-                                            overlay: {
-                                                position: 'fixed',
-                                                top: 0,
-                                                left: 0,
-                                                right: 0,
-                                                bottom: 0,
-                                                backgroundColor: 'rgba(255, 255, 255, 0.75)'
-                                            },
-                                            content: {
-                                                position: 'absolute',
-                                                top: '12%',
-                                                left: '30%'
-                                            }
-                                        }}
-                                    >
-                                        <>
-                                        <div className="modal-title">
-                                    MESSAGES 
-                                    <CgClose
-                                        className="pointer"
-                                        style={{position: 'absolute', right: '15px', color: 'red'}} 
-                                        size={20} 
-                                        onClick={this.handleBuyerMessages} /></div>
-                                        <div className="p-4">
-                                        <div 
-                                           className="d-flex flex-column"
-                                           style={{
-                                            borderBottom: '1px solid #e2e2e2',
-                                            paddingBottom: '18px'
-                                        }}>
-                                            <div>
-                                            <label>
-                                                Order ID:
-                                                </label>
-                                            </div>
-                                                <span>{this.state.buyerSelectOrder}</span>
-                                        </div>
-
-                                        <div className="mt-4 flex-grow-1">
-                                            <div className="d-flex justify-content-between align-items-center">
-                                                <label>Messages</label>
-                                                <button
-                                                    onClick={() =>
-                                                        this.load_buyers_messages_for_selected_order()}
-                                                >
-                                                    Refresh Messages
-                                                </button>
-                                            </div>
-                                            <div style={{height: '325px', overflow: 'overlay', marginTop: '10px'}}>
-                                                {this.renderBuyerMessages()}
-                                                </div>
-                                        </div>
-                                        <form onSubmit={this.buyer_reply_by_order}>
-                                                    <textarea style={{
-                                                        fontSize: '1.5rem'
-                                                    }} rows="6" cols="30" name="messageBox"></textarea>
-
-                                                    <button style={{height: '45px'}} className="my-3 search-button" type="submit">Send</button>
-                                                </form>
-                                        </div>
-                                        
-                                                </>
-                                    </ReactModal>
+                                        closeFn={() => this.handleBuyerMessages()}
+                                        sendFn={e => this.buyer_reply_by_order(e)}
+                                        refreshFn={() => this.load_buyers_messages_for_selected_order()}
+                                        messages={this.renderBuyerMessages()}
+                                        orderId={this.state.buyerSelectOrder} />
                                 </div>
 
                                 :

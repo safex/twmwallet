@@ -1,26 +1,10 @@
 import React from 'react';
 
-import Loader from 'react-loader-spinner'
-
-import ReactModal from 'react-modal';
-
-import {Row, Col, Form, Modal, Image} from 'react-bootstrap'
-
-// Icon Imports
-import {AiOutlineInfoCircle} from 'react-icons/ai'
-import {IconContext} from 'react-icons'
-import {CgCloseR} from 'react-icons/cg'
-
-import ReactTooltip from 'react-tooltip'
-
 import './ComponentCSS/MerchantAccounts.css'
 import './ComponentCSS/StakingTable.css'
-import OfferTableRow from "./OfferTableRow";
-
-let offer_rows = [];
+import MessagesModal from './MessagesModal';
 
 export default class MerchantOffers extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -37,7 +21,7 @@ export default class MerchantOffers extends React.Component {
         this.setState({selected_offer: listing, selected_offer_orders: my_table});
     };
 
-    select_the_order = async (e, order) => {
+    showMessagesModal = async (e, order) => {
         e.preventDefault();
         console.log(order);
         let show_messages = await this.props.loadMessages(
@@ -56,7 +40,7 @@ export default class MerchantOffers extends React.Component {
                 this.state.selected_offer.seller,
                 this.state.selected_offer.offerID,
                 this.state.selected_order.order_id,
-                e.target.message_box.value,
+                e.target.messageBox.value,
                 'http://stageapi.theworldmarketplace.com:17700');
             try {
                 let show_messages = await this.props.loadMessages(
@@ -147,7 +131,7 @@ export default class MerchantOffers extends React.Component {
                                 <div style={{width: '100px'}}>{order.msg_count}</div>
                                 <div style={{width: '140px'}}>
                                     <button
-                                        onClick={(e) => this.select_the_order(e, order)}
+                                        onClick={(e) => this.showMessagesModal(e, order)}
                                         className="orders-button">
                                         Open Messaging
                                     </button>
@@ -157,7 +141,7 @@ export default class MerchantOffers extends React.Component {
                     </div>
                 </div>)
             } else if (this.state.selected_order !== '') {
-                let inner_view = this.state.selected_messages.map((msg, key) => {
+                const merchangeMessages = this.state.selected_messages.map((msg, key) => {
                     console.log(`messages rendered`);
                     console.log(msg);
                     console.log(key);
@@ -169,61 +153,22 @@ export default class MerchantOffers extends React.Component {
                         if (msg.message.n.length > 0) {
                             console.log(`nft address supplied!`);
                             return (
-                                <Row style={{justifyContent: 'space-around'}} key={key}>
-                                    <h1 style={{
-                                        border: '2px solid #13D3FD',
-                                        borderRadius: 10,
-                                        padding: '.5rem',
-                                        margin: '1rem'
-                                    }}>
-                                        {msg.position}
-                                    </h1>
-                                    <h3 className="mx-auto">{msg.message.n}</h3>
-                                </Row>
+                                <div className="d-flex align-items-center justify-content-between mt-3" key={msg}>
+                                <span>
+                                    {msg.position}
+                                </span>
+                                <span>{msg.message.n}</span>
+                            </div>
                             );
                         } else if (msg.message.m.length > 0) {
                             console.log(`this is a direct message open ended`);
                             return (
-                                <Row className="my-3 w-75 text-break p-1"
-                                     style={msg.message.m === 'seller' ?
-                                         {
-                                             justifyContent: 'space-around',
-                                             alignItems: 'center',
-                                             backgroundColor: '#13D3FD',
-                                             color: 'white',
-                                             marginRight: 'auto',
-                                             borderRadius: 25,
-                                         }
-                                         :
-                                         {
-                                             justifyContent: 'space-around',
-                                             alignItems: 'center',
-                                             marginLeft: 'auto',
-                                             borderRadius: 25,
-                                             border: '2px solid #13D3FD'
-                                         }
-                                     }
-                                     key={key}>
-                                    <h1
-                                        style={msg.message.m === 'seller' ?
-                                            {
-                                                border: '2px solid #13D3FD',
-                                                borderRadius: 10,
-                                                padding: '.5rem',
-                                                margin: '1rem'
-                                            }
-                                            :
-                                            {
-                                                border: '2px solid white',
-                                                borderRadius: 10,
-                                                padding: '.5rem',
-                                                margin: '1rem'
-                                            }
-                                        }>
-                                        {msg.position}
-                                    </h1>
-                                    <h3 style={{maxWidth: '50vh'}} className="mx-auto">{msg.message.m}</h3>
-                                </Row>
+                                <div className="d-flex align-items-center mt-3" key={msg}>
+                                <span style={{color: '#0000004d'}}>
+                                    {msg.position}
+                                </span>
+                                <span className={`message ${msg.from.startsWith('-----BEGIN') ? 'message--mine' : 'message--yours'}`}>{msg.message.m}</span>
+                            </div>
                             );
                         } else if (msg.message.hasOwnProperty('so')) {
                             console.log(msg.message.so);
@@ -243,29 +188,56 @@ export default class MerchantOffers extends React.Component {
                                     console.log(`parsed the so`);
                                     return (
                                         <div key={key}>
-                                            <Row style={{justifyContent: 'space-around'}}>
-                                                <h1 style={{
-                                                    border: '2px solid #13D3FD',
-                                                    borderRadius: 10,
-                                                    padding: '.5rem',
-                                                    margin: '1rem'
-                                                }}>
-                                                    {msg.position}
-                                                </h1>
-                                                <Col>
-                                                    <h2><i> <u>First Name:</u></i> <b></b>{parsed_so.fn}<b/></h2>
-                                                    <h2><i> <u>Last Name:</u></i> <b></b>{parsed_so.ln}<b/></h2>
-                                                    <h2><i>Email:</i> <b></b>{parsed_so.ea}<b/></h2>
-                                                    <h2><i>Phone:</i> <b></b>{parsed_so.ph}<b/></h2>
-                                                </Col>
-                                                <Col>
-                                                    <h2><i> <u>Street Address:</u></i> <b></b>{parsed_so.a1}<b/></h2>
-                                                    <h2><i> <u>City:</u></i> <b></b>{parsed_so.city}<b/></h2>
-                                                    <h2><i> <u>State:</u></i> <b></b>{parsed_so.s}<b/></h2>
-                                                    <h2><i> <u>Area Code:</u></i> <b></b>{parsed_so.z}<b/></h2>
-                                                    <h2><i> <u>Country:</u></i> <b></b>{parsed_so.c}<b/></h2>
-                                                </Col>
-                                            </Row>
+                                            <div>
+                                            <span>
+                                                {msg.position}
+                                            </span>
+                                            <div class="d-flex flex-column"
+                                            style={{
+                                                backgroundColor: '#d3d3d345',
+                                                padding: '10px',
+                                                borderRadius: '10px'}}>
+                                                <div class="d-flex">
+                                                <label>First name:</label>
+                                                <span className="ml-2">{parsed_so.fn}</span>
+                                                </div>
+                                                
+                                                <div class="d-flex">
+                                                <label>Last name:</label>
+                                                <span className="ml-2">{parsed_so.ln}</span>
+                                                </div>
+
+                                                <div class="d-flex">
+                                                <label>Email:</label>
+                                                <span className="ml-2">{parsed_so.ea}</span>
+                                                </div>
+
+                                                <div class="d-flex">
+                                                <label>Phone:</label>
+                                                <span className="ml-2">{parsed_so.ph}</span>
+                                                </div>
+                                            <div>
+                                                <label>Street Address:</label>
+                                                <span className="ml-2">{parsed_so.a1}</span>
+                                                </div>
+                                                <div class="d-flex">
+                                                <label>City:</label>
+                                                <span className="ml-2">{parsed_so.city}</span>
+                                                </div>
+                                                <div class="d-flex">
+                                                <label>State:</label>
+                                                <span className="ml-2">{parsed_so.s}</span>
+                                                </div>
+                                                <div class="d-flex">
+                                                <label>Area code:</label>
+                                                <span className="ml-2">{parsed_so.z}</span>
+                                                </div>
+                                                <div class="d-flex">
+                                                <label>Country:</label>
+                                                <span className="ml-2">{parsed_so.c}</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                         </div>
                                     );
                                 } catch (err) {
@@ -287,20 +259,13 @@ export default class MerchantOffers extends React.Component {
 
                 });
                 the_view = (<div className="w-100">
-                    <h1>{this.state.selected_offer.title} {this.state.selected_offer.offerID}</h1>
-                        <Row className="staking-table-header no-gutters">
-                        </Row>
-                        {
-                            inner_view
-                        }
-                        <Row className="staking-table-header no-gutters">
-                            <form onSubmit={(e) => this.local_merchant_reply(e)}>
-
-                                <textarea style={{border: '2px solid #13D3FD', borderRadius: 10, padding: '.5rem', fontSize: '1.5rem' }} rows="6" cols="50" name="message_box"></textarea>
-
-                                <button className="my-3 search-button" type="submit">Send</button>
-                            </form>
-                    </Row>
+                    <MessagesModal
+                        isOpen={!!this.state.selected_order}
+                        closeFn={() => this.setState({selected_order: '', selected_messages: null})}
+                        sendFn={(e) => this.local_merchant_reply(e)}
+                        refreshFn={e => this.showMessagesModal(e, this.state.selected_order)}
+                        messages={merchangeMessages}
+                        orderId={this.state.selected_order.order_id} />
                 </div>)
             }
         }
