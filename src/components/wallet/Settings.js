@@ -104,16 +104,17 @@ export default class Settings extends React.Component {
                     fontFamily: 'Inter',
                     fontSize: '1rem',
                     whiteSpace: 'nowrap',
-                    minHeight: '800px'
+                    minHeight: '800px',
                 }}>
                      <Row>
                         <Table
                             style={{
-                                marginLeft: '12px',
-                                maxWidth: '95%'
+                                margin: '50px auto',
+                                maxWidth: '95%',
+                                backgroundColor: 'white'
                             }}
                         >
-                            <thead>
+                            <thead style={{border: '1px solid lightgray'}}>
                                 <tr>
                                     <th>TXID</th>
                                     <th>In/Out</th>

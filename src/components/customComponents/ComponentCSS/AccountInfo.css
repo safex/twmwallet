@@ -86,6 +86,39 @@
     margin-bottom: 10px;
 }
 
+.ask-password-modal {
+    width: 300px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    box-shadow: 0 1px 14px -7px #7b7b7b;
+}
+
+.ask-password-modal input {
+    height: 30px;
+    padding-left: 10px;
+}
+
+.ask-password-modal button {
+    border-radius: 10px;
+    border: 3px solid #13D3FD;
+    background: linear-gradient(90deg, #13D3FD 0%, #3698F3 100%);
+    font-size: 1.5rem;
+    text-align: center;
+    color: white;
+    text-transform: uppercase;
+}
+
+.show-keys-modal {
+    width: 800px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    box-shadow: 0 1px 14px -7px #7b7b7b;
+}
+
 .buyer-messages-modal {
     width: 500px;
     height: 80%;

@@ -1,291 +1,265 @@
 import React from "react";
-
-import { Row, Col } from "react-bootstrap";
 import ReactModal from "react-modal";
 
 import ReactTooltip from "react-tooltip";
 
 // Icon Imports
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import { IconContext } from "react-icons";
-import { CgCloseR, CgCopy, CgKey } from "react-icons/cg";
+import { CgClose, CgCopy, CgKey } from "react-icons/cg";
 
 import "./ComponentCSS/AccountInfo.css";
 
 import print from "print-js";
 import copy from "copy-to-clipboard";
 
-export default function AccountInfo(props) {
-  return props.keyRequest === false ? (
-    <div className="account-info-box p-4 mt-4">
+const renderRow = (id, label, value, renderTooltipMessage) => (
+  <div className="d-flex flex-column mb-4">
+    <label>
+      {label}
+      <AiOutlineInfoCircle className="ml-2" size={15} data-tip data-for={id} />
+
+      <ReactTooltip id={id} type="info" effect="solid" place="right">
+        {renderTooltipMessage()}
+      </ReactTooltip>
+    </label>
+    <div className="d-flex align-items-center">
+      <span>{value}</span>
+      <CgCopy
+        size={15}
+        className="mb-0 ml-2"
+        onClick={() => {
+          copy(value);
+          alert("Copied to clipboard");
+        }}
+      >
+        Copy
+      </CgCopy>
+    </div>
+  </div>
+);
+
+class AccountInfo extends React.Component {
+  defaultState = {
+    passwordInput: "",
+    askPassword: false,
+    wrongPassword: false,
+  };
+  constructor(props) {
+    super(props);
+    this.state = this.defaultState;
+  }
+
+  closePasswordBox = () => {
+    this.setState(this.defaultState);
+    this.props.handleShow();
+  };
+
+  confirmPassword = () => {
+    if (this.state.passwordInput !== this.props.password) {
+      return this.setState({ wrongPassword: true });
+    }
+    this.setState(this.defaultState);
+    this.props.handleShow(this.state.passwordInput);
+  };
+
+  render() {
+    const { props } = this;
+    return this.props.keyRequest === false ? (
+      <div className="account-info-box p-4 mt-4">
         <div className="d-flex align-items-center justify-content-between mb-2">
-        <label for="safexAddress" class="form-label">
-          SAFEX Cash and SAFEX Token address
-        </label>
-        <button onClick={props.rescan}>Hard Rescan</button>
+          <label for="safexAddress" class="form-label">
+            SAFEX Cash and SAFEX Token address
+          </label>
+          <button onClick={props.rescan}>Hard Rescan</button>
         </div>
-        
-      <div class="input-group">
-        <input
-          style={{height: "30px", textOverflow: "ellipsis", zIndex: '0'}}
-          id="safexAddress"
-          readOnly={true}
-          value={props.address}
-          type="text"
-          class="form-control"
-          aria-describedby="button-addon2"
-        />
-        <button
-          class="btn btn-outline-secondary"
-          type="button"
-          data-tip="Copy address"
-          id="button-addon2"
-          onClick={() => {copy(props.address); alert('Wallet address has been copied to clipboard')}}
-        >
-         <CgCopy size={20} />
-        </button>
-        <ReactTooltip />
-        <button
-          class="btn btn-outline-secondary"
-          type="button"
-          data-tip="Show keys"
-          id="button-addon2"
-          onClick={props.handleKeyRequest}
-        >
-          <CgKey size={20} />
-        </button>
-      </div>
-      {/* <h1>{props.address}</h1> */}
-      {/*this.state.synced === false ? (
+
+        <div class="input-group">
+          <input
+            style={{ height: "30px", textOverflow: "ellipsis", zIndex: "0" }}
+            id="safexAddress"
+            readOnly={true}
+            value={props.address}
+            type="text"
+            class="form-control"
+            aria-describedby="button-addon2"
+          />
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            data-tip="Copy address"
+            id="button-addon2"
+            onClick={() => {
+              copy(props.address);
+              alert("Wallet address has been copied to clipboard");
+            }}
+          >
+            <CgCopy size={20} />
+          </button>
+          <ReactTooltip />
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            data-tip="Show keys"
+            id="button-addon2"
+            onClick={() => {
+              props.handleKeyRequest();
+              this.setState({ askPassword: true });
+            }}
+          >
+            <CgKey size={20} />
+          </button>
+        </div>
+        {/* <h1>{props.address}</h1> */}
+        {/*this.state.synced === false ? (
                         <Button variant="warning" onClick={this.check}>
                             Check
                     </Button>) : ''*/}
-    </div>
-  ) : (
-    <div className="account-info-box justify-content-around">
-      <IconContext.Provider value={{ color: "#FEB056", size: "20px" }}>
-        <CgCloseR className="" onClick={props.handleKeyRequest} />
-      </IconContext.Provider>
-
-      <div className="show-keys-password-box">
-        {/* <h1 className="password-header">To see your <b>Private Keys</b> please enter your password:</h1>
-                    
-                    <input type="password" className="show-keys-password"/>
-                */}
-        <button className="m-5" onClick={props.handleShow}>
-          Open
-        </button>
-
-        <button className="m-5" onClick={props.handleKeyRequest}>
-          Close
-        </button>
       </div>
+    ) : (
+      <div className="account-info-box p-4 mt-4">
+        <ReactModal
+          isOpen={this.state.askPassword}
+          className="ask-password-modal"
+          onRequestClose={this.closePasswordBox}
+          style={{
+            overlay: {
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(255, 255, 255, 0.75)",
+            },
+            content: {
+              position: "absolute",
+              top: "30%",
+              left: "40%",
+              overflow: "auto",
+            },
+          }}
+        >
+          <div className="modal-title">
+            Confirm password
+            <CgClose
+              className="pointer"
+              style={{ position: "absolute", right: "15px", color: "red" }}
+              size={20}
+              onClick={this.closePasswordBox}
+            />
+          </div>
+          <div
+            className={`d-flex flex-column p-4 ${
+              this.state.wrongPassword ? "wrong-password" : ""
+            }`}
+          >
+            <span>
+              To see your <b>private keys</b> please enter your password.
+            </span>
+            <label className="mt-2">Password:</label>
+            <input
+              value={this.state.passwordInput}
+              onChange={(e) => this.setState({ passwordInput: e.target.value })}
+              type="password"
+            />
+            {this.state.wrongPassword && (
+              <span style={{ color: "red" }}>Wrong password</span>
+            )}
+            <button className="mt-3" onClick={this.confirmPassword}>
+              Confirm
+            </button>
+          </div>
+        </ReactModal>
 
-      <ReactModal
-        isOpen={props.show}
-        className="keys-modal"
-        onRequestClose={props.handleShow}
-      >
-        <button onClick={() => print("seedsAndKeysDiv", "html")}>Print</button>
-        <Row>
-          <Col sm={10}>
-            <h1>
-              Keys {"&"} Seeds
-              <IconContext.Provider value={{ color: "#767676", size: "25px" }}>
-                <AiOutlineInfoCircle
-                  className="ml-2 mb-2"
-                  data-tip
-                  data-for="keysSeedInfo"
-                />
+        <ReactModal
+          isOpen={props.show}
+          className="show-keys-modal"
+          onRequestClose={props.handleShow}
+          style={{
+            overlay: {
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(255, 255, 255, 0.75)",
+            },
+            content: {
+              position: "absolute",
+              top: "12%",
+              left: "17%",
+              overflow: "auto",
+            },
+          }}
+        >
+          <div className="modal-title">
+            Keys {"&"} Seeds
+            <CgClose
+              className="pointer"
+              style={{ position: "absolute", right: "15px", color: "red" }}
+              size={20}
+              onClick={props.handleShow}
+            />
+          </div>
+          <div className="p-4">
+            {renderRow(
+              "publicKeyInfo",
+              "Public Address:",
+              props.address,
+              () => (
+                <span>
+                  IMPORTANT: Secret Keys and Seed Phrases are sensitive
+                  information. <br />
+                  Make sure you don’t share them with anyone. Back them up, and
+                  store on the safe place(s). <br /> Losing file backups can
+                  compromise your resources.
+                </span>
+              )
+            )}
 
-                <ReactTooltip
-                  className="entry-tooltip-container"
-                  id="keysSeedInfo"
-                  effect="solid"
-                  place="right"
-                >
-                  <span>
-                    IMPORTANT: Secret Keys and Seed Phrases are sensitive
-                    information. Make sure you don’t share them with anyone.
-                    Back them up, and store on the safe place(s). Losing file
-                    backups can compromise your resources.
-                  </span>
-                </ReactTooltip>
-              </IconContext.Provider>
-            </h1>
-          </Col>
-          <Col sm={2}>
-            <IconContext.Provider value={{ color: "#FEB056", size: "30px" }}>
-              <CgCloseR className="mx-auto" onClick={props.handleShow} />
-            </IconContext.Provider>
-          </Col>
-        </Row>
+            {renderRow(
+              "spendKeyInfo",
+              "Private Spend Address:",
+              props.spendKey,
+              () => (
+                <span>
+                  IMPORTANT: Secret Keys and Seed Phrases are sensitive
+                  information. <br />
+                  Make sure you don’t share them with anyone. Back them up, and
+                  store on the safe place(s). <br /> Losing file backups can
+                  compromise your resources.
+                </span>
+              )
+            )}
 
-        <Row>
-          <Col sm={12}>
-            <h2>
-              Public Address
-              <IconContext.Provider value={{ color: "#767676", size: "25px" }}>
-                <AiOutlineInfoCircle
-                  className="ml-2 mb-2"
-                  data-tip
-                  data-for="keysSeedInfo"
-                />
+            {renderRow(
+              "viewKeyInfo",
+              "Private View Address:",
+              props.viewKey,
+              () => (
+                <span>
+                  IMPORTANT: Secret Keys and Seed Phrases are sensitive
+                  information. <br />
+                  Make sure you don’t share them with anyone. Back them up, and
+                  store on the safe place(s). <br /> Losing file backups can
+                  compromise your resources.
+                </span>
+              )
+            )}
 
-                <ReactTooltip
-                  className="entry-tooltip-container"
-                  id="keysSeedInfo"
-                  effect="solid"
-                  place="right"
-                >
-                  <span>
-                    IMPORTANT: Secret Keys and Seed Phrases are sensitive
-                    information. Make sure you don’t share them with anyone.
-                    Back them up, and store on the safe place(s). Losing file
-                    backups can compromise your resources.
-                  </span>
-                </ReactTooltip>
-              </IconContext.Provider>
-            </h2>
-          </Col>
-
-          <Col sm={10}>{props.address}</Col>
-
-          <Col sm={2}>
-            <button onClick={() => copy(props.address)}>Copy</button>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col sm={12}>
-            <h2>
-              Private Spend Key
-              <IconContext.Provider value={{ color: "#767676", size: "25px" }}>
-                <AiOutlineInfoCircle
-                  className="ml-2 mb-2"
-                  data-tip
-                  data-for="keysSeedInfo"
-                />
-
-                <ReactTooltip
-                  className="entry-tooltip-container"
-                  id="keysSeedInfo"
-                  effect="solid"
-                  place="right"
-                >
-                  <span>
-                    IMPORTANT: Secret Keys and Seed Phrases are sensitive
-                    information. Make sure you don’t share them with anyone.
-                    Back them up, and store on the safe place(s). Losing file
-                    backups can compromise your resources.
-                  </span>
-                </ReactTooltip>
-              </IconContext.Provider>
-            </h2>
-          </Col>
-
-          <Col sm={10}>{props.spendKey}</Col>
-
-          <Col sm={2}>
-            <button onClick={() => copy(props.spendKey)}>Copy</button>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col sm={12}>
-            <h2>
-              Private View Key
-              <IconContext.Provider value={{ color: "#767676", size: "20px" }}>
-                <AiOutlineInfoCircle
-                  className="ml-2 mb-2"
-                  data-tip
-                  data-for="keysSeedInfo"
-                />
-
-                <ReactTooltip
-                  className="entry-tooltip-container"
-                  id="keysSeedInfo"
-                  effect="solid"
-                  place="right"
-                >
-                  <span>
-                    IMPORTANT: Secret Keys and Seed Phrases are sensitive
-                    information. Make sure you don’t share them with anyone.
-                    Back them up, and store on the safe place(s). Losing file
-                    backups can compromise your resources.
-                  </span>
-                </ReactTooltip>
-              </IconContext.Provider>
-            </h2>
-          </Col>
-
-          <Col sm={10}>{props.viewKey}</Col>
-
-          <Col sm={2}>
-            <button onClick={() => copy(props.viewKey)}>Copy</button>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col sm={12}>
-            <h2>
-              Seed Phrase
-              <IconContext.Provider value={{ color: "#767676", size: "20px" }}>
-                <AiOutlineInfoCircle
-                  className="ml-2 mb-2"
-                  data-tip
-                  data-for="keysSeedInfo"
-                />
-
-                <ReactTooltip
-                  className="entry-tooltip-container"
-                  id="keysSeedInfo"
-                  effect="solid"
-                  place="right"
-                >
-                  <span>
-                    IMPORTANT: Secret Keys and Seed Phrases are sensitive
-                    information. Make sure you don’t share them with anyone.
-                    Back them up, and store on the safe place(s). Losing file
-                    backups can compromise your resources.
-                  </span>
-                </ReactTooltip>
-              </IconContext.Provider>
-            </h2>
-          </Col>
-
-          <Col sm={10}>{props.seed}</Col>
-
-          <Col sm={2}>
-            <button onClick={() => copy(props.seed)}>Copy</button>
-          </Col>
-        </Row>
-      </ReactModal>
-
-      <div style={{ display: "none" }}>
-        <h1 id="seedsAndKeysDiv" style={{ textAlign: "center" }}>
-          This is a copy of your <u>SAFEX KEYS + SEED PHRASE</u>.
-          <br />
-          <br />
-          This is <u>SENSITIVE + IMPORTANT</u> information and should{" "}
-          <u>BE KEPT PRIVATE + SAFE</u>.
-          <br />
-          <br />
-          You will need this information to <u>RECOVER YOUR WALLET</u>.
-          <br />
-          <br />
-          Public Address: {props.address}
-          <br />
-          <br />
-          Private Spend Key: {props.spendKey}
-          <br />
-          <br />
-          Private View Key: {props.viewKey}
-          <br />
-          <br />
-          Private Seed Phrase: {props.seed}
-        </h1>
+            {renderRow("seedPhraseInfo", "Seed Phrase:", props.seed, () => (
+              <span>
+                IMPORTANT: Secret Keys and Seed Phrases are sensitive
+                information. <br />
+                Make sure you don’t share them with anyone. Back them up, and
+                store on the safe place(s). <br /> Losing file backups can
+                compromise your resources.
+              </span>
+            ))}
+          </div>
+        </ReactModal>
       </div>
-    </div>
-  );
+    );
+  }
 }
+
+export default AccountInfo;
