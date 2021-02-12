@@ -1034,10 +1034,11 @@ class WalletHome extends React.Component {
     }
 
     //show modal of private keys
-    handleKeys = () => {
-        this.setState({show_keys: !this.state.show_keys});
-        if (this.state.show_keys === false) {
-            this.setState({keyRequest: true})
+    handleKeys = (password) => {
+        if (!this.state.show_keys && password && password === this.state.password) {
+            this.setState({show_keys: true});
+        } else {
+            this.setState({show_keys: false, keyRequest: false})
         }
     };
 
@@ -3187,6 +3188,7 @@ class WalletHome extends React.Component {
 
                             <Col sm={7} className="no-padding d-flex flex-column  justify-content-between">
                                 <AccountInfo
+                                    password={this.state.password}
                                     rescan={this.rescan}
                                     handleShow={this.handleKeys}
                                     show={this.state.show_keys}
