@@ -4605,9 +4605,9 @@ class WalletHome extends React.Component {
                             <Image
                                 style={{height: 500}}
                                 className="align-content-center"
-                                src={require("./../../img/panda.png")}
+                                src={require("./../../img/wolf.svg")}
                             />
-                            <h1 className="black-text">Bear with us... we're just loading the correct info...</h1>
+                            <div className="bg-white"><h1 className="black-text">Loading...</h1></div>
                         </Container>
                     );
                 default:
