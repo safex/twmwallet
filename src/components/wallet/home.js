@@ -2629,13 +2629,13 @@ class WalletHome extends React.Component {
                         console.log(confirmed);
                         if (confirmed) {
                             try {
-                                console.log(quant);
                                 console.log(listing.title);
                                 console.log(listing.offer_id);
                                 console.log(listing.price);
                                 console.log(total_cost);
                                 console.log(mixins);
                                 this.setState({
+                                    purchase_txn_image: listing.main_image,
                                     purchase_txn_quantity: quant,
                                     purchase_txn_title: listing.title,
                                     purchase_txn_seller: listing.username,
@@ -3555,9 +3555,12 @@ class WalletHome extends React.Component {
                                             onClick={this.handleConfirmationModal}
                                         />
                                 </div>
-
+{console.error(this.state.show_purchase_offer)}
                                 <div id="receipt" className="p-4">
-                                <div className="d-flex align-items-center">
+                                <div className="d-flex justify-content-center">
+                                    <img width="200px" src={this.state.purchase_txn_image} />
+                                </div>
+                                <div className="d-flex mt-3 align-items-center">
                                     <label className="mb-0">Title:</label>
                                     <span className="ml-3">{this.state.show_purchase_offer.title}</span>
                                 </div>
