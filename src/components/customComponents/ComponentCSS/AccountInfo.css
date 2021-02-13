@@ -164,3 +164,13 @@
 .message--yours {
     background-color: #eee;
 }
+
+.settings-table-wrapper {
+    width: 95%;
+    min-width: 600px;
+    max-height: 80vh;
+    background: white;
+    overflow: overlay;
+    margin: 30px auto;
+    border: 1px solid lightgray;
+}

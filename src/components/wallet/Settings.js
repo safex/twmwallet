@@ -99,21 +99,8 @@ export default class Settings extends React.Component {
         });
         console.log(txn_history_table_data);
         return (
-            <div
-                style={{
-                    fontFamily: 'Inter',
-                    fontSize: '1rem',
-                    whiteSpace: 'nowrap',
-                    minHeight: '800px',
-                }}>
-                     <Row>
-                        <Table
-                            style={{
-                                margin: '50px auto',
-                                maxWidth: '95%',
-                                backgroundColor: 'white'
-                            }}
-                        >
+                     <div className="settings-table-wrapper">
+                        <Table>
                             <thead style={{border: '1px solid lightgray'}}>
                                 <tr>
                                     <th>TXID</th>
@@ -131,8 +118,7 @@ export default class Settings extends React.Component {
                                 {txn_history_table_data}
                             </tbody>
                         </Table>
-                    </Row>
-            </div>
+                    </div>
         );
     }
 
