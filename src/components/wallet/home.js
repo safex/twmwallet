@@ -3430,14 +3430,19 @@ class WalletHome extends React.Component {
                                           <div className="d-flex flex-column">
                                               <div className="d-flex" style={{height: '128px'}}>
                                               {this.state.show_purchase_offer_data.main_image && <Image
-                                            className="product-image"
+                                            className="product-image pointer"
                                                src={this.state.show_purchase_offer_data.main_image}
                                                onClick={() => this.setState({show_modal_for_image: this.state.show_purchase_offer_data.main_image})}></Image>}
 
                                             {this.state.show_purchase_offer_data.image_2 && 
-                                                <Image className="product-image ml-1"
+                                                <Image className="product-image pointer ml-1"
                                                     src={this.state.show_purchase_offer_data.image_2}
                                                     onClick={() => this.setState({show_modal_for_image: this.state.show_purchase_offer_data.image_2})}></Image>}
+
+                                            {this.state.show_purchase_offer_data.image_3 && 
+                                                <Image className="product-image pointer ml-1"
+                                                    src={this.state.show_purchase_offer_data.image_3}
+                                                    onClick={() => this.setState({show_modal_for_image: this.state.show_purchase_offer_data.image_3})}></Image>}
                                             <ReactModal 
                                                 isOpen={!!this.state.show_modal_for_image}
                                                 onRequestClose={() => this.setState({show_modal_for_image: null})}
