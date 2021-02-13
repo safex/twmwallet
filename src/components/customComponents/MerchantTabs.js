@@ -56,7 +56,7 @@ export default function MerchantTabs(props) {
                     <Image
                         width={75}
                         height={75}
-                        src={props.newAccountImage}
+                        src={props.offersImage}
                         roundedCircle
                     />
 

@@ -22,7 +22,7 @@ function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         backgroundColor: "#021d32",
-        width: 1600,
+        width: 1440,
         height: 900,
         minWidth: 1024,
         minHeight: 728,
