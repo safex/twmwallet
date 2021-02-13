@@ -3526,7 +3526,7 @@ class WalletHome extends React.Component {
                             <ReactModal
                                 isOpen={this.state.show_purchase_confirm_modal}
                                 closeTimeoutMS={500}
-                                className="keys-modal"
+                                className="purchase-confirm-modal"
                                 onRequestClose={this.handleConfirmationModal}
 
                                 style={{
@@ -3540,64 +3540,59 @@ class WalletHome extends React.Component {
                                     },
                                     content: {
                                         position: 'absolute',
-                                        top: '40px',
-                                        left: '40px',
-                                        right: '40px',
-                                        bottom: '40px',
+                                        top: '12%',
+                                        left: '30%',
                                         overflow: 'auto',
                                     }
                                 }}
                             >
-                                <h1>Purchase Confirmed: {this.state.show_purchase_offer.title}</h1>
+                                <div className="modal-title">
+                                    Purchase confirmed
+                                        <CgClose
+                                            className="pointer"
+                                            style={{ position: "absolute", right: "15px", color: "red" }}
+                                            size={20}
+                                            onClick={this.handleConfirmationModal}
+                                        />
+                                </div>
 
-                                <button onClick={() => print('receipt', 'html')}>Print</button>
+                                <div id="receipt" className="p-4">
+                                <div className="d-flex align-items-center">
+                                    <label className="mb-0">Title:</label>
+                                    <span className="ml-3">{this.state.show_purchase_offer.title}</span>
+                                </div>
 
-                                <h2>Purchase transaction committed.</h2>
+                                <div className="d-flex align-items-center mt-2">
+                                    <label className="mb-0">Transaction ID:</label>
+                                    <span className="ml-3">{this.state.purchase_txn_id}</span>
+                                </div>
 
-                                <h2>Transaction ID: {this.state.purchase_txn_id}</h2>
+                                <div className="d-flex align-items-center mt-2">
+                                    <label className="mb-0">Seller:</label>
+                                    <span className="ml-3">{this.state.purchase_txn_seller}</span>
+                                </div>
 
-                                <h2>Seller: {this.state.purchase_txn_seller}</h2>
+                                <div className="d-flex align-items-center mt-2">
+                                    <label className="mb-0">Purchased:</label>
+                                    <span className="ml-3">{this.state.purchase_txn_title}</span>
+                                </div>
 
-                                <h2>Purchased: {this.state.purchase_txn_title}</h2>
+                                <div className="d-flex align-items-center mt-2">
+                                    <label className="mb-0">Amount:</label>
+                                    <span className="ml-3">{this.state.purchase_txn_quantity}</span>
+                                </div>
 
-                                <h2>Amount: {this.state.purchase_txn_quantity}</h2>
+                                <div className="d-flex align-items-center mt-2">
+                                    <label className="mb-0">Price:</label>
+                                    <span className="ml-3">{this.state.purchase_txn_price}</span>
+                                </div>
 
-                                <h2>Price: {this.state.purchase_txn_price} SFX</h2>
+                                <div className="d-flex align-items-center mt-2">
+                                    <label className="mb-0">Network fee:</label>
+                                    <span className="ml-3">{this.state.purchase_txn_fee / 10000000000} SFX</span>
+                                </div>
 
-                                <h2>Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX</h2>
-
-                                <div style={{display: 'none'}}>
-                                    <h1 id="receipt" style={{textAlign: 'center'}}>
-                                        Purchase Confirmed: {this.state.show_purchase_offer.title}
-                                        <br/><br/>
-                                        Date: {new Date().toString()}
-                                        <br/><br/>
-                                        Transaction ID: {this.state.purchase_txn_id}
-                                        <br/><br/>
-                                        Seller: {this.state.purchase_txn_seller}
-                                        <br/><br/>
-                                        Purchased: {this.state.purchase_txn_title}
-                                        <br/><br/>
-                                        Amount: {this.state.purchase_txn_quantity}
-                                        <br/><br/>
-                                        Price: {this.state.purchase_txn_price} SFX
-                                        <br/><br/>
-                                        Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
-                                        <br/><br/>
-                                        Buyer: {this.state.sele} SFX
-                                        <br/><br/>
-                                        Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
-                                        <br/><br/>
-                                        Thank You For Shopping With Safex!
-                                    </h1>
-
-                                    {/*<p>
-                                    Public Key: {this.state.show_purchase_confirm_modal ?
-                                        this.state.twm_file.api.urls[this.state.api_url][this.state.show_purchase_offer.offer_id][this.state.purchase_txn_id].pgp_keys.public_key
-                                    :
-                                        ''
-                                    }
-                                </p>*/}
+                                <button className="mt-3" onClick={() => print('receipt', 'html')}>Print</button>
                                 </div>
                             </ReactModal>
 
