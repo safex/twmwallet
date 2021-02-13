@@ -158,6 +158,7 @@ class WalletHome extends React.Component {
             url: '',
             buyer_urls: [],
             user_registered: null,
+            show_modal_for_image: null,
             token_stakes: []
         };
     }
@@ -2629,13 +2630,13 @@ class WalletHome extends React.Component {
                         console.log(confirmed);
                         if (confirmed) {
                             try {
-                                console.log(quant);
                                 console.log(listing.title);
                                 console.log(listing.offer_id);
                                 console.log(listing.price);
                                 console.log(total_cost);
                                 console.log(mixins);
                                 this.setState({
+                                    purchase_txn_image: listing.main_image,
                                     purchase_txn_quantity: quant,
                                     purchase_txn_title: listing.title,
                                     purchase_txn_seller: listing.username,
@@ -3427,21 +3428,40 @@ class WalletHome extends React.Component {
                                     </div>
                                     </div>
                                           <div className="d-flex flex-column">
-                                              <div style={{width: '128px', height: '128px', backgroundColor: '#d3d3d329'}}>
-                                              <Image
-                                            className="product-image border border-dark"
-                                               src={this.state.show_purchase_offer_data.main_image}></Image>
+                                              <div className="d-flex" style={{height: '128px'}}>
+                                              {this.state.show_purchase_offer_data.main_image && <Image
+                                            className="product-image pointer"
+                                               src={this.state.show_purchase_offer_data.main_image}
+                                               onClick={() => this.setState({show_modal_for_image: this.state.show_purchase_offer_data.main_image})}></Image>}
+
+                                            {this.state.show_purchase_offer_data.image_2 && 
+                                                <Image className="product-image pointer ml-1"
+                                                    src={this.state.show_purchase_offer_data.image_2}
+                                                    onClick={() => this.setState({show_modal_for_image: this.state.show_purchase_offer_data.image_2})}></Image>}
+
+                                            {this.state.show_purchase_offer_data.image_3 && 
+                                                <Image className="product-image pointer ml-1"
+                                                    src={this.state.show_purchase_offer_data.image_3}
+                                                    onClick={() => this.setState({show_modal_for_image: this.state.show_purchase_offer_data.image_3})}></Image>}
+                                            <ReactModal 
+                                                isOpen={!!this.state.show_modal_for_image}
+                                                onRequestClose={() => this.setState({show_modal_for_image: null})}
+                                                >
+                                    <CgClose
+                                        className="pointer bg-white"
+                                        style={{position: 'absolute', top: '5px', right: '15px', color: 'red'}} 
+                                        size={20} 
+                                        onClick={()=> this.setState({show_modal_for_image: null})} />
+                                                    <div className="mt-4">
+                                                        <img src={this.state.show_modal_for_image} />
+                                                    </div>
+                                            </ReactModal>
+                                        {this.state.show_purchase_offer_data.image_3 && <Image className="product-image ml-1"
+                                               src={this.state.show_purchase_offer_data.image_3}></Image>}
+
+                                        {this.state.show_purchase_offer_data.image_4 && <Image className="product-image ml-1"
+                                               src={this.state.show_purchase_offer_data.image_4}></Image>}
                                               </div>
-                                          
-
-                                        <Image className="product-image border border-dark"
-                                               src={this.state.show_purchase_offer_data.image_2}></Image>
-
-                                        <Image className="product-image border border-dark"
-                                               src={this.state.show_purchase_offer_data.image_3}></Image>
-
-                                        <Image className="product-image border border-dark"
-                                               src={this.state.show_purchase_offer_data.image_4}></Image>
 
                                         <hr className="border border-light w-100"></hr>
 
@@ -3526,7 +3546,7 @@ class WalletHome extends React.Component {
                             <ReactModal
                                 isOpen={this.state.show_purchase_confirm_modal}
                                 closeTimeoutMS={500}
-                                className="keys-modal"
+                                className="purchase-confirm-modal"
                                 onRequestClose={this.handleConfirmationModal}
 
                                 style={{
@@ -3540,64 +3560,62 @@ class WalletHome extends React.Component {
                                     },
                                     content: {
                                         position: 'absolute',
-                                        top: '40px',
-                                        left: '40px',
-                                        right: '40px',
-                                        bottom: '40px',
+                                        top: '12%',
+                                        left: '30%',
                                         overflow: 'auto',
                                     }
                                 }}
                             >
-                                <h1>Purchase Confirmed: {this.state.show_purchase_offer.title}</h1>
+                                <div className="modal-title">
+                                    Purchase confirmed
+                                        <CgClose
+                                            className="pointer"
+                                            style={{ position: "absolute", right: "15px", color: "red" }}
+                                            size={20}
+                                            onClick={this.handleConfirmationModal}
+                                        />
+                                </div>
+{console.error(this.state.show_purchase_offer)}
+                                <div id="receipt" className="p-4">
+                                <div className="d-flex justify-content-center">
+                                    <img width="200px" src={this.state.purchase_txn_image} />
+                                </div>
+                                <div className="d-flex mt-3 align-items-center">
+                                    <label className="mb-0">Title:</label>
+                                    <span className="ml-3">{this.state.show_purchase_offer.title}</span>
+                                </div>
 
-                                <button onClick={() => print('receipt', 'html')}>Print</button>
+                                <div className="d-flex align-items-center mt-2">
+                                    <label className="mb-0">Transaction ID:</label>
+                                    <span className="ml-3">{this.state.purchase_txn_id}</span>
+                                </div>
 
-                                <h2>Purchase transaction committed.</h2>
+                                <div className="d-flex align-items-center mt-2">
+                                    <label className="mb-0">Seller:</label>
+                                    <span className="ml-3">{this.state.purchase_txn_seller}</span>
+                                </div>
 
-                                <h2>Transaction ID: {this.state.purchase_txn_id}</h2>
+                                <div className="d-flex align-items-center mt-2">
+                                    <label className="mb-0">Purchased:</label>
+                                    <span className="ml-3">{this.state.purchase_txn_title}</span>
+                                </div>
 
-                                <h2>Seller: {this.state.purchase_txn_seller}</h2>
+                                <div className="d-flex align-items-center mt-2">
+                                    <label className="mb-0">Amount:</label>
+                                    <span className="ml-3">{this.state.purchase_txn_quantity}</span>
+                                </div>
 
-                                <h2>Purchased: {this.state.purchase_txn_title}</h2>
+                                <div className="d-flex align-items-center mt-2">
+                                    <label className="mb-0">Price:</label>
+                                    <span className="ml-3">{this.state.purchase_txn_price}</span>
+                                </div>
 
-                                <h2>Amount: {this.state.purchase_txn_quantity}</h2>
+                                <div className="d-flex align-items-center mt-2">
+                                    <label className="mb-0">Network fee:</label>
+                                    <span className="ml-3">{this.state.purchase_txn_fee / 10000000000} SFX</span>
+                                </div>
 
-                                <h2>Price: {this.state.purchase_txn_price} SFX</h2>
-
-                                <h2>Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX</h2>
-
-                                <div style={{display: 'none'}}>
-                                    <h1 id="receipt" style={{textAlign: 'center'}}>
-                                        Purchase Confirmed: {this.state.show_purchase_offer.title}
-                                        <br/><br/>
-                                        Date: {new Date().toString()}
-                                        <br/><br/>
-                                        Transaction ID: {this.state.purchase_txn_id}
-                                        <br/><br/>
-                                        Seller: {this.state.purchase_txn_seller}
-                                        <br/><br/>
-                                        Purchased: {this.state.purchase_txn_title}
-                                        <br/><br/>
-                                        Amount: {this.state.purchase_txn_quantity}
-                                        <br/><br/>
-                                        Price: {this.state.purchase_txn_price} SFX
-                                        <br/><br/>
-                                        Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
-                                        <br/><br/>
-                                        Buyer: {this.state.sele} SFX
-                                        <br/><br/>
-                                        Network Fee: {this.state.purchase_txn_fee / 10000000000} SFX
-                                        <br/><br/>
-                                        Thank You For Shopping With Safex!
-                                    </h1>
-
-                                    {/*<p>
-                                    Public Key: {this.state.show_purchase_confirm_modal ?
-                                        this.state.twm_file.api.urls[this.state.api_url][this.state.show_purchase_offer.offer_id][this.state.purchase_txn_id].pgp_keys.public_key
-                                    :
-                                        ''
-                                    }
-                                </p>*/}
+                                <button className="mt-3" onClick={() => print('receipt', 'html')}>Print</button>
                                 </div>
                             </ReactModal>
 
@@ -4605,9 +4623,9 @@ class WalletHome extends React.Component {
                             <Image
                                 style={{height: 500}}
                                 className="align-content-center"
-                                src={require("./../../img/panda.png")}
+                                src={require("./../../img/wolf.svg")}
                             />
-                            <h1 className="black-text">Bear with us... we're just loading the correct info...</h1>
+                            <div className="bg-white"><h1 className="black-text">Loading...</h1></div>
                         </Container>
                     );
                 default:

@@ -119,6 +119,15 @@
     box-shadow: 0 1px 14px -7px #7b7b7b;
 }
 
+.purchase-confirm-modal {
+    width: 500px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    box-shadow: 0 1px 14px -7px #7b7b7b;
+}
+
 .buyer-messages-modal {
     width: 500px;
     height: 80%;
@@ -163,4 +172,14 @@
 
 .message--yours {
     background-color: #eee;
+}
+
+.settings-table-wrapper {
+    width: 95%;
+    min-width: 600px;
+    max-height: 80vh;
+    background: white;
+    overflow: overlay;
+    margin: 30px auto;
+    border: 1px solid lightgray;
 }
