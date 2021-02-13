@@ -158,6 +158,7 @@ class WalletHome extends React.Component {
             url: '',
             buyer_urls: [],
             user_registered: null,
+            show_modal_for_image: null,
             token_stakes: []
         };
     }
@@ -3427,21 +3428,35 @@ class WalletHome extends React.Component {
                                     </div>
                                     </div>
                                           <div className="d-flex flex-column">
-                                              <div style={{width: '128px', height: '128px', backgroundColor: '#d3d3d329'}}>
-                                              <Image
-                                            className="product-image border border-dark"
-                                               src={this.state.show_purchase_offer_data.main_image}></Image>
+                                              <div className="d-flex" style={{height: '128px'}}>
+                                              {this.state.show_purchase_offer_data.main_image && <Image
+                                            className="product-image"
+                                               src={this.state.show_purchase_offer_data.main_image}
+                                               onClick={() => this.setState({show_modal_for_image: this.state.show_purchase_offer_data.main_image})}></Image>}
+
+                                            {this.state.show_purchase_offer_data.image_2 && 
+                                                <Image className="product-image ml-1"
+                                                    src={this.state.show_purchase_offer_data.image_2}
+                                                    onClick={() => this.setState({show_modal_for_image: this.state.show_purchase_offer_data.image_2})}></Image>}
+                                            <ReactModal 
+                                                isOpen={!!this.state.show_modal_for_image}
+                                                onRequestClose={() => this.setState({show_modal_for_image: null})}
+                                                >
+                                    <CgClose
+                                        className="pointer bg-white"
+                                        style={{position: 'absolute', top: '5px', right: '15px', color: 'red'}} 
+                                        size={20} 
+                                        onClick={()=> this.setState({show_modal_for_image: null})} />
+                                                    <div className="mt-4">
+                                                        <img src={this.state.show_modal_for_image} />
+                                                    </div>
+                                            </ReactModal>
+                                        {this.state.show_purchase_offer_data.image_3 && <Image className="product-image ml-1"
+                                               src={this.state.show_purchase_offer_data.image_3}></Image>}
+
+                                        {this.state.show_purchase_offer_data.image_4 && <Image className="product-image ml-1"
+                                               src={this.state.show_purchase_offer_data.image_4}></Image>}
                                               </div>
-                                          
-
-                                        <Image className="product-image border border-dark"
-                                               src={this.state.show_purchase_offer_data.image_2}></Image>
-
-                                        <Image className="product-image border border-dark"
-                                               src={this.state.show_purchase_offer_data.image_3}></Image>
-
-                                        <Image className="product-image border border-dark"
-                                               src={this.state.show_purchase_offer_data.image_4}></Image>
 
                                         <hr className="border border-light w-100"></hr>
 
