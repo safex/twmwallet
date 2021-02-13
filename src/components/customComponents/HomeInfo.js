@@ -18,29 +18,35 @@ export default function HomeInfo(props) {
 
       <div className="d-flex flex-column">
         <label>SAFEX CASH BALANCE</label>
-        <div className="d-flex align-items-center">
+        <div className="d-flex flex-column">
+          <div>
           {props.firstRefresh === true
             ? props.cashBalance.toLocaleString() + " SFX"
             : "∞"}{" "}
           <img className="ml-2" src={sfxLogo} width={20} alt="Safex Cash" />
-          <br />
+          </div>
+          <span>
           {props.pendingCash > 0
             ? `(${props.pendingCash.toLocaleString()} SFX Pending)`
             : ""}
+          </span>
         </div>
       </div>
 
       <div className="d-flex flex-column mt-4">
         <label>SAFEX TOKEN BALANCE</label>
-        <div className="d-flex align-items-center">
+        <div className="d-flex flex-column">
+          <div>
           {props.firstRefresh === true
             ? props.tokenBalance.toLocaleString() + " SFT"
             : "∞"}
             <img src={sftLogo} width={30} alt="Safex Cash" />
-          <br />
+          </div>
+          <span>
           {props.pendingTokens > 0
             ? `(${props.pendingTokens.toLocaleString()} SFT Pending)`
             : ""}
+          </span>
         </div>
       </div>
     </div>
