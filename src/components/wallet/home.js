@@ -3446,6 +3446,24 @@ class WalletHome extends React.Component {
                                             <ReactModal 
                                                 isOpen={!!this.state.show_modal_for_image}
                                                 onRequestClose={() => this.setState({show_modal_for_image: null})}
+                                                style={{
+                                                    overlay: {
+                                                        position: 'fixed',
+                                                        top: 0,
+                                                        left: 0,
+                                                        right: 0,
+                                                        bottom: 0,
+                                                        backgroundColor: 'rgba(255, 255, 255, 0.75)'
+                                                    },
+                                                    content: {
+                                                        top: '50%',
+                                                        left: '50%',
+                                                        right: 'auto',
+                                                        bottom: 'auto',
+                                                        marginRight: '-50%',
+                                                        transform: 'translate(-50%, -50%)'
+                                                    }
+                                                }}
                                                 >
                                     <CgClose
                                         className="pointer bg-white"
@@ -3456,11 +3474,6 @@ class WalletHome extends React.Component {
                                                         <img src={this.state.show_modal_for_image} />
                                                     </div>
                                             </ReactModal>
-                                        {this.state.show_purchase_offer_data.image_3 && <Image className="product-image ml-1"
-                                               src={this.state.show_purchase_offer_data.image_3}></Image>}
-
-                                        {this.state.show_purchase_offer_data.image_4 && <Image className="product-image ml-1"
-                                               src={this.state.show_purchase_offer_data.image_4}></Image>}
                                               </div>
 
                                         <hr className="border border-light w-100"></hr>
@@ -3725,11 +3738,13 @@ class WalletHome extends React.Component {
 
                                     <MessagesModal 
                                         isOpen={this.state.showBuyerMessages}
+                                        apiUrl={this.state.api_url}
                                         closeFn={() => this.handleBuyerMessages()}
                                         sendFn={e => this.buyer_reply_by_order(e)}
                                         refreshFn={() => this.load_buyers_messages_for_selected_order()}
                                         messages={this.renderBuyerMessages()}
-                                        orderId={this.state.buyerSelectOrder} />
+                                        orderId={this.state.buyerSelectOrder}
+                                        offerId={this.state.buyerSelectOffer} />
                                 </div>
 
                                 :
@@ -3909,6 +3924,7 @@ class WalletHome extends React.Component {
 
                                                 :
                                                 <MerchantOffers
+                                                    apiUrl={this.state.api_url}
                                                     merchantReply={this.seller_reply_message}
                                                     loadOrders={this.get_seller_order_ids_by_offer}
                                                     loadMessages={this.get_messages_by_order_id_of_seller}
