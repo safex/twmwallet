@@ -3456,11 +3456,6 @@ class WalletHome extends React.Component {
                                                         <img src={this.state.show_modal_for_image} />
                                                     </div>
                                             </ReactModal>
-                                        {this.state.show_purchase_offer_data.image_3 && <Image className="product-image ml-1"
-                                               src={this.state.show_purchase_offer_data.image_3}></Image>}
-
-                                        {this.state.show_purchase_offer_data.image_4 && <Image className="product-image ml-1"
-                                               src={this.state.show_purchase_offer_data.image_4}></Image>}
                                               </div>
 
                                         <hr className="border border-light w-100"></hr>
@@ -3729,7 +3724,8 @@ class WalletHome extends React.Component {
                                         sendFn={e => this.buyer_reply_by_order(e)}
                                         refreshFn={() => this.load_buyers_messages_for_selected_order()}
                                         messages={this.renderBuyerMessages()}
-                                        orderId={this.state.buyerSelectOrder} />
+                                        orderId={this.state.buyerSelectOrder}
+                                        offerId={this.state.buyerSelectOffer} />
                                 </div>
 
                                 :
