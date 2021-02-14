@@ -197,7 +197,7 @@ export async function get_api_info(twm_api_url = 'http://127.0.0.1:17700') {
 export async function get_offer_by_id(offer_id, twm_api_url = 'http://127.0.0.1:17700') {
     return axios({
         method: 'post',
-        url: twm_api_url + '/offers/' + offer_id,
+        url: twm_api_url + '/offers/offer_id/' + offer_id,
         headers: {
             'Content-Type': 'application/json'
         }
