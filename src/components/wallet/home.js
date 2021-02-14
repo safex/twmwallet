@@ -3439,6 +3439,11 @@ class WalletHome extends React.Component {
                                                 <Image className="product-image pointer ml-1"
                                                     src={this.state.show_purchase_offer_data.image_3}
                                                     onClick={() => this.setState({show_modal_for_image: this.state.show_purchase_offer_data.image_3})}></Image>}
+
+                                            {this.state.show_purchase_offer_data.image_4 && 
+                                                <Image className="product-image pointer ml-1"
+                                                    src={this.state.show_purchase_offer_data.image_4}
+                                                    onClick={() => this.setState({show_modal_for_image: this.state.show_purchase_offer_data.image_4})}></Image>}    
                                             <ReactModal 
                                                 isOpen={!!this.state.show_modal_for_image}
                                                 onRequestClose={() => this.setState({show_modal_for_image: null})}
