@@ -1,7 +1,7 @@
 {
   "name": "twmwallet",
   "description": "graphical user interface to the world marketplace application on the safex blockchain",
-  "version": "v0.1.7",
+  "version": "v0.1.8",
   "homepage": "./",
   "repository": {
     "type": "git",
