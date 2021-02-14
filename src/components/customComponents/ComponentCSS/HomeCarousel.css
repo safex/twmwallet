@@ -1,9 +1,0 @@
-.home-carousel {
-    height: 50vh;
-    max-height: 600px;
-    margin-top: 20px;
-}
-
-.home-carousel .carousel-inner {
-    box-shadow: 0 1px 14px -7px #7b7b7b;
-}

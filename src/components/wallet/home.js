@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Row, Col, Container, Button, Table, Form, Image, Modal} from 'react-bootstrap';
+import {Row, Col, Container, Button, Form, Image} from 'react-bootstrap';
 
 import {withRouter} from 'react-router-dom';
 
@@ -49,7 +49,6 @@ import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import MainHeader from '../customComponents/MainHeader';
 import SendSafex from '../customComponents/SendSafex';
 import HomeInfo from '../customComponents/HomeInfo';
-import HomeCarousel from '../customComponents/HomeCarousel';
 import AccountInfo from '../customComponents/AccountInfo';
 import Stake from '../customComponents/Stake';
 import StakeInfo from '../customComponents/StakeInfo';
@@ -58,8 +57,6 @@ import MerchantAccounts from '../customComponents/MerchantAccounts';
 import MerchantTabs from '../customComponents/MerchantTabs';
 import MerchantOffers from '../customComponents/MerchantOffers';
 import MyOrders from '../customComponents/MyOrders';
-import OrderTableRow from '../customComponents/OrderTableRow';
-import OfferTableRow from '../customComponents/OfferTableRow';
 
 import {
     open_twm_file,
@@ -3204,7 +3201,6 @@ class WalletHome extends React.Component {
                                     toEllipsis={this.to_ellipsis}
                                 />
 
-                                <HomeCarousel/>
                             </Col>
                         </div>
                     );
