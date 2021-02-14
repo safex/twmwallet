@@ -65,6 +65,126 @@ export default class MerchantOffers extends React.Component {
         }
     };
 
+    getMerchantMessages() {
+        return this.state.selected_messages && this.state.selected_messages.map((msg, key) => {
+            console.log(`messages rendered`);
+            console.log(msg);
+            console.log(key);
+            try {
+                console.log(msg.message);
+                if (typeof msg.message == 'string') {
+                    msg.message = JSON.parse(msg.message);
+                }
+                if (msg.message.n.length > 0) {
+                    console.log(`nft address supplied!`);
+                    return (
+                        <div className="d-flex align-items-center justify-content-between mt-3" key={msg}>
+                        <span>
+                            {msg.position}
+                        </span>
+                        <span>{msg.message.n}</span>
+                    </div>
+                    );
+                } else if (msg.message.m.length > 0) {
+                    console.log(`this is a direct message open ended`);
+                    return (
+                        <div className="d-flex align-items-center mt-3" key={msg}>
+                        <span style={{color: '#0000004d'}}>
+                            {msg.position}
+                        </span>
+                        <span className={`message ${msg.from.startsWith('-----BEGIN') ? 'message--mine' : 'message--yours'}`}>{msg.message.m}</span>
+                    </div>
+                    );
+                } else if (msg.message.hasOwnProperty('so')) {
+                    console.log(msg.message.so);
+                    console.log(`found shipping object`);
+                    let parsed_so;
+                    if (typeof msg.message.so == 'string') {
+                        console.log(`so is a string`);
+
+                        parsed_so = JSON.parse(msg.message.so);
+                        console.log(parsed_so);
+                    } else {
+                        parsed_so = msg.message.so;
+                    }
+                    if (parsed_so.fn.length > 2) {
+                        console.log(`there is a shipping object supplied!`);
+                        try {
+                            console.log(`parsed the so`);
+                            return (
+                                <div key={key}>
+                                    <div>
+                                    <span>
+                                        {msg.position}
+                                    </span>
+                                    <div class="d-flex flex-column"
+                                    style={{
+                                        backgroundColor: '#d3d3d345',
+                                        padding: '10px',
+                                        borderRadius: '10px'}}>
+                                        <div class="d-flex">
+                                        <label>First name:</label>
+                                        <span className="ml-2">{parsed_so.fn}</span>
+                                        </div>
+                                        
+                                        <div class="d-flex">
+                                        <label>Last name:</label>
+                                        <span className="ml-2">{parsed_so.ln}</span>
+                                        </div>
+
+                                        <div class="d-flex">
+                                        <label>Email:</label>
+                                        <span className="ml-2">{parsed_so.ea}</span>
+                                        </div>
+
+                                        <div class="d-flex">
+                                        <label>Phone:</label>
+                                        <span className="ml-2">{parsed_so.ph}</span>
+                                        </div>
+                                    <div>
+                                        <label>Street Address:</label>
+                                        <span className="ml-2">{parsed_so.a1}</span>
+                                        </div>
+                                        <div class="d-flex">
+                                        <label>City:</label>
+                                        <span className="ml-2">{parsed_so.city}</span>
+                                        </div>
+                                        <div class="d-flex">
+                                        <label>State:</label>
+                                        <span className="ml-2">{parsed_so.s}</span>
+                                        </div>
+                                        <div class="d-flex">
+                                        <label>Area code:</label>
+                                        <span className="ml-2">{parsed_so.z}</span>
+                                        </div>
+                                        <div class="d-flex">
+                                        <label>Country:</label>
+                                        <span className="ml-2">{parsed_so.c}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            );
+                        } catch (err) {
+                            console.error(err);
+                            console.error(`error at parsing the shipping object`);
+                        }
+                    }
+                }
+                return (
+                    <div key={key}>
+                        {msg.position}
+                        {msg.msg}
+                    </div>
+                );
+            } catch (err) {
+                console.error(err);
+                console.error(`error parsing message contents`)
+            }
+
+        });
+    }
+
     //top level if not selected offer, then show
     //also top level if not selected order, then show
     render() {
@@ -145,139 +265,21 @@ export default class MerchantOffers extends React.Component {
                         )}
                     </div>
                 </div>)
-            } else if (this.state.selected_order !== '') {
-                const merchangeMessages = this.state.selected_messages.map((msg, key) => {
-                    console.log(`messages rendered`);
-                    console.log(msg);
-                    console.log(key);
-                    try {
-                        console.log(msg.message);
-                        if (typeof msg.message == 'string') {
-                            msg.message = JSON.parse(msg.message);
-                        }
-                        if (msg.message.n.length > 0) {
-                            console.log(`nft address supplied!`);
-                            return (
-                                <div className="d-flex align-items-center justify-content-between mt-3" key={msg}>
-                                <span>
-                                    {msg.position}
-                                </span>
-                                <span>{msg.message.n}</span>
-                            </div>
-                            );
-                        } else if (msg.message.m.length > 0) {
-                            console.log(`this is a direct message open ended`);
-                            return (
-                                <div className="d-flex align-items-center mt-3" key={msg}>
-                                <span style={{color: '#0000004d'}}>
-                                    {msg.position}
-                                </span>
-                                <span className={`message ${msg.from.startsWith('-----BEGIN') ? 'message--mine' : 'message--yours'}`}>{msg.message.m}</span>
-                            </div>
-                            );
-                        } else if (msg.message.hasOwnProperty('so')) {
-                            console.log(msg.message.so);
-                            console.log(`found shipping object`);
-                            let parsed_so;
-                            if (typeof msg.message.so == 'string') {
-                                console.log(`so is a string`);
-
-                                parsed_so = JSON.parse(msg.message.so);
-                                console.log(parsed_so);
-                            } else {
-                                parsed_so = msg.message.so;
-                            }
-                            if (parsed_so.fn.length > 2) {
-                                console.log(`there is a shipping object supplied!`);
-                                try {
-                                    console.log(`parsed the so`);
-                                    return (
-                                        <div key={key}>
-                                            <div>
-                                            <span>
-                                                {msg.position}
-                                            </span>
-                                            <div class="d-flex flex-column"
-                                            style={{
-                                                backgroundColor: '#d3d3d345',
-                                                padding: '10px',
-                                                borderRadius: '10px'}}>
-                                                <div class="d-flex">
-                                                <label>First name:</label>
-                                                <span className="ml-2">{parsed_so.fn}</span>
-                                                </div>
-                                                
-                                                <div class="d-flex">
-                                                <label>Last name:</label>
-                                                <span className="ml-2">{parsed_so.ln}</span>
-                                                </div>
-
-                                                <div class="d-flex">
-                                                <label>Email:</label>
-                                                <span className="ml-2">{parsed_so.ea}</span>
-                                                </div>
-
-                                                <div class="d-flex">
-                                                <label>Phone:</label>
-                                                <span className="ml-2">{parsed_so.ph}</span>
-                                                </div>
-                                            <div>
-                                                <label>Street Address:</label>
-                                                <span className="ml-2">{parsed_so.a1}</span>
-                                                </div>
-                                                <div class="d-flex">
-                                                <label>City:</label>
-                                                <span className="ml-2">{parsed_so.city}</span>
-                                                </div>
-                                                <div class="d-flex">
-                                                <label>State:</label>
-                                                <span className="ml-2">{parsed_so.s}</span>
-                                                </div>
-                                                <div class="d-flex">
-                                                <label>Area code:</label>
-                                                <span className="ml-2">{parsed_so.z}</span>
-                                                </div>
-                                                <div class="d-flex">
-                                                <label>Country:</label>
-                                                <span className="ml-2">{parsed_so.c}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        </div>
-                                    );
-                                } catch (err) {
-                                    console.error(err);
-                                    console.error(`error at parsing the shipping object`);
-                                }
-                            }
-                        }
-                        return (
-                            <div key={key}>
-                                {msg.position}
-                                {msg.msg}
-                            </div>
-                        );
-                    } catch (err) {
-                        console.error(err);
-                        console.error(`error parsing message contents`)
-                    }
-
-                });
-                the_view = (<div className="w-100">
-                    <MessagesModal
-                        isOpen={!!this.state.selected_order}
-                        closeFn={() => this.setState({selected_order: '', selected_messages: null})}
-                        sendFn={(e) => this.local_merchant_reply(e)}
-                        refreshFn={e => this.showMessagesModal(e, this.state.selected_order)}
-                        messages={merchangeMessages}
-                        orderId={this.state.selected_order.order_id} />
-                </div>)
             }
         }
 
         return (
             <div>
                 {the_view}
+                <MessagesModal
+                        apiUrl={this.props.apiUrl}
+                        isOpen={!!this.state.selected_order}
+                        closeFn={() => this.setState({selected_order: '', selected_messages: null})}
+                        sendFn={(e) => this.local_merchant_reply(e)}
+                        refreshFn={e => this.showMessagesModal(e, this.state.selected_order)}
+                        messages={this.getMerchantMessages()}
+                        offerId={this.state.selected_offer.offerID}
+                        orderId={this.state.selected_order.order_id} />
             </div>
         )
     }

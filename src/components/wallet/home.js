@@ -3738,6 +3738,7 @@ class WalletHome extends React.Component {
 
                                     <MessagesModal 
                                         isOpen={this.state.showBuyerMessages}
+                                        apiUrl={this.state.api_url}
                                         closeFn={() => this.handleBuyerMessages()}
                                         sendFn={e => this.buyer_reply_by_order(e)}
                                         refreshFn={() => this.load_buyers_messages_for_selected_order()}
@@ -3923,6 +3924,7 @@ class WalletHome extends React.Component {
 
                                                 :
                                                 <MerchantOffers
+                                                    apiUrl={this.state.api_url}
                                                     merchantReply={this.seller_reply_message}
                                                     loadOrders={this.get_seller_order_ids_by_offer}
                                                     loadMessages={this.get_messages_by_order_id_of_seller}
