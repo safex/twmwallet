@@ -3184,6 +3184,18 @@ class WalletHome extends React.Component {
         })
     };
 
+    renderAddressComponent = () => {
+        return (<AccountInfo
+            password={this.state.password}
+            rescan={this.rescan}
+            address={this.props.wallet.address()}
+            spendKey={this.props.wallet.secretSpendKey()}
+            viewKey={this.props.wallet.secretViewKey()}
+            seed={this.props.wallet.seed()}
+            toEllipsis={this.to_ellipsis}
+        />)
+    }
+
 
     render() {
         var message_render;
@@ -3224,22 +3236,7 @@ class WalletHome extends React.Component {
                             </Col>
 
                             <Col sm={7} className="no-padding d-flex flex-column  justify-content-between">
-                                <AccountInfo
-                                    password={this.state.password}
-                                    rescan={this.rescan}
-                                    handleShow={this.handleKeys}
-                                    show={this.state.show_keys}
-                                    handleKeyRequest={() => {
-                                        this.setState({keyRequest: !this.state.keyRequest})
-                                    }}
-                                    keyRequest={this.state.keyRequest}
-                                    address={this.props.wallet.address()}
-                                    spendKey={this.props.wallet.secretSpendKey()}
-                                    viewKey={this.props.wallet.secretViewKey()}
-                                    seed={this.props.wallet.seed()}
-                                    toEllipsis={this.to_ellipsis}
-                                />
-
+                                {this.renderAddressComponent()}                                
                             </Col>
                         </div>
                     );
@@ -3690,20 +3687,7 @@ class WalletHome extends React.Component {
                                 sm={7}
                                 className="no-padding d-flex flex-column justify-content-between"
                             >
-                                <AccountInfo
-                                    rescan={this.rescan}
-                                    handleShow={this.handleKeys}
-                                    show={this.state.show_keys}
-                                    handleKeyRequest={() => {
-                                        this.setState({keyRequest: !this.state.keyRequest})
-                                    }}
-                                    keyRequest={this.state.keyRequest}
-                                    address={this.props.wallet.address()}
-                                    spendKey={this.props.wallet.secretSpendKey()}
-                                    viewKey={this.props.wallet.secretViewKey()}
-                                    seed={this.props.wallet.seed()}
-                                    toEllipsis={this.to_ellipsis}
-                                />
+                                {this.renderAddressComponent()}
                             </Col>
 
                                 <div
@@ -3914,21 +3898,7 @@ class WalletHome extends React.Component {
                                 </Col>
 
                                 <Col sm={7} className="no-padding d-flex flex-column  justify-content-between">
-                                    <AccountInfo
-                                        rescan={this.rescan}
-                                        handleShow={this.handleKeys}
-                                        show={this.state.show_keys}
-                                        handleKeyRequest={() => {
-                                            this.setState({keyRequest: !this.state.keyRequest})
-                                        }}
-                                        keyRequest={this.state.keyRequest}
-                                        address={this.props.wallet.address()}
-                                        spendKey={this.props.wallet.secretSpendKey()}
-                                        viewKey={this.props.wallet.secretViewKey()}
-                                        seed={this.props.wallet.seed()}
-                                        toEllipsis={this.to_ellipsis}
-                                    />
-
+                                    {this.renderAddressComponent()}
                                     {this.state.merchantTabs === "accounts" ?
                                         <MerchantAccounts
                                             handleChange={this.handleChange}
