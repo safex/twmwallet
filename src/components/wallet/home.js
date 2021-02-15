@@ -3504,7 +3504,7 @@ class WalletHome extends React.Component {
 
                                         <div className="d-flex flex-column mt-3">
                                             <label>Description:</label>
-                                            <span>{this.state.show_purchase_offer.descprition}</span>
+                                            <span>{this.state.show_purchase_offer.description}</span>
                                         </div>
 
                                         <div className="d-flex flex-column mt-3">
