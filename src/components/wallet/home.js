@@ -3192,6 +3192,8 @@ class WalletHome extends React.Component {
             spendKey={this.props.wallet.secretSpendKey()}
             viewKey={this.props.wallet.secretViewKey()}
             seed={this.props.wallet.seed()}
+            showKeys={this.props.showKeys}
+            onInitialShowClose={this.props.onInitialShowClose}
             toEllipsis={this.to_ellipsis}
         />)
     }

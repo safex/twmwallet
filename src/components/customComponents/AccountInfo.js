@@ -43,7 +43,7 @@ class AccountInfo extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = this.defaultState;
+    this.state = {...this.defaultState, showKeys: props.showKeys || false};
   }
 
   showPasswordConfirmation = () => {
@@ -51,6 +51,7 @@ class AccountInfo extends React.Component {
   }
 
   reset = () => {
+    this.props.onInitialShowClose && this.props.onInitialShowClose()
     this.setState(this.defaultState);
   };
 

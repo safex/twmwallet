@@ -34,11 +34,16 @@ export default class CreateWallet extends React.Component {
       wallet_made: false,
       loading: false,
       pageNumber: 1,
+      showKeys: false
     };
     this.wallet_meta = null;
   }
 
   async componentDidMount() {}
+
+  handleInitialKeysClose = () => {
+    this.setState({showKeys: false});
+  }
 
   set_path = (e) => {
     e.preventDefault();
@@ -158,7 +163,7 @@ export default class CreateWallet extends React.Component {
           console.error(err);
           console.error(`error at initial save of the twm file`);
         }
-        this.setState({ wallet_made: true, wallet: wallet, loading: false });
+        this.setState({ wallet_made: true, wallet: wallet, loading: false, showKeys: true });
       } catch (err) {
         this.setState({ loading: false });
         console.error(err);
@@ -225,7 +230,9 @@ export default class CreateWallet extends React.Component {
             daemon_host={this.state.daemon_host}
             daemon_port={this.state.daemon_port}
             password={this.state.password}
-            wallet_path={this.state.new_path} />      
+            wallet_path={this.state.new_path}
+            showKeys={this.state.showKeys}
+            onInitialShowClose={this.handleInitialKeysClose} />      
           </div>
         </div>)
       }
