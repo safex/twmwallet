@@ -129,6 +129,7 @@ class WalletHome extends React.Component {
             twm_file: {},
             show_purchase_offer: {title: '', quantity: 0, offerID: '', seller: ''},
             show_purchase_offer_data: {main_image: false},
+            show_edit_offer_data: {description: '', main_image: '', image_2: '', image_3: '', image_4: '', sku: '', barcode: '', weight: '', country: ''},
             show_edit_offer: {},
             order_ids_selected: [],
             messages_selected: [],
@@ -1095,9 +1096,11 @@ class WalletHome extends React.Component {
         let nft_state = false;
         let shipping_state = false;
         let open_message_state = false;
+        let d_obj = {};
         try {
             let p_data = JSON.parse(listing.description);
             console.log(p_data);
+            let d_obj = {};
             if (p_data.hasOwnProperty('nft')) {
                 nft_state = p_data.nft;
                 console.log(nft_state);
@@ -1108,6 +1111,34 @@ class WalletHome extends React.Component {
             if (p_data.hasOwnProperty('shipping')) {
                 shipping_state = p_data.shipping;
             }
+            if (p_data.description) {
+                d_obj.description = p_data.description;
+            }
+            if (p_data.main_image) {
+                d_obj.main_image = p_data.main_image;
+            }
+            if (p_data.image_2) {
+                d_obj.image_2 = p_data.image_2;
+            }
+            if (p_data.image_3) {
+                d_obj.image_3 = p_data.image_3;
+            }
+            if (p_data.image_4) {
+                d_obj.image_4 = p_data.image_4;
+            }
+            if (p_data.sku) {
+                d_obj.sku = p_data.sku;
+            }
+            if (p_data.barcode) {
+                d_obj.barcode = p_data.barcode;
+            }
+            if (p_data.weight) {
+                d_obj.weight = p_data.weight;
+            }
+            if (p_data.country) {
+                d_obj.country = p_data.country;
+            }
+            this.setState({show_edit_offer_data: p_data})
         } catch (err) {
             console.error(err);
             console.error(`error at the loading of listing data`);
@@ -2993,7 +3024,6 @@ class WalletHome extends React.Component {
         console.log(`let's list the offer it`);
         let va = e.target;
 
-        console.log(va.offerid.value);
 
         let o_obj = {};
         o_obj.twm_version = 1;
@@ -3003,6 +3033,15 @@ class WalletHome extends React.Component {
         }
         if (va.main_image.value.length > 0) {
             o_obj.main_image = va.main_image.value;
+        }
+        if (va.image_2.value.length > 0) {
+            o_obj.image_2 = va.image_2.value;
+        }
+        if (va.image_3.value.length > 0) {
+            o_obj.image_3 = va.image_3.value;
+        }
+        if (va.image_4.value.length > 0) {
+            o_obj.image_4 = va.image_4.value;
         }
         if (va.sku.value.length > 0) {
             o_obj.sku = va.sku.value;
@@ -4385,10 +4424,26 @@ class WalletHome extends React.Component {
 
                                                         <Form.Control
                                                             name="main_image"
-                                                            defaultValue={data.main_image}
+                                                            defaultValue={this.state.show_edit_offer_data.main_image}
+                                                            onChange={this.handleChange}
+                                                        />
+                                                        <Form.Control
+                                                            name="image_2"
+                                                            defaultValue={this.state.show_edit_offer_data.image_2}
+                                                            onChange={this.handleChange}
+                                                        />
+                                                        <Form.Control
+                                                            name="image_3"
+                                                            defaultValue={this.state.show_edit_offer_data.image_3}
+                                                            onChange={this.handleChange}
+                                                        />
+                                                        <Form.Control
+                                                            name="image_4"
+                                                            defaultValue={this.state.show_edit_offer_data.image_4}
                                                             onChange={this.handleChange}
                                                         />
                                                     </Form.Group>
+
                                                 </Col>
 
                                                 <Col md="4">
@@ -4396,7 +4451,7 @@ class WalletHome extends React.Component {
                                                         className="border border-white grey-back"
                                                         width={150}
                                                         height={150}
-                                                        src={this.state.new_offer_image ? this.state.new_offer_image : data.main_image}
+                                                        src={this.state.new_offer_image ? this.state.new_offer_image : this.state.show_edit_offer_data.main_image}
                                                         roundedCircle
                                                     />
                                                 </Col>
@@ -4415,7 +4470,7 @@ class WalletHome extends React.Component {
 
                                                     <Form.Control maxLength="2000" as="textarea"
                                                                   name="description"
-                                                                  defaultValue={data.description}/>
+                                                                  defaultValue={this.state.show_edit_offer_data.description}/>
                                                 </Form.Group>
                                             </Form.Row>
 
@@ -4442,7 +4497,7 @@ class WalletHome extends React.Component {
 
                                                     <Form.Control
                                                         name="sku"
-                                                        defaultValue={data.sku}
+                                                        defaultValue={this.state.show_edit_offer_data.sku}
                                                     />
                                                 </Form.Group>
                                                 <Form.Group md="6" as={Col}>
@@ -4450,7 +4505,7 @@ class WalletHome extends React.Component {
 
                                                     <Form.Control
                                                         name="barcode"
-                                                        defaultValue={data.barcode}
+                                                        defaultValue={this.state.show_edit_offer_data.barcode}
                                                     />
                                                 </Form.Group>
                                                 <Form.Group md="6" as={Col}>
@@ -4458,7 +4513,7 @@ class WalletHome extends React.Component {
 
                                                     <Form.Control
                                                         name="weight"
-                                                        defaultValue={data.weight}
+                                                        defaultValue={this.state.show_edit_offer_data.weight}
                                                     />
                                                 </Form.Group>
 
@@ -4469,8 +4524,7 @@ class WalletHome extends React.Component {
 
                                                     <Form.Control
                                                         name="country"
-                                                        defaultValue={data.country}
-                                                        placedholder="your location"
+                                                        defaultValue={this.state.show_edit_offer_data.country}
                                                     />
                                                 </Form.Group>
                                                 <Row className="w-100 justify-content-around my-3">
