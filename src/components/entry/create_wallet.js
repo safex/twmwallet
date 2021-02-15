@@ -217,22 +217,24 @@ export default class CreateWallet extends React.Component {
         </Container>)
       }
 
+      if (this.state.wallet_made) {
+        return (<div className={`w-100 h-100`}>
+          <div className="w-100 h-100">
+          <WalletHome
+            wallet={this.state.wallet}
+            daemon_host={this.state.daemon_host}
+            daemon_port={this.state.daemon_port}
+            password={this.state.password}
+            wallet_path={this.state.new_path} />      
+          </div>
+        </div>)
+      }
+
     return (
       <div
         fluid
-        className={`w-100 h-100 ${this.state.wallet_made ? "background-entry-fix" : ""}`}
+        className={`w-100 h-100`}
       >
-        {this.state.wallet_made ? (
-          <div fluid className="w-100 height100 justify-content-between">
-            <WalletHome
-              wallet={this.state.wallet}
-              daemon_host={this.state.daemon_host}
-              daemon_port={this.state.daemon_port}
-              password={this.state.password}
-              wallet_path={this.state.new_path}
-            />
-          </div>
-        ) : (
           <div
             fluid
             className="w-100 h-100 d-flex flex-column justify-content-center align-items-center"
@@ -319,19 +321,7 @@ export default class CreateWallet extends React.Component {
                 </a>
               </Row>
 
-              {this.state.wallet_made && (
-                <Container fluid className="height100 justify-content-between">
-                  <WalletHome
-                    wallet={this.state.wallet}
-                    daemon_host={this.state.daemon_host}
-                    daemon_port={this.state.daemon_port}
-                    password={this.state.password}
-                    wallet_path={this.state.new_path}
-                  />
-                </Container>
-              )}
-
-              {this.state.pageNumber === 1 ? (
+              {this.state.pageNumber === 1 && (
                 <div>
                   {this.state.new_path.length > 0 ? (
                     <div className="entry-container">
@@ -382,11 +372,9 @@ export default class CreateWallet extends React.Component {
                     </div>
                   )}
                 </div>
-              ) : (
-                ""
               )}
 
-              {this.state.new_path.length > 0 && this.state.pageNumber === 2 ? (
+              {this.state.new_path.length > 0 && this.state.pageNumber === 2 && (
                 <div className="entry-container">
                   <div className="entry-info-div">
                     <IconContext.Provider
@@ -494,11 +482,9 @@ export default class CreateWallet extends React.Component {
                     </div>
                   )}
                 </div>
-              ) : (
-                ""
               )}
 
-              {this.state.pageNumber === 3 ? (
+              {this.state.pageNumber === 3 && (
                 <div className="entry-container">
                   <form
                     id="set_password"
@@ -533,15 +519,13 @@ export default class CreateWallet extends React.Component {
                     </button>
                   </form>
                 </div>
-              ) : (
-                ""
               )}
 
               {this.state.new_path.length > 0 &&
               this.state.daemon_host.length > 0 &&
               this.state.wallet_made === false &&
               this.state.password.length > 0 &&
-              this.state.pageNumber === 4 ? (
+              this.state.pageNumber === 4 && (
                 <div className="entry-container">
                   <p>
                     This file will be saved to: <i>{this.state.new_path}</i>
@@ -555,12 +539,9 @@ export default class CreateWallet extends React.Component {
                     Create New Wallet
                   </button>
                 </div>
-              ) : (
-                ""
               )}
             </div>
           </div>
-        )}
       </div>
     );
   }
