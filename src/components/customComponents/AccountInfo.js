@@ -1,15 +1,10 @@
 import React from "react";
 import ReactModal from "react-modal";
-
 import ReactTooltip from "react-tooltip";
-
-// Icon Imports
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { CgClose, CgCopy, CgKey } from "react-icons/cg";
 
 import "./ComponentCSS/AccountInfo.css";
-
-import print from "print-js";
 import copy from "copy-to-clipboard";
 
 const renderRow = (id, label, value, renderTooltipMessage) => (
@@ -43,28 +38,33 @@ class AccountInfo extends React.Component {
     passwordInput: "",
     askPassword: false,
     wrongPassword: false,
+    showKeys: false
   };
+
   constructor(props) {
     super(props);
-    this.state = this.defaultState;
+    this.state = {...this.defaultState, showKeys: props.showKeys || false};
   }
 
-  closePasswordBox = () => {
+  showPasswordConfirmation = () => {
+    this.setState({askPassword: true})
+  }
+
+  reset = () => {
+    this.props.onInitialShowClose && this.props.onInitialShowClose()
     this.setState(this.defaultState);
-    this.props.handleShow();
   };
 
   confirmPassword = () => {
     if (this.state.passwordInput !== this.props.password) {
       return this.setState({ wrongPassword: true });
     }
-    this.setState(this.defaultState);
-    this.props.handleShow(this.state.passwordInput);
+    this.setState({...this.defaultState, showKeys: true});
   };
 
   render() {
     const { props } = this;
-    return this.props.keyRequest === false ? (
+    return (
       <div className="account-info-box p-4 mt-4">
         <div className="d-flex align-items-center justify-content-between mb-2">
           <label for="safexAddress" class="form-label">
@@ -101,26 +101,16 @@ class AccountInfo extends React.Component {
             type="button"
             data-tip="Show keys"
             id="button-addon2"
-            onClick={() => {
-              props.handleKeyRequest();
-              this.setState({ askPassword: true });
-            }}
+            onClick={() => this.showPasswordConfirmation()}
           >
             <CgKey size={20} />
           </button>
         </div>
-        {/* <h1>{props.address}</h1> */}
-        {/*this.state.synced === false ? (
-                        <Button variant="warning" onClick={this.check}>
-                            Check
-                    </Button>) : ''*/}
-      </div>
-    ) : (
-      <div className="account-info-box p-4 mt-4">
+
         <ReactModal
           isOpen={this.state.askPassword}
           className="ask-password-modal"
-          onRequestClose={this.closePasswordBox}
+          onRequestClose={this.reset}
           style={{
             overlay: {
               position: "fixed",
@@ -144,7 +134,7 @@ class AccountInfo extends React.Component {
               className="pointer"
               style={{ position: "absolute", right: "15px", color: "red" }}
               size={20}
-              onClick={this.closePasswordBox}
+              onClick={this.reset}
             />
           </div>
           <div
@@ -171,9 +161,9 @@ class AccountInfo extends React.Component {
         </ReactModal>
 
         <ReactModal
-          isOpen={props.show}
+          isOpen={this.state.showKeys}
           className="show-keys-modal"
-          onRequestClose={props.handleShow}
+          onRequestClose={this.reset}
           style={{
             overlay: {
               position: "fixed",
@@ -197,7 +187,7 @@ class AccountInfo extends React.Component {
               className="pointer"
               style={{ position: "absolute", right: "15px", color: "red" }}
               size={20}
-              onClick={props.handleShow}
+              onClick={this.reset}
             />
           </div>
           <div className="p-4">
@@ -258,7 +248,7 @@ class AccountInfo extends React.Component {
           </div>
         </ReactModal>
       </div>
-    );
+    )
   }
 }
 
