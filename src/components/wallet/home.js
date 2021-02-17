@@ -4616,20 +4616,12 @@ class WalletHome extends React.Component {
                                     id="send_token"
                                 />
                             </Col>
-                            <Col sm={9} className="no-padding token-main-box">
-                                <Row className="mx-auto w-100">
+                                <div style={{width: '900px'}} className="p-4">
                                     <StakingTable
                                         stakeRows={this.state.token_stakes}
                                     />
-                                    <Row className="justify-content-around w-100 mx-auto my-5">
-                                        <Stake
-                                            style="stake"
-                                            send={this.make_token_stake}
-                                            id="stake_token"
-                                            tokenBalance={this.state.tokens.toLocaleString()}
-                                            tokenStakes={this.state.token_stakes}
-                                        />
-                                        <StakeInfo
+                                    <div className="d-flex justify-content-between w-100 mt-4">
+                                    <StakeInfo
                                             tokenBalance={this.state.tokens.toLocaleString()}
                                             pendingStakeBalance={this.state.pending_stake.toLocaleString()}
                                             stakedBalance={this.state.unlocked_stake.toLocaleString()}
@@ -4639,14 +4631,20 @@ class WalletHome extends React.Component {
                                             totalNetworkStake={this.state.blockchain_tokens_staked.toLocaleString()}
                                         />
                                         <Stake
+                                            style="stake"
+                                            send={this.make_token_stake}
+                                            id="stake_token"
+                                            tokenBalance={this.state.tokens.toLocaleString()}
+                                            tokenStakes={this.state.token_stakes}
+                                        />
+                                        <Stake
                                             style="unstake"
                                             send={this.make_token_unstake}
                                             id="stake_token"
                                             tokenStakes={this.state.token_stakes}
                                         />
-                                    </Row>
-                                </Row>
-                            </Col>
+                                    </div>
+                                </div>
                         </div>
                     );
                 }
