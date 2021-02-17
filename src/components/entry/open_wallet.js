@@ -260,15 +260,49 @@ export default class OpenWallet extends React.Component {
     return this.state.loading === true;
   }
 
+  renderUrlTooltip() {
+    return (
+      <>
+      <AiOutlineInfoCircle className="ml-2" size={15} data-tip data-for="daemonHostInfo" />
+                      <ReactTooltip
+                        id="daemonHostInfo"
+                        effect="solid"
+                        type="info"
+                        place="bottom"
+                      >
+                        <span>
+                          This is the URL used to connect to the Safex
+                          blockchain.
+                          <br />
+                          You can use the default provided by the Safex
+                          Foundation
+                          <br />
+                          or replace it with your own full node.
+                          <br />
+                          <br />
+                          <ul className="mb-4">
+                            <li>
+                              The default self hosted wallet setup would be:
+                            </li>
+                            <li className="mt-4">
+                              HOST: <b>127.0.0.1</b>
+                            </li>
+                            <li className="mt-1">
+                              PORT: <b>17402</b>
+                            </li>
+                            <li className="mt-2">
+                              The default is rpc.safex.org:30393
+                            </li>
+                          </ul>
+                        </span>
+                      </ReactTooltip>
+                      </>
+    )
+  }
+
   render() {
     return (
-      <div
-        className={
-          this.state.wallet_made && !this.isLoading
-            ? "h-100 w-100"
-            : "h-100 background-entry-fix w-100"
-        }
-      >
+      <div className="h-100 w-100">
         {this.state.wallet_made && !this.isLoading ? (
           <div className="w-100 h-100">
             <WalletHome
@@ -370,14 +404,14 @@ export default class OpenWallet extends React.Component {
                 <div>
                   {this.state.new_path.length > 0 ? (
                     <div className="entry-container">
-                      <Col className="justify-content-around d-flex flex-column">
-                        <p>
+                        <p className="h3">
                           {" "}
-                          Selected Wallet File: <i>{this.state.new_path}</i>
+                          Selected Wallet File: <br /><i>{this.state.new_path}</i>
                         </p>
 
+                        <div className="d-flex flex-column mt-3">
                         <button
-                          className="mx-auto custom-button-entry"
+                          className="w-100 mx-auto custom-button-entry"
                           onClick={this.change_path}
                         >
                           Change File
@@ -385,37 +419,34 @@ export default class OpenWallet extends React.Component {
 
                         <button
                           autoFocus
-                          className="mx-auto custom-button-entry orange-border"
+                          className="mt-2 w-100 mx-auto custom-button-entry orange-border"
                           onClick={() => this.setState({ pageNumber: 2 })}
                         >
                           Continue
                         </button>
-                      </Col>
+                        </div>
                     </div>
                   ) : (
                     <div className="entry-container">
-                      <p>
+                      <p className="h3">
                         Open an existing Safex wallet by selecting the{" "}
                         <b>.keys file</b>
                       </p>
 
                       <Form
-                        className="mt-2 mb-2"
+                        className="mt-4"
                         id="set_path"
                         onSubmit={this.set_path}
                       >
                         <input className="display-none" type="file" />
-                        <Col className="justify-content-around d-flex flex-column">
                           <button
                             autoFocus
-                            className="mx-auto custom-button-entry orange-border my-5"
+                            className="w-100 mx-auto custom-button-entry orange-border"
                             type="submit"
                             variant="primary"
-                            size="lg"
                           >
                             Select File Path
                           </button>
-                        </Col>
                       </Form>
                     </div>
                   )}
@@ -425,48 +456,7 @@ export default class OpenWallet extends React.Component {
               )}
 
               {this.state.pageNumber === 2 ? (
-                <div className="entry-container">
-                  <div className="entry-info-div">
-                    <IconContext.Provider
-                      value={{ color: "#767676", size: "30px" }}
-                    >
-                      <AiOutlineInfoCircle data-tip data-for="daemonHostInfo" />
-
-                      <ReactTooltip
-                        className="entry-tooltip-container"
-                        id="daemonHostInfo"
-                        effect="solid"
-                        place="bottom"
-                      >
-                        <span>
-                          This is the URL used to connect to the Safex
-                          blockchain.
-                          <br />
-                          You can use the default provided by the Safex
-                          Foundation
-                          <br />
-                          or replace it with your own full node.
-                          <br />
-                          <br />
-                          <ul className="mb-4">
-                            <li>
-                              The default self hosted wallet setup would be:
-                            </li>
-                            <li className="mt-4">
-                              HOST: <b>127.0.0.1</b>
-                            </li>
-                            <li className="mt-1">
-                              PORT: <b>17402</b>
-                            </li>
-                            <li className="mt-2">
-                              The default is rpc.safex.org:30393
-                            </li>
-                          </ul>
-                        </span>
-                      </ReactTooltip>
-                    </IconContext.Provider>
-                  </div>
-
+                <div className="entry-container p-4">
                   {this.state.daemon_host.length < 1 ? (
                     <form
                       id="set_daemon"
@@ -475,6 +465,7 @@ export default class OpenWallet extends React.Component {
                     >
                       <label className="entry-form-label" htmlFor="daemon-host">
                         Daemon Host:
+                        {this.renderUrlTooltip()}
                       </label>
 
                       <input
@@ -489,7 +480,7 @@ export default class OpenWallet extends React.Component {
 
                       <input
                         id="daemon-port"
-                        className="mt-2 mb-5"
+                        className="mt-2 mb-3"
                         name="daemon_port"
                         defaultValue="30393"
                         placedholder="set the port of the safex blockchain"
@@ -497,27 +488,26 @@ export default class OpenWallet extends React.Component {
 
                       <button
                         autoFocus
-                        className="custom-button-entry orange-border"
+                        className="w-100 custom-button-entry orange-border"
                         type="submit"
                         variant="primary"
-                        size="lg"
                       >
                         Set Connection
                       </button>
                     </form>
                   ) : (
-                    <div className="d-flex flex-column justify-content-around h-100">
-                      <p>
+                    <div className="d-flex flex-column h-100">
+                      <p className="h3">
                         You will be connected to:
                         <br />
                         <i>
                           {this.state.daemon_host}:{this.state.daemon_port}
                         </i>
+                        {this.renderUrlTooltip()}
                       </p>
 
                       <button
-                        className="custom-button-entry"
-                        size="lg"
+                        className="mt-2 w-100 custom-button-entry"
                         onClick={() =>
                           this.setState({ daemon_host: "", daemon_port: 0 })
                         }
@@ -527,7 +517,7 @@ export default class OpenWallet extends React.Component {
 
                       <button
                         autoFocus
-                        className="mx-auto custom-button-entry orange-border"
+                        className="mt-2 w-100 mx-auto custom-button-entry orange-border"
                         onClick={() => this.setState({ pageNumber: 3 })}
                       >
                         Continue
@@ -577,10 +567,10 @@ export default class OpenWallet extends React.Component {
 
                     <button
                       type="submit"
-                      className={
+                      className={`w-100 mt-2 ${
                         this.state.error === "checking"
                           ? "opacity100"
-                          : "custom-button-entry orange-border my-5"
+                          : "custom-button-entry orange-border"}`
                       }
                     >
                       Continue
