@@ -63,15 +63,11 @@
 }
 
 .custom-button-send {
-    width: 90%;
-    margin-left: auto;
-    margin-right: auto;
-    font-family: 'Inter', sans-serif;
-    font-size: 2.5rem;
+    width: 100%;
+    font-size: 2rem;
     font-weight: 600;
     text-align: center;
     border-radius: 10px;
-
     color:#fff;
     padding: .5rem;
 }

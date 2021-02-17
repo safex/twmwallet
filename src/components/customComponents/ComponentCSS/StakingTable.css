@@ -1,10 +1,7 @@
 .staking-table-box {
     height: 20vh;
     max-height: 600px;
-    width: 95%;
-    border-radius: 50px;
-    margin: 3rem auto;
-
+    border-radius: 10px;
     background-color: white;
     box-shadow: var(--blue-box-shadow);
 }
@@ -17,8 +14,7 @@
     justify-content: center;
     align-items: center;
     background: linear-gradient(180deg, #3698F3 0%, #13D3FD 100%);
-    border-radius: 25px 0 0 25px;
-
+    border-radius: 10px 0 0 10px;
     color: white;
     font-family: 'Inter';
     font-size: 2.2rem;
@@ -28,19 +24,9 @@
 }
 
 .staking-table-table {
-    width: 100%;
     max-height: 45vh;
     overflow-y: auto;
-    margin: auto 0;
     padding: 2rem;
-
-    font-family: 'Inter';
-    font-size: 1.5rem;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 26px;
-    letter-spacing: 0em;
-    text-align: center;
 }
 
 .staking-table-header {
