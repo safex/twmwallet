@@ -1,13 +1,10 @@
 import React from "react";
-import { Row, Col, Container, Form, Image } from "react-bootstrap";
+import { Row, Col, Form, Image } from "react-bootstrap";
 import { recover_from_seed_util } from "../../utils/wallet_creation";
 
 import WalletHome from "../wallet/home";
 
 import ProgressIcon from "../customComponents/ProgressIcon";
-
-import Loader from "react-loader-spinner";
-
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { IoIosArrowBack } from "react-icons/io";
 import { IconContext } from "react-icons";
@@ -194,16 +191,9 @@ export default class RecoverSeed extends React.Component {
 
   render() {
     return (
-      <div
-        fluid
-        className={
-          this.state.wallet_made && this.state.loading === false
-            ? "w-100 h-100"
-            : "w-100 h-100 background-entry-fix"
-        }
-      >
+      <div className={"w-100 h-100"}>
         {this.state.wallet_made && this.state.loading === false ? (
-          <div fluid className="w-100 height100 justify-content-between">
+          <div fluid className="w-100 h-100">
             <WalletHome
               wallet={this.state.wallet}
               daemon_host={this.state.daemon_host}
@@ -294,7 +284,7 @@ export default class RecoverSeed extends React.Component {
               </Row>
 
               {this.state.wallet_made && (
-                <div className="w-100 height100 justify-content-between">
+                <div className="w-100 h-100">
                   <WalletHome
                     wallet={this.state.wallet}
                     daemon_host={this.state.daemon_host}
