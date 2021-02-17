@@ -209,6 +209,45 @@ export default class CreateWallet extends React.Component {
       return this.state.loading === true;
   }
 
+  renderUrlTooltip() {
+    return (
+    <>
+    <AiOutlineInfoCircle size={15} className="ml-2" data-tip data-for="daemonHostInfo" />
+    <ReactTooltip
+      id="daemonHostInfo"
+      type="info"
+      effect="solid"
+      place="bottom"
+    >
+      <span>
+        This is the URL used to connect to the Safex
+        blockchain.
+        <br />
+        You can use the default provided by the Safex
+        Foundation
+        <br />
+        or replace it with your own full node.
+        <br />
+        <br />
+        <ul className="mb-4">
+          <li>
+            The default self hosted wallet setup would be:
+          </li>
+          <li className="mt-4">
+            HOST: <b>127.0.0.1</b>
+          </li>
+          <li className="mt-1">
+            PORT: <b>17402</b>
+          </li>
+          <li className="mt-2">
+            The default is rpc.safex.org:30393
+          </li>
+        </ul>
+      </span>
+    </ReactTooltip>
+    </>)
+  }
+
   render() {
       if (this.isLoading) {
         return (
@@ -255,8 +294,8 @@ export default class CreateWallet extends React.Component {
                 onClick={() => {
                   alert("Closing Wallet... (TEST)");
                 }}
-                className="entry-off-button"
-                src={require("./../../img/off.svg")}
+                className="entry-off-button pointer"
+                src={require("./../../img/off_black.svg")}
               />
 
               <Row className="entry-progress-row">
@@ -332,11 +371,10 @@ export default class CreateWallet extends React.Component {
                 <div>
                   {this.state.new_path.length > 0 ? (
                     <div className="entry-container">
-                      <Col className="justify-content-around d-flex flex-column">
-                        <p>
+                        <p className="h3">
                           {" "}
                           This file will be saved to:{" "}
-                          <i>{this.state.new_path}</i>
+                          <br /> <i>{this.state.new_path}</i>
                         </p>
 
                         <button
@@ -347,16 +385,15 @@ export default class CreateWallet extends React.Component {
                         </button>
 
                         <button
-                          className="mx-auto custom-button-entry orange-border"
+                          className="mt-2 mx-auto custom-button-entry orange-border"
                           onClick={() => this.setState({ pageNumber: 2 })}
                         >
                           Continue
                         </button>
-                      </Col>
                     </div>
                   ) : (
                     <div className="entry-container">
-                      <p>
+                      <p className="h3">
                         Where would you like to save your Safex Wallet Files?
                       </p>
                       <Form
@@ -365,16 +402,13 @@ export default class CreateWallet extends React.Component {
                         onSubmit={this.set_path}
                       >
                         <input className="display-none" type="file" />
-                        <Col className="justify-content-around d-flex flex-column">
                           <button
-                            className="mx-auto custom-button-entry orange-border my-5"
+                            className="mx-auto custom-button-entry orange-border mt-2"
                             type="submit"
                             variant="primary"
-                            size="lg"
                           >
                             Select File Path
                           </button>
-                        </Col>
                       </Form>
                     </div>
                   )}
@@ -383,46 +417,6 @@ export default class CreateWallet extends React.Component {
 
               {this.state.new_path.length > 0 && this.state.pageNumber === 2 && (
                 <div className="entry-container">
-                  <div className="entry-info-div">
-                    <IconContext.Provider
-                      value={{ color: "#767676", size: "30px" }}
-                    >
-                      <AiOutlineInfoCircle data-tip data-for="daemonHostInfo" />
-
-                      <ReactTooltip
-                        className="entry-tooltip-container"
-                        id="daemonHostInfo"
-                        effect="solid"
-                        place="bottom"
-                      >
-                        <span>
-                          This is the URL used to connect to the Safex
-                          blockchain.
-                          <br />
-                          You can use the default provided by the Safex
-                          Foundation
-                          <br />
-                          or replace it with your own full node.
-                          <br />
-                          <br />
-                          <ul className="mb-4">
-                            <li>
-                              The default self hosted wallet setup would be:
-                            </li>
-                            <li className="mt-4">
-                              HOST: <b>127.0.0.1</b>
-                            </li>
-                            <li className="mt-1">
-                              PORT: <b>17402</b>
-                            </li>
-                            <li className="mt-2">
-                              The default is rpc.safex.org:30393
-                            </li>
-                          </ul>
-                        </span>
-                      </ReactTooltip>
-                    </IconContext.Provider>
-                  </div>
                   {this.state.daemon_host.length < 1 ? (
                     <form
                       id="set_daemon"
@@ -431,6 +425,7 @@ export default class CreateWallet extends React.Component {
                     >
                       <label className="entry-form-label" htmlFor="daemon-host">
                         Daemon Host:
+                        {this.renderUrlTooltip()}
                       </label>
 
                       <input
@@ -445,24 +440,23 @@ export default class CreateWallet extends React.Component {
 
                       <input
                         id="daemon-port"
-                        className="mt-2 mb-5"
+                        className="mt-2 mb-3"
                         name="daemon_port"
                         defaultValue="30393"
                         placedholder="set the port of the safex blockchain"
                       />
 
                       <button
-                        className="custom-button-entry orange-border"
+                        className="w-100 custom-button-entry orange-border"
                         type="submit"
                         variant="primary"
-                        size="lg"
                       >
                         Set Connection
                       </button>
                     </form>
                   ) : (
                     <div className="d-flex flex-column justify-content-around h-100">
-                      <p>
+                      <p className="h3">
                         You will be connected to:
                         <br />
                         <i>
@@ -471,7 +465,7 @@ export default class CreateWallet extends React.Component {
                       </p>
 
                       <button
-                        className="custom-button-entry"
+                        className="w-100 mt-3 custom-button-entry"
                         type="button"
                         onClick={() =>
                           this.setState({ daemon_host: "", daemon_port: 0 })
@@ -481,7 +475,7 @@ export default class CreateWallet extends React.Component {
                       </button>
 
                       <button
-                        className="mx-auto custom-button-entry orange-border"
+                        className="w-100 mt-2 mx-auto custom-button-entry orange-border"
                         onClick={() => this.setState({ pageNumber: 3 })}
                       >
                         Continue
@@ -520,7 +514,7 @@ export default class CreateWallet extends React.Component {
 
                     <button
                       type="submit"
-                      className="custom-button-entry orange-border my-5"
+                      className="w-100 custom-button-entry orange-border mt-3"
                     >
                       Set Password
                     </button>
@@ -534,14 +528,14 @@ export default class CreateWallet extends React.Component {
               this.state.password.length > 0 &&
               this.state.pageNumber === 4 && (
                 <div className="entry-container">
-                  <p>
-                    This file will be saved to: <i>{this.state.new_path}</i>
+                  <p className="h3">
+                    This file will be saved to: <br /> <i>{this.state.new_path}</i>
                   </p>
 
                   <button
                     autoFocus
                     onClick={this.make_wallet}
-                    className="my-5 mx-auto custom-button-entry orange-border"
+                    className="mt-2 mx-auto custom-button-entry orange-border"
                   >
                     Create New Wallet
                   </button>

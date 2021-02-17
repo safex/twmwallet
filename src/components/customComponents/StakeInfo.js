@@ -1,31 +1,26 @@
 import React from 'react';
 
-import {Row, Col, Image, } from 'react-bootstrap';
-
-import ReactTooltip from "react-tooltip";
-
-// Icon Imports
-import { AiOutlineInfoCircle } from 'react-icons/ai'
-
-import { IconContext } from 'react-icons'
-
-import './ComponentCSS/StakeInfo.css'
-
 export default function StakeInfo(props) {
+    const renderRow = (label, body) => {
+        return (
+            <div className="d-flex flex-column mb-3">
+                <label>{label}</label>
+                {body()}
+            </div>
+        )
+    }
 
     return (
-            <div className="stake-info-box" id={props.id} onSubmit={props.send}>
-                <p> STATUS </p>
-
-                <ul>
-                    <li>Staked Safex Token: {props.stakedBalance} SFT</li>
+            <div className="stake-token-box" id={props.id} onSubmit={props.send}>
+                <p className="h3 my-3 text-center">STATUS</p>
+                {renderRow("Staked Safex Token:", () => <span>
+                    {props.stakedBalance} SFT
                     {props.pendingStakeBalance > 0 ? (<li>Pending Stake: {props.pendingStakeBalance} SFT</li>) : ''}
-                    <li>Current Block: {props.blockHeight}</li>
-                    <li>Next Interval: {props.nextInterval}</li>
-                    <li>Total SFT Staked on the Network: {props.totalNetworkStake}</li>
-                </ul>
-            </div>
-                
+                    </span>)}
 
+                {renderRow("Current Block:", () => <span>{props.blockHeight}</span>)}
+                {renderRow("Next Interval:", () => <span>{props.nextInterval}</span>)}
+                {renderRow("Total SFT Staked on the Network:", () => <span>{props.totalNetworkStake}</span>)}
+            </div>
     )
 }

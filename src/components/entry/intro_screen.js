@@ -66,7 +66,7 @@ export default class IntroScreen extends React.Component {
                         <Image className="w-50 intro-safex-logo " src={require("./../../img/safex-home-multi.png")}/>
                     </Row>
 
-                    <button onClick={this.open_select} className="custom-button-entry my-5 intro-safex-logo">
+                    <button onClick={this.open_select} className="w-50 custom-button-entry my-5 intro-safex-logo">
                         Get Started
                     </button>
                 </Container>  

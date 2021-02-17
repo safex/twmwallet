@@ -67,7 +67,7 @@ class AccountInfo extends React.Component {
     return (
       <div className="account-info-box p-4 mt-4">
         <div className="d-flex align-items-center justify-content-between mb-2">
-          <label for="safexAddress" class="form-label">
+          <label htmlFor="safexAddress" className="form-label">
             SAFEX Cash and SAFEX Token address
           </label>
           <button onClick={props.rescan}>Hard Rescan</button>

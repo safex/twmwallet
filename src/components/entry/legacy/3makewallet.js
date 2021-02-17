@@ -115,7 +115,7 @@ export default class ConvertLegacy extends React.Component {
         return (
             <div>
                 {this.state.wallet_made ?
-                    (<div className="height100">
+                    (<div className="w-100 h-100">
                         <WalletHome
                             wallet={this.state.wallet}/>
                     </div>) :
