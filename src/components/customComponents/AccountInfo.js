@@ -208,7 +208,7 @@ class AccountInfo extends React.Component {
 
             {renderRow(
               "spendKeyInfo",
-              "Private Spend Address:",
+              "Private Spend Key:",
               props.spendKey,
               () => (
                 <span>
@@ -223,7 +223,7 @@ class AccountInfo extends React.Component {
 
             {renderRow(
               "viewKeyInfo",
-              "Private View Address:",
+              "Private View Key:",
               props.viewKey,
               () => (
                 <span>

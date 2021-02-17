@@ -1,7 +1,7 @@
 {
-  "name": "twmwallet",
-  "description": "graphical user interface to the world marketplace application on the safex blockchain",
-  "version": "v0.1.8",
+  "name": "SafexSendReceive",
+  "description": "a simplified version of the twm wallet for sending/receiving safex cash and tokens",
+  "version": "v1.0.0",
   "homepage": "./",
   "repository": {
     "type": "git",
@@ -96,7 +96,7 @@
     "make-all-installers": "npm run build && electron-builder build -ml && electron-builder build -w --x64"
   },
   "build": {
-    "appId": "com.electron.TWMWALLET",
+    "appId": "com.electron.SafexSendReceive",
     "npmRebuild": true,
     "extends": null,
     "files": [

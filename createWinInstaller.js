@@ -23,8 +23,8 @@ function getInstallerConfig() {
     authors: "Safex Developers",
     noMsi: true,
     outputDirectory: outPath,
-    exe: "SafexTWMWallet.exe",
-    setupExe: "SafexTWMWalletWindowsInstaller0_1_1.exe",
+    exe: "SafexSendReceive.exe",
+    setupExe: "SafexSendReceive0_1_1.exe",
     setupIcon: "public/images/icons/wallet-icon2.ico",
     skipUpdateIcon: true
   });

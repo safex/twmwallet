@@ -32,7 +32,7 @@ function createWindow() {
         },
         useContentSize: true
     });
-    mainWindow.webContents.openDevTools();
+    //mainWindow.webContents.openDevTools();
 
     // and load the index.html of the app.
     const startUrl =

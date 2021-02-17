@@ -28,7 +28,7 @@ export default class RecoverKeys extends React.Component {
       password: "",
       safex_key: null,
       success: false,
-      network: "stagenet",
+      network: "mainnet",
       testnet: false,
       wallet: null,
       wallet_made: false,
@@ -501,7 +501,7 @@ export default class RecoverKeys extends React.Component {
                               PORT: <b>17402</b>
                             </li>
                             <li className="mt-2">
-                              The default is rpc.safex.org:30393
+                              The default is rpc.safex.org:17402
                             </li>
                           </ul>
                         </span>
@@ -522,7 +522,7 @@ export default class RecoverKeys extends React.Component {
                         id="daemon-host"
                         className="my-2 entry-form-input"
                         name="daemon_host"
-                        defaultValue="stagenetrpc.safex.org"
+                        defaultValue="rpc.safex.org"
                         placedholder="set the ip address of the safex blockchain"
                       />
 
@@ -532,7 +532,7 @@ export default class RecoverKeys extends React.Component {
                         id="daemon-port"
                         className="mt-2 mb-5"
                         name="daemon_port"
-                        defaultValue="30393"
+                        defaultValue="17402"
                         placedholder="set the port of the safex blockchain"
                       />
 

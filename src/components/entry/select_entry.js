@@ -50,16 +50,6 @@ export default class SelectEntry extends React.Component {
             console.error(err);
             console.error("error at reading legacy wallet");
         }
-        try {
-            let api_info = await get_api_info('http://stageapi.theworldmarketplace.com:17700');
-            if (api_info.wallet_version !== '0.1.8') {
-                alert(`there is a newer version of the wallet you are on version 0.1.8, the api version is ${api_info.wallet_version}`);
-                alert(api_info.update_message);
-            }
-        } catch(err) {
-            console.error(err);
-            console.error(`error at getting the info about the api`);
-        }
     };
 
     back = (e) => {
@@ -102,9 +92,6 @@ export default class SelectEntry extends React.Component {
                     <Image onClick={this.back} className="entry-off-button" src={require("./../../img/off_black.svg")}/>
                     
 
-                    <Row className="rowjustify-content-md-center justify-content-center p-3">
-                        <Image className="w-25" src={require("./../../img/safex-home-multi.png")}/>
-                    </Row>
 
                     <Col className="my-5">
                         <Col className="my-2 p-3">

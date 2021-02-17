@@ -28,7 +28,7 @@ export default class CreateWallet extends React.Component {
       password: "",
       safex_key: null,
       success: false,
-      network: "stagenet",
+      network: "mainnet",
       testnet: false,
       wallet: null,
       wallet_made: false,
@@ -97,78 +97,7 @@ export default class CreateWallet extends React.Component {
     if (error) {
       this.setState({ loading: false });
     } else {
-      try {
-        console.log(wallet);
-        wallet.setSeedLanguage("English");
-        try {
-          let twm_obj = {};
-
-          twm_obj.version = 1;
-          twm_obj.api = {};
-          twm_obj.api.urls = {};
-          /*twm_obj.api.urls.theworldmarketplace = {};
-                    twm_obj.api.urls.theworldmarketplace.url = 'api.theworldmarketplace.com';*/
-          twm_obj.accounts = {};
-          twm_obj.settings = {};
-
-          //for each account make one, and within an account you have urls and keys  the top lvel api urls is for top level non account actions
-          var accs = wallet.getSafexAccounts();
-          for (const acc of accs) {
-            console.log(acc);
-            twm_obj.accounts[acc.username] = {};
-            twm_obj.accounts[acc.username].username = acc.username;
-            twm_obj.accounts[acc.username].data = acc.data;
-            twm_obj.accounts[acc.username].safex_public_key = acc.publicKey;
-            twm_obj.accounts[acc.username].safex_private_key = acc.privateKey;
-            twm_obj.accounts[acc.username].urls = {};
-            /*
-                                                twm_obj.accounts[acc.username].urls.theworldmarketplace = {};
-                                                twm_obj.accounts[acc.username].urls.theworldmarketplace.url = 'api.theworldmarketplace.com';
-                        */
-          }
-
-          const algorithm = "aes-256-ctr";
-          const cipher = crypto.createCipher(algorithm, this.state.password);
-          let crypted = cipher.update(JSON.stringify(twm_obj), "utf8", "hex");
-          crypted += cipher.final("hex");
-
-          const hash1 = crypto.createHash("sha256");
-          hash1.update(JSON.stringify(twm_obj));
-          console.log(`password ${this.state.password}`);
-          console.log(JSON.stringify(twm_obj));
-
-          let twm_save = await save_twm_file(
-            this.state.new_path + ".twm",
-            crypted,
-            this.state.password,
-            hash1.digest("hex")
-          );
-
-          try {
-            let twm_file = await open_twm_file(
-              this.state.new_path + ".twm",
-              this.state.password
-            );
-            console.log(twm_file);
-
-            localStorage.setItem("twm_file", JSON.stringify(twm_file.contents));
-          } catch (err) {
-            this.setState({ loading: false });
-            console.error(err);
-            console.error(`error opening twm file after save to verify`);
-          }
-          console.log(twm_save);
-        } catch (err) {
-          this.setState({ loading: false });
-          console.error(err);
-          console.error(`error at initial save of the twm file`);
-        }
-        this.setState({ wallet_made: true, wallet: wallet, loading: false, showKeys: true });
-      } catch (err) {
-        this.setState({ loading: false });
-        console.error(err);
-        console.error(`error at open_wallet_result`);
-      }
+      this.setState({ wallet_made: true, wallet: wallet, loading: false, showKeys: true });
     }
   };
 
@@ -437,7 +366,7 @@ export default class CreateWallet extends React.Component {
                         id="daemon-host"
                         className="my-2 entry-form-input"
                         name="daemon_host"
-                        defaultValue="stagenetrpc.safex.org"
+                        defaultValue="rpc.safex.org"
                         placedholder="set the ip address of the safex blockchain"
                       />
 
@@ -447,7 +376,7 @@ export default class CreateWallet extends React.Component {
                         id="daemon-port"
                         className="mt-2 mb-5"
                         name="daemon_port"
-                        defaultValue="30393"
+                        defaultValue="17402"
                         placedholder="set the port of the safex blockchain"
                       />
 

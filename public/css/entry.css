@@ -37,17 +37,14 @@
 }
 
 .intro-background-image {
-    background: url(./../images/intro-background.png) no-repeat center center fixed; 
     background-size: cover
 }
 
 .start-background-image {
-    background: url(./../images/start-background.png) no-repeat center center fixed; 
     background-size: cover
 }
 
 .home-background-image {
-    background: url(./../images/home-background.png) no-repeat center center fixed; 
     background-size: cover
 }
 

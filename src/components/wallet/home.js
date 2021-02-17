@@ -153,6 +153,8 @@ class WalletHome extends React.Component {
             tableOfTables: {},
             loadingOffers: false,
             showBuyerMessages: false,
+            pending_stake: 0,
+            unlocked_stake: 0,
             url: '',
             buyer_urls: [],
             user_registered: null,
@@ -170,34 +172,8 @@ class WalletHome extends React.Component {
     async componentDidMount() {
         try {
             wallet = this.props.wallet;
-            try {
-                let twm_ls = localStorage.getItem('twm_file');
-                console.log(twm_ls);
 
-                let twm_file = JSON.parse(twm_ls);
-
-                const crypto = window.require('crypto');
-
-                const storage_hash = crypto.createHash('sha256');
-                storage_hash.update(twm_ls);
-
-                let s_hash = storage_hash.digest('hex');
-
-                const parse_hash = crypto.createHash('sha256');
-                parse_hash.update(JSON.stringify(twm_file));
-
-                let p_hash = parse_hash.digest('hex');
-
-                if (p_hash === s_hash) {
-                    this.setState({twm_file: twm_file});
-                } else {
-                    alert(`have an issue with the twm file!`);
-                }
-            } catch (err) {
-                console.error(err);
-                console.error(`error at mounting with the twm file`);
-            }
-
+            wallet.setSeedLanguage("English");
             let txnhistory = wallet.history();
 
             txnhistory.sort(function (a, b) {
@@ -247,13 +223,6 @@ class WalletHome extends React.Component {
             console.log(wallet.synchronized());
 
             this.setState({loading: false, address: wallet.address(), wallet: wallet});
-
-            var accs = wallet.getSafexAccounts();
-
-            console.log(accs);
-            console.log(`accounts`);
-            this.refresh_action();
-            this.buyer_get_offer_ids_by_api();
         } catch (err) {
             console.error(err);
             console.log("errors on startup");
@@ -283,25 +252,6 @@ class WalletHome extends React.Component {
         }
         try {
             let height = wallet.daemonBlockchainHeight();
-            /*console.log(height);
-            let previous_interval = (height - (height % 100)) / 100;
-            let gim_obj = {};
-            gim_obj.begin_interval = previous_interval - 3;
-            gim_obj.end_interval = previous_interval + 1;
-            gim_obj.daemon_host = this.state.daemon_host;
-            gim_obj.daemon_port = this.state.daemon_port;
-
-            console.log(gim_obj);
-            console.log(`refresh get`);
-            console.log(wallet.getRefreshFromBlockHeight())
-            let gim = await get_interest_map(gim_obj);
-
-             this.setState({
-                 blockchain_tokens_staked: gst.pairs[0].amount / 10000000000,
-                 blockchain_interest_history: gim.interest_per_interval.slice(0, 4),
-                 blockchain_current_interest: gim.interest_per_interval[4]
-             });*/
-            var accs = wallet.getSafexAccounts();
 
             this.setState({
                 address: wallet.address(),
@@ -314,7 +264,6 @@ class WalletHome extends React.Component {
                 pending_tokens: normalize_8decimals(wallet.tokenBalance() - wallet.unlockedTokenBalance()),
                 tokens: normalize_8decimals(wallet.unlockedTokenBalance()),
                 first_refresh: true,
-                usernames: accs,
                 staked_tokens: wallet.stakedTokenBalance() / 10000000000,
                 unlocked_stake: wallet.unlockedStakedTokenBalance() / 10000000000,
                 pending_stake: (wallet.stakedTokenBalance() - wallet.unlockedStakedTokenBalance()) / 10000000000

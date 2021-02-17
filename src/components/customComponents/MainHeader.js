@@ -25,8 +25,6 @@ export default function MainHeader(props) {
 
                 <Col sm={6} className="d-flex">
                     {renderMenuItem('home', 'Home', props.goHome)}
-                    {renderMenuItem('market', 'Market', props.goToMarket)}
-                    {renderMenuItem('merchant', 'Merchant', props.goToMerchant)}
                     {renderMenuItem('tokens', 'Tokens', props.goToTokens)}                
                 </Col>
 
