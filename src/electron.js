@@ -58,10 +58,10 @@ function createWindow() {
     if (os.platform() !== "win32") {
         const template = [
             {
-                label: "TWM Wallet",
+                label: "Safex Send Receive Wallet",
                 submenu: [
                     {
-                        label: "About TWM Wallet v0.1.8",
+                        label: "Safex Send Receive Wallet 1.0.0",
                         selector: "orderFrontStandardAboutPanel:"
                     },
                     { type: "separator" },
@@ -107,7 +107,7 @@ function createWindow() {
 require("electron-context-menu")({
     prepend: (params, browserWindow) => [
         {
-            label: "TWM Wallet"
+            label: "Safex Send Receive Wallet"
         }
     ],
     shouldShowMenu: (event, params) => params.mediaType !== "image",
