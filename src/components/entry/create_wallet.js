@@ -255,8 +255,8 @@ export default class CreateWallet extends React.Component {
                 onClick={() => {
                   alert("Closing Wallet... (TEST)");
                 }}
-                className="entry-off-button"
-                src={require("./../../img/off.svg")}
+                className="entry-off-button pointer"
+                src={require("./../../img/off_black.svg")}
               />
 
               <Row className="entry-progress-row">

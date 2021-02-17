@@ -99,7 +99,7 @@ export default class SelectEntry extends React.Component {
                 <Container fluid className="height100 flex-column d-flex justify-content-center start-background-image">
 
                     
-                    <Image onClick={this.back} className="entry-off-button" src={require("./../../img/off_black.svg")}/>
+                    <Image onClick={this.back} className="entry-off-button pointer" src={require("./../../img/off_black.svg")}/>
                     
 
                     <Row className="rowjustify-content-md-center justify-content-center p-3">

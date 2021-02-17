@@ -213,7 +213,7 @@ export default class RecoverKeys extends React.Component {
                 onClick={() => {
                   alert("Closing Wallet... (TEST)");
                 }}
-                className="entry-off-button"
+                className="entry-off-button pointer"
                 src={require("./../../img/off_black.svg")}
               />
 
