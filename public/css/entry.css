@@ -66,13 +66,10 @@
 }
 
 .custom-button-entry {
-    width: 50%;
     min-width: 400px;
-    max-width: 700px;
     margin-left: auto;
     margin-right: auto;
-    font-family: 'Inter', sans-serif;
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: 600;
     text-align: center;
     border: .5rem solid #13D3FD;
@@ -158,34 +155,14 @@ form {
 }
 
 .entry-container {
+    padding: 1.5rem;
+    min-width: 460px;
     border-radius: 10px;
     background: #fff;
-    height: 50vh;
-    width: 60vw;
-    z-index: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    -webkit-box-shadow: 0px 0px 20px 10px rgba(19,211,253,0.3);
-    -moz-box-shadow: 0px 0px 20px 10px rgba(19,211,253,0.3);
-    box-shadow: 0px 0px 20px 10px rgba(19,211,253,0.3);
-}
-
-.entry-container p {
-    font-family: 'Exo 2';
-    font-size: 4rem;
-    font-weight: 500;
-    text-align: center;
-    color: #767676;
-    width: 60%;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.entry-container i {
-
-    font-size: 3rem;
-    overflow-wrap: break-word;
+    box-shadow: 0 1px 14px -7px #7b7b7b;
 }
 
 .entry-info-div {
@@ -311,28 +288,21 @@ form {
 }
 
 .entry-container label {
-    font-family: 'Exo 2';
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 600;
     text-align: center;
-    color: #767676;
-
 }
 
 .entry-container input {
-    width: 50%;
+    width: 100%;
     margin-left: auto;
     margin-right: auto;
     padding: .5rem;
     border: .5rem solid #13d3fd!important;
     border-radius: 10px!important;
-
-    font-family: 'Exo 2';
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 500;
     text-align: center;
-    color: #767676;
-
 }
 
 .entry-container textarea {
@@ -347,6 +317,10 @@ form {
     font-size: 1.8rem;
     font-weight: 500;
     text-align: center;
+}
+
+.entry-container form {
+    justify-content: unset;
 }
 
 .loading-icon {
