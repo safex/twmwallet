@@ -310,17 +310,12 @@ class WalletHome extends React.Component {
             "This will halt the wallet operation while the rescan is in progress.");
         console.log(confirmed);
         if (confirmed) {
-            wallet.off();
             wallet.rescanBlockchainAsync();
             const timer = setInterval(() => {
                 console.log(wallet.blockchainHeight());
                 if (wallet.blockchainHeight() === wallet.daemonBlockchainHeight()) {
                     console.log(`looks like we're synced heights match`);
                     clearInterval(this.state.timer);
-                    wallet.on('refreshed', () => {
-                        this.refresh_action();
-                        wallet.store(this.wallet_store_callback)
-                    });
                     this.setState({
                         timer: '', wallet_height: wallet.blockchainHeight(),
                         blockchain_height: wallet.daemonBlockchainHeight()
