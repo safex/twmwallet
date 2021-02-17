@@ -190,7 +190,7 @@ export default class RecoverKeys extends React.Component {
     return (
       <div className={"w-100 h-100"}>
         {this.state.wallet_made && this.state.loading === false ? (
-          <div fluid className="w-100 h-100">
+          <div className="w-100 h-100">
             <WalletHome
               wallet={this.state.wallet}
               daemon_host={this.state.daemon_host}
@@ -200,10 +200,7 @@ export default class RecoverKeys extends React.Component {
             />
           </div>
         ) : (
-          <div
-            fluid
-            className="w-100 height100 d-flex flex-column justify-content-center align-items-center"
-          >
+          <div className="w-100 h-100 d-flex flex-column justify-content-center align-items-center">
             <div className="start-background-image w-100 h-100 d-flex flex-column justify-content-center align-items-center">
               <Image
                 className="entry-mini-logo"
@@ -301,17 +298,14 @@ export default class RecoverKeys extends React.Component {
                   <Form id="set_keys" onSubmit={this.set_keys}>
                     <label htmlFor="public_address">
                       Public Address
-                      <IconContext.Provider
-                        value={{ color: "#767676", size: "30px" }}
-                      >
                         <AiOutlineInfoCircle
                           data-tip
                           data-for="publicAddressInfo"
-                          className="ml-3 mb-1"
+                          className="ml-3"
                         />
 
                         <ReactTooltip
-                          className="entry-tooltip-container"
+                          type="info"
                           id="publicAddressInfo"
                           effect="solid"
                           place="bottom"
@@ -324,24 +318,20 @@ export default class RecoverKeys extends React.Component {
                             Safex5zHGtYQYE41yEzLTRQWiajC5keyJHVwQamarNyp9ssouD87bbGhobVnYAtUEQa4me79ybZev2AmLUnbds4PRYv3P1KmW6j2F
                           </span>
                         </ReactTooltip>
-                      </IconContext.Provider>
                     </label>
-                    <input className="mb-3 w-75" name="public_address" />
+                    <input className="mb-3" name="public_address" />
 
                     <label htmlFor="spendkey">
                       Spend Key
-                      <IconContext.Provider
-                        value={{ color: "#767676", size: "30px" }}
-                      >
                         <AiOutlineInfoCircle
+                          size={15}
                           data-tip
                           data-for="spendKeyInfo"
-                          className="ml-3 mb-1"
+                          className="ml-3"
                         />
-
                         <ReactTooltip
-                          className="entry-tooltip-container"
                           id="spendKeyInfo"
+                          type="info"
                           effect="solid"
                           place="bottom"
                         >
@@ -353,24 +343,19 @@ export default class RecoverKeys extends React.Component {
                             55e48e029634404f1f19b45eb89298e7c27efb414d4151d98f551b39f015fb0d
                           </span>
                         </ReactTooltip>
-                      </IconContext.Provider>
                     </label>
-                    <input className="mb-3 w-75" name="spendkey" />
+                    <input className="mb-3" name="spendkey" />
 
                     <label htmlFor="viewkey">
                       View Key
-                      <IconContext.Provider
-                        value={{ color: "#767676", size: "30px" }}
-                      >
                         <AiOutlineInfoCircle
                           data-tip
                           data-for="viewKeyInfo"
-                          className="ml-3 mb-1"
+                          className="ml-3"
                         />
-
                         <ReactTooltip
-                          className="entry-tooltip-container"
                           id="viewKeyInfo"
+                          type="info"
                           effect="solid"
                           place="bottom"
                         >
@@ -384,12 +369,11 @@ export default class RecoverKeys extends React.Component {
                             </b>
                           </span>
                         </ReactTooltip>
-                      </IconContext.Provider>
                     </label>
-                    <input className="mb-3 w-75" name="viewkey" />
+                    <input className="mb-3" name="viewkey" />
 
                     <button
-                      className="mx-auto custom-button-entry orange-border my-3"
+                      className="w-100 mx-auto custom-button-entry orange-border mt-3"
                       type="submit"
                     >
                       Set Keys
@@ -404,31 +388,29 @@ export default class RecoverKeys extends React.Component {
                 <div>
                   {this.state.new_path.length > 0 ? (
                     <div className="entry-container">
-                      <Col className="justify-content-around d-flex flex-column">
-                        <p>
+                        <p className="h3">
                           {" "}
                           This file will be saved to:{" "}
-                          <i>{this.state.new_path}</i>
+                          <br /><i>{this.state.new_path}</i>
                         </p>
 
                         <button
-                          className="mx-auto custom-button-entry"
+                          className="w-100 mx-auto custom-button-entry"
                           onClick={this.change_path}
                         >
                           Change Path
                         </button>
 
                         <button
-                          className="mx-auto custom-button-entry orange-border"
+                          className="mt-2 w-100 mx-auto custom-button-entry orange-border"
                           onClick={() => this.setState({ pageNumber: 2 })}
                         >
                           Continue
                         </button>
-                      </Col>
                     </div>
                   ) : (
                     <div className="entry-container">
-                      <p>
+                      <p className="h3">
                         Where would you like to save your new Safex Wallet
                         Files?
                       </p>
@@ -438,16 +420,13 @@ export default class RecoverKeys extends React.Component {
                         onSubmit={this.set_path}
                       >
                         <input className="display-none" type="file" />
-                        <Col className="justify-content-around d-flex flex-column">
                           <button
-                            className="mx-auto custom-button-entry orange-border my-5"
+                            className="w-100 mx-auto custom-button-entry orange-border"
                             type="submit"
                             variant="primary"
-                            size="lg"
                           >
                             Select File Path
                           </button>
-                        </Col>
                       </Form>
                     </div>
                   )}
@@ -458,15 +437,19 @@ export default class RecoverKeys extends React.Component {
 
               {this.state.new_path.length > 0 && this.state.pageNumber === 2 ? (
                 <div className="entry-container">
-                  <div className="entry-info-div">
-                    <IconContext.Provider
-                      value={{ color: "#767676", size: "30px" }}
+                  {this.state.daemon_host.length < 1 ? (
+                    <form
+                      id="set_daemon"
+                      onSubmit={this.set_daemon_state}
+                      className=""
                     >
-                      <AiOutlineInfoCircle data-tip data-for="daemonHostInfo" />
+                      <label className="entry-form-label" htmlFor="daemon-host">
+                        Daemon Host:
 
+                        <AiOutlineInfoCircle className="ml-3" size={15} data-tip data-for="daemonHostInfo" />
                       <ReactTooltip
-                        className="entry-tooltip-container"
                         id="daemonHostInfo"
+                        type="info"
                         effect="solid"
                         place="bottom"
                       >
@@ -496,16 +479,6 @@ export default class RecoverKeys extends React.Component {
                           </ul>
                         </span>
                       </ReactTooltip>
-                    </IconContext.Provider>
-                  </div>
-                  {this.state.daemon_host.length < 1 ? (
-                    <form
-                      id="set_daemon"
-                      onSubmit={this.set_daemon_state}
-                      className=""
-                    >
-                      <label className="entry-form-label" htmlFor="daemon-host">
-                        Daemon Host:
                       </label>
 
                       <input
@@ -520,24 +493,23 @@ export default class RecoverKeys extends React.Component {
 
                       <input
                         id="daemon-port"
-                        className="mt-2 mb-5"
+                        className="mt-2 mb-3"
                         name="daemon_port"
                         defaultValue="30393"
                         placedholder="set the port of the safex blockchain"
                       />
 
                       <button
-                        className="custom-button-entry orange-border"
+                        className="w-100 custom-button-entry orange-border"
                         type="submit"
                         variant="primary"
-                        size="lg"
                       >
                         Set Connection
                       </button>
                     </form>
                   ) : (
-                    <div className="d-flex flex-column justify-content-around h-100">
-                      <p>
+                    <div className="d-flex flex-column">
+                      <p className="h3">
                         You will be connected to:
                         <br />
                         <i>
@@ -546,8 +518,7 @@ export default class RecoverKeys extends React.Component {
                       </p>
 
                       <button
-                        className="custom-button-entry"
-                        size="lg"
+                        className="w-100 custom-button-entry"
                         onClick={() =>
                           this.setState({ daemon_host: "", daemon_port: 0 })
                         }
@@ -556,7 +527,7 @@ export default class RecoverKeys extends React.Component {
                       </button>
 
                       <button
-                        className="mx-auto custom-button-entry orange-border"
+                        className="mt-2 w-100 mx-auto custom-button-entry orange-border"
                         onClick={() => this.setState({ pageNumber: 3 })}
                       >
                         Continue
@@ -576,7 +547,6 @@ export default class RecoverKeys extends React.Component {
                     onSubmit={this.set_password}
                   >
                     <label htmlFor="password-input">Choose a password</label>
-
                     <input
                       id="password-input"
                       type="password"
@@ -600,7 +570,7 @@ export default class RecoverKeys extends React.Component {
                       onClick={() => {
                         this.setState({ pageNumber: 4 });
                       }}
-                      className="custom-button-entry orange-border my-5"
+                      className="w-100 custom-button-entry orange-border mt-2"
                     >
                       Set Password
                     </button>
@@ -610,13 +580,13 @@ export default class RecoverKeys extends React.Component {
 
               {this.state.pageNumber === 4 && (
                 <div className="entry-container">
-                  <p>
-                    This file will be saved to: <i>{this.state.new_path}</i>
+                  <p className="h3">
+                    This file will be saved to: <br /><i>{this.state.new_path}</i>
                   </p>
 
                   <button
                     onClick={this.make_wallet}
-                    className="my-5 mx-auto custom-button-entry orange-border"
+                    className="w-100 mt-2 mx-auto custom-button-entry orange-border"
                   >
                     Restore Wallet
                   </button>
