@@ -24,8 +24,8 @@
 }
 
 .staking-table-table {
-    max-height: 45vh;
-    overflow-y: auto;
+    height: 100%;
+    overflow: overlay;
     padding: 2rem;
 }
 
