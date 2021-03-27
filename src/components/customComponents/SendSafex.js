@@ -44,7 +44,7 @@ export default function SendSafex(props) {
         <input className="mb-4" id="address" name="destination" placeholder="Safex address" />
 
         <label htmlFor="amount">AMOUNT</label>
-        <input className="mb-4" id="amount" name="amount" placeholder="How much to send?" type="number" />
+        <input className="mb-4" id="amount" name="amount" placeholder="How much to send?" type="number" min="0" />
 
         <div className="mb-4">
             <label>

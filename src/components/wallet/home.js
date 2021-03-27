@@ -3555,6 +3555,7 @@ class WalletHome extends React.Component {
                                             name="quantity"
                                             type="number"
                                             onChange={e => this.setState({quantity_input: e.target.value})}
+                                            min="0"
                                             max={this.state.show_purchase_offer.quantity} />
                                             <span className="ml-2"> / {this.state.show_purchase_offer.quantity} available</span>
                                             </div>
