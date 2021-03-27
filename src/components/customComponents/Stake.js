@@ -38,6 +38,7 @@ export default function Stake(props) {
             name="amount"
             placeholder="How much to stake?"
             type="number"
+            min="0"
           />
         </div>
         <div className="w-100 d-flex align-items-center mt-3">
